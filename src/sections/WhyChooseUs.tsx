@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const trustItems = [
   "ציוד מקצועי",
   "שירות עד הבית",
@@ -14,6 +16,20 @@ export function WhyChooseUs() {
       className="reveal theme-section-soft relative overflow-hidden py-9 sm:py-20 lg:py-22"
     >
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
+      <div
+        className="pointer-events-none absolute left-0 top-8 hidden w-60 opacity-[0.18] blur-[0.2px] transition duration-500 sm:block lg:left-8 lg:top-10 lg:w-80"
+      >
+        <div className="absolute inset-4 rounded-full bg-turquoise/18 blur-3xl" />
+        <div className="absolute inset-x-10 bottom-4 h-16 rounded-full bg-clean-blue/12 blur-2xl" />
+        <Image
+          src="/images/mascots/cleanbrothers-mascots.png"
+          alt="CleanBrothers cleaning professionals mascots"
+          width={1536}
+          height={1024}
+          className="relative h-auto w-full object-contain"
+          sizes="(min-width: 1024px) 320px, 240px"
+        />
+      </div>
       <div className="section-container grid gap-7 sm:gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div className="max-w-2xl">
           <p className="text-sm font-black text-turquoise">למה לבחור בנו?</p>

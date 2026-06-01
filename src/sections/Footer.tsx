@@ -4,6 +4,11 @@ import { businessConfig } from "@/config/business";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
+const legalLinks = [
+  { label: "מדיניות פרטיות", href: "/privacy-policy" },
+  { label: "הצהרת נגישות", href: "/accessibility-statement" },
+];
+
 export function Footer() {
   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
@@ -92,8 +97,19 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-5 border-t border-white/10 pt-3 text-xs text-white/48 sm:mt-7 sm:flex sm:items-center sm:justify-between sm:pt-4 sm:text-sm">
+        <div className="mt-5 border-t border-white/10 pt-3 text-xs text-white/48 sm:mt-7 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:pt-4 sm:text-sm">
           <p>© CleanBrothers כל הזכויות שמורות</p>
+          <div className="mt-2 flex flex-wrap gap-3 sm:mt-0">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
           <p className="mt-1 sm:mt-0">ניקוי ריפודים מקצועי בבית הלקוח</p>
         </div>
       </div>

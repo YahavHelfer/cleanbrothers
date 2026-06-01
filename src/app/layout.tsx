@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
+import { AccessibilityControls } from "@/components/AccessibilityControls";
+import { CookieConsent } from "@/components/CookieConsent";
 import { JsonLd } from "@/components/JsonLd";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -53,7 +55,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <AccessibilityControls />
         <WhatsAppButton />
+        <CookieConsent />
       </body>
     </html>
   );

@@ -97,6 +97,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-heebo), Arial, sans-serif;
   position: relative;
+  font-size: calc(1rem * var(--accessibility-font-scale, 1));
   transition:
     background-color 300ms ease,
     color 300ms ease;
@@ -454,6 +455,35 @@ select {
   .wa-pulse {
     animation: wa-pulse 4.8s ease-in-out infinite;
   }
+
+  .mascot-float {
+    transform-origin: 50% 80%;
+  }
+
+  .a11y-control-button {
+    @apply rounded-2xl border border-[var(--card-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm font-bold text-[var(--foreground)] transition hover:border-turquoise/45 hover:bg-turquoise/10 focus:outline-none focus:ring-2 focus:ring-turquoise;
+  }
+}
+
+body.a11y-high-contrast {
+  --background: #ffffff;
+  --foreground: #020817;
+  --surface: #ffffff;
+  --surface-soft: #eef6f8;
+  --card: #ffffff;
+  --card-border: rgba(2, 8, 23, 0.42);
+  --muted: #142033;
+}
+
+body.a11y-high-contrast a,
+body.a11y-high-contrast button {
+  outline-offset: 4px;
+}
+
+body.a11y-highlight-links a {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
 }
 
 @keyframes fade-up {
@@ -518,6 +548,17 @@ select {
     box-shadow:
       0 10px 24px rgba(8, 19, 31, 0.18),
       0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+@keyframes mascot-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate3d(0, -0.45rem, 0) rotate(-0.4deg);
   }
 }
 
@@ -592,6 +633,12 @@ select {
   }
 }
 
+@media (min-width: 640px) {
+  .mascot-float {
+    animation: mascot-float 6.5s var(--ease-premium) infinite;
+  }
+}
+
 @media (hover: none) {
   .btn-primary:hover,
   .btn-secondary:hover,
@@ -622,7 +669,8 @@ select {
 
   .reveal,
   .reveal-soft,
-  .wa-pulse {
+  .wa-pulse,
+  .mascot-float {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
