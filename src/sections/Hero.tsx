@@ -29,15 +29,14 @@ export function Hero() {
       <div className="section-container relative flex min-h-[calc(100svh-74px)] items-center justify-center py-8 pb-12 sm:py-18 lg:min-h-[calc(100vh-168px)] lg:py-20">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-7 [direction:ltr] lg:grid-cols-[0.86fr_1.14fr] lg:gap-12">
           <div className="reveal-soft stagger-1 relative mx-auto mb-1 w-full max-w-[16rem] sm:max-w-[20rem] lg:mb-0 lg:max-w-[34rem]">
-            <div className="absolute inset-x-1 bottom-0 top-7 rounded-full bg-turquoise/24 blur-3xl lg:inset-x-4 lg:top-10" />
-            <div className="absolute inset-x-7 bottom-0 h-2/5 rounded-full bg-clean-blue/18 blur-2xl" />
-            <div className="absolute inset-x-12 bottom-2 h-10 rounded-full bg-white/10 blur-xl" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[82%] w-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(39,211,195,0.26)_0%,_rgba(47,128,237,0.12)_45%,_transparent_72%)] blur-2xl" />
+            <div className="pointer-events-none absolute bottom-0 left-1/2 h-[22%] w-[68%] -translate-x-1/2 rounded-full bg-turquoise/14 blur-2xl" />
             <Image
               src="/images/mascots/cleanbrothers-mascots.png"
               alt={mascotAlt}
               width={1536}
               height={1024}
-              className="mascot-float relative h-auto w-full object-contain drop-shadow-[0_26px_58px_rgba(0,0,0,0.30)]"
+              className="mascot-float relative h-auto w-full object-contain"
               sizes="(min-width: 1024px) 544px, (min-width: 640px) 320px, 256px"
               priority
             />

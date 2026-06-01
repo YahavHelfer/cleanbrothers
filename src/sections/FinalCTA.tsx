@@ -21,28 +21,28 @@ export function FinalCTA() {
         <div className="card-lift group relative overflow-hidden rounded-[1.35rem] border border-turquoise/18 bg-[radial-gradient(circle_at_20%_0%,_rgba(39,211,195,0.20),_transparent_34%),radial-gradient(circle_at_85%_100%,_rgba(75,159,216,0.14),_transparent_36%),linear-gradient(135deg,_#0b2133_0%,_#102f48_100%)] p-4 text-white shadow-lg shadow-slate-900/12 sm:rounded-[2rem] sm:p-10 sm:shadow-xl lg:p-14">
           <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/55 to-transparent" />
           <div className="pointer-events-none absolute -bottom-6 -left-4 hidden w-56 opacity-95 transition duration-500 group-hover:-translate-y-1 sm:block lg:-bottom-8 lg:left-2 lg:w-72">
-            <div className="absolute inset-x-3 bottom-3 top-9 rounded-full bg-turquoise/22 blur-3xl" />
-            <div className="absolute inset-x-10 bottom-0 h-16 rounded-full bg-clean-blue/14 blur-2xl" />
+            <div className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(39,211,195,0.24)_0%,_rgba(47,128,237,0.10)_46%,_transparent_72%)] blur-2xl" />
+            <div className="absolute bottom-0 left-1/2 h-16 w-[68%] -translate-x-1/2 rounded-full bg-clean-blue/12 blur-2xl" />
             <Image
               src="/images/mascots/cleanbrothers-mascots.png"
               alt="CleanBrothers cleaning professionals mascots"
               width={1536}
               height={1024}
-              className="relative h-auto w-full object-contain drop-shadow-[0_22px_45px_rgba(0,0,0,0.28)]"
+              className="relative h-auto w-full object-contain"
               sizes="(min-width: 1024px) 288px, 224px"
             />
           </div>
 
           <div className="relative mx-auto max-w-4xl text-center lg:max-w-3xl">
             <div className="relative mx-auto mb-3 w-36 sm:hidden">
-              <div className="absolute inset-x-2 bottom-1 top-7 rounded-full bg-turquoise/22 blur-2xl" />
-              <div className="absolute inset-x-7 bottom-0 h-8 rounded-full bg-clean-blue/14 blur-xl" />
+              <div className="absolute left-1/2 top-1/2 h-[76%] w-[76%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(39,211,195,0.22)_0%,_rgba(47,128,237,0.10)_46%,_transparent_72%)] blur-xl" />
+              <div className="absolute bottom-0 left-1/2 h-8 w-[66%] -translate-x-1/2 rounded-full bg-clean-blue/12 blur-xl" />
               <Image
                 src="/images/mascots/cleanbrothers-mascots.png"
                 alt="CleanBrothers cleaning professionals mascots"
                 width={1536}
                 height={1024}
-                className="relative h-auto w-full object-contain drop-shadow-[0_16px_34px_rgba(0,0,0,0.24)]"
+                className="relative h-auto w-full object-contain"
                 sizes="144px"
               />
             </div>

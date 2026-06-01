@@ -17,10 +17,10 @@ export function WhyChooseUs() {
     >
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
       <div
-        className="pointer-events-none absolute left-0 top-8 hidden w-60 opacity-[0.18] blur-[0.2px] transition duration-500 sm:block lg:left-8 lg:top-10 lg:w-80"
+        className="pointer-events-none absolute left-0 top-8 hidden w-60 opacity-[0.18] transition duration-500 sm:block lg:left-8 lg:top-10 lg:w-80"
       >
-        <div className="absolute inset-4 rounded-full bg-turquoise/18 blur-3xl" />
-        <div className="absolute inset-x-10 bottom-4 h-16 rounded-full bg-clean-blue/12 blur-2xl" />
+        <div className="absolute left-1/2 top-1/2 h-[76%] w-[76%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(39,211,195,0.20)_0%,_rgba(47,128,237,0.08)_48%,_transparent_74%)] blur-2xl" />
+        <div className="absolute bottom-4 left-1/2 h-16 w-[60%] -translate-x-1/2 rounded-full bg-clean-blue/10 blur-2xl" />
         <Image
           src="/images/mascots/cleanbrothers-mascots.png"
           alt="CleanBrothers cleaning professionals mascots"

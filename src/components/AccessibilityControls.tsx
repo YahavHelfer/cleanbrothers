@@ -2,35 +2,71 @@
 
 import { useEffect, useState } from "react";
 
+type TextSize = "base" | "lg" | "xl";
+
 type Preferences = {
-  textScale: number;
+  textSize: TextSize;
   highContrast: boolean;
   highlightLinks: boolean;
 };
 
 const storageKey = "cleanbrothers-accessibility-preferences";
+const accessibilityClasses = [
+  "a11y-text-lg",
+  "a11y-text-xl",
+  "a11y-high-contrast",
+  "a11y-highlight-links",
+];
 const defaultPreferences: Preferences = {
-  textScale: 0,
+  textSize: "base",
   highContrast: false,
   highlightLinks: false,
 };
 
+function normalizePreferences(value: Partial<Preferences> & { textScale?: number }): Preferences {
+  let textSize: TextSize = "base";
+
+  if (value.textSize === "lg" || value.textSize === "xl") {
+    textSize = value.textSize;
+  } else if (typeof value.textScale === "number") {
+    textSize = value.textScale >= 2 ? "xl" : value.textScale >= 1 ? "lg" : "base";
+  }
+
+  return {
+    textSize,
+    highContrast: Boolean(value.highContrast),
+    highlightLinks: Boolean(value.highlightLinks),
+  };
+}
+
 function readPreferences(): Preferences {
   try {
     const stored = localStorage.getItem(storageKey);
-    return stored ? { ...defaultPreferences, ...JSON.parse(stored) } : defaultPreferences;
+    return stored ? normalizePreferences(JSON.parse(stored)) : defaultPreferences;
   } catch {
     return defaultPreferences;
   }
 }
 
 function applyPreferences(preferences: Preferences) {
-  document.documentElement.style.setProperty(
-    "--accessibility-font-scale",
-    `${1 + preferences.textScale * 0.08}`,
-  );
-  document.body.classList.toggle("a11y-high-contrast", preferences.highContrast);
-  document.body.classList.toggle("a11y-highlight-links", preferences.highlightLinks);
+  const root = document.documentElement;
+  root.classList.remove(...accessibilityClasses);
+
+  if (preferences.textSize === "lg") {
+    root.classList.add("a11y-text-lg");
+  }
+
+  if (preferences.textSize === "xl") {
+    root.classList.add("a11y-text-xl");
+  }
+
+  if (preferences.highContrast) {
+    root.classList.add("a11y-high-contrast");
+  }
+
+  if (preferences.highlightLinks) {
+    root.classList.add("a11y-highlight-links");
+  }
 }
 
 export function AccessibilityControls() {
@@ -71,23 +107,25 @@ export function AccessibilityControls() {
   function increaseText() {
     updatePreferences({
       ...preferences,
-      textScale: Math.min(preferences.textScale + 1, 3),
+      textSize: preferences.textSize === "base" ? "lg" : "xl",
     });
   }
 
   function decreaseText() {
     updatePreferences({
       ...preferences,
-      textScale: Math.max(preferences.textScale - 1, -1),
+      textSize: preferences.textSize === "xl" ? "lg" : "base",
     });
   }
 
   function reset() {
-    updatePreferences(defaultPreferences);
+    setPreferences(defaultPreferences);
+    applyPreferences(defaultPreferences);
+    localStorage.removeItem(storageKey);
   }
 
   return (
-    <div className="fixed bottom-[calc(6.25rem+env(safe-area-inset-bottom))] right-3 z-50 sm:bottom-5 sm:right-5">
+    <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-3 z-50 sm:bottom-5 sm:right-5">
       {isOpen ? (
         <div
           role="dialog"
@@ -107,10 +145,20 @@ export function AccessibilityControls() {
           </div>
 
           <div className="grid gap-2">
-            <button type="button" onClick={increaseText} className="a11y-control-button">
+            <button
+              type="button"
+              onClick={increaseText}
+              aria-pressed={preferences.textSize !== "base"}
+              className="a11y-control-button"
+            >
               הגדלת טקסט
             </button>
-            <button type="button" onClick={decreaseText} className="a11y-control-button">
+            <button
+              type="button"
+              onClick={decreaseText}
+              aria-pressed={preferences.textSize === "base"}
+              className="a11y-control-button"
+            >
               הקטנת טקסט
             </button>
             <button
