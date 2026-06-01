@@ -11,7 +11,7 @@ export function WhyChooseUs() {
   return (
     <section
       id="why-us"
-      className="reveal theme-section-soft relative overflow-hidden py-11 sm:py-20 lg:py-22"
+      className="reveal theme-section-soft relative overflow-hidden py-9 sm:py-20 lg:py-22"
     >
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
       <div className="section-container grid gap-7 sm:gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
@@ -20,7 +20,10 @@ export function WhyChooseUs() {
           <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:mt-3 sm:text-5xl lg:text-6xl">
             שירות מדויק, נקי ומקצועי מהרגע הראשון
           </h2>
-          <p className="mt-3 text-base leading-7 theme-muted sm:mt-5 sm:text-lg sm:leading-8">
+          <p className="mt-3 text-base leading-7 theme-muted sm:hidden">
+            שולחים תמונה, מקבלים הערכה ואנחנו מגיעים עד אליכם.
+          </p>
+          <p className="mt-3 hidden text-base leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
             אנחנו הופכים את תהליך הניקוי לפשוט וברור: שולחים תמונה, מקבלים
             הערכת מחיר, קובעים מועד ואנחנו מגיעים עד אליכם עם כל מה שצריך.
           </p>

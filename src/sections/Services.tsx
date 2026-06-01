@@ -14,7 +14,7 @@ function ServiceAccentIcon({ title }: { title: string }) {
   const isAirConditioner = title === "ניקוי מזגנים";
 
   return (
-    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-turquoise/14 text-turquoise-dark ring-1 ring-turquoise/20">
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-turquoise/14 text-turquoise-dark ring-1 ring-turquoise/20 sm:h-12 sm:w-12">
       <svg
         className="h-6 w-6"
         viewBox="0 0 24 24"
@@ -66,17 +66,18 @@ export function Services() {
   return (
     <section
       id="services"
-      className="reveal theme-section-clean py-11 sm:py-18 lg:py-20"
+      className="reveal theme-section-clean py-9 sm:py-18 lg:py-20"
     >
       <div className="section-container">
         <SectionHeading
           eyebrow="השירותים המרכזיים"
           title="השירותים המרכזיים שמחזירים לבית תחושה נקייה"
+          mobileDescription="ספות, מזרנים, רכבים ומזגנים. שולחים תמונה ומקבלים הערכה."
           description="מתמקדים במה שהלקוחות מבקשים הכי הרבה: ספות, מזרנים, ריפודי רכב ומזגנים. שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה."
           tone="light"
         />
 
-        <div className="mt-7 grid gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
           {primaryServices.map((service, index) => (
             <article
               key={service.title}
@@ -87,7 +88,7 @@ export function Services() {
                   src={service.image}
                   alt={service.title}
                   fallbackLabel={service.title}
-                  className="image-reveal relative aspect-[4/3] w-full"
+                  className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"
                   imageClassName="object-cover transition duration-500 group-hover:scale-105"
                   fallbackClassName="from-surface-soft via-white to-cyan-100 text-navy"
                   sizes="(min-width: 1024px) 33vw, 100vw"
@@ -95,19 +96,19 @@ export function Services() {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/24 via-transparent to-turquoise/8" />
               </div>
 
-              <div className="p-4 sm:p-7">
-                <div className="flex items-start gap-3">
+              <div className="p-3.5 sm:p-7">
+                <div className="flex items-start gap-2.5 sm:gap-3">
                   <ServiceAccentIcon title={service.title} />
                   <div>
-                    <p className="text-sm font-black text-turquoise-dark">
+                    <p className="text-xs font-black leading-5 text-turquoise-dark sm:text-sm sm:leading-normal">
                       {service.benefit}
                     </p>
-                    <h3 className="mt-2 text-2xl font-black sm:mt-3 sm:text-3xl">
+                    <h3 className="mt-1.5 text-xl font-black leading-tight sm:mt-3 sm:text-3xl">
                       {service.title}
                     </h3>
                   </div>
                 </div>
-                <p className="mt-3 text-sm leading-7 theme-muted sm:text-base sm:leading-8">
+                <p className="mt-2 text-sm leading-6 theme-muted sm:mt-3 sm:text-base sm:leading-8">
                   {service.description}
                 </p>
 
@@ -116,11 +117,11 @@ export function Services() {
                     `היי, אשמח לקבל הצעת מחיר עבור ${service.title}.`,
                   )}
                   aria-label={`פתיחת וואטסאפ לקבלת מחיר עבור ${service.title}`}
-                  className="btn-primary mt-4 inline-flex sm:mt-6"
+                  className="btn-primary mt-3 inline-flex min-h-10 px-4 py-2 text-xs sm:mt-6 sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
                 >
                   לקבלת מחיר
                 </a>
-                <p className="mt-3 text-xs font-bold theme-muted">
+                <p className="mt-2 hidden text-xs font-bold theme-muted sm:mt-3 sm:block">
                   אפשר לשלוח תמונה ולקבל הערכת מחיר ללא התחייבות.
                 </p>
               </div>

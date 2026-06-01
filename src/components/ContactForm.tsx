@@ -102,7 +102,7 @@ export function ContactForm() {
             type="tel"
             value={values.phone}
             onChange={(event) => updateField("phone", event.target.value)}
-            placeholder="05X-XXXXXXX"
+            placeholder="0559577731"
             aria-invalid={Boolean(errors.phone)}
             aria-describedby={errors.phone ? "phone-error" : undefined}
           />

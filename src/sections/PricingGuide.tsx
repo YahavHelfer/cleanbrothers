@@ -129,7 +129,7 @@ function PricingCardIcon({ icon }: { icon: PricingIcon }) {
 
 export function PricingGuide() {
   return (
-    <section className="reveal theme-section-soft relative overflow-hidden py-9 sm:py-16 lg:py-20">
+    <section className="reveal theme-section-soft relative overflow-hidden py-8 sm:py-16 lg:py-20">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
 
       <div className="section-container">
@@ -140,7 +140,10 @@ export function PricingGuide() {
           <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:mt-3 sm:text-5xl">
             איך נקבע המחיר?
           </h2>
-          <p className="mx-auto mt-3 max-w-3xl text-base leading-7 theme-muted sm:mt-5 sm:text-lg sm:leading-8">
+          <p className="mx-auto mt-3 max-w-3xl text-base leading-7 theme-muted sm:hidden">
+            המחיר נקבע לפי הפריט, המצב והכמות.
+          </p>
+          <p className="mx-auto mt-3 hidden max-w-3xl text-base leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
             אין מחיר קבוע לכל עבודה - המחיר נקבע לפי סוג הפריט, מצב הריפוד
             וכמות הפריטים, כדי לתת לכם הצעה הוגנת וברורה.
           </p>
@@ -195,7 +198,7 @@ export function PricingGuide() {
           ))}
         </div>
 
-        <div className="mx-auto mt-5 max-w-2xl text-center sm:mt-8">
+        <div className="mx-auto mt-5 hidden max-w-2xl text-center sm:mt-8 sm:block">
           <a
             href={getWhatsAppLink(
               "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי ריפודים.",

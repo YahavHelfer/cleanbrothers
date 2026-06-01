@@ -1,5 +1,7 @@
 const fallbackSiteUrl = "http://localhost:3000";
-const fallbackBusinessPhone = "הגדירו מספר טלפון";
+const fallbackBusinessPhone = "0559577731";
+const fallbackWhatsAppPhone = "972559577731";
+const fallbackBusinessEmail = "CleanBrothers.ISR@gmail.com";
 
 function withoutTrailingSlash(value: string) {
   return value.replace(/\/+$/, "");
@@ -12,7 +14,8 @@ export const businessConfig = {
   ),
   phoneDisplay:
     process.env.NEXT_PUBLIC_BUSINESS_PHONE || fallbackBusinessPhone,
-  whatsappPhone: process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "",
+  whatsappPhone: process.env.NEXT_PUBLIC_WHATSAPP_PHONE || fallbackWhatsAppPhone,
+  email: process.env.NEXT_PUBLIC_BUSINESS_EMAIL || fallbackBusinessEmail,
   whatsappDefaultMessage:
     "היי, אשמח לקבל הצעת מחיר לניקוי ספות / ריפודים / שטיחים / רכב.",
   serviceAreas: [

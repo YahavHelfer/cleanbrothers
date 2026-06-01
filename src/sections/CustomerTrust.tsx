@@ -22,7 +22,7 @@ const returnReasons = [
 
 export function CustomerTrust() {
   return (
-    <section className="reveal theme-section-clean py-9 sm:py-16 lg:py-18">
+    <section className="reveal theme-section-clean py-8 sm:py-16 lg:py-18">
       <div className="section-container">
         <div className="grid gap-5 sm:gap-7 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
           <div>
@@ -32,7 +32,10 @@ export function CustomerTrust() {
             <h2 className="mt-3 text-2xl font-black leading-tight text-[var(--foreground)] sm:mt-4 sm:text-4xl">
               למה לקוחות חוזרים אלינו?
             </h2>
-            <p className="mt-3 max-w-2xl text-base leading-7 theme-muted sm:mt-4 sm:text-lg sm:leading-8">
+            <p className="mt-3 max-w-2xl text-base leading-7 theme-muted sm:hidden">
+              תהליך קצר וברור: שולחים תמונה, מקבלים הערכה וקובעים זמן.
+            </p>
+            <p className="mt-3 hidden max-w-2xl text-base leading-7 theme-muted sm:mt-4 sm:block sm:text-lg sm:leading-8">
               כי מעבר לניקוי עצמו, חשוב לנו שהתהליך יהיה ברור, נעים ומקצועי:
               שולחים תמונה, מקבלים הערכה, קובעים זמן ואנחנו מגיעים מוכנים.
             </p>

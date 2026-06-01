@@ -29,12 +29,14 @@ Environment variables:
 
 ```bash
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_WHATSAPP_PHONE=9725XXXXXXXX
-NEXT_PUBLIC_BUSINESS_PHONE=05X-XXXXXXX
+NEXT_PUBLIC_WHATSAPP_PHONE=972559577731
+NEXT_PUBLIC_BUSINESS_PHONE=0559577731
+NEXT_PUBLIC_BUSINESS_EMAIL=CleanBrothers.ISR@gmail.com
 ```
 
 For production, update `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_WHATSAPP_PHONE`, and
-`NEXT_PUBLIC_BUSINESS_PHONE` to the real values.
+`NEXT_PUBLIC_BUSINESS_PHONE` to the real values. `NEXT_PUBLIC_BUSINESS_EMAIL`
+controls the public email address.
 
 ## Development
 
@@ -79,8 +81,9 @@ git push -u origin main
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://your-temporary-vercel-url.vercel.app
-NEXT_PUBLIC_WHATSAPP_PHONE=9725XXXXXXXX
-NEXT_PUBLIC_BUSINESS_PHONE=05X-XXXXXXX
+NEXT_PUBLIC_WHATSAPP_PHONE=972559577731
+NEXT_PUBLIC_BUSINESS_PHONE=0559577731
+NEXT_PUBLIC_BUSINESS_EMAIL=CleanBrothers.ISR@gmail.com
 ```
 
 A temporary Vercel URL is fine for testing and sharing. Later, after connecting
@@ -99,6 +102,7 @@ Prefer changing values through environment variables:
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_WHATSAPP_PHONE`
 - `NEXT_PUBLIC_BUSINESS_PHONE`
+- `NEXT_PUBLIC_BUSINESS_EMAIL`
 
 ## Where To Update WhatsApp Message
 

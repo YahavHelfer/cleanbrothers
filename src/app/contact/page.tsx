@@ -43,6 +43,7 @@ export const metadata = buildMetadata({
 export default function ContactPage() {
   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
+  const emailHref = `mailto:${businessConfig.email}`;
 
   return (
     <>
@@ -91,6 +92,13 @@ export default function ContactPage() {
               >
                 <Icon name="phone" className="ml-2 h-5 w-5" />
                 {businessConfig.phoneDisplay}
+              </a>
+              <a
+                href={emailHref}
+                aria-label="שליחת אימייל ל-CleanBrothers"
+                className="btn-secondary inline-flex"
+              >
+                {businessConfig.email}
               </a>
             </div>
 

@@ -7,6 +7,7 @@ export const localBusinessJsonLd = {
   name: businessConfig.name,
   url: businessConfig.siteUrl,
   telephone: businessConfig.phoneDisplay,
+  email: businessConfig.email,
   description:
     "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים וריפודי רכב בבית הלקוח באזור המרכז.",
   areaServed: businessConfig.serviceAreas.map((area) => ({
@@ -24,6 +25,7 @@ export const serviceJsonLd = {
     "@type": "LocalBusiness",
     name: businessConfig.name,
     telephone: businessConfig.phoneDisplay,
+    email: businessConfig.email,
   },
   areaServed: businessConfig.serviceAreas.join(", "),
   serviceType: services.map((service) => service.title),

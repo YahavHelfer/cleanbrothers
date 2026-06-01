@@ -4,6 +4,7 @@ import { getWhatsAppLink } from "@/lib/whatsapp";
 type ProcessStep = {
   title: string;
   description: string;
+  mobileDescription: string;
   icon: "image" | "quote" | "calendar" | "cleaning";
 };
 
@@ -12,23 +13,27 @@ const processSteps: ProcessStep[] = [
     title: "שולחים תמונה בוואטסאפ",
     description:
       "צלמו את הספה, המזרן, השטיח או הרכב ושלחו לנו הודעה קצרה.",
+    mobileDescription: "מצלמים ושולחים בוואטסאפ.",
     icon: "image",
   },
   {
     title: "מקבלים הצעת מחיר",
     description:
       "נחזור אליכם עם מחיר ברור לפי סוג הניקוי והמצב של הריפוד.",
+    mobileDescription: "מקבלים הערכה ברורה.",
     icon: "quote",
   },
   {
     title: "קובעים מועד",
     description: "מתאמים זמן שנוח לכם, בלי סיבוכים ובלי המתנה מיותרת.",
+    mobileDescription: "מתאמים זמן שנוח לכם.",
     icon: "calendar",
   },
   {
     title: "מגיעים ומנקים",
     description:
       "אנחנו מגיעים עד אליכם עם ציוד מקצועי ומחזירים לריפוד מראה נקי ורענן.",
+    mobileDescription: "מגיעים עם ציוד מקצועי.",
     icon: "cleaning",
   },
 ];
@@ -89,6 +94,7 @@ export function CleaningProcess() {
         <SectionHeading
           eyebrow="תהליך העבודה"
           title="ארבעה צעדים פשוטים לריפוד נקי"
+          mobileDescription="תמונה, מחיר, תיאום וניקוי עד הבית."
           description="בלי טפסים מיותרים ובלי ניחושים. שולחים תמונה, מקבלים מחיר ברור, קובעים מועד ואנחנו מגיעים עם כל הציוד."
           tone="light"
         />
@@ -115,7 +121,10 @@ export function CleaningProcess() {
                     <h3 className="mt-2 text-lg font-black leading-tight text-[var(--foreground)] sm:mt-3 sm:text-xl">
                       {step.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-6 theme-muted sm:mt-3 sm:leading-7">
+                    <p className="mt-2 text-sm leading-6 theme-muted sm:hidden">
+                      {step.mobileDescription}
+                    </p>
+                    <p className="mt-2 hidden text-sm leading-6 theme-muted sm:mt-3 sm:block sm:leading-7">
                       {step.description}
                     </p>
                   </div>

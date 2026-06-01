@@ -104,7 +104,7 @@ function CleaningExampleIcon({ icon }: { icon: ExampleIcon }) {
 
 export function CleaningExamples() {
   return (
-    <section className="reveal theme-section-soft py-9 sm:py-16 lg:py-18">
+    <section className="reveal theme-section-soft py-8 sm:py-16 lg:py-18">
       <div className="section-container">
         <SectionHeading
           eyebrow="ניקוי פרקטי ליום יום"

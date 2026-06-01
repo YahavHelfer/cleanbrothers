@@ -191,7 +191,7 @@ function Chip({
       aria-label={ariaLabel}
       aria-pressed={isActive}
       onClick={onClick}
-      className={`rounded-full border px-3.5 py-2 text-sm font-black transition duration-300 focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-4 ${
+      className={`rounded-full border px-3 py-1.5 text-[0.82rem] font-black transition duration-300 focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-4 sm:py-2 sm:text-sm ${
         isActive
           ? "border-turquoise bg-turquoise text-navy shadow-[0_0_0_4px_rgba(39,211,195,0.12),0_14px_30px_rgba(39,211,195,0.2)]"
           : "border-[var(--card-border)] bg-[var(--card)] text-[var(--foreground)] hover:border-turquoise/45 hover:bg-turquoise/10 hover:text-turquoise-dark"
@@ -231,7 +231,7 @@ export function QuickPriceEstimate() {
   }
 
   return (
-    <section className="reveal theme-section-clean relative overflow-hidden py-9 sm:py-16 lg:py-18">
+    <section className="reveal theme-section-clean relative overflow-hidden py-8 sm:py-16 lg:py-18">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
 
       <div className="section-container">
@@ -242,17 +242,20 @@ export function QuickPriceEstimate() {
           <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:text-5xl">
             בדקו טווח מחיר לפני ששולחים תמונה
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 theme-muted sm:mt-5 sm:text-lg sm:leading-8">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 theme-muted sm:hidden">
+            בחרו שירות ורמת לכלוך וקבלו טווח מחיר.
+          </p>
+          <p className="mx-auto mt-3 hidden max-w-2xl text-sm leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
             בחרו שירות, סוג פריט ורמת לכלוך. לאחר מכן שלחו תמונה בוואטסאפ כדי
             לקבל מחיר מדויק יותר.
           </p>
         </div>
 
-        <div className="mx-auto mt-6 grid max-w-6xl gap-4 lg:mt-9 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6">
-          <div className="reveal stagger-1 rounded-[1.5rem] border theme-glass p-4 sm:rounded-[2rem] sm:p-6">
-            <div className="space-y-5">
+        <div className="mx-auto mt-5 grid max-w-6xl gap-3 pb-16 sm:mt-9 sm:gap-4 sm:pb-0 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6">
+          <div className="reveal stagger-1 rounded-[1.35rem] border theme-glass p-3.5 sm:rounded-[2rem] sm:p-6">
+            <div className="space-y-4 sm:space-y-5">
               <div>
-                <h3 className="mb-3 text-base font-black text-[var(--foreground)]">
+                <h3 className="mb-2 text-sm font-black text-[var(--foreground)] sm:mb-3 sm:text-base">
                   1. בחרו שירות
                 </h3>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -266,13 +269,13 @@ export function QuickPriceEstimate() {
                         aria-label={`בחירת שירות ${service.label}`}
                         aria-pressed={serviceKey === key}
                         onClick={() => handleServiceChange(key)}
-                        className={`card-lift flex min-h-24 flex-col items-center justify-center gap-2 rounded-[1.15rem] border px-3 py-3 text-sm font-black transition duration-300 focus:outline-none focus:ring-2 focus:ring-turquoise sm:min-h-28 sm:rounded-[1.5rem] ${
+                        className={`card-lift flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-[1rem] border px-2.5 py-2 text-sm font-black transition duration-300 focus:outline-none focus:ring-2 focus:ring-turquoise sm:min-h-28 sm:gap-2 sm:rounded-[1.5rem] sm:px-3 sm:py-3 ${
                           serviceKey === key
                             ? "border-turquoise bg-turquoise/14 text-turquoise-dark shadow-[0_0_0_4px_rgba(39,211,195,0.1),0_18px_38px_rgba(39,211,195,0.16)]"
                             : "border-[var(--card-border)] bg-[var(--card)] text-[var(--foreground)] hover:border-turquoise/40 hover:bg-turquoise/8"
                         }`}
                       >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-turquoise/12 text-turquoise-dark ring-1 ring-turquoise/22">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-turquoise/12 text-turquoise-dark ring-1 ring-turquoise/22 sm:h-10 sm:w-10 sm:rounded-2xl">
                           <ServiceIcon icon={service.icon} />
                         </span>
                         {service.label}
@@ -283,10 +286,10 @@ export function QuickPriceEstimate() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-base font-black text-[var(--foreground)]">
+                <h3 className="mb-2 text-sm font-black text-[var(--foreground)] sm:mb-3 sm:text-base">
                   2. בחרו סוג פריט
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {currentService.options.map((option, index) => (
                     <Chip
                       key={option.label}
@@ -301,10 +304,10 @@ export function QuickPriceEstimate() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-base font-black text-[var(--foreground)]">
+                <h3 className="mb-2 text-sm font-black text-[var(--foreground)] sm:mb-3 sm:text-base">
                   3. רמת לכלוך
                 </h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                   {dirtLevels.map((level) => (
                     <Chip
                       key={level}
@@ -320,14 +323,14 @@ export function QuickPriceEstimate() {
             </div>
           </div>
 
-          <aside className="card-lift reveal stagger-2 flex flex-col justify-between rounded-[1.5rem] border theme-card p-5 sm:rounded-[2rem] sm:p-8">
+          <aside className="card-lift reveal stagger-2 flex flex-col justify-between rounded-[1.35rem] border theme-card p-4 pb-8 sm:rounded-[2rem] sm:p-8">
             <div>
               <p className="text-sm font-black text-turquoise-dark">
                 טווח מחיר משוער
               </p>
               <div
                 key={`${serviceKey}-${optionIndex}-${dirtLevel}`}
-                className="reveal mt-3 rounded-[1.35rem] border border-turquoise/22 bg-turquoise/10 p-5 text-center sm:p-6"
+                className="reveal mt-2.5 rounded-[1.2rem] border border-turquoise/22 bg-turquoise/10 p-4 text-center sm:mt-3 sm:rounded-[1.35rem] sm:p-6"
                 aria-live="polite"
               >
                 <p className="text-sm font-black theme-muted">
@@ -338,22 +341,22 @@ export function QuickPriceEstimate() {
                 </p>
               </div>
 
-              <p className="mt-4 rounded-2xl border border-[var(--card-border)] bg-[var(--surface-soft)] px-4 py-3 text-sm font-bold leading-6 theme-muted">
+              <p className="mt-3 rounded-2xl border border-[var(--card-border)] bg-[var(--surface-soft)] px-3.5 py-2.5 text-sm font-bold leading-6 theme-muted sm:mt-4 sm:px-4 sm:py-3">
                 מחיר סופי ייקבע לפי מצב הפריט בפועל.
               </p>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-4 sm:mt-5">
               <a
                 href={getWhatsAppLink(whatsAppMessage)}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר מדויק"
-                className="btn-primary inline-flex w-full"
+                className="btn-primary inline-flex w-full min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 שלחו תמונה לקבלת מחיר מדויק
               </a>
-              <p className="mt-3 text-center text-xs font-bold theme-muted">
+              <p className="mt-2 text-center text-xs font-bold theme-muted sm:mt-3">
                 ללא התחייבות - הערכה מהירה לפי תמונה.
               </p>
             </div>

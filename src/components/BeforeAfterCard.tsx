@@ -153,9 +153,9 @@ export function BeforeAfterCard({
   return (
     <>
       <article
-        className={`card-lift group overflow-hidden rounded-[1.5rem] border theme-card p-2.5 hover:border-turquoise/40 sm:rounded-[2rem] sm:p-3 ${className}`}
+        className={`card-lift group overflow-hidden rounded-[1.25rem] border theme-card p-2 hover:border-turquoise/40 sm:rounded-[2rem] sm:p-3 ${className}`}
       >
-        <div className="relative overflow-hidden rounded-[1.35rem]">
+        <div className="relative overflow-hidden rounded-[1.1rem] sm:rounded-[1.35rem]">
           <div
             ref={comparisonRef}
             role="button"
@@ -165,7 +165,7 @@ export function BeforeAfterCard({
             onPointerUp={handleComparisonPointerUp}
             onKeyDown={handleComparisonKeyDown}
             aria-label={`פתיחת תמונת אחרי עבור ${title}`}
-            className="relative block aspect-[4/3] w-full cursor-ew-resize touch-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-turquoise"
+            className="relative block aspect-[16/10] w-full cursor-ew-resize touch-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-turquoise sm:aspect-[4/3]"
           >
             <ImageWithFallback
               src={afterImage}
@@ -195,11 +195,11 @@ export function BeforeAfterCard({
             </div>
           </div>
 
-          <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">
-            <span className="rounded-full border border-white/15 bg-navy/74 px-3 py-1 text-xs font-black text-white backdrop-blur-sm sm:px-4 sm:py-1.5 sm:text-sm">
+          <div className="pointer-events-none absolute inset-x-2.5 top-2.5 flex items-center justify-between sm:inset-x-3 sm:top-3">
+            <span className="rounded-full border border-white/15 bg-navy/74 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm sm:px-4 sm:py-1.5 sm:text-sm">
               לפני
             </span>
-            <span className="rounded-full border border-turquoise/35 bg-turquoise px-3 py-1 text-xs font-black text-navy shadow-sm shadow-turquoise/15 sm:px-4 sm:py-1.5 sm:text-sm">
+            <span className="rounded-full border border-turquoise/35 bg-turquoise px-2.5 py-0.5 text-[0.68rem] font-black text-navy shadow-sm shadow-turquoise/15 sm:px-4 sm:py-1.5 sm:text-sm">
               אחרי
             </span>
           </div>
@@ -209,7 +209,7 @@ export function BeforeAfterCard({
             style={{ right: `${slider}%` }}
           >
             <div className="h-full w-px bg-white/90 shadow-[0_0_18px_rgba(39,211,195,0.45)]" />
-            <div className="absolute top-1/2 -right-5 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/75 bg-turquoise text-sm font-black text-navy shadow-lg shadow-turquoise/15">
+            <div className="absolute top-1/2 -right-4 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/75 bg-turquoise text-xs font-black text-navy shadow-lg shadow-turquoise/15 sm:-right-5 sm:h-10 sm:w-10 sm:text-sm">
               ↔
             </div>
           </div>
@@ -221,32 +221,32 @@ export function BeforeAfterCard({
             value={slider}
             onChange={(event) => setSlider(Number(event.target.value))}
             aria-label={`השוואת לפני ואחרי עבור ${title}`}
-            className="absolute inset-x-4 bottom-3 h-3 cursor-ew-resize touch-pan-x appearance-none rounded-full bg-white/35 accent-turquoise backdrop-blur focus:outline-none focus:ring-2 focus:ring-turquoise sm:bottom-4 sm:h-2"
+            className="absolute inset-x-3 bottom-2.5 h-2.5 cursor-ew-resize touch-pan-x appearance-none rounded-full bg-white/35 accent-turquoise backdrop-blur focus:outline-none focus:ring-2 focus:ring-turquoise sm:inset-x-4 sm:bottom-4 sm:h-2"
           />
 
-          <div className="absolute bottom-3 left-3 flex gap-1.5 sm:bottom-4 sm:left-4 sm:gap-2">
+          <div className="absolute bottom-2.5 left-2.5 flex gap-1 sm:bottom-4 sm:left-4 sm:gap-2">
             <button
               type="button"
               onClick={() => setLightbox("before")}
-              className="rounded-full border border-white/20 bg-navy/68 px-3 py-1 text-xs font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise"
+              className="rounded-full border border-white/20 bg-navy/68 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3 sm:py-1 sm:text-xs"
             >
               לפני
             </button>
             <button
               type="button"
               onClick={() => setLightbox("after")}
-              className="rounded-full border border-white/20 bg-navy/68 px-3 py-1 text-xs font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise"
+              className="rounded-full border border-white/20 bg-navy/68 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3 sm:py-1 sm:text-xs"
             >
               אחרי
             </button>
           </div>
         </div>
 
-        <div className="px-2 py-4 sm:px-3 sm:py-5">
-          <h3 className="text-xl font-black text-[var(--foreground)] sm:text-2xl">
+        <div className="px-2 py-3 sm:px-3 sm:py-5">
+          <h3 className="text-lg font-black text-[var(--foreground)] sm:text-2xl">
             {title}
           </h3>
-          <p className="mt-1 text-sm leading-6 theme-muted sm:text-base sm:leading-7">
+          <p className="mt-0.5 text-sm leading-5 theme-muted sm:mt-1 sm:text-base sm:leading-7">
             {description}
           </p>
         </div>

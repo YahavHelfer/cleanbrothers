@@ -2,6 +2,7 @@ type SectionHeadingProps = {
   eyebrow: string;
   title: string;
   description?: string;
+  mobileDescription?: string;
   align?: "center" | "start";
   tone?: "dark" | "light";
 };
@@ -10,6 +11,7 @@ export function SectionHeading({
   eyebrow,
   title,
   description,
+  mobileDescription,
   align = "center",
   tone = "dark",
 }: SectionHeadingProps) {
@@ -26,8 +28,13 @@ export function SectionHeading({
       <h2 className={`mt-1.5 text-[1.45rem] font-bold leading-tight sm:mt-3 sm:text-4xl ${titleColor}`}>
         {title}
       </h2>
+      {mobileDescription ? (
+        <p className={`mt-2.5 text-[0.95rem] leading-6 sm:hidden ${descriptionColor}`}>
+          {mobileDescription}
+        </p>
+      ) : null}
       {description ? (
-        <p className={`mt-2.5 text-[0.95rem] leading-6 sm:mt-4 sm:text-lg sm:leading-8 ${descriptionColor}`}>
+        <p className={`${mobileDescription ? "hidden sm:block" : ""} mt-2.5 text-[0.95rem] leading-6 sm:mt-4 sm:text-lg sm:leading-8 ${descriptionColor}`}>
           {description}
         </p>
       ) : null}

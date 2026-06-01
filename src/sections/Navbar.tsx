@@ -13,7 +13,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[color-mix(in_srgb,var(--background)_78%,transparent)] shadow-[0_8px_24px_rgba(8,19,31,0.05)] backdrop-blur-xl transition duration-300">
-      <nav className="section-container flex min-h-[3.65rem] flex-wrap items-center justify-between gap-1.5 py-1 lg:grid lg:min-h-[4.5rem] lg:grid-cols-[auto_1fr_auto] lg:gap-6 lg:py-1.5">
+      <nav className="section-container flex min-h-[3.1rem] flex-wrap items-center justify-between gap-0.5 py-0.5 lg:grid lg:min-h-[4.5rem] lg:grid-cols-[auto_1fr_auto] lg:gap-6 lg:py-1.5">
         <Link
           href="/"
           aria-label="מעבר לדף הבית של CleanBrothers"
@@ -24,17 +24,17 @@ export function Navbar() {
             alt="CleanBrothers"
             width={260}
             height={148}
-            className="h-[2.72rem] w-auto object-contain sm:h-[3.75rem] lg:h-[4.35rem]"
+            className="h-[2.28rem] w-auto object-contain sm:h-[3.75rem] lg:h-[4.35rem]"
             sizes="(min-width: 1024px) 260px, (min-width: 640px) 220px, 190px"
             priority
           />
         </Link>
 
-        <div className="order-3 relative -mx-4 w-[calc(100%+2rem)] sm:order-none sm:mx-0 sm:w-auto">
+        <div className="order-3 relative -mx-4 -mt-0.5 w-[calc(100%+2rem)] sm:order-none sm:mx-0 sm:mt-0 sm:w-auto">
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[var(--background)] to-transparent sm:hidden" />
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[var(--background)] to-transparent sm:hidden" />
 
-          <div className="flex gap-1.5 overflow-x-auto px-4 pb-1 text-nowrap [scrollbar-width:none] sm:px-0 lg:justify-center lg:gap-2 lg:overflow-visible lg:pb-0">
+          <div className="flex gap-1 overflow-x-auto px-4 pb-0.5 text-nowrap [scrollbar-width:none] sm:gap-1.5 sm:px-0 sm:pb-1 lg:justify-center lg:gap-2 lg:overflow-visible lg:pb-0">
             {navLinks.map((link) => {
               const isActive =
                 link.href === "/" ? pathname === "/" : pathname === link.href;
@@ -45,7 +45,7 @@ export function Navbar() {
                   href={link.href}
                   aria-label={`מעבר לעמוד ${link.label}`}
                   aria-current={isActive ? "page" : undefined}
-                  className={`nav-link-motion rounded-full border px-3 py-1.5 text-[0.82rem] font-bold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3.5 sm:py-2 sm:text-sm lg:px-4 ${
+                  className={`nav-link-motion rounded-full border px-2.5 py-1 text-[0.76rem] font-bold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3.5 sm:py-2 sm:text-sm lg:px-4 ${
                     isActive
                       ? "border-turquoise/55 bg-turquoise/16 text-turquoise-dark shadow-[0_0_0_1px_rgba(39,211,195,0.08),0_8px_24px_rgba(39,211,195,0.16)] dark:text-turquoise"
                       : "border-transparent bg-transparent text-[var(--muted)] hover:border-turquoise/30 hover:bg-turquoise/8 hover:text-turquoise-dark dark:hover:text-turquoise"
