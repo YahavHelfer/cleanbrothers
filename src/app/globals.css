@@ -459,6 +459,13 @@ select {
     transform-origin: 50% 80%;
   }
 
+  .mascot-render-safe {
+    backface-visibility: hidden;
+    background: transparent;
+    transform: translateZ(0);
+    will-change: auto;
+  }
+
   .a11y-control-button {
     @apply rounded-2xl border border-[var(--card-border)] bg-[var(--surface-soft)] px-3 py-2 text-sm font-bold text-[var(--foreground)] transition hover:border-turquoise/45 hover:bg-turquoise/10 focus:outline-none focus:ring-2 focus:ring-turquoise;
   }
@@ -665,7 +672,7 @@ html.a11y-highlight-links button {
   }
 }
 
-@media (min-width: 640px) {
+@media (min-width: 769px) {
   .mascot-float {
     animation: mascot-float 6.5s var(--ease-premium) infinite;
   }

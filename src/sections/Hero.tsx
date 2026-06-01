@@ -28,15 +28,15 @@ export function Hero() {
 
       <div className="section-container relative flex min-h-[calc(100svh-74px)] items-center justify-center py-8 pb-12 sm:py-18 lg:min-h-[calc(100vh-168px)] lg:py-20">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-7 [direction:ltr] lg:grid-cols-[0.86fr_1.14fr] lg:gap-12">
-          <div className="reveal-soft stagger-1 relative mx-auto mb-1 w-full max-w-[16rem] sm:max-w-[20rem] lg:mb-0 lg:max-w-[34rem]">
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[82%] w-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(39,211,195,0.26)_0%,_rgba(47,128,237,0.12)_45%,_transparent_72%)] blur-2xl" />
-            <div className="pointer-events-none absolute bottom-0 left-1/2 h-[22%] w-[68%] -translate-x-1/2 rounded-full bg-turquoise/14 blur-2xl" />
+          <div className="reveal-soft stagger-1 relative mx-auto mb-1 w-full max-w-[16rem] bg-transparent sm:max-w-[20rem] lg:mb-0 lg:max-w-[34rem]">
+            <div className="pointer-events-none absolute inset-[12%] hidden rounded-full bg-cyan-300/20 opacity-80 blur-3xl md:block" />
+            <div className="pointer-events-none absolute bottom-[6%] left-1/2 hidden h-[18%] w-[58%] -translate-x-1/2 rounded-full bg-turquoise/12 opacity-80 blur-2xl md:block" />
             <Image
               src="/images/mascots/cleanbrothers-mascots.png"
               alt={mascotAlt}
               width={1536}
               height={1024}
-              className="mascot-float relative h-auto w-full object-contain"
+              className="mascot-float mascot-render-safe relative z-10 h-auto w-full bg-transparent object-contain"
               sizes="(min-width: 1024px) 544px, (min-width: 640px) 320px, 256px"
               priority
             />
