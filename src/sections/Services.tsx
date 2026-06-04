@@ -89,9 +89,9 @@ export function Services() {
                   alt={service.title}
                   fallbackLabel={service.title}
                   className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"
-                  imageClassName="object-cover transition duration-500 group-hover:scale-105"
+                  imageClassName={`object-cover ${service.imagePosition} transition duration-500 group-hover:scale-105`}
                   fallbackClassName="from-surface-soft via-white to-cyan-100 text-navy"
-                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/24 via-transparent to-turquoise/8" />
               </div>

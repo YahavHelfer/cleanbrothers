@@ -10,7 +10,6 @@ const filters = [
   { label: "מזרנים", value: "mattresses" },
   { label: "רכבים", value: "cars" },
   { label: "שטיחים", value: "carpets" },
-  { label: "מזגנים", value: "air-conditioners" },
 ] as const;
 
 type FilterValue = (typeof filters)[number]["value"];

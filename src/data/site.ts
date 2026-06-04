@@ -14,7 +14,8 @@ export const services = [
     description:
       "ניקוי עמוק לריפודי בד, הסרת לכלוך ורענון הספה בבית הלקוח.",
     benefit: "מחזיר לספה מראה רענן ונעים בלי להחליף ריפוד.",
-    image: "/images/services/sofa-cleaning.jpg",
+    image: "/images/services/sofa-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "שירות ניקוי ספות מקצועי לספות בד, מיקרופייבר וריפודים נפוצים נוספים. אנחנו בודקים את סוג הריפוד, מרככים את הלכלוך, שואבים לעומק ומבצעים ניקוי שמחזיר לספה מראה נקי ורענן.",
   },
@@ -23,7 +24,8 @@ export const services = [
     description:
       "טיפול יסודי באבק, ריחות וכתמים לשינה נקייה ונעימה יותר.",
     benefit: "שינה נקייה יותר עם טיפול ממוקד בריחות וכתמים.",
-    image: "/images/services/mattress-cleaning.jpg",
+    image: "/images/services/mattress-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "ניקוי מזרנים בבית הלקוח עם דגש על רענון הבד, הפחתת ריחות וטיפול בכתמים נקודתיים. מתאים למזרני יחיד, זוגי, מיטות ילדים וחדרי אירוח.",
   },
@@ -32,7 +34,8 @@ export const services = [
     description:
       "ניקוי מקצועי לשטיחים ביתיים עם התאמה לסוג הסיב ורמת הלכלוך.",
     benefit: "מרענן את החלל ומחזיר לשטיח תחושה נקייה ונעימה.",
-    image: "/images/services/carpet-cleaning.jpg",
+    image: "/images/services/carpet-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "אנחנו בודקים את סוג השטיח לפני תחילת העבודה ומתאימים את שיטת הניקוי. השירות מתאים לשטיחי סלון, חדרי ילדים, שטיחים קצרים ושטיחים בשימוש יום יומי.",
   },
@@ -41,7 +44,8 @@ export const services = [
     description:
       "חידוש מושבים, דיפונים וריפודים ברכב עם ציוד קומפקטי ומדויק.",
     benefit: "רכב שמרגיש נקי יותר לנסיעות יום יומיות ומשפחתיות.",
-    image: "/images/services/car-upholstery-cleaning.jpg",
+    image: "/images/services/car-upholstery-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "ניקוי מושבים, דיפונים וריפודי רכב עד הבית או למקום העבודה. פתרון מצוין לרכבים משפחתיים, רכבים אחרי קנייה, ריחות, כתמים ושימוש אינטנסיבי.",
   },
@@ -50,7 +54,8 @@ export const services = [
     description:
       "ניקוי מזגנים מקצועי להסרת אבק, ריחות ולכלוך שהצטבר בתוך המזגן.",
     benefit: "אוויר נקי ורענן יותר עם טיפול בלכלוך שמצטבר בתוך המזגן.",
-    image: "/images/services/air-conditioner-cleaning.jpg",
+    image: "/images/services/Air-conditioner-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "ניקוי מזגנים מקצועי לבית ולעסק, עם דגש על הסרת אבק, לכלוך וריחות לא נעימים שהצטברו בתוך היחידה. השירות מתאים למזגנים עיליים נפוצים ועוזר לשמור על תחושת אוויר נקייה ונעימה יותר.",
   },
@@ -59,7 +64,8 @@ export const services = [
     description:
       "ניקוי נקודתי או מלא לכורסאות, כיסאות אוכל וכיסאות משרדיים.",
     benefit: "פתרון יעיל לפריטים שנוגעים בהם כל יום ומתלכלכים מהר.",
-    image: "/images/services/armchair-chair-cleaning.jpg",
+    image: "/images/services/armchair-chair-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "שירות מדויק לפריטים קטנים יותר בבית או במשרד. מתאים לכורסאות טלוויזיה, כיסאות אוכל, כיסאות המתנה וכיסאות משרדיים עם ריפוד בד.",
   },
@@ -68,7 +74,8 @@ export const services = [
     description:
       "עבודה זהירה עם חומרים איכותיים לריפודים שדורשים יחס מיוחד.",
     benefit: "ניקוי זהיר ומותאם לריפודים שדורשים עבודה רגישה.",
-    image: "/images/services/delicate-upholstery-cleaning.jpg",
+    image: "/images/services/delicate-upholstery-cleaning.jpeg",
+    imagePosition: "object-center",
     details:
       "לריפודים עדינים אנחנו עובדים בזהירות, בודקים תגובה של החומר ומתאימים את רמת הלחות והניקוי. המטרה היא ניקיון יעיל בלי לפגוע במרקם או במראה.",
   },
@@ -140,8 +147,8 @@ export const galleryItems = [
     title: "ניקוי מזרן",
     category: "mattresses",
     description: "רענון מזרן וטיפול בכתמים",
-    beforeImage: "/images/before-after/mattress-before.png",
-    afterImage: "/images/before-after/mattress-after.png",
+    beforeImage: "/images/before-after/mattress-before.jpeg",
+    afterImage: "/images/before-after/mattress-after.jpeg",
     beforeAlt: "מזרן לפני ניקוי מקצועי של CleanBrothers",
     afterAlt: "מזרן אחרי ניקוי מקצועי של CleanBrothers",
   },
@@ -149,8 +156,8 @@ export const galleryItems = [
     title: "ניקוי שטיח",
     category: "carpets",
     description: "חידוש שטיח ביתי",
-    beforeImage: "/images/before-after/carpet-before.png",
-    afterImage: "/images/before-after/carpet-after.png",
+    beforeImage: "/images/before-after/carpet-before.jpeg",
+    afterImage: "/images/before-after/carpet-after.jpeg",
     beforeAlt: "שטיח לפני ניקוי מקצועי של CleanBrothers",
     afterAlt: "שטיח אחרי ניקוי מקצועי של CleanBrothers",
   },
@@ -158,19 +165,10 @@ export const galleryItems = [
     title: "ניקוי ריפודי רכב",
     category: "cars",
     description: "ניקוי מושבים וריפודי רכב",
-    beforeImage: "/images/before-after/car-before.png",
-    afterImage: "/images/before-after/car-after.png",
+    beforeImage: "/images/before-after/car-before.jpeg",
+    afterImage: "/images/before-after/car-after.jpeg",
     beforeAlt: "ריפודי רכב לפני ניקוי מקצועי של CleanBrothers",
     afterAlt: "ריפודי רכב אחרי ניקוי מקצועי של CleanBrothers",
-  },
-  {
-    title: "ניקוי מזגן",
-    category: "air-conditioners",
-    description: "ניקוי מזגן לפני ואחרי הצטברות אבק ולכלוך",
-    beforeImage: "/images/before-after/air-conditioner-before.jpg",
-    afterImage: "/images/before-after/air-conditioner-after.jpg",
-    beforeAlt: "מזגן לפני ניקוי מקצועי של CleanBrothers",
-    afterAlt: "מזגן אחרי ניקוי מקצועי של CleanBrothers",
   },
 ];
 

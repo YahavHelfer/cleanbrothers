@@ -54,7 +54,7 @@ export default function ServicesPage() {
                   alt={service.title}
                   fallbackLabel={service.title}
                   className="relative aspect-[16/10] w-full lg:h-full lg:min-h-72"
-                  imageClassName="object-cover"
+                  imageClassName={`object-cover ${service.imagePosition} transition duration-500 group-hover:scale-[1.025]`}
                   fallbackClassName="from-slate-100 via-white to-cyan-100 text-navy"
                   sizes="(min-width: 1024px) 38vw, 100vw"
                 />

@@ -36,9 +36,8 @@ export default function GalleryPage() {
                   תמונות לדוגמה מתוצאות ניקוי
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-7 theme-muted sm:mt-3 sm:text-base sm:leading-8">
-                  הגלריה מציגה דוגמאות לפני ואחרי כדי להמחיש את סוגי התוצאות
-                  האפשריות. בהמשך ניתן להחליף או להוסיף תמונות אמיתיות נוספות
-                  מעבודות חדשות של CleanBrothers.
+                  הגלריה מציגה תמונות אמיתיות לפני ואחרי מעבודות של
+                  CleanBrothers, כדי להמחיש את תוצאות הניקוי בפועל.
                 </p>
               </div>
             </div>

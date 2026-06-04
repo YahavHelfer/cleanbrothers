@@ -4,8 +4,6 @@ import { galleryItems } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 export function BeforeAfter() {
-  const homepageGalleryItems = galleryItems.slice(0, 2);
-
   return (
     <section
       id="before-after"
@@ -21,7 +19,7 @@ export function BeforeAfter() {
           />
 
           <div className="mt-5 grid gap-3 sm:mt-10 sm:gap-6 lg:grid-cols-2">
-            {homepageGalleryItems.map((item, index) => (
+            {galleryItems.map((item, index) => (
               <BeforeAfterCard
                 key={item.title}
                 className={`reveal stagger-${(index % 4) + 1}`}

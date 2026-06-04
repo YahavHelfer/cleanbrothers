@@ -4,22 +4,20 @@ import { useEffect, useState } from "react";
 
 type ThemeMode = "light" | "dark";
 
-function getInitialTheme(): ThemeMode {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  return window.localStorage.getItem("cleanbrothers-theme") === "dark"
-    ? "dark"
-    : "light";
-}
-
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<ThemeMode>(() => getInitialTheme());
+  const [theme, setTheme] = useState<ThemeMode>("light");
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    const savedTheme =
+      window.localStorage.getItem("cleanbrothers-theme") === "dark"
+        ? "dark"
+        : "light";
+
+    document.documentElement.dataset.theme = savedTheme;
+    const frame = window.requestAnimationFrame(() => setTheme(savedTheme));
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   function toggleTheme() {
     const nextTheme = theme === "dark" ? "light" : "dark";
