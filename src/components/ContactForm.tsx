@@ -23,14 +23,17 @@ export function ContactForm() {
   const [values, setValues] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
 
   function updateField(field: keyof FormState, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
     setSubmitted(false);
+    setSubmissionError("");
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: Partial<FormState> = {};
@@ -49,9 +52,48 @@ export function ContactForm() {
 
     setErrors(nextErrors);
 
-    if (Object.keys(nextErrors).length === 0) {
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitted(false);
+    setSubmissionError("");
+
+    try {
+      // Send validated website leads directly to the CleanBrothers CRM webhook.
+      const response = await fetch(
+        "https://cleanbrothers-crm.vercel.app/api/integrations/leads/website",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-webhook-secret":
+              process.env.NEXT_PUBLIC_CRM_WEBHOOK_SECRET ?? "",
+          },
+          body: JSON.stringify({
+            full_name: values.fullName,
+            phone: values.phone,
+            service: values.service,
+            city: values.city,
+            message: values.message,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`CRM webhook returned ${response.status}`);
+      }
+
       setSubmitted(true);
       setValues(initialState);
+    } catch {
+      // Keep the entered details available so the customer can retry easily.
+      setSubmissionError(
+        "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -166,19 +208,28 @@ export function ContactForm() {
 
       <button
         type="submit"
+        disabled={isSubmitting}
+        aria-busy={isSubmitting}
         aria-label="שליחת פנייה באתר CleanBrothers"
-        className="btn-primary mt-5 inline-flex sm:mt-7"
+        className="btn-primary mt-5 inline-flex disabled:cursor-not-allowed disabled:opacity-60 sm:mt-7"
       >
-        שליחת פנייה
+        {isSubmitting ? "שולח..." : "שליחת פנייה"}
       </button>
 
-      {submitted ? (
+      {submissionError ? (
+        <p
+          role="alert"
+          className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-700"
+        >
+          {submissionError}
+        </p>
+      ) : submitted ? (
         <p className="mt-4 rounded-2xl bg-turquoise/15 p-4 text-sm font-bold text-turquoise-dark">
-          הפנייה נקלטה בצד האתר. בשלב הבא נחבר את הטופס לשליחה אמיתית.
+          הפרטים נשלחו בהצלחה. נחזור אליכם בהקדם.
         </p>
       ) : (
         <p className="mt-4 text-sm theme-muted">
-          הטופס אינו מחובר עדיין. להצעת מחיר בוואטסאפ תוך דקות, שלחו תמונה.
+          לאחר השליחה הפרטים יועברו ישירות לצוות CleanBrothers.
         </p>
       )}
     </form>
