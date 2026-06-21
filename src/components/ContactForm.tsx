@@ -61,36 +61,40 @@ export function ContactForm() {
     setSubmissionError("");
 
     try {
-      // Send validated website leads directly to the CleanBrothers CRM webhook.
-      const response = await fetch(
-        "https://cleanbrothers-crm.vercel.app/api/integrations/leads/website",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-webhook-secret":
-              process.env.NEXT_PUBLIC_CRM_WEBHOOK_SECRET ?? "",
-          },
-          body: JSON.stringify({
-            full_name: values.fullName,
-            phone: values.phone,
-            service: values.service,
-            city: values.city,
-            message: values.message,
-          }),
+      // The local API route forwards the lead without exposing the CRM secret.
+      const response = await fetch("/api/contact-lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          full_name: values.fullName,
+          phone: values.phone,
+          service: values.service,
+          city: values.city,
+          message: values.message,
+        }),
+      });
+
+      const result = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
 
       if (!response.ok) {
-        throw new Error(`CRM webhook returned ${response.status}`);
+        throw new Error(
+          result?.error ||
+            "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
+        );
       }
 
       setSubmitted(true);
       setValues(initialState);
-    } catch {
+    } catch (error) {
       // Keep the entered details available so the customer can retry easily.
       setSubmissionError(
-        "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
+        error instanceof Error
+          ? error.message
+          : "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
       );
     } finally {
       setIsSubmitting(false);
