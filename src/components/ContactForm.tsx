@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { serviceOptions } from "@/data/site";
+import { trackMetaPixelEvent } from "@/lib/meta-pixel";
 
 type FormState = {
   fullName: string;
@@ -87,6 +88,7 @@ export function ContactForm() {
         );
       }
 
+      trackMetaPixelEvent("Lead");
       setSubmitted(true);
       setValues(initialState);
     } catch (error) {

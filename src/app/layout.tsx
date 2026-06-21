@@ -3,6 +3,7 @@ import { Heebo } from "next/font/google";
 import { AccessibilityControls } from "@/components/AccessibilityControls";
 import { CookieConsent } from "@/components/CookieConsent";
 import { JsonLd } from "@/components/JsonLd";
+import { MetaPixel } from "@/components/MetaPixel";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { businessConfig } from "@/config/business";
@@ -49,6 +50,7 @@ export default function RootLayout({
         <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
       </head>
       <body className="flex min-h-full flex-col">
+        <MetaPixel />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
