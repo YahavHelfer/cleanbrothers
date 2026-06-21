@@ -23,6 +23,9 @@ const heebo = Heebo({
   display: "swap",
 });
 
+const metaPixelId =
+  process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || "1356088816405959";
+
 export const metadata: Metadata = {
   metadataBase: new URL(businessConfig.siteUrl),
   ...buildMetadata({
@@ -50,7 +53,7 @@ export default function RootLayout({
         <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
       </head>
       <body className="flex min-h-full flex-col">
-        <MetaPixel />
+        <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">

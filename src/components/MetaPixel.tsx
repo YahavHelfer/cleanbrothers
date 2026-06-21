@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { trackMetaPixelPageView } from "@/lib/meta-pixel";
 
-const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+type MetaPixelProps = {
+  pixelId: string;
+};
 
-export function MetaPixel() {
+export function MetaPixel({ pixelId }: MetaPixelProps) {
   const pathname = usePathname();
   const previousPathname = useRef(pathname);
 
@@ -31,6 +33,11 @@ export function MetaPixel() {
       <Script
         id="meta-pixel"
         strategy="afterInteractive"
+        onReady={() => {
+          if (process.env.NODE_ENV === "development") {
+            console.info("Meta Pixel loaded", pixelId);
+          }
+        }}
         dangerouslySetInnerHTML={{
           __html: `
             !function(f,b,e,v,n,t,s)
