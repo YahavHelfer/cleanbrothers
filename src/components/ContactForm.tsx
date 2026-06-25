@@ -3,6 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import { serviceOptions } from "@/data/site";
 import { reportGoogleAdsLeadConversion } from "@/lib/google-ads";
+import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
 import { trackMetaPixelEvent } from "@/lib/meta-pixel";
 
 type FormState = {
@@ -85,6 +86,7 @@ export function ContactForm() {
           service: values.service,
           city: values.city,
           message: values.message,
+          marketingAttribution: getStoredMarketingAttribution(),
         }),
       });
 

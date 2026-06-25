@@ -4,6 +4,7 @@ import { AccessibilityControls } from "@/components/AccessibilityControls";
 import { CookieConsent } from "@/components/CookieConsent";
 import { GoogleAdsTag } from "@/components/GoogleAdsTag";
 import { JsonLd } from "@/components/JsonLd";
+import { MarketingAttributionTracker } from "@/components/MarketingAttributionTracker";
 import { MetaPixel } from "@/components/MetaPixel";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -56,6 +57,7 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col">
         <GoogleAdsTag adsId={googleAdsId} />
+        <MarketingAttributionTracker />
         <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />
         <Navbar />
