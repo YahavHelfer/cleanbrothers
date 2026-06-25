@@ -90,6 +90,7 @@ export function ContactForm() {
 
       const result = (await response.json().catch(() => null)) as {
         error?: string;
+        leadId?: string;
       } | null;
 
       if (!response.ok) {
@@ -99,10 +100,18 @@ export function ContactForm() {
         );
       }
 
+      const leadId = result?.leadId?.trim();
+
+      if (!leadId) {
+        throw new Error(
+          "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
+        );
+      }
+
       trackMetaPixelEvent("Lead");
       if (conversionReportedForSubmissionRef.current !== submissionId) {
         conversionReportedForSubmissionRef.current = submissionId;
-        reportGoogleAdsLeadConversion();
+        reportGoogleAdsLeadConversion(leadId);
       }
       setSubmitted(true);
       setValues(initialState);

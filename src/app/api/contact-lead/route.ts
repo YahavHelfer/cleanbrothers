@@ -11,10 +11,63 @@ type ContactLead = {
   service: string;
   city: string;
   message: string;
+  referenceId: string;
 };
 
 function readString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function readIdentifier(value: unknown) {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+
+  return "";
+}
+
+function readNestedIdentifier(
+  data: Record<string, unknown>,
+  path: readonly string[],
+) {
+  let current: unknown = data;
+
+  for (const key of path) {
+    if (!current || typeof current !== "object") {
+      return "";
+    }
+
+    current = (current as Record<string, unknown>)[key];
+  }
+
+  return readIdentifier(current);
+}
+
+function extractStableLeadId(data: unknown, fallbackLeadId: string) {
+  if (!data || typeof data !== "object") {
+    return fallbackLeadId;
+  }
+
+  const responseData = data as Record<string, unknown>;
+  const candidate =
+    readIdentifier(responseData.leadId) ||
+    readIdentifier(responseData.id) ||
+    readIdentifier(responseData.crmLeadId) ||
+    readIdentifier(responseData.referenceId) ||
+    readNestedIdentifier(responseData, ["lead", "id"]) ||
+    readNestedIdentifier(responseData, ["lead", "leadId"]) ||
+    readNestedIdentifier(responseData, ["lead", "crmLeadId"]) ||
+    readNestedIdentifier(responseData, ["lead", "referenceId"]) ||
+    readNestedIdentifier(responseData, ["data", "id"]) ||
+    readNestedIdentifier(responseData, ["data", "leadId"]) ||
+    readNestedIdentifier(responseData, ["data", "crmLeadId"]) ||
+    readNestedIdentifier(responseData, ["data", "referenceId"]);
+
+  return candidate || fallbackLeadId;
 }
 
 export async function POST(request: Request) {
@@ -37,12 +90,14 @@ export async function POST(request: Request) {
   }
 
   const data = body as Record<string, unknown>;
+  const referenceId = crypto.randomUUID();
   const lead: ContactLead = {
     full_name: readString(data.full_name),
     phone: readString(data.phone),
     service: readString(data.service),
     city: readString(data.city),
     message: readString(data.message),
+    referenceId,
   };
 
   if (!lead.full_name || !lead.phone || !lead.service) {
@@ -76,7 +131,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: SUBMISSION_ERROR }, { status: 502 });
     }
 
-    return NextResponse.json({ success: true });
+    const crmResult = (await crmResponse.json().catch(() => null)) as unknown;
+    const leadId = extractStableLeadId(crmResult, referenceId);
+
+    return NextResponse.json({ success: true, leadId });
   } catch (error) {
     console.error("Failed to forward contact lead to CRM", error);
     return NextResponse.json({ error: SUBMISSION_ERROR }, { status: 502 });
