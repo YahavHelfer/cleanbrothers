@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { serviceOptions } from "@/data/site";
+import { reportGoogleAdsLeadConversion } from "@/lib/google-ads";
 import { trackMetaPixelEvent } from "@/lib/meta-pixel";
 
 type FormState = {
@@ -26,6 +27,7 @@ export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
+  const isSubmissionInFlightRef = useRef(false);
 
   function updateField(field: keyof FormState, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -36,6 +38,10 @@ export function ContactForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (isSubmissionInFlightRef.current) {
+      return;
+    }
 
     const nextErrors: Partial<FormState> = {};
 
@@ -57,6 +63,7 @@ export function ContactForm() {
       return;
     }
 
+    isSubmissionInFlightRef.current = true;
     setIsSubmitting(true);
     setSubmitted(false);
     setSubmissionError("");
@@ -89,6 +96,7 @@ export function ContactForm() {
       }
 
       trackMetaPixelEvent("Lead");
+      reportGoogleAdsLeadConversion();
       setSubmitted(true);
       setValues(initialState);
     } catch (error) {
@@ -99,6 +107,7 @@ export function ContactForm() {
           : "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
       );
     } finally {
+      isSubmissionInFlightRef.current = false;
       setIsSubmitting(false);
     }
   }
