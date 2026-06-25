@@ -28,6 +28,8 @@ export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const isSubmissionInFlightRef = useRef(false);
+  const submissionSequenceRef = useRef(0);
+  const conversionReportedForSubmissionRef = useRef<number | null>(null);
 
   function updateField(field: keyof FormState, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -64,6 +66,8 @@ export function ContactForm() {
     }
 
     isSubmissionInFlightRef.current = true;
+    const submissionId = submissionSequenceRef.current + 1;
+    submissionSequenceRef.current = submissionId;
     setIsSubmitting(true);
     setSubmitted(false);
     setSubmissionError("");
@@ -96,7 +100,10 @@ export function ContactForm() {
       }
 
       trackMetaPixelEvent("Lead");
-      reportGoogleAdsLeadConversion();
+      if (conversionReportedForSubmissionRef.current !== submissionId) {
+        conversionReportedForSubmissionRef.current = submissionId;
+        reportGoogleAdsLeadConversion();
+      }
       setSubmitted(true);
       setValues(initialState);
     } catch (error) {
