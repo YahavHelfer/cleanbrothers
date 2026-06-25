@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import { AccessibilityControls } from "@/components/AccessibilityControls";
 import { CookieConsent } from "@/components/CookieConsent";
+import { GoogleAdsTag } from "@/components/GoogleAdsTag";
 import { JsonLd } from "@/components/JsonLd";
 import { MetaPixel } from "@/components/MetaPixel";
 import { ScrollProgress } from "@/components/ScrollProgress";
@@ -25,6 +26,7 @@ const heebo = Heebo({
 
 const metaPixelId =
   process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || "1356088816405959";
+const googleAdsId = "AW-18271875274";
 
 export const metadata: Metadata = {
   metadataBase: new URL(businessConfig.siteUrl),
@@ -53,6 +55,7 @@ export default function RootLayout({
         <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
       </head>
       <body className="flex min-h-full flex-col">
+        <GoogleAdsTag adsId={googleAdsId} />
         <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />
         <Navbar />
