@@ -22,8 +22,18 @@ const initialState: FormState = {
   message: "",
 };
 
-export function ContactForm() {
-  const [values, setValues] = useState<FormState>(initialState);
+type ContactFormProps = {
+  initialService?: string;
+};
+
+export function ContactForm({ initialService = "" }: ContactFormProps) {
+  const defaultService = serviceOptions.includes(initialService)
+    ? initialService
+    : "";
+  const [values, setValues] = useState<FormState>(() => ({
+    ...initialState,
+    service: defaultService,
+  }));
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +126,7 @@ export function ContactForm() {
         reportGoogleAdsLeadConversion(leadId);
       }
       setSubmitted(true);
-      setValues(initialState);
+      setValues({ ...initialState, service: defaultService });
     } catch (error) {
       // Keep the entered details available so the customer can retry easily.
       setSubmissionError(

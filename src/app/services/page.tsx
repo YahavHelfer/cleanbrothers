@@ -1,6 +1,7 @@
 import { Icon } from "@/components/Icon";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { PageHero } from "@/components/PageHero";
+import Link from "next/link";
 import { services } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
 import { getWhatsAppLink } from "@/lib/whatsapp";
@@ -91,15 +92,13 @@ export default function ServicesPage() {
                     )}
                   </div>
 
-                  <a
-                    href={getWhatsAppLink(
-                      `היי, אשמח לקבל הצעת מחיר עבור ${service.title}.`,
-                    )}
-                    aria-label={`פתיחת וואטסאפ לקבלת מחיר עבור ${service.title}`}
+                  <Link
+                    href={service.landingPath}
+                    aria-label={`מידע נוסף וקבלת הצעת מחיר עבור ${service.title}`}
                     className="btn-primary mt-5 inline-flex sm:mt-7"
                   >
-                    לקבלת מחיר בוואטסאפ
-                  </a>
+                    לפרטים וקבלת מחיר
+                  </Link>
                 </div>
               </article>
             ))}

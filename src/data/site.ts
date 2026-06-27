@@ -11,6 +11,7 @@ export const navLinks = [
 export const services = [
   {
     title: "ניקוי ספות",
+    landingPath: "/sofa-cleaning",
     description:
       "ניקוי עמוק לריפודי בד, הסרת לכלוך ורענון הספה בבית הלקוח.",
     benefit: "מחזיר לספה מראה רענן ונעים בלי להחליף ריפוד.",
@@ -21,6 +22,7 @@ export const services = [
   },
   {
     title: "ניקוי מזרנים",
+    landingPath: "/mattress-cleaning",
     description:
       "טיפול יסודי באבק, ריחות וכתמים לשינה נקייה ונעימה יותר.",
     benefit: "שינה נקייה יותר עם טיפול ממוקד בריחות וכתמים.",
@@ -31,6 +33,7 @@ export const services = [
   },
   {
     title: "ניקוי שטיחים",
+    landingPath: "/carpet-cleaning",
     description:
       "ניקוי מקצועי לשטיחים ביתיים עם התאמה לסוג הסיב ורמת הלכלוך.",
     benefit: "מרענן את החלל ומחזיר לשטיח תחושה נקייה ונעימה.",
@@ -41,6 +44,7 @@ export const services = [
   },
   {
     title: "ניקוי ריפודי רכב",
+    landingPath: "/car-upholstery-cleaning",
     description:
       "חידוש מושבים, דיפונים וריפודים ברכב עם ציוד קומפקטי ומדויק.",
     benefit: "רכב שמרגיש נקי יותר לנסיעות יום יומיות ומשפחתיות.",
@@ -51,6 +55,7 @@ export const services = [
   },
   {
     title: "ניקוי מזגנים",
+    landingPath: "/air-conditioner-cleaning",
     description:
       "ניקוי מזגנים מקצועי להסרת אבק, ריחות ולכלוך שהצטבר בתוך המזגן.",
     benefit: "אוויר נקי ורענן יותר עם טיפול בלכלוך שמצטבר בתוך המזגן.",
@@ -61,6 +66,7 @@ export const services = [
   },
   {
     title: "ניקוי כורסאות וכיסאות",
+    landingPath: "/armchair-chair-cleaning",
     description:
       "ניקוי נקודתי או מלא לכורסאות, כיסאות אוכל וכיסאות משרדיים.",
     benefit: "פתרון יעיל לפריטים שנוגעים בהם כל יום ומתלכלכים מהר.",
@@ -71,6 +77,7 @@ export const services = [
   },
   {
     title: "ניקוי ריפודים עדינים",
+    landingPath: "/delicate-upholstery-cleaning",
     description:
       "עבודה זהירה עם חומרים איכותיים לריפודים שדורשים יחס מיוחד.",
     benefit: "ניקוי זהיר ומותאם לריפודים שדורשים עבודה רגישה.",

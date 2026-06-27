@@ -37,7 +37,11 @@ export function Navbar() {
           <div className="flex gap-1 overflow-x-auto px-4 pb-0.5 text-nowrap [scrollbar-width:none] sm:gap-1.5 sm:px-0 sm:pb-1 lg:justify-center lg:gap-2 lg:overflow-visible lg:pb-0">
             {navLinks.map((link) => {
               const isActive =
-                link.href === "/" ? pathname === "/" : pathname === link.href;
+                link.href === "/"
+                  ? pathname === "/"
+                  : link.href === "/services"
+                    ? pathname === "/services" || pathname.endsWith("-cleaning")
+                    : pathname === link.href;
 
               return (
                 <Link

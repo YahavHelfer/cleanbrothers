@@ -1,3 +1,5 @@
+import { JsonLd } from "@/components/JsonLd";
+import { faqJsonLd } from "@/lib/structured-data";
 import { BeforeAfter } from "@/sections/BeforeAfter";
 import { CleaningExamples } from "@/sections/CleaningExamples";
 import { CleaningProcess } from "@/sections/CleaningProcess";
@@ -23,6 +25,7 @@ export const metadata = buildMetadata({
 export default function Home() {
   return (
     <>
+      <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
       <Hero />
       <TrustStrip />
       <Services />

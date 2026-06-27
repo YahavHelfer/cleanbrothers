@@ -5,6 +5,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
     "/services",
+    "/air-conditioner-cleaning",
+    "/sofa-cleaning",
+    "/mattress-cleaning",
+    "/carpet-cleaning",
+    "/car-upholstery-cleaning",
+    "/armchair-chair-cleaning",
+    "/delicate-upholstery-cleaning",
     "/gallery",
     "/about",
     "/contact",

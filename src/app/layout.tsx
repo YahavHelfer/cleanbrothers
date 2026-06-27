@@ -11,7 +11,6 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { businessConfig } from "@/config/business";
 import { buildMetadata } from "@/lib/seo";
 import {
-  faqJsonLd,
   localBusinessJsonLd,
   serviceJsonLd,
 } from "@/lib/structured-data";
@@ -53,7 +52,6 @@ export default function RootLayout({
       <head>
         <JsonLd id="cleanbrothers-local-business-jsonld" data={localBusinessJsonLd} />
         <JsonLd id="cleanbrothers-service-jsonld" data={serviceJsonLd} />
-        <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
       </head>
       <body className="flex min-h-full flex-col">
         <GoogleAdsTag adsId={googleAdsId} />

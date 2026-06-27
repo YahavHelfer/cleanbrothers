@@ -1,7 +1,7 @@
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { SectionHeading } from "@/components/SectionHeading";
+import Link from "next/link";
 import { services } from "@/data/site";
-import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const primaryServiceTitles = new Set([
   "ניקוי ספות",
@@ -112,15 +112,13 @@ export function Services() {
                   {service.description}
                 </p>
 
-                <a
-                  href={getWhatsAppLink(
-                    `היי, אשמח לקבל הצעת מחיר עבור ${service.title}.`,
-                  )}
-                  aria-label={`פתיחת וואטסאפ לקבלת מחיר עבור ${service.title}`}
+                <Link
+                  href={service.landingPath}
+                  aria-label={`מידע נוסף וקבלת הצעת מחיר עבור ${service.title}`}
                   className="btn-primary mt-3 inline-flex min-h-10 px-4 py-2 text-xs sm:mt-6 sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
                 >
-                  לקבלת מחיר
-                </a>
+                  לפרטים וקבלת מחיר
+                </Link>
                 <p className="mt-2 hidden text-xs font-bold theme-muted sm:mt-3 sm:block">
                   אפשר לשלוח תמונה ולקבל הערכת מחיר ללא התחייבות.
                 </p>

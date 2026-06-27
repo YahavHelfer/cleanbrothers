@@ -1,4 +1,17 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { getWhatsAppLink } from "@/lib/whatsapp";
+
+const serviceLandingPaths = new Set([
+  "/air-conditioner-cleaning",
+  "/sofa-cleaning",
+  "/mattress-cleaning",
+  "/carpet-cleaning",
+  "/car-upholstery-cleaning",
+  "/armchair-chair-cleaning",
+  "/delicate-upholstery-cleaning",
+]);
 
 function WhatsAppIcon() {
   return (
@@ -24,6 +37,12 @@ function WhatsAppIcon() {
 }
 
 export function WhatsAppButton() {
+  const pathname = usePathname();
+
+  if (serviceLandingPaths.has(pathname)) {
+    return null;
+  }
+
   return (
     <a
       href={getWhatsAppLink()}
