@@ -10,8 +10,8 @@ export const airConditionerLanding = {
   h1: "ניקוי מזגנים מקצועי עד הבית",
   intro:
     "ניקוי יסודי להסרת אבק, לכלוך, עובש וריחות לא נעימים - מראשון לציון ועד נתניה.",
-  image: "/images/services/Air-conditioner-cleaning.jpeg",
-  imageAlt: "איש צוות CleanBrothers מנקה מזגן בבית לקוח",
+  image: "/images/services/air-conditioner-cleaning-web.jpg",
+  imageAlt: "ניקוי מזגן מקצועי של CleanBrothers בבית הלקוח",
   signsTitle: "מתי כדאי להזמין ניקוי מזגן?",
   signsDescription:
     "כאשר מצטברים סימנים של לכלוך או שינוי בפעולת המזגן, בדיקה וניקוי מסודר יכולים לטפל בהצטברות בתוך היחידה.",
@@ -24,7 +24,25 @@ export const airConditionerLanding = {
     "שירות ישיר ונעים, תהליך עבודה מסודר וציוד שמתאים לניקוי בבית הלקוח.",
   benefits: ["עבודה יסודית ומסודרת", "שמירה על סביבת העבודה נקייה", "ציוד מקצועי", "שירות אישי", "זמינות באזור המרכז והשרון"],
   resultDescription:
-    "מוצגת תמונה אמיתית במהלך ניקוי מזגן. אין בפרויקט זוג תמונות תואם מאותו טיפול, ולכן לא מוצגת השוואה מלאכותית.",
+    "תמונות אמיתיות מתהליך פירוק המסנן וניקוי יחידת המזגן בבית הלקוח.",
+  additionalImages: [
+    {
+      src: "/images/services/Air-conditioner-cleaning2.PNG",
+      alt: "הסרת מסנן במהלך ניקוי מזגן של CleanBrothers",
+    },
+    {
+      src: "/images/services/Air-conditioner-cleaning4.JPG",
+      alt: "ניקוי יסודי של יחידת מזגן בבית הלקוח",
+    },
+  ],
+  video: {
+    youtubeId: "cCQpujXNpSQ",
+    watchUrl: "https://www.youtube.com/shorts/cCQpujXNpSQ",
+    poster: "/images/services/air-conditioner-cleaning-web.jpg",
+    title: "כך נראה ניקוי מזגן מקצועי",
+    description:
+      "צפו בתהליך העבודה של CleanBrothers – ניקוי יסודי ומסודר בבית הלקוח.",
+  },
   relatedLinks: [{ label: "לניקוי ריפודים עדינים", href: "/delicate-upholstery-cleaning" }],
   faqs: [
     { question: "כמה זמן לוקח ניקוי מזגן?", answer: "משך העבודה משתנה לפי סוג המזגן, הגישה אליו ומצב הלכלוך. לאחר בדיקה קצרה נוכל לתת הערכת זמן מדויקת יותר." },
@@ -44,7 +62,7 @@ export const sofaLanding = {
   eyebrow: "ניקוי ספות בבית הלקוח",
   h1: "ניקוי ספות מקצועי עד הבית",
   intro: "ניקוי יסודי לטיפול בלכלוך, כתמים וריחות מספות בד וריפודים - בשירות מקצועי עד הבית.",
-  image: "/images/services/sofa-cleaning.jpeg",
+  image: "/images/services/sofa-cleaning-web.jpg",
   imageAlt: "ניקוי ספת בד בבית הלקוח על ידי CleanBrothers",
   signsTitle: "מתי כדאי להזמין ניקוי ספה?",
   signsDescription: "שימוש יומיומי משאיר על הריפוד לכלוך, אבק וריחות. בדיקה מוקדמת עוזרת להתאים את העבודה לסוג הבד.",

@@ -15,7 +15,7 @@ export const services = [
     description:
       "ניקוי עמוק לריפודי בד, הסרת לכלוך ורענון הספה בבית הלקוח.",
     benefit: "מחזיר לספה מראה רענן ונעים בלי להחליף ריפוד.",
-    image: "/images/services/sofa-cleaning.jpeg",
+    image: "/images/services/sofa-cleaning-web.jpg",
     imagePosition: "object-center",
     details:
       "שירות ניקוי ספות מקצועי לספות בד, מיקרופייבר וריפודים נפוצים נוספים. אנחנו בודקים את סוג הריפוד, מרככים את הלכלוך, שואבים לעומק ומבצעים ניקוי שמחזיר לספה מראה נקי ורענן.",
@@ -59,7 +59,7 @@ export const services = [
     description:
       "ניקוי מזגנים מקצועי להסרת אבק, ריחות ולכלוך שהצטבר בתוך המזגן.",
     benefit: "אוויר נקי ורענן יותר עם טיפול בלכלוך שמצטבר בתוך המזגן.",
-    image: "/images/services/Air-conditioner-cleaning.jpeg",
+    image: "/images/services/air-conditioner-cleaning-web.jpg",
     imagePosition: "object-center",
     details:
       "ניקוי מזגנים מקצועי לבית ולעסק, עם דגש על הסרת אבק, לכלוך וריחות לא נעימים שהצטברו בתוך היחידה. השירות מתאים למזגנים עיליים נפוצים ועוזר לשמור על תחושת אוויר נקייה ונעימה יותר.",

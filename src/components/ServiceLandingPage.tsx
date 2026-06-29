@@ -6,12 +6,24 @@ import { ContactForm } from "@/components/ContactForm";
 import { Icon } from "@/components/Icon";
 import { JsonLd } from "@/components/JsonLd";
 import { SectionHeading } from "@/components/SectionHeading";
+import { YouTubeLiteEmbed } from "@/components/YouTubeLiteEmbed";
 import { businessConfig } from "@/config/business";
 import { buildMetadata } from "@/lib/seo";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 type Faq = { question: string; answer: string };
 type RelatedLink = { label: string; href: string };
+type ServiceImage = {
+  src: string;
+  alt: string;
+};
+type ServiceVideo = {
+  youtubeId: string;
+  watchUrl: string;
+  poster: string;
+  title: string;
+  description: string;
+};
 type BeforeAfter = {
   title: string;
   description: string;
@@ -43,6 +55,8 @@ export type ServiceLandingConfig = {
   relatedLinks: RelatedLink[];
   resultDescription: string;
   beforeAfter?: BeforeAfter;
+  additionalImages?: ServiceImage[];
+  video?: ServiceVideo;
 };
 
 export function buildServiceLandingMetadata(
@@ -91,6 +105,14 @@ export function ServiceLandingPage({
   const whatsappHref = getWhatsAppLink(
     `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`,
   );
+  const resultImages = config.additionalImages?.length
+    ? config.additionalImages
+    : [
+        {
+          src: config.image,
+          alt: `צילום מהשטח במהלך ${config.serviceName}`,
+        },
+      ];
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -211,6 +233,23 @@ export function ServiceLandingPage({
           </div>
         </div>
       </section>
+      {config.video ? (
+        <section className="section-block theme-section-contrast">
+          <div className="section-container">
+            <SectionHeading
+              eyebrow="וידאו מהשטח"
+              title={config.video.title}
+              description={config.video.description}
+            />
+            <YouTubeLiteEmbed
+              videoId={config.video.youtubeId}
+              title={config.video.title}
+              poster={config.video.poster}
+              watchUrl={config.video.watchUrl}
+            />
+          </div>
+        </section>
+      ) : null}
       <section className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
@@ -225,8 +264,21 @@ export function ServiceLandingPage({
             </div>
           ) : (
             <div className="mx-auto mt-7 grid max-w-5xl items-center gap-7 sm:mt-10 lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy">
-                <Image src={config.image} alt={`צילום מהשטח במהלך ${config.serviceName}`} fill className="object-cover object-center" sizes="(min-width: 1024px) 40vw, 100vw" />
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                {resultImages.map((image) => (
+                  <div
+                    key={image.src}
+                    className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy"
+                  >
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      className="object-cover object-center"
+                      sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 40vw, (min-width: 640px) 45vw, 100vw"
+                    />
+                  </div>
+                ))}
               </div>
               <div>
                 <h3 className="text-3xl font-black leading-tight sm:text-4xl">
