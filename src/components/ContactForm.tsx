@@ -123,7 +123,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
       trackMetaPixelEvent("Lead");
       if (conversionReportedForSubmissionRef.current !== submissionId) {
         conversionReportedForSubmissionRef.current = submissionId;
-        reportGoogleAdsLeadConversion(leadId);
+        reportGoogleAdsLeadConversion(leadId, values.phone);
       }
       setSubmitted(true);
       setValues({ ...initialState, service: defaultService });
