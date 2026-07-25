@@ -1,4 +1,5 @@
 import type { ServiceLandingConfig } from "@/components/ServiceLandingPage";
+import { serviceImages } from "@/data/serviceImages";
 
 export const airConditionerLanding = {
   path: "/air-conditioner-cleaning",
@@ -10,8 +11,9 @@ export const airConditionerLanding = {
   h1: "ניקוי מזגנים מקצועי עד הבית",
   intro:
     "ניקוי יסודי להסרת אבק, לכלוך, עובש וריחות לא נעימים - מראשון לציון ועד נתניה.",
-  image: "/images/services/air-conditioner-cleaning-web.jpg",
+  images: serviceImages.airConditioner,
   imageAlt: "ניקוי מזגן מקצועי של CleanBrothers בבית הלקוח",
+  imagePosition: "object-[center_38%]",
   signsTitle: "מתי כדאי להזמין ניקוי מזגן?",
   signsDescription:
     "כאשר מצטברים סימנים של לכלוך או שינוי בפעולת המזגן, בדיקה וניקוי מסודר יכולים לטפל בהצטברות בתוך היחידה.",
@@ -25,16 +27,6 @@ export const airConditionerLanding = {
   benefits: ["עבודה יסודית ומסודרת", "שמירה על סביבת העבודה נקייה", "ציוד מקצועי", "שירות אישי", "זמינות באזור המרכז והשרון"],
   resultDescription:
     "תמונות אמיתיות מתהליך פירוק המסנן וניקוי יחידת המזגן בבית הלקוח.",
-  additionalImages: [
-    {
-      src: "/images/services/Air-conditioner-cleaning2.PNG",
-      alt: "הסרת מסנן במהלך ניקוי מזגן של CleanBrothers",
-    },
-    {
-      src: "/images/services/Air-conditioner-cleaning4.JPG",
-      alt: "ניקוי יסודי של יחידת מזגן בבית הלקוח",
-    },
-  ],
   video: {
     youtubeId: "cCQpujXNpSQ",
     watchUrl: "https://www.youtube.com/shorts/cCQpujXNpSQ",
@@ -62,7 +54,7 @@ export const sofaLanding = {
   eyebrow: "ניקוי ספות בבית הלקוח",
   h1: "ניקוי ספות מקצועי עד הבית",
   intro: "ניקוי יסודי לטיפול בלכלוך, כתמים וריחות מספות בד וריפודים - בשירות מקצועי עד הבית.",
-  image: "/images/services/sofa-cleaning-web.jpg",
+  images: serviceImages.sofa,
   imageAlt: "ניקוי ספת בד בבית הלקוח על ידי CleanBrothers",
   signsTitle: "מתי כדאי להזמין ניקוי ספה?",
   signsDescription: "שימוש יומיומי משאיר על הריפוד לכלוך, אבק וריחות. בדיקה מוקדמת עוזרת להתאים את העבודה לסוג הבד.",
@@ -100,7 +92,7 @@ export const mattressLanding = {
   eyebrow: "ניקוי מזרנים בבית הלקוח",
   h1: "ניקוי מזרנים מקצועי עד הבית",
   intro: "ניקוי יסודי ורענון של מזרנים יחידים, זוגיים ומיטות מרופדות - בשירות מקצועי בבית הלקוח.",
-  image: "/images/services/mattress-cleaning.jpeg",
+  images: serviceImages.mattress,
   imageAlt: "ניקוי מזרן בבית הלקוח על ידי CleanBrothers",
   signsTitle: "מתי כדאי להזמין ניקוי מזרן?",
   signsDescription: "מזרן נמצא בשימוש יום יומי וצובר אבק, זיעה ולכלוך. התאמת העבודה מתחילה בבדיקת הבד והכתמים.",
@@ -137,7 +129,7 @@ export const carpetLanding = {
   eyebrow: "ניקוי שטיחים בבית הלקוח",
   h1: "ניקוי שטיחים מקצועי עד הבית",
   intro: "ניקוי שטיחים ורענון יסודי בהתאם לסוג השטיח, הבד ורמת הלכלוך.",
-  image: "/images/services/carpet-cleaning.jpeg",
+  images: serviceImages.carpet,
   imageAlt: "ניקוי שטיח ביתי על ידי CleanBrothers",
   signsTitle: "מתי כדאי להזמין ניקוי שטיח?",
   signsDescription: "שטיחים בשימוש יומיומי צוברים אבק, כתמים וריחות. לפני העבודה נבדוק את סוג הסיב והוראות הטיפול.",
@@ -174,8 +166,9 @@ export const carUpholsteryLanding = {
   eyebrow: "ניקוי ריפודי רכב במיקום הלקוח",
   h1: "ניקוי ריפודי רכב מקצועי",
   intro: "ניקוי מושבים וריפודי רכב לטיפול בלכלוך, כתמים וריחות - לרכב נקי ונעים יותר.",
-  image: "/images/services/car-upholstery-cleaning.jpeg",
+  images: serviceImages.carUpholstery,
   imageAlt: "ניקוי מושבי בד ברכב על ידי CleanBrothers",
+  imagePosition: "object-[center_42%]",
   signsTitle: "מתי כדאי להזמין ניקוי ריפודי רכב?",
   signsDescription: "נסיעות יומיומיות, ילדים ובעלי חיים משאירים לכלוך על המושבים. נבדוק את סוג הריפוד לפני העבודה.",
   signs: ["כתמי שתייה ומזון", "ריחות בריפוד", "שיער בעלי חיים", "מושבי ילדים", "רכב שלא נוקה זמן רב"],
@@ -212,7 +205,7 @@ export const armchairChairLanding = {
   eyebrow: "ניקוי כורסאות וכיסאות עד הבית",
   h1: "ניקוי כורסאות וכיסאות מקצועי",
   intro: "ניקוי כורסאות, כורסאות טלוויזיה, כיסאות אוכל וכיסאות משרדיים בשירות עד הבית.",
-  image: "/images/services/armchair-chair-cleaning.jpeg",
+  images: serviceImages.armchairChair,
   imageAlt: "ניקוי כורסאות וכיסאות מרופדים על ידי CleanBrothers",
   signsTitle: "מתי כדאי להזמין ניקוי כורסאות וכיסאות?",
   signsDescription: "פריטים שנמצאים בשימוש יומיומי צוברים לכלוך במושב, במשענת ובאזורים שנוגעים בהם לעיתים קרובות.",
@@ -241,7 +234,7 @@ export const delicateUpholsteryLanding = {
   eyebrow: "ניקוי זהיר ומותאם לריפוד",
   h1: "ניקוי ריפודים עדינים בהתאמה לבד",
   intro: "בדיקה והתאמת שיטת הניקוי לסוג הבד, הצבע ומצב הריפוד לפני תחילת העבודה.",
-  image: "/images/services/delicate-upholstery-cleaning.jpeg",
+  images: serviceImages.delicateUpholstery,
   imageAlt: "ניקוי מבוקר של ריפוד עדין על ידי CleanBrothers",
   signsTitle: "מתי ריפוד דורש בדיקה מיוחדת?",
   signsDescription: "בד רגיש, צבע בהיר או הוראות יצרן מיוחדות מחייבים זיהוי ובדיקה לפני שמתחילים לנקות.",

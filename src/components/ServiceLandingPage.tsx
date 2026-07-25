@@ -6,17 +6,18 @@ import { ContactForm } from "@/components/ContactForm";
 import { Icon } from "@/components/Icon";
 import { JsonLd } from "@/components/JsonLd";
 import { SectionHeading } from "@/components/SectionHeading";
+import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { YouTubeLiteEmbed } from "@/components/YouTubeLiteEmbed";
 import { businessConfig } from "@/config/business";
 import { buildMetadata } from "@/lib/seo";
+import {
+  getPrimaryServiceImage,
+  getServiceImages,
+} from "@/lib/service-images";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 type Faq = { question: string; answer: string };
 type RelatedLink = { label: string; href: string };
-type ServiceImage = {
-  src: string;
-  alt: string;
-};
 type ServiceVideo = {
   youtubeId: string;
   watchUrl: string;
@@ -41,8 +42,10 @@ export type ServiceLandingConfig = {
   eyebrow: string;
   h1: string;
   intro: string;
-  image: string;
+  image?: string;
+  images?: readonly string[];
   imageAlt: string;
+  imagePosition?: string;
   signsTitle: string;
   signsDescription: string;
   signs: string[];
@@ -55,13 +58,13 @@ export type ServiceLandingConfig = {
   relatedLinks: RelatedLink[];
   resultDescription: string;
   beforeAfter?: BeforeAfter;
-  additionalImages?: ServiceImage[];
   video?: ServiceVideo;
 };
 
 export function buildServiceLandingMetadata(
   config: ServiceLandingConfig,
 ): Metadata {
+  const primaryImage = getPrimaryServiceImage(config);
   const base = buildMetadata({
     title: config.metaTitle,
     description: config.metaDescription,
@@ -77,13 +80,13 @@ export function buildServiceLandingMetadata(
       siteName: businessConfig.name,
       locale: "he_IL",
       type: "website",
-      images: [{ url: config.image, alt: config.imageAlt }],
+      images: [{ url: primaryImage, alt: config.imageAlt }],
     },
     twitter: {
       card: "summary_large_image",
       title: config.metaTitle,
       description: config.metaDescription,
-      images: [config.image],
+      images: [primaryImage],
     },
   };
 }
@@ -105,14 +108,14 @@ export function ServiceLandingPage({
   const whatsappHref = getWhatsAppLink(
     `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`,
   );
-  const resultImages = config.additionalImages?.length
-    ? config.additionalImages
-    : [
-        {
-          src: config.image,
-          alt: `צילום מהשטח במהלך ${config.serviceName}`,
-        },
-      ];
+  const serviceImages = getServiceImages(config);
+  const primaryImage = getPrimaryServiceImage(config);
+  const resultImages = [
+    {
+      src: primaryImage,
+      alt: `צילום מהשטח במהלך ${config.serviceName}`,
+    },
+  ];
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -159,7 +162,15 @@ export function ServiceLandingPage({
             </div>
           </div>
           <div className="reveal stagger-2 relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/15 bg-navy shadow-2xl">
-            <Image src={config.image} alt={config.imageAlt} fill priority className="object-cover object-center" sizes="(min-width: 1024px) 42vw, 100vw" />
+            <ServiceImageCarousel
+              images={serviceImages}
+              alt={config.imageAlt}
+              className="absolute inset-0 h-full w-full"
+              imageClassName="object-cover"
+              imagePosition={config.imagePosition}
+              sizes="(min-width: 1024px) 42vw, 100vw"
+              priority
+            />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
             <p className="absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
               תמונה אמיתית מעבודה בשטח
@@ -228,9 +239,14 @@ export function ServiceLandingPage({
               ))}
             </ul>
           </div>
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy">
-            <Image src={config.image} alt={`תיעוד אמיתי של ${config.serviceName} על ידי CleanBrothers`} fill className="object-cover object-center" sizes="(min-width: 1024px) 45vw, 100vw" />
-          </div>
+          <ServiceImageCarousel
+            images={serviceImages}
+            alt={`תיעוד אמיתי של ${config.serviceName} על ידי CleanBrothers`}
+            className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy"
+            imageClassName="object-cover"
+            imagePosition={config.imagePosition}
+            sizes="(min-width: 1024px) 45vw, 100vw"
+          />
         </div>
       </section>
       {config.video ? (

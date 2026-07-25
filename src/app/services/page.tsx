@@ -1,6 +1,6 @@
 import { Icon } from "@/components/Icon";
-import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { PageHero } from "@/components/PageHero";
+import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import Link from "next/link";
 import { services } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
@@ -50,12 +50,13 @@ export default function ServicesPage() {
                 key={service.title}
                 className={`card-lift reveal grid overflow-hidden rounded-[1.5rem] border theme-card sm:rounded-[2rem] lg:grid-cols-[0.42fr_1fr] stagger-${(index % 6) + 1}`}
               >
-                <ImageWithFallback
-                  src={service.image}
+                <ServiceImageCarousel
+                  images={service.images}
                   alt={service.title}
                   fallbackLabel={service.title}
                   className="relative aspect-[16/10] w-full lg:h-full lg:min-h-72"
-                  imageClassName={`object-cover ${service.imagePosition} transition duration-500 group-hover:scale-[1.025]`}
+                  imageClassName="object-cover transition duration-500 group-hover:scale-[1.025]"
+                  imagePosition={service.imagePosition}
                   fallbackClassName="from-slate-100 via-white to-cyan-100 text-navy"
                   sizes="(min-width: 1024px) 38vw, 100vw"
                 />

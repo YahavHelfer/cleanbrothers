@@ -1,4 +1,4 @@
-import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { SectionHeading } from "@/components/SectionHeading";
 import Link from "next/link";
 import { services } from "@/data/site";
@@ -84,12 +84,13 @@ export function Services() {
               className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
             >
               <div className="relative">
-                <ImageWithFallback
-                  src={service.image}
+                <ServiceImageCarousel
+                  images={service.images}
                   alt={service.title}
                   fallbackLabel={service.title}
                   className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"
-                  imageClassName={`object-cover ${service.imagePosition} transition duration-500 group-hover:scale-105`}
+                  imageClassName="object-cover transition duration-500 group-hover:scale-105"
+                  imagePosition={service.imagePosition}
                   fallbackClassName="from-surface-soft via-white to-cyan-100 text-navy"
                   sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
                 />
