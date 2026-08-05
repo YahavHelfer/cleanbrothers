@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
+import Script from "next/script";
 import { AccessibilityControls } from "@/components/AccessibilityControls";
 import { CookieConsent } from "@/components/CookieConsent";
 import { GoogleAdsTag } from "@/components/GoogleAdsTag";
@@ -9,6 +10,7 @@ import { MetaPixel } from "@/components/MetaPixel";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { businessConfig } from "@/config/business";
+import { getGoogleConsentBootstrapScript } from "@/lib/consent";
 import { buildMetadata } from "@/lib/seo";
 import {
   localBusinessJsonLd,
@@ -50,6 +52,9 @@ export default function RootLayout({
       className={`${heebo.variable} h-full scroll-smooth antialiased`}
     >
       <head>
+        <Script id="google-consent-defaults" strategy="beforeInteractive">
+          {getGoogleConsentBootstrapScript()}
+        </Script>
         <JsonLd id="cleanbrothers-local-business-jsonld" data={localBusinessJsonLd} />
         <JsonLd id="cleanbrothers-service-jsonld" data={serviceJsonLd} />
       </head>

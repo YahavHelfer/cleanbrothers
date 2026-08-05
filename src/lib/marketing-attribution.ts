@@ -1,3 +1,5 @@
+import { hasAnalyticsConsent } from "@/lib/consent";
+
 export type MarketingAttribution = Partial<
   Record<
     | "gclid"
@@ -65,6 +67,10 @@ function normalizeStoredAttribution(value: unknown): MarketingAttribution {
 }
 
 export function getStoredMarketingAttribution(): MarketingAttribution {
+  if (!hasAnalyticsConsent()) {
+    return {};
+  }
+
   const cookieValue = parseCookieValue(ATTRIBUTION_COOKIE_NAME);
 
   if (!cookieValue) {
@@ -81,7 +87,7 @@ export function getStoredMarketingAttribution(): MarketingAttribution {
 }
 
 export function captureFirstTouchMarketingAttribution() {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || !hasAnalyticsConsent()) {
     return;
   }
 
@@ -105,6 +111,8 @@ export function captureFirstTouchMarketingAttribution() {
   }
 
   if (document.referrer) {
+    // Privacy hardening for full referrers is intentionally deferred to a
+    // separate reviewed change so the existing CRM payload stays compatible.
     attribution.referrer = document.referrer;
   }
 

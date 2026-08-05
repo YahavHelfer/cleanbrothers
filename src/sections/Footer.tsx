@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { businessConfig } from "@/config/business";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
@@ -109,6 +110,7 @@ export function Footer() {
                 {link.label}
               </Link>
             ))}
+            <CookiePreferencesButton />
           </div>
           <p className="mt-1 sm:mt-0">ניקוי ריפודים מקצועי בבית הלקוח</p>
         </div>
