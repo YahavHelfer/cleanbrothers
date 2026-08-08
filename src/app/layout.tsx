@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import Script from "next/script";
 import { AccessibilityControls } from "@/components/AccessibilityControls";
+import { BusinessEventTracker } from "@/components/BusinessEventTracker";
 import { CookieConsent } from "@/components/CookieConsent";
 import { GoogleAdsTag } from "@/components/GoogleAdsTag";
 import { JsonLd } from "@/components/JsonLd";
@@ -60,6 +61,7 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col">
         <GoogleAdsTag adsId={googleAdsId} />
+        <BusinessEventTracker />
         <MarketingAttributionTracker />
         <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />

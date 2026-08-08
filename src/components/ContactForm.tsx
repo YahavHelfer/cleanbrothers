@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { serviceOptions } from "@/data/site";
+import { trackGoogleAnalyticsEvent } from "@/lib/google-analytics";
 import { reportGoogleAdsLeadConversion } from "@/lib/google-ads";
 import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
 import { trackMetaPixelEvent } from "@/lib/meta-pixel";
@@ -124,6 +125,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
       if (conversionReportedForSubmissionRef.current !== submissionId) {
         conversionReportedForSubmissionRef.current = submissionId;
         reportGoogleAdsLeadConversion(leadId, values.phone);
+        trackGoogleAnalyticsEvent("generate_lead");
       }
       setSubmitted(true);
       setValues({ ...initialState, service: defaultService });

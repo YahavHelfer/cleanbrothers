@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:consent": "node --experimental-strip-types --test tests/consent-behavior.test.mjs"
+    "test:consent": "node --experimental-strip-types --test tests/consent-behavior.test.mjs",
+    "test:analytics": "node --test tests/google-analytics-events.test.mjs"
   },
   "dependencies": {
     "next": "16.2.6",
