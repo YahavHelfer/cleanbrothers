@@ -4,10 +4,11 @@ import Link from "next/link";
 import { services } from "@/data/site";
 
 const primaryServiceTitles = new Set([
+  "ניקוי מזגנים",
   "ניקוי ספות",
   "ניקוי מזרנים",
+  "ניקוי שטיחים",
   "ניקוי ריפודי רכב",
-  "ניקוי מזגנים",
 ]);
 
 function ServiceAccentIcon({ title }: { title: string }) {
@@ -73,7 +74,7 @@ export function Services() {
           eyebrow="השירותים המרכזיים"
           title="השירותים המרכזיים שמחזירים לבית תחושה נקייה"
           mobileDescription="ספות, מזרנים, רכבים ומזגנים. שולחים תמונה ומקבלים הערכה."
-          description="מתמקדים במה שהלקוחות מבקשים הכי הרבה: ספות, מזרנים, ריפודי רכב ומזגנים. שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה."
+          description="ניקוי מזגנים בראש סדר העדיפויות לקיץ, לצד ספות, מזרנים, שטיחים וריפודי רכב. שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה."
           tone="light"
         />
 
@@ -81,7 +82,7 @@ export function Services() {
           {primaryServices.map((service, index) => (
             <article
               key={service.title}
-              className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
+              className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1} ${service.landingPath === "/air-conditioner-cleaning" ? "border-turquoise/45 shadow-lg shadow-turquoise/10 ring-1 ring-turquoise/10" : ""}`}
             >
               <div className="relative">
                 <ServiceImageCarousel
@@ -95,6 +96,11 @@ export function Services() {
                   sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/24 via-transparent to-turquoise/8" />
+                {service.landingPath === "/air-conditioner-cleaning" && (
+                  <span className="absolute right-3 top-3 z-20 rounded-full border border-white/30 bg-navy/75 px-3 py-1.5 text-xs font-black text-turquoise shadow-lg backdrop-blur">
+                    מבוקש בקיץ
+                  </span>
+                )}
               </div>
 
               <div className="p-3.5 sm:p-7">

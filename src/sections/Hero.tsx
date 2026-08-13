@@ -2,8 +2,8 @@ import Image from "next/image";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 const trustChips = [
+  "ניקוי מזגנים",
   "שירות עד הבית",
-  "הצעת מחיר מהירה",
   "תוצאה נקייה",
 ];
 
@@ -53,17 +53,17 @@ export function Hero() {
             preload
           />
 
-          <p className="reveal stagger-2 mb-3 inline-flex rounded-full border border-white/18 bg-navy/30 px-3 py-1.5 text-xs font-bold text-turquoise backdrop-blur sm:mb-5 sm:px-4 sm:py-2 sm:text-sm lg:mb-4">
-            CleanBrothers
+          <p className="reveal stagger-2 mb-3 inline-flex rounded-full border border-turquoise/35 bg-navy/35 px-3 py-1.5 text-xs font-bold text-turquoise backdrop-blur sm:mb-5 sm:px-4 sm:py-2 sm:text-sm lg:mb-4">
+            קיץ נקי מתחיל במזגן נקי
           </p>
 
           <h1 className="reveal stagger-3 mx-auto max-w-4xl text-[2rem] font-black leading-[1.13] text-white min-[380px]:text-[2.18rem] sm:text-5xl lg:mx-0 lg:text-[4.05rem]">
-            ניקוי ספות, מזרנים, שטיחים ורכבים ברמה מקצועית
+            ניקוי מזגנים, ספות, מזרנים וריפודים ברמה מקצועית
           </h1>
 
           <p className="reveal stagger-4 mx-auto mt-4 max-w-2xl text-base leading-7 text-white/86 sm:mt-6 sm:text-xl sm:leading-9 lg:mx-0">
-            CleanBrothers מגיעים עד אליכם עם ציוד מקצועי, חומרי ניקוי איכותיים
-            ושירות אמין שמחזיר לריפודים את המראה הנקי והחדש.
+            ניקוי מזגנים, ספות וריפודים עם ציוד מקצועי ושירות עד הבית —
+            לתוצאה נקייה ורעננה.
           </p>
 
           <div className="reveal stagger-5 mx-auto mt-6 flex max-w-2xl flex-wrap justify-center gap-1.5 sm:mt-8 sm:gap-2 lg:mx-0 lg:justify-start">

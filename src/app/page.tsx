@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/JsonLd";
 import { faqJsonLd } from "@/lib/structured-data";
 import { BeforeAfter } from "@/sections/BeforeAfter";
+import { AirConditionerFeature } from "@/sections/AirConditionerFeature";
 import { CleaningExamples } from "@/sections/CleaningExamples";
 import { CleaningProcess } from "@/sections/CleaningProcess";
 import { CustomerTrust } from "@/sections/CustomerTrust";
@@ -17,9 +18,9 @@ import { WhyChooseUs } from "@/sections/WhyChooseUs";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "CleanBrothers | ניקוי ספות, ריפודים, שטיחים ומזגנים בבית הלקוח",
+  title: "CleanBrothers | ניקוי מזגנים מקצועי, ספות וריפודים בבית הלקוח",
   description:
-    "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב וניקוי מזגנים בבית הלקוח בראש העין, פתח תקווה, הוד השרון, כפר סבא, רמת גן, גבעתיים, תל אביב ומרכז הארץ.",
+    "CleanBrothers מספקים ניקוי מזגנים מקצועי בבית הלקוח, לצד ניקוי ספות, ריפודים, מזרנים, שטיחים וריפודי רכב. שירות עד הבית עם ציוד מקצועי באזור המרכז.",
 });
 
 export default function Home() {
@@ -28,6 +29,7 @@ export default function Home() {
       <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
       <Hero />
       <TrustStrip />
+      <AirConditionerFeature />
       <Services />
       <CleaningExamples />
       <BeforeAfter />

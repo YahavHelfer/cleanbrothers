@@ -19,6 +19,7 @@ type ServiceConfig = {
 };
 
 const dirtLevels: DirtLevel[] = ["קל", "בינוני", "קשה"];
+const serviceOrder: ServiceKey[] = ["ac", "sofa", "mattress", "carpet", "car"];
 
 const pricingConfig: Record<ServiceKey, ServiceConfig> = {
   sofa: {
@@ -203,7 +204,7 @@ function Chip({
 }
 
 export function QuickPriceEstimate() {
-  const [serviceKey, setServiceKey] = useState<ServiceKey>("sofa");
+  const [serviceKey, setServiceKey] = useState<ServiceKey>("ac");
   const [optionIndex, setOptionIndex] = useState(0);
   const [dirtLevel, setDirtLevel] = useState<DirtLevel>("בינוני");
 
@@ -259,7 +260,7 @@ export function QuickPriceEstimate() {
                   1. בחרו שירות
                 </h3>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-                  {(Object.keys(pricingConfig) as ServiceKey[]).map((key) => {
+                  {serviceOrder.map((key) => {
                     const service = pricingConfig[key];
 
                     return (

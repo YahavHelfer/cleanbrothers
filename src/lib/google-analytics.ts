@@ -5,7 +5,10 @@ export const GA4_MEASUREMENT_ID = "G-B0KGLSC7VG";
 export type GoogleAnalyticsBusinessEvent =
   | "generate_lead"
   | "click_whatsapp"
-  | "click_phone";
+  | "click_phone"
+  | "promotion_popup_impression"
+  | "promotion_popup_close"
+  | "promotion_whatsapp_click";
 
 const SAFE_PATHNAME_PATTERN = /^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*)?\/?$/;
 const MAX_PATHNAME_LENGTH = 120;
@@ -47,13 +50,22 @@ export function trackGoogleAnalyticsEvent(
   }
 
   if (eventName !== "click_whatsapp" && eventName !== "click_phone") {
-    return false;
+    if (
+      eventName !== "promotion_popup_impression" &&
+      eventName !== "promotion_popup_close" &&
+      eventName !== "promotion_whatsapp_click"
+    ) {
+      return false;
+    }
   }
 
   try {
     window.gtag("event", eventName, {
       send_to: GA4_MEASUREMENT_ID,
       page_path: getSafePagePath(),
+      ...(eventName.startsWith("promotion_")
+        ? { promotion_name: "summer_ac_cleaning_2026" }
+        : {}),
     });
     return true;
   } catch {

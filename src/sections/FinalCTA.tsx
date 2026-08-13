@@ -50,18 +50,18 @@ export function FinalCTA() {
               הצעת מחיר בוואטסאפ תוך דקות
             </p>
             <h2 className="mt-2 text-[1.45rem] font-black leading-tight sm:mt-3 sm:text-5xl">
-              רוצים להחזיר לריפוד את המראה הנקי?
+              צריכים ניקוי מזגן, ספה או ריפוד?
             </h2>
             <p className="mx-auto mt-2.5 max-w-2xl text-sm leading-6 text-white/78 sm:mt-5 sm:text-lg sm:leading-8">
-              שלחו תמונה של הריפוד בוואטסאפ ונחזור עם הערכת מחיר ברורה.
+              שלחו תמונה של המזגן או הריפוד בוואטסאפ ונחזור עם הערכת מחיר ברורה.
             </p>
 
             <div className="mt-4 grid justify-center gap-2 sm:mt-8 sm:flex sm:flex-row sm:items-center sm:gap-3">
               <a
                 href={getWhatsAppLink(
-                  "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי ריפודים.",
+                  "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי מזגן או ריפודים.",
                 )}
-                aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר לניקוי ריפודים"
+                aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר לניקוי מזגן או ריפודים"
                 className="btn-primary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 שלחו תמונה וקבלו מחיר
