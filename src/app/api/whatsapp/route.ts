@@ -8,6 +8,10 @@ import {
 import {
   WHATSAPP_ATTRIBUTION_TOKEN_PATTERN,
 } from "@/lib/whatsapp-attribution";
+import {
+  logWhatsAppAttributionFailure,
+  type WhatsAppAttributionFailureClass,
+} from "@/lib/whatsapp-attribution-diagnostics";
 import { buildDirectWhatsAppLink } from "@/lib/whatsapp";
 import { buildWhatsAppRedirectMessage } from "@/lib/whatsapp-redirect";
 
@@ -42,10 +46,21 @@ export async function GET(request: NextRequest) {
 async function requestAttributionToken(
   marketingAttribution: MarketingAttribution,
 ) {
+  const endpoint = new URL(CRM_ATTRIBUTION_ENDPOINT);
   const secret = process.env.CRM_WEBHOOK_SECRET?.trim();
-  if (!secret) return null;
+  const requestHasAttribution = Object.keys(marketingAttribution).length > 0;
+  if (!secret) {
+    logWhatsAppAttributionFailure({
+      endpoint,
+      status: null,
+      failureClass: "missing_env",
+      requestHasSecret: false,
+      requestHasAttribution,
+    });
+    return null;
+  }
   try {
-    const response = await fetch(CRM_ATTRIBUTION_ENDPOINT, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,15 +70,58 @@ async function requestAttributionToken(
       cache: "no-store",
       signal: AbortSignal.timeout(TOKEN_REQUEST_TIMEOUT_MS),
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      logWhatsAppAttributionFailure({
+        endpoint,
+        status: response.status,
+        failureClass: classifyUpstreamStatus(response.status),
+        requestHasSecret: true,
+        requestHasAttribution,
+      });
+      return null;
+    }
     const data = (await response.json().catch(() => null)) as {
       token?: unknown;
     } | null;
-    return typeof data?.token === "string" &&
-      WHATSAPP_ATTRIBUTION_TOKEN_PATTERN.test(data.token)
-      ? data.token
-      : null;
-  } catch {
+    if (
+      typeof data?.token !== "string" ||
+      !WHATSAPP_ATTRIBUTION_TOKEN_PATTERN.test(data.token)
+    ) {
+      logWhatsAppAttributionFailure({
+        endpoint,
+        status: response.status,
+        failureClass: "malformed_response",
+        requestHasSecret: true,
+        requestHasAttribution,
+      });
+      return null;
+    }
+    return data.token;
+  } catch (error) {
+    logWhatsAppAttributionFailure({
+      endpoint,
+      status: null,
+      failureClass: isTimeoutError(error) ? "timeout" : "network_error",
+      requestHasSecret: true,
+      requestHasAttribution,
+    });
     return null;
   }
+}
+
+function classifyUpstreamStatus(
+  status: number,
+): WhatsAppAttributionFailureClass {
+  if (status === 400 || status === 422) return "bad_request";
+  if (status === 401 || status === 403) return "unauthorized";
+  if (status === 404) return "not_found";
+  if (status >= 500) return "upstream_error";
+  return "unexpected_status";
+}
+
+function isTimeoutError(error: unknown) {
+  return (
+    error instanceof Error &&
+    (error.name === "TimeoutError" || error.name === "AbortError")
+  );
 }

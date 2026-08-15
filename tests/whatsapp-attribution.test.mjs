@@ -14,6 +14,9 @@ import {
 import {
   appendWhatsAppAttributionMarker,
 } from "../src/lib/whatsapp-attribution.ts";
+import {
+  buildWhatsAppAttributionFailureDiagnostic,
+} from "../src/lib/whatsapp-attribution-diagnostics.ts";
 
 const SITE_ORIGIN = "https://cleanbrothers.co.il";
 const SYNTHETIC_TOKEN = "AbCdEfGhIjKlMnOpQrStUv";
@@ -147,6 +150,44 @@ test("GA4 WhatsApp event remains free of tokens, attribution, and PII", () => {
     analytics,
     /CBREF|token|gclid|gbraid|wbraid|utm_source|phone_number|email/i,
   );
+});
+
+test("upstream diagnostics expose only safe request metadata", () => {
+  const sensitiveSentinels = {
+    CRM_WEBHOOK_SECRET: "SECRET_VALUE_SENTINEL",
+    token: SYNTHETIC_TOKEN,
+    gclid: "GCLID_VALUE_SENTINEL",
+    gbraid: "GBRAID_VALUE_SENTINEL",
+    wbraid: "WBRAID_VALUE_SENTINEL",
+    utm_source: "UTM_VALUE_SENTINEL",
+    message: "MESSAGE_VALUE_SENTINEL",
+  };
+  const diagnostic = buildWhatsAppAttributionFailureDiagnostic({
+    endpoint: new URL(
+      "https://cleanbrothers-crm.vercel.app/api/integrations/whatsapp/attribution",
+    ),
+    status: 401,
+    failureClass: "unauthorized",
+    requestHasSecret: true,
+    requestHasAttribution: true,
+    ...sensitiveSentinels,
+  });
+  const serialized = JSON.stringify(diagnostic);
+
+  assert.deepEqual(Object.keys(diagnostic).sort(), [
+    "event",
+    "failure_class",
+    "http_status",
+    "request_has_attribution",
+    "request_has_secret",
+    "response_ok",
+    "upstream_host",
+    "upstream_path",
+  ]);
+  for (const sentinel of Object.values(sensitiveSentinels)) {
+    assert.doesNotMatch(serialized, new RegExp(sentinel));
+  }
+  assert.doesNotMatch(serialized, /CRM_WEBHOOK_SECRET|token|gclid|gbraid|wbraid|utm_|message/i);
 });
 
 function listSourceFiles(directory) {
