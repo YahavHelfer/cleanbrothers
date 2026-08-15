@@ -16,21 +16,17 @@ import {
 } from "../src/lib/whatsapp-attribution.ts";
 const SITE_ORIGIN = "https://cleanbrothers.co.il";
 const SYNTHETIC_TOKEN = "AbCdEfGhIjKlMnOpQrStUv";
-const DIAGNOSTIC_ENDPOINT = new URL(
+const ATTRIBUTION_ENDPOINT = new URL(
   "https://cleanbrothers-crm.vercel.app/api/integrations/whatsapp/attribution",
 );
-const DIAGNOSTIC_REQUEST = {
-  endpoint: DIAGNOSTIC_ENDPOINT,
+const ATTRIBUTION_REQUEST = {
+  endpoint: ATTRIBUTION_ENDPOINT,
   secret: "SECRET_VALUE_SENTINEL",
   marketingAttribution: { utm_source: "UTM_VALUE_SENTINEL" },
   timeoutMs: 10,
 };
 const buildWhatsAppRedirectMessage = loadRedirectHelper();
-const {
-  fallbackWhatsAppAttributionDiagnostic,
-  getWhatsAppAttributionDiagnosticHeaders,
-  requestWhatsAppAttributionToken,
-} = loadDiagnosticHelper();
+const requestWhatsAppAttributionToken = loadAttributionRequestHelper();
 
 test("direct placeholder first-touch upgrades to later paid evidence", () => {
   assert.deepEqual(
@@ -162,22 +158,20 @@ test("GA4 WhatsApp event remains free of tokens, attribution, and PII", () => {
   );
 });
 
-test("debug flag absent adds no X-CB diagnostic headers", () => {
-  const headers = getWhatsAppAttributionDiagnosticHeaders(
-    false,
-    fallbackWhatsAppAttributionDiagnostic({
-      failure: "missing_env",
-      hasSecret: false,
-      hasAttribution: true,
-    }),
+test("public WhatsApp route exposes no temporary diagnostic state", () => {
+  const route = readFileSync(
+    new URL("../src/app/api/whatsapp/route.ts", import.meta.url),
+    "utf8",
   );
-  assert.equal(Object.keys(headers).length, 0);
+  assert.match(route, /NextResponse\.redirect\([\s\S]*307/);
+  assert.match(route, /buildDirectWhatsAppLink\(outboundMessage\)/);
+  assert.doesNotMatch(route, /cb_attribution_debug|X-CB-|AttributionDiagnostic/);
 });
 
-test("missing environment is deterministic and does not call CRM", async () => {
+test("missing environment fails open without calling CRM", async () => {
   let calls = 0;
-  const result = await runDiagnosticRequest({
-    ...DIAGNOSTIC_REQUEST,
+  const token = await requestWhatsAppAttributionToken({
+    ...ATTRIBUTION_REQUEST,
     secret: undefined,
     fetchImpl: async () => {
       calls += 1;
@@ -185,122 +179,46 @@ test("missing environment is deterministic and does not call CRM", async () => {
     },
   });
   assert.equal(calls, 0);
-  assert.deepEqual(JSON.parse(JSON.stringify(result.diagnostic)), {
-    result: "fallback",
-    failure: "missing_env",
-    upstreamStatus: null,
-    hasSecret: false,
-    hasAttribution: true,
-  });
+  assert.equal(token, null);
 });
 
-test("CRM statuses map to deterministic safe failures", async () => {
-  for (const [status, failure] of [
-    [400, "bad_request"],
-    [401, "unauthorized"],
-    [403, "forbidden"],
-    [404, "not_found"],
-    [422, "unprocessable"],
-    [500, "upstream_error"],
-  ]) {
-    const result = await runDiagnosticRequest({
-      ...DIAGNOSTIC_REQUEST,
+test("CRM failures and malformed responses fail open", async () => {
+  for (const status of [400, 401, 403, 404, 422, 500]) {
+    const token = await requestWhatsAppAttributionToken({
+      ...ATTRIBUTION_REQUEST,
       fetchImpl: responseWith(status),
     });
-    assert.equal(result.token, null);
-    assert.equal(result.diagnostic.failure, failure);
-    assert.equal(result.diagnostic.upstreamStatus, status);
+    assert.equal(token, null);
   }
-});
-
-test("timeout is reported without exposing the thrown error", async () => {
-  const timeout = new Error("PRIVATE_TIMEOUT_DETAIL");
-  timeout.name = "TimeoutError";
-  const result = await runDiagnosticRequest({
-    ...DIAGNOSTIC_REQUEST,
+  const networkFailure = await requestWhatsAppAttributionToken({
+    ...ATTRIBUTION_REQUEST,
     fetchImpl: async () => {
-      throw timeout;
+      throw new Error("synthetic network failure");
     },
   });
-  assert.equal(result.diagnostic.failure, "timeout");
-  assert.equal(result.diagnostic.upstreamStatus, null);
-});
-
-test("malformed success response is reported safely", async () => {
-  const result = await runDiagnosticRequest({
-    ...DIAGNOSTIC_REQUEST,
+  const malformed = await requestWhatsAppAttributionToken({
+    ...ATTRIBUTION_REQUEST,
     fetchImpl: responseWith(200, { token: "not-valid!" }),
   });
-  assert.equal(result.token, null);
-  assert.equal(result.diagnostic.failure, "malformed_response");
-  assert.equal(result.diagnostic.upstreamStatus, 200);
+  assert.equal(networkFailure, null);
+  assert.equal(malformed, null);
 });
 
-test("successful token response reports success without putting token in headers", async () => {
-  const result = await runDiagnosticRequest({
-    ...DIAGNOSTIC_REQUEST,
+test("successful CRM response returns only a valid opaque token", async () => {
+  const token = await requestWhatsAppAttributionToken({
+    ...ATTRIBUTION_REQUEST,
     fetchImpl: responseWith(200, { token: SYNTHETIC_TOKEN }),
   });
-  assert.equal(result.token, SYNTHETIC_TOKEN);
-  assert.deepEqual(JSON.parse(JSON.stringify(result.diagnostic)), {
-    result: "success",
-    failure: "none",
-    upstreamStatus: 200,
-    hasSecret: true,
-    hasAttribution: true,
-  });
-  assert.deepEqual(
-    JSON.parse(
-      JSON.stringify(
-        getWhatsAppAttributionDiagnosticHeaders(true, result.diagnostic),
-      ),
-    ),
-    {
-      "X-CB-Attribution-Result": "success",
-      "X-CB-Attribution-Failure": "none",
-      "X-CB-Upstream-Status": "200",
-      "X-CB-Has-Secret": "true",
-      "X-CB-Has-Attribution": "true",
-    },
-  );
+  assert.equal(token, SYNTHETIC_TOKEN);
 });
 
-test("diagnostic headers expose no token, secret, attribution values, or PII", () => {
-  const sensitiveSentinels = {
-    CRM_WEBHOOK_SECRET: "SECRET_VALUE_SENTINEL",
-    token: SYNTHETIC_TOKEN,
-    gclid: "GCLID_VALUE_SENTINEL",
-    gbraid: "GBRAID_VALUE_SENTINEL",
-    wbraid: "WBRAID_VALUE_SENTINEL",
-    utm_source: "UTM_VALUE_SENTINEL",
-    message: "MESSAGE_VALUE_SENTINEL",
-    email: "EMAIL_VALUE_SENTINEL",
-    phone: "PHONE_VALUE_SENTINEL",
-  };
-  const diagnostic = fallbackWhatsAppAttributionDiagnostic({
-    failure: "unauthorized",
-    upstreamStatus: 401,
-    hasSecret: true,
-    hasAttribution: true,
-    ...sensitiveSentinels,
-  });
-  const headers = getWhatsAppAttributionDiagnosticHeaders(true, diagnostic);
-  const serialized = JSON.stringify(headers);
-
-  assert.deepEqual(Object.keys(headers).sort(), [
-    "X-CB-Attribution-Failure",
-    "X-CB-Attribution-Result",
-    "X-CB-Has-Attribution",
-    "X-CB-Has-Secret",
-    "X-CB-Upstream-Status",
-  ]);
-  for (const sentinel of Object.values(sensitiveSentinels)) {
-    assert.doesNotMatch(serialized, new RegExp(sentinel));
-  }
-  assert.doesNotMatch(
-    serialized,
-    /CRM_WEBHOOK_SECRET|token|CBREF|gclid|gbraid|wbraid|utm_|referrer|phone|email|message/i,
+test("permanent token request code logs no secret, token, attribution, or PII", () => {
+  const helper = readFileSync(
+    new URL("../src/lib/whatsapp-attribution-request.ts", import.meta.url),
+    "utf8",
   );
+  assert.doesNotMatch(helper, /console\.(?:log|info|warn|error)/);
+  assert.doesNotMatch(helper, /X-CB-|cb_attribution_debug/);
 });
 
 function responseWith(status, body = { error: "SAFE_TEST_ERROR" }) {
@@ -309,16 +227,6 @@ function responseWith(status, body = { error: "SAFE_TEST_ERROR" }) {
     status,
     json: async () => body,
   });
-}
-
-async function runDiagnosticRequest(input) {
-  const originalConsoleError = console.error;
-  console.error = () => {};
-  try {
-    return await requestWhatsAppAttributionToken(input);
-  } finally {
-    console.error = originalConsoleError;
-  }
 }
 
 function listSourceFiles(directory) {
@@ -365,9 +273,9 @@ function loadRedirectHelper() {
   return context.module.exports.buildWhatsAppRedirectMessage;
 }
 
-function loadDiagnosticHelper() {
+function loadAttributionRequestHelper() {
   const source = readFileSync(
-    new URL("../src/lib/whatsapp-attribution-diagnostics.ts", import.meta.url),
+    new URL("../src/lib/whatsapp-attribution-request.ts", import.meta.url),
     "utf8",
   )
     .replace(
@@ -397,5 +305,5 @@ function loadDiagnosticHelper() {
   });
   context.exports = context.module.exports;
   vm.runInContext(javascript, context);
-  return context.module.exports;
+  return context.module.exports.requestWhatsAppAttributionToken;
 }
