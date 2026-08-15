@@ -10,6 +10,9 @@ export type GoogleConsentState = {
 export const CONSENT_STORAGE_KEY = "cleanbrothers-cookie-consent";
 export const CONSENT_CHANGE_EVENT = "cleanbrothers:consent-change";
 export const CONSENT_PREFERENCES_EVENT = "cleanbrothers:open-consent-preferences";
+export const CONSENT_COOKIE_NAME = "cb_analytics_consent";
+const ATTRIBUTION_COOKIE_NAME = "cb_first_touch_attribution";
+const CONSENT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 const DENIED_CONSENT: GoogleConsentState = {
   analytics_storage: "denied",
@@ -83,12 +86,29 @@ export function hasAdUserDataConsent() {
   return getStoredConsent() === "accepted";
 }
 
+export function synchronizeConsentCookie(choice: ConsentChoice) {
+  if (typeof window === "undefined") return;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const sharedOptions = `Path=/; SameSite=Lax${secure}`;
+
+  if (choice === "accepted" || choice === "rejected") {
+    document.cookie = `${CONSENT_COOKIE_NAME}=${choice}; Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}; ${sharedOptions}`;
+  } else {
+    document.cookie = `${CONSENT_COOKIE_NAME}=; Max-Age=0; ${sharedOptions}`;
+  }
+
+  if (choice !== "accepted") {
+    document.cookie = `${ATTRIBUTION_COOKIE_NAME}=; Max-Age=0; ${sharedOptions}`;
+  }
+}
+
 export function updateConsent(choice: Exclude<ConsentChoice, "unknown">) {
   if (typeof window === "undefined") {
     return;
   }
 
   currentPageConsent = choice;
+  synchronizeConsentCookie(choice);
 
   try {
     window.localStorage.setItem(CONSENT_STORAGE_KEY, choice);
@@ -148,6 +168,8 @@ export function subscribeToConsentPreferenceRequests(listener: () => void) {
 
 export function getGoogleConsentBootstrapScript() {
   const storageKey = JSON.stringify(CONSENT_STORAGE_KEY);
+  const consentCookieName = JSON.stringify(CONSENT_COOKIE_NAME);
+  const attributionCookieName = JSON.stringify(ATTRIBUTION_COOKIE_NAME);
 
   return `
     window.dataLayer = window.dataLayer || [];
@@ -163,6 +185,15 @@ export function getGoogleConsentBootstrapScript() {
       var storedConsent = window.localStorage.getItem(${storageKey});
       var acceptedConsent = storedConsent === 'accepted' || storedConsent === 'yes' || storedConsent === 'approved';
       var rejectedConsent = storedConsent === 'rejected' || storedConsent === 'no';
+      var cookieSecure = window.location.protocol === 'https:' ? '; Secure' : '';
+      if (acceptedConsent || rejectedConsent) {
+        document.cookie = ${consentCookieName} + '=' + (acceptedConsent ? 'accepted' : 'rejected') + '; Path=/; Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax' + cookieSecure;
+      } else {
+        document.cookie = ${consentCookieName} + '=; Path=/; Max-Age=0; SameSite=Lax' + cookieSecure;
+      }
+      if (!acceptedConsent) {
+        document.cookie = ${attributionCookieName} + '=; Path=/; Max-Age=0; SameSite=Lax' + cookieSecure;
+      }
       if (acceptedConsent || rejectedConsent) {
         var consentValue = acceptedConsent ? 'granted' : 'denied';
         window.gtag('consent', 'update', {

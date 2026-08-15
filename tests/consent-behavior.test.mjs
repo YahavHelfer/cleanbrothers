@@ -15,9 +15,16 @@ import {
 const readSource = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 
 function executeBootstrap(storedValue) {
+  const cookies = [];
   const context = {
     localStorage: {
       getItem: () => storedValue,
+    },
+    location: { protocol: "https:" },
+    document: {
+      set cookie(value) {
+        cookies.push(value);
+      },
     },
   };
   context.window = context;
@@ -81,6 +88,7 @@ test("scenario C: stored rejection keeps all four values denied", () => {
 test("scenario D/E: changing consent persists and publishes matching updates", () => {
   const originalWindow = globalThis.window;
   const originalCustomEvent = globalThis.CustomEvent;
+  const originalDocument = globalThis.document;
   const stored = new Map();
   const gtagCalls = [];
   const browserWindow = new EventTarget();
@@ -89,6 +97,8 @@ test("scenario D/E: changing consent persists and publishes matching updates", (
     setItem: (key, value) => stored.set(key, value),
   };
   browserWindow.gtag = (...args) => gtagCalls.push(args);
+  browserWindow.location = { protocol: "https:" };
+  globalThis.document = { cookie: "" };
   globalThis.CustomEvent = class CustomEvent extends Event {
     constructor(type, options) {
       super(type);
@@ -117,6 +127,7 @@ test("scenario D/E: changing consent persists and publishes matching updates", (
   } finally {
     globalThis.window = originalWindow;
     globalThis.CustomEvent = originalCustomEvent;
+    globalThis.document = originalDocument;
   }
 });
 

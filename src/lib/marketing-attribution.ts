@@ -1,33 +1,14 @@
 import { hasAnalyticsConsent } from "@/lib/consent";
+import {
+  ATTRIBUTION_COOKIE_NAME,
+  ATTRIBUTION_MAX_AGE_SECONDS,
+  CAMPAIGN_ATTRIBUTION_FIELDS,
+  chooseFirstTouchAttribution,
+  sanitizeMarketingAttribution,
+  type MarketingAttribution,
+} from "@/lib/marketing-attribution-shared";
 
-export type MarketingAttribution = Partial<
-  Record<
-    | "gclid"
-    | "gbraid"
-    | "wbraid"
-    | "utm_source"
-    | "utm_medium"
-    | "utm_campaign"
-    | "utm_content"
-    | "utm_term"
-    | "landing_page"
-    | "referrer",
-    string
-  >
->;
-
-const ATTRIBUTION_COOKIE_NAME = "cb_first_touch_attribution";
-const ATTRIBUTION_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
-const ATTRIBUTION_FIELDS = [
-  "gclid",
-  "gbraid",
-  "wbraid",
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "utm_term",
-] as const;
+export type { MarketingAttribution } from "@/lib/marketing-attribution-shared";
 
 function parseCookieValue(name: string) {
   if (typeof document === "undefined") {
@@ -47,25 +28,6 @@ function getCookieOptions() {
   return `Path=/; Max-Age=${ATTRIBUTION_MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
 }
 
-function normalizeStoredAttribution(value: unknown): MarketingAttribution {
-  if (!value || typeof value !== "object") {
-    return {};
-  }
-
-  const data = value as Record<string, unknown>;
-  const attribution: MarketingAttribution = {};
-
-  for (const field of [...ATTRIBUTION_FIELDS, "landing_page", "referrer"] as const) {
-    const fieldValue = data[field];
-
-    if (typeof fieldValue === "string" && fieldValue.trim()) {
-      attribution[field] = fieldValue.trim();
-    }
-  }
-
-  return attribution;
-}
-
 export function getStoredMarketingAttribution(): MarketingAttribution {
   if (!hasAnalyticsConsent()) {
     return {};
@@ -78,7 +40,7 @@ export function getStoredMarketingAttribution(): MarketingAttribution {
   }
 
   try {
-    return normalizeStoredAttribution(
+    return sanitizeMarketingAttribution(
       JSON.parse(decodeURIComponent(cookieValue)),
     );
   } catch {
@@ -93,16 +55,12 @@ export function captureFirstTouchMarketingAttribution() {
 
   const existingAttribution = getStoredMarketingAttribution();
 
-  if (Object.keys(existingAttribution).length > 0) {
-    return;
-  }
-
   const searchParams = new URLSearchParams(window.location.search);
   const attribution: MarketingAttribution = {
     landing_page: window.location.pathname || "/",
   };
 
-  for (const field of ATTRIBUTION_FIELDS) {
+  for (const field of CAMPAIGN_ATTRIBUTION_FIELDS) {
     const value = searchParams.get(field)?.trim();
 
     if (value) {
@@ -111,12 +69,22 @@ export function captureFirstTouchMarketingAttribution() {
   }
 
   if (document.referrer) {
-    // Privacy hardening for full referrers is intentionally deferred to a
-    // separate reviewed change so the existing CRM payload stays compatible.
     attribution.referrer = document.referrer;
   }
 
+  const selectedAttribution = chooseFirstTouchAttribution(
+    existingAttribution,
+    attribution,
+    window.location.origin,
+  );
+
+  if (
+    JSON.stringify(selectedAttribution) === JSON.stringify(existingAttribution)
+  ) {
+    return;
+  }
+
   document.cookie = `${ATTRIBUTION_COOKIE_NAME}=${encodeURIComponent(
-    JSON.stringify(attribution),
+    JSON.stringify(selectedAttribution),
   )}; ${getCookieOptions()}`;
 }

@@ -24,10 +24,12 @@ function isCleanBrothersWhatsAppLink(anchor: HTMLAnchorElement) {
     const destination = new URL(anchor.href, window.location.origin);
 
     return (
-      destination.protocol === "https:" &&
-      destination.hostname === "wa.me" &&
-      normalizeBusinessPhone(destination.pathname) ===
-        CLEANBROTHERS_WHATSAPP_PHONE
+      (destination.origin === window.location.origin &&
+        destination.pathname === "/api/whatsapp") ||
+      (destination.protocol === "https:" &&
+        destination.hostname === "wa.me" &&
+        normalizeBusinessPhone(destination.pathname) ===
+          CLEANBROTHERS_WHATSAPP_PHONE)
     );
   } catch {
     return false;
