@@ -1,4 +1,4 @@
-const fallbackSiteUrl = "http://localhost:3000";
+const fallbackSiteUrl = "https://www.cleanbrothers.co.il";
 const BUSINESS_PHONE =
   cleanEnv(process.env.NEXT_PUBLIC_BUSINESS_PHONE) || "0559577731";
 const WHATSAPP_PHONE =

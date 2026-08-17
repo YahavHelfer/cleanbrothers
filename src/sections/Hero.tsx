@@ -1,13 +1,15 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const trustChips = [
-  "ניקוי מזגנים",
+  "לבית, לעסק ולרכב",
   "שירות עד הבית",
-  "תוצאה נקייה",
+  "הערכת מחיר לפי תמונה",
 ];
 
-const mascotAlt = "CleanBrothers cleaning professionals mascots";
+const mascotAlt = "איור של צוות CleanBrothers";
 
 export function Hero() {
   return (
@@ -54,19 +56,33 @@ export function Hero() {
           />
 
           <p className="reveal stagger-2 mb-3 inline-flex rounded-full border border-turquoise/35 bg-navy/35 px-3 py-1.5 text-xs font-bold text-turquoise backdrop-blur sm:mb-5 sm:px-4 sm:py-2 sm:text-sm lg:mb-4">
-            קיץ נקי מתחיל במזגן נקי
+            CleanBrothers • שירותי ניקיון מקצועיים
           </p>
 
           <h1 className="reveal stagger-3 mx-auto max-w-4xl text-[2rem] font-black leading-[1.13] text-white min-[380px]:text-[2.18rem] sm:text-5xl lg:mx-0 lg:text-[4.05rem]">
-            ניקוי מזגנים, ספות, מזרנים וריפודים ברמה מקצועית
+            ניקיון מקצועי לבית, לעסק ולרכב
           </h1>
 
           <p className="reveal stagger-4 mx-auto mt-4 max-w-2xl text-base leading-7 text-white/86 sm:mt-6 sm:text-xl sm:leading-9 lg:mx-0">
-            ניקוי מזגנים, ספות וריפודים עם ציוד מקצועי ושירות עד הבית —
-            לתוצאה נקייה ורעננה.
+            ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות — עם
+            שירות מקצועי עד אליכם.
           </p>
 
-          <div className="reveal stagger-5 mx-auto mt-6 flex max-w-2xl flex-wrap justify-center gap-1.5 sm:mt-8 sm:gap-2 lg:mx-0 lg:justify-start">
+          <div className="reveal stagger-5 mx-auto mt-6 flex max-w-2xl flex-col justify-center gap-3 sm:flex-row sm:flex-wrap lg:mx-0 lg:justify-start">
+            <a
+              href={getWhatsAppLink(
+                "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לשירות ניקיון.",
+              )}
+              className="btn-primary inline-flex"
+            >
+              שלחו תמונה וקבלו הערכת מחיר
+            </a>
+            <Link href="/services" className="btn-secondary inline-flex text-white">
+              צפו בכל השירותים
+            </Link>
+          </div>
+
+          <div className="reveal stagger-6 mx-auto mt-5 flex max-w-2xl flex-wrap justify-center gap-1.5 sm:mt-6 sm:gap-2 lg:mx-0 lg:justify-start">
             {trustChips.map((item) => (
               <div
                 key={item}

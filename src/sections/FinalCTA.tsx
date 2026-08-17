@@ -26,7 +26,7 @@ export function FinalCTA() {
             <div className="absolute bottom-0 left-1/2 h-16 w-[68%] -translate-x-1/2 rounded-full bg-clean-blue/12 blur-2xl" />
             <Image
               src="/images/mascots/cleanbrothers-mascots.png"
-              alt="CleanBrothers cleaning professionals mascots"
+              alt="איור של צוות CleanBrothers"
               width={1536}
               height={1024}
               className="relative h-auto w-full object-contain"
@@ -40,7 +40,7 @@ export function FinalCTA() {
               <div className="absolute bottom-0 left-1/2 h-8 w-[66%] -translate-x-1/2 rounded-full bg-clean-blue/12 blur-xl" />
               <Image
                 src="/images/mascots/cleanbrothers-mascots.png"
-                alt="CleanBrothers cleaning professionals mascots"
+                alt="איור של צוות CleanBrothers"
                 width={1536}
                 height={1024}
                 className="relative h-auto w-full object-contain"
@@ -51,10 +51,10 @@ export function FinalCTA() {
               הצעת מחיר בוואטסאפ תוך דקות
             </p>
             <h2 className="mt-2 text-[1.45rem] font-black leading-tight sm:mt-3 sm:text-5xl">
-              צריכים ניקוי מזגן, ספה או ריפוד?
+              צריכים שירות ניקיון לבית, לעסק או לרכב?
             </h2>
             <p className="mx-auto mt-2.5 max-w-2xl text-sm leading-6 text-white/78 sm:mt-5 sm:text-lg sm:leading-8">
-              שלחו תמונה של המזגן או הריפוד בוואטסאפ ונחזור עם הערכת מחיר ברורה.
+              שלחו תמונה של מה שתרצו לנקות בוואטסאפ ונחזור עם הערכת מחיר ברורה.
             </p>
 
             <div className="mt-4 grid justify-center gap-2 sm:mt-8 sm:flex sm:flex-row sm:items-center sm:gap-3">
@@ -62,7 +62,7 @@ export function FinalCTA() {
                 href={getWhatsAppLink(
                   "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי מזגן או ריפודים.",
                 )}
-                aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר לניקוי מזגן או ריפודים"
+                aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת הערכת מחיר"
                 className="btn-primary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 שלחו תמונה וקבלו מחיר

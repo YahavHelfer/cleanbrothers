@@ -1,65 +1,45 @@
-import Image from "next/image";
-
 const trustItems = [
-  "ציוד מקצועי",
+  "הצעת מחיר מראש",
   "שירות עד הבית",
-  "חומרי ניקוי איכותיים",
-  "יחס אישי",
-  "זמינות מהירה",
-  "תוצאות שנראות לעין",
+  "ציוד וחומרים מקצועיים",
+  "עבודה נקייה ומסודרת",
 ];
 
 export function WhyChooseUs() {
   return (
     <section
       id="why-us"
-      className="reveal theme-section-soft relative overflow-hidden py-9 sm:py-20 lg:py-22"
+      className="reveal theme-section-soft py-10 sm:py-12 lg:py-14"
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
-      <div
-        className="pointer-events-none absolute left-0 top-8 hidden w-60 opacity-[0.18] transition duration-500 sm:block lg:left-8 lg:top-10 lg:w-80"
-      >
-        <div className="absolute left-1/2 top-1/2 h-[76%] w-[76%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(39,211,195,0.20)_0%,_rgba(47,128,237,0.08)_48%,_transparent_74%)] blur-2xl" />
-        <div className="absolute bottom-4 left-1/2 h-16 w-[60%] -translate-x-1/2 rounded-full bg-clean-blue/10 blur-2xl" />
-        <Image
-          src="/images/mascots/cleanbrothers-mascots.png"
-          alt="CleanBrothers cleaning professionals mascots"
-          width={1536}
-          height={1024}
-          className="relative h-auto w-full object-contain"
-          sizes="(min-width: 1024px) 320px, 240px"
-        />
-      </div>
-      <div className="section-container grid gap-7 sm:gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div className="max-w-2xl">
+      <div className="section-container">
+        <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-black text-turquoise">למה לבחור בנו?</p>
-          <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:mt-3 sm:text-5xl lg:text-6xl">
-            שירות מדויק, נקי ומקצועי מהרגע הראשון
+          <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:text-4xl">
+            שירות מקצועי, פשוט וברור
           </h2>
-          <p className="mt-3 text-base leading-7 theme-muted sm:hidden">
-            שולחים תמונה, מקבלים הערכה ואנחנו מגיעים עד אליכם.
-          </p>
-          <p className="mt-3 hidden text-base leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
-            אנחנו הופכים את תהליך הניקוי לפשוט וברור: שולחים תמונה, מקבלים
-            הערכת מחיר, קובעים מועד ואנחנו מגיעים עד אליכם עם כל מה שצריך.
+          <p className="mt-3 text-base leading-7 theme-muted sm:text-lg">
+            שולחים תמונה, מקבלים הערכת מחיר ומתאמים ניקוי עד הבית.
           </p>
         </div>
 
-        <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
-          {trustItems.map((item, index) => (
-            <div
+        <ul className="mx-auto mt-6 grid max-w-5xl grid-cols-2 gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-4">
+          {trustItems.map((item) => (
+            <li
               key={item}
-              className={`card-lift reveal group flex min-h-16 items-center gap-3 rounded-[1.5rem] border theme-card p-3.5 hover:border-turquoise/40 hover:shadow-turquoise/10 sm:min-h-20 sm:gap-4 sm:rounded-[2rem] sm:p-5 stagger-${(index % 6) + 1}`}
+              className="flex min-h-20 items-center gap-2.5 rounded-[1.25rem] border theme-card px-3 py-3 sm:min-h-24 sm:gap-3 sm:px-4"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-turquoise/14 font-black text-turquoise-dark shadow-[0_12px_28px_rgba(39,211,195,0.12)] ring-1 ring-turquoise/20 transition duration-300 group-hover:scale-105 sm:shadow-[0_16px_38px_rgba(39,211,195,0.14)]">
+              <span
+                aria-hidden="true"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-turquoise/14 text-sm font-black text-turquoise-dark ring-1 ring-turquoise/20"
+              >
                 ✓
               </span>
-              <span className="text-lg font-black leading-tight text-[var(--foreground)]">
+              <span className="text-sm font-black leading-6 text-[var(--foreground)] sm:text-base">
                 {item}
               </span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

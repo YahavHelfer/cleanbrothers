@@ -1,14 +1,6 @@
 import { businessConfig } from "@/config/business";
 import { serviceImages } from "@/data/serviceImages";
 
-const seasonalServicePriority: Record<string, number> = {
-  "ניקוי מזגנים": 0,
-  "ניקוי ספות": 1,
-  "ניקוי מזרנים": 2,
-  "ניקוי שטיחים": 3,
-  "ניקוי ריפודי רכב": 4,
-};
-
 export const navLinks = [
   { label: "בית", href: "/" },
   { label: "שירותים", href: "/services" },
@@ -74,6 +66,17 @@ export const services = [
       "ניקוי מזגנים מקצועי לבית ולעסק, עם דגש על הסרת אבק, לכלוך וריחות לא נעימים שהצטברו בתוך היחידה. השירות מתאים למזגנים עיליים נפוצים ועוזר לשמור על תחושת אוויר נקייה ונעימה יותר.",
   },
   {
+    title: "ניקוי חלונות",
+    landingPath: "/window-cleaning",
+    description:
+      "ניקוי זכוכית, מסגרות, מסילות, תריסים ורשתות בחלונות בעלי גישה בטוחה.",
+    benefit: "שירות מסודר לדירות, בתים ומשרדים.",
+    images: [] as string[],
+    imagePosition: "object-center",
+    details:
+      "ניקוי חלונות מקצועי בדירות, בתים ומשרדים, כולל זכוכית, מסגרות, מסילות, תריסים ורשתות בהתאם למצב ולגישה. השירות אינו כולל עבודות בגובה או סנפלינג.",
+  },
+  {
     title: "ניקוי כורסאות וכיסאות",
     landingPath: "/armchair-chair-cleaning",
     description:
@@ -96,12 +99,6 @@ export const services = [
       "לריפודים עדינים אנחנו עובדים בזהירות, בודקים תגובה של החומר ומתאימים את רמת הלחות והניקוי. המטרה היא ניקיון יעיל בלי לפגוע במרקם או במראה.",
   },
 ];
-
-services.sort(
-  (a, b) =>
-    (seasonalServicePriority[a.title] ?? Number.MAX_SAFE_INTEGER) -
-    (seasonalServicePriority[b.title] ?? Number.MAX_SAFE_INTEGER),
-);
 
 export const whyChooseUs = [
   "ציוד מקצועי",

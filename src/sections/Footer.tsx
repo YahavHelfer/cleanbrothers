@@ -11,6 +11,12 @@ const legalLinks = [
   { label: "הצהרת נגישות", href: "/accessibility-statement" },
 ];
 
+const featuredServiceLinks = [
+  { label: "ניקוי ספות", href: "/sofa-cleaning" },
+  { label: "ניקוי מזגנים", href: "/air-conditioner-cleaning" },
+  { label: "ניקוי חלונות", href: "/window-cleaning" },
+];
+
 export function Footer() {
   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
@@ -36,8 +42,8 @@ export function Footer() {
               />
             </Link>
             <p className="mt-2 text-sm leading-6 text-white/64 sm:mt-3 sm:leading-7">
-              ניקוי ספות, מזרנים, שטיחים, ריפודים ורכבים עד בית הלקוח עם שירות
-              מקצועי, נעים וברור.
+              ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית
+              ולעסק עם שירות מקצועי, נעים וברור.
             </p>
           </div>
 
@@ -49,6 +55,18 @@ export function Footer() {
                   key={link.href}
                   href={link.href}
                   aria-label={`מעבר לעמוד ${link.label}`}
+                  className="nav-link-motion rounded-sm focus:outline-none focus:ring-2 focus:ring-turquoise hover:text-turquoise"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <p className="mb-2 mt-4 text-sm font-black text-white">שירותים</p>
+            <div className="grid gap-1.5 text-sm font-semibold text-white/66 sm:gap-2">
+              {featuredServiceLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
                   className="nav-link-motion rounded-sm focus:outline-none focus:ring-2 focus:ring-turquoise hover:text-turquoise"
                 >
                   {link.label}

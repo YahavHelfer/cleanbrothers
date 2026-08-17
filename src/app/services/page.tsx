@@ -1,15 +1,16 @@
 import { Icon } from "@/components/Icon";
 import { PageHero } from "@/components/PageHero";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
+import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
 import Link from "next/link";
 import { services } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata = buildMetadata({
-  title: "שירותי ניקוי ספות, ריפודים ומזגנים | CleanBrothers",
+  title: "שירותי ניקיון לבית, לעסק ולרכב | CleanBrothers",
   description:
-    "שירותי ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב וניקוי מזגנים בבית הלקוח באזור המרכז, כולל ראש העין, פתח תקווה, כפר סבא, רמת גן ותל אביב.",
+    "שירותי ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז מבית CleanBrothers.",
   path: "/services",
 });
 
@@ -50,16 +51,22 @@ export default function ServicesPage() {
                 key={service.title}
                 className={`card-lift reveal grid overflow-hidden rounded-[1.5rem] border theme-card sm:rounded-[2rem] lg:grid-cols-[0.42fr_1fr] stagger-${(index % 6) + 1}`}
               >
-                <ServiceImageCarousel
-                  images={service.images}
-                  alt={service.title}
-                  fallbackLabel={service.title}
-                  className="relative aspect-[16/10] w-full lg:h-full lg:min-h-72"
-                  imageClassName="object-cover transition duration-500 group-hover:scale-[1.025]"
-                  imagePosition={service.imagePosition}
-                  fallbackClassName="from-slate-100 via-white to-cyan-100 text-navy"
-                  sizes="(min-width: 1024px) 38vw, 100vw"
-                />
+                {service.landingPath === "/window-cleaning" ? (
+                  <div className="aspect-[16/10] lg:h-full lg:min-h-72">
+                    <WindowCleaningVisual compact />
+                  </div>
+                ) : (
+                  <ServiceImageCarousel
+                    images={service.images}
+                    alt={service.title}
+                    fallbackLabel={service.title}
+                    className="relative aspect-[16/10] w-full lg:h-full lg:min-h-72"
+                    imageClassName="object-cover transition duration-500 group-hover:scale-[1.025]"
+                    imagePosition={service.imagePosition}
+                    fallbackClassName="from-slate-100 via-white to-cyan-100 text-navy"
+                    sizes="(min-width: 1024px) 38vw, 100vw"
+                  />
+                )}
 
                 <div className="p-5 sm:p-8">
                   <div className="flex items-start gap-4">

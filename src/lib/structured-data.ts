@@ -8,19 +8,19 @@ export const localBusinessJsonLd = {
   url: businessConfig.siteUrl,
   telephone: businessConfig.phoneDisplay,
   email: businessConfig.email,
+  logo: `${businessConfig.siteUrl}/images/logo/cleanbrothers-logo.png`,
   description:
-    "CleanBrothers מספקים ניקוי מזגנים, ספות, ריפודים, מזרנים, שטיחים וריפודי רכב בבית הלקוח באזור המרכז.",
+    "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
   areaServed: businessConfig.serviceAreas.map((area) => ({
     "@type": "City",
     name: area,
   })),
-  sameAs: [businessConfig.siteUrl],
 };
 
 export const serviceJsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
-  name: "ניקוי מזגנים, ספות וריפודים בבית הלקוח",
+  name: "שירותי ניקיון מקצועיים לבית, לעסק ולרכב",
   provider: {
     "@type": "LocalBusiness",
     name: businessConfig.name,
@@ -30,7 +30,7 @@ export const serviceJsonLd = {
   areaServed: businessConfig.serviceAreas.join(", "),
   serviceType: services.map((service) => service.title),
   description:
-    "שירות ניקוי מקצועי למזגנים, ספות, מזרנים, שטיחים, כורסאות וריפודי רכב בבית הלקוח.",
+    "שירות ניקוי מקצועי לספות, מזרנים, שטיחים, כורסאות, ריפודי רכב, מזגנים וחלונות לבית ולעסק.",
 };
 
 export const faqJsonLd = {

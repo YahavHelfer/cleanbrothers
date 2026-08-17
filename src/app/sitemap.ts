@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/services",
     "/air-conditioner-cleaning",
+    "/window-cleaning",
     "/sofa-cleaning",
     "/mattress-cleaning",
     "/carpet-cleaning",
@@ -21,7 +22,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.map((route) => ({
     url: `${businessConfig.siteUrl}${route}`,
-    lastModified: new Date(),
     changeFrequency: route === "" ? "weekly" : "monthly",
     priority: route === "" ? 1 : 0.8,
   }));

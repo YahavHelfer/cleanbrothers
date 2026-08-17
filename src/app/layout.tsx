@@ -16,7 +16,6 @@ import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking"
 import { buildMetadata } from "@/lib/seo";
 import {
   localBusinessJsonLd,
-  serviceJsonLd,
 } from "@/lib/structured-data";
 import { Footer } from "@/sections/Footer";
 import { Navbar } from "@/sections/Navbar";
@@ -39,9 +38,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(businessConfig.siteUrl),
   ...buildMetadata({
     title:
-      "CleanBrothers | ניקוי ספות, ריפודים ומזגנים בבית הלקוח במרכז",
+      "CleanBrothers | ניקיון מקצועי לבית, לעסק ולרכב",
     description:
-      "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב וניקוי מזגנים בבית הלקוח בראש העין, פתח תקווה, הוד השרון, כפר סבא, רמת גן, גבעתיים ותל אביב.",
+      "CleanBrothers מספקים ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
   }),
 };
 
@@ -61,7 +60,6 @@ export default function RootLayout({
           {getGoogleConsentBootstrapScript()}
         </Script>
         <JsonLd id="cleanbrothers-local-business-jsonld" data={localBusinessJsonLd} />
-        <JsonLd id="cleanbrothers-service-jsonld" data={serviceJsonLd} />
       </head>
       <body className="flex min-h-full flex-col">
         <GoogleAdsTag

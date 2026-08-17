@@ -1,5 +1,6 @@
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { SectionHeading } from "@/components/SectionHeading";
+import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
 import Link from "next/link";
 import { services } from "@/data/site";
 
@@ -9,6 +10,7 @@ const primaryServiceTitles = new Set([
   "ניקוי מזרנים",
   "ניקוי שטיחים",
   "ניקוי ריפודי רכב",
+  "ניקוי חלונות",
 ]);
 
 function ServiceAccentIcon({ title }: { title: string }) {
@@ -72,35 +74,36 @@ export function Services() {
       <div className="section-container">
         <SectionHeading
           eyebrow="השירותים המרכזיים"
-          title="השירותים המרכזיים שמחזירים לבית תחושה נקייה"
-          mobileDescription="ספות, מזרנים, רכבים ומזגנים. שולחים תמונה ומקבלים הערכה."
-          description="ניקוי מזגנים בראש סדר העדיפויות לקיץ, לצד ספות, מזרנים, שטיחים וריפודי רכב. שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה."
+          title="שירותי ניקיון מקצועיים לבית, לעסק ולרכב"
+          mobileDescription="ספות, מזרנים, שטיחים, רכבים, מזגנים וחלונות. שולחים תמונה ומקבלים הערכה."
+          description="ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות. בוחרים את השירות המתאים, שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה."
           tone="light"
         />
 
-        <div className="mt-5 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
           {primaryServices.map((service, index) => (
             <article
               key={service.title}
-              className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1} ${service.landingPath === "/air-conditioner-cleaning" ? "border-turquoise/45 shadow-lg shadow-turquoise/10 ring-1 ring-turquoise/10" : ""}`}
+              className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
             >
               <div className="relative">
-                <ServiceImageCarousel
-                  images={service.images}
-                  alt={service.title}
-                  fallbackLabel={service.title}
-                  className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"
-                  imageClassName="object-cover transition duration-500 group-hover:scale-105"
-                  imagePosition={service.imagePosition}
-                  fallbackClassName="from-surface-soft via-white to-cyan-100 text-navy"
-                  sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/24 via-transparent to-turquoise/8" />
-                {service.landingPath === "/air-conditioner-cleaning" && (
-                  <span className="absolute right-3 top-3 z-20 rounded-full border border-white/30 bg-navy/75 px-3 py-1.5 text-xs font-black text-turquoise shadow-lg backdrop-blur">
-                    מבוקש בקיץ
-                  </span>
+                {service.landingPath === "/window-cleaning" ? (
+                  <div className="aspect-[16/10] sm:aspect-[4/3]">
+                    <WindowCleaningVisual compact />
+                  </div>
+                ) : (
+                  <ServiceImageCarousel
+                    images={service.images}
+                    alt={service.title}
+                    fallbackLabel={service.title}
+                    className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"
+                    imageClassName="object-cover transition duration-500 group-hover:scale-105"
+                    imagePosition={service.imagePosition}
+                    fallbackClassName="from-surface-soft via-white to-cyan-100 text-navy"
+                    sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  />
                 )}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/24 via-transparent to-turquoise/8" />
               </div>
 
               <div className="p-3.5 sm:p-7">
@@ -135,7 +138,7 @@ export function Services() {
         </div>
 
         <p className="theme-glass mx-auto mt-5 max-w-3xl rounded-2xl border px-4 py-3 text-center text-sm font-bold theme-muted sm:mt-7 sm:rounded-full sm:px-5">
-          וגם ניקוי שטיחים, כורסאות, כיסאות וריפודים עדינים.
+          בנוסף: ניקוי כורסאות, כיסאות וריפודים עדינים.
         </p>
       </div>
     </section>

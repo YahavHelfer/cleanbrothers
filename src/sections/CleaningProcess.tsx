@@ -12,14 +12,14 @@ const processSteps: ProcessStep[] = [
   {
     title: "שולחים תמונה בוואטסאפ",
     description:
-      "צלמו את הספה, המזרן, השטיח או הרכב ושלחו לנו הודעה קצרה.",
+      "צלמו את הפריט או האזור שתרצו לנקות ושלחו לנו הודעה קצרה.",
     mobileDescription: "מצלמים ושולחים בוואטסאפ.",
     icon: "image",
   },
   {
     title: "מקבלים הצעת מחיר",
     description:
-      "נחזור אליכם עם מחיר ברור לפי סוג הניקוי והמצב של הריפוד.",
+      "נחזור אליכם עם מחיר ברור לפי סוג השירות, ההיקף והמצב.",
     mobileDescription: "מקבלים הערכה ברורה.",
     icon: "quote",
   },
@@ -32,7 +32,7 @@ const processSteps: ProcessStep[] = [
   {
     title: "מגיעים ומנקים",
     description:
-      "אנחנו מגיעים עד אליכם עם ציוד מקצועי ומחזירים לריפוד מראה נקי ורענן.",
+      "אנחנו מגיעים עד אליכם עם הציוד המתאים ומבצעים את השירות שתואם מראש.",
     mobileDescription: "מגיעים עם ציוד מקצועי.",
     icon: "cleaning",
   },
@@ -93,7 +93,7 @@ export function CleaningProcess() {
       <div className="section-container">
         <SectionHeading
           eyebrow="תהליך העבודה"
-          title="ארבעה צעדים פשוטים לריפוד נקי"
+          title="ארבעה צעדים פשוטים לשירות ניקיון"
           mobileDescription="תמונה, מחיר, תיאום וניקוי עד הבית."
           description="בלי טפסים מיותרים ובלי ניחושים. שולחים תמונה, מקבלים מחיר ברור, קובעים מועד ואנחנו מגיעים עם כל הציוד."
           tone="light"
@@ -139,7 +139,7 @@ export function CleaningProcess() {
             href={getWhatsAppLink(
               "היי, אשמח לקבל הצעת מחיר לניקוי ריפודים.",
             )}
-            aria-label="פתיחת וואטסאפ לקבלת הצעת מחיר לניקוי ריפודים"
+            aria-label="פתיחת וואטסאפ לקבלת הצעת מחיר"
             className="btn-primary inline-flex"
           >
             התחילו עכשיו בוואטסאפ
