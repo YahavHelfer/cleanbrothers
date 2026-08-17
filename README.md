@@ -28,15 +28,15 @@ cp .env.example .env.local
 Environment variables:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_WHATSAPP_PHONE=972559577731
 NEXT_PUBLIC_BUSINESS_PHONE=0559577731
 NEXT_PUBLIC_BUSINESS_EMAIL=CleanBrothers.ISR@gmail.com
 ```
 
-For production, update `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_WHATSAPP_PHONE`, and
+For production, update `NEXT_PUBLIC_WHATSAPP_PHONE` and
 `NEXT_PUBLIC_BUSINESS_PHONE` to the real values. `NEXT_PUBLIC_BUSINESS_EMAIL`
-controls the public email address.
+controls the public email address. The canonical public site URL is configured
+in `src/config/business.ts` and is not overridden by environment variables.
 
 ## Development
 
@@ -80,14 +80,13 @@ git push -u origin main
 3. Add these environment variables in Vercel:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://your-temporary-vercel-url.vercel.app
 NEXT_PUBLIC_WHATSAPP_PHONE=972559577731
 NEXT_PUBLIC_BUSINESS_PHONE=0559577731
 NEXT_PUBLIC_BUSINESS_EMAIL=CleanBrothers.ISR@gmail.com
 ```
 
-A temporary Vercel URL is fine for testing and sharing. Later, after connecting
-the real domain, replace `NEXT_PUBLIC_SITE_URL` with the production domain.
+A temporary Vercel URL is fine for testing and sharing. Canonical metadata
+continues to use the public production domain configured in the business config.
 
 ## Where To Update Business Details
 
@@ -97,9 +96,9 @@ Phone and site URL are configured in:
 src/config/business.ts
 ```
 
-Prefer changing values through environment variables:
+The canonical site URL is defined as `CANONICAL_SITE_URL`. Prefer changing the
+remaining public business values through environment variables:
 
-- `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_WHATSAPP_PHONE`
 - `NEXT_PUBLIC_BUSINESS_PHONE`
 - `NEXT_PUBLIC_BUSINESS_EMAIL`

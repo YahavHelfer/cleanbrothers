@@ -1,4 +1,4 @@
-const fallbackSiteUrl = "https://www.cleanbrothers.co.il";
+export const CANONICAL_SITE_URL = "https://www.cleanbrothers.co.il";
 const BUSINESS_PHONE =
   cleanEnv(process.env.NEXT_PUBLIC_BUSINESS_PHONE) || "0559577731";
 const WHATSAPP_PHONE =
@@ -6,10 +6,6 @@ const WHATSAPP_PHONE =
 const BUSINESS_EMAIL =
   cleanEnv(process.env.NEXT_PUBLIC_BUSINESS_EMAIL) ||
   "CleanBrothers.ISR@gmail.com";
-
-function withoutTrailingSlash(value: string) {
-  return value.replace(/\/+$/, "");
-}
 
 function cleanEnv(value?: string) {
   const trimmed = value?.trim();
@@ -23,9 +19,7 @@ function cleanEnv(value?: string) {
 
 export const businessConfig = {
   name: "CleanBrothers",
-  siteUrl: withoutTrailingSlash(
-    process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteUrl,
-  ),
+  siteUrl: CANONICAL_SITE_URL,
   phoneDisplay: BUSINESS_PHONE,
   whatsappPhone: WHATSAPP_PHONE,
   email: BUSINESS_EMAIL,
