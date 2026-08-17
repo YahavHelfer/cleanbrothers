@@ -4,17 +4,9 @@ import { services } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const benefits = [
-  "ניקוי אבק ולכלוך שהצטברו",
-  "טיפול בפילטרים ובחלקים הנגישים לניקוי",
-  "הפחתת ריחות לא נעימים",
-  "ניקוי מקצועי בבית הלקוח",
-];
-
-const signals = [
-  "ריח לא נעים",
-  "אבק מהפתח",
-  "מזגן שלא נוקה זמן רב",
-  "לפני תחילת הקיץ",
+  "ניקוי אבק ולכלוך",
+  "הפחתת ריחות",
+  "שירות מקצועי בבית הלקוח",
 ];
 
 export function AirConditionerFeature() {
@@ -42,43 +34,33 @@ export function AirConditionerFeature() {
 
             <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
               <p className="text-xs font-black text-turquoise-dark sm:text-sm">
-                ניקוי מזגנים לקיץ
+                ניקוי מזגנים מקצועי
               </p>
               <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
                 מזגן נקי. אוויר נעים יותר.
               </h2>
               <p className="mt-3 text-sm leading-6 theme-muted sm:mt-5 sm:text-lg sm:leading-8">
-                ניקוי מזגן מקצועי מסייע להסיר אבק, לכלוך וריחות לא נעימים
-                שהצטברו ביחידה הפנימית ובפילטרים. אנחנו מגיעים עד הבית עם ציוד
-                מקצועי ומבצעים ניקוי מסודר באזור המרכז.
+                ניקוי עמוק להסרת אבק, עובש וריחות — בבית או בעסק.
               </p>
 
-              <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
+              <ul className="mt-5 space-y-3 sm:mt-6">
                 {benefits.map((benefit) => (
-                  <div
+                  <li
                     key={benefit}
-                    className="flex items-start gap-2 rounded-2xl border border-turquoise/15 bg-turquoise/[0.06] px-3 py-2.5 text-sm font-bold"
+                    className="flex items-center gap-3 text-sm font-bold sm:text-base"
                   >
-                    <span className="mt-0.5 text-turquoise-dark" aria-hidden="true">
+                    <span
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-turquoise/10 text-sm text-turquoise-dark"
+                      aria-hidden="true"
+                    >
                       ✓
                     </span>
                     <span>{benefit}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
 
-              <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
-                {signals.map((signal) => (
-                  <span
-                    key={signal}
-                    className="rounded-full border theme-card px-2.5 py-1 text-[0.7rem] font-black theme-muted sm:px-3 sm:py-1.5 sm:text-xs"
-                  >
-                    {signal}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-5 flex flex-col gap-2 sm:mt-7 sm:flex-row sm:items-center sm:gap-3">
+              <div className="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:items-center sm:gap-3">
                 <a
                   href={getWhatsAppLink(
                     "היי, אשמח לשלוח תמונה של המזגן ולקבל הערכת מחיר לניקוי מזגן.",
@@ -98,8 +80,7 @@ export function AirConditionerFeature() {
               </div>
 
               <p className="mt-3 text-xs leading-5 theme-muted">
-                השירות הוא ניקוי מקצועי ואינו תיקון טכני. אם נשארת תקלה לאחר
-                הניקוי, ייתכן שיידרש טכנאי מזגנים מוסמך.
+                השירות כולל ניקוי ואינו תיקון תקלות.
               </p>
             </div>
           </div>
