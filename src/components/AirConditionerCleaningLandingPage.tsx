@@ -7,6 +7,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { SummerAcPromotionPopup } from "@/components/SummerAcPromotionPopup";
 import { businessConfig } from "@/config/business";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { serviceImages } from "@/data/serviceImages";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
@@ -525,7 +526,7 @@ export function AirConditionerCleaningLandingPage() {
                 שלחו תמונת מזגן וקבלו מחיר
               </a>
               <a href={phoneHref} className="btn-secondary inline-flex">
-                התקשרו: {businessConfig.phoneDisplay}
+                התקשרו: <GoogleCallTrackingNumber />
               </a>
             </div>
           </div>

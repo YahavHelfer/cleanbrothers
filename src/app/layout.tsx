@@ -12,6 +12,7 @@ import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { businessConfig } from "@/config/business";
 import { getGoogleConsentBootstrapScript } from "@/lib/consent";
+import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking";
 import { buildMetadata } from "@/lib/seo";
 import {
   localBusinessJsonLd,
@@ -30,6 +31,9 @@ const heebo = Heebo({
 const metaPixelId =
   process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || "1356088816405959";
 const googleAdsId = "AW-18271875274";
+const googleAdsPhoneConversionId =
+  "AW-18271875274/71I-CKLxmOMcEMrh2ohE";
+const googleAdsPhoneConversionNumber = "0559577731";
 
 export const metadata: Metadata = {
   metadataBase: new URL(businessConfig.siteUrl),
@@ -60,7 +64,12 @@ export default function RootLayout({
         <JsonLd id="cleanbrothers-service-jsonld" data={serviceJsonLd} />
       </head>
       <body className="flex min-h-full flex-col">
-        <GoogleAdsTag adsId={googleAdsId} />
+        <GoogleAdsTag
+          adsId={googleAdsId}
+          phoneConversionId={googleAdsPhoneConversionId}
+          phoneConversionNumber={googleAdsPhoneConversionNumber}
+          phoneConversionCssClass={GOOGLE_CALL_CONVERSION_NUMBER_CLASS}
+        />
         <BusinessEventTracker />
         <MarketingAttributionTracker />
         <MetaPixel pixelId={metaPixelId} />

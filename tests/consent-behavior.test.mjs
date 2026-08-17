@@ -134,6 +134,15 @@ test("scenario D/E: changing consent persists and publishes matching updates", (
 test("tag integrations retain one loader and enforce consent gates", () => {
   const layout = readSource("../src/app/layout.tsx");
   const googleTag = readSource("../src/components/GoogleAdsTag.tsx");
+  const trackedNumber = readSource(
+    "../src/components/GoogleCallTrackingNumber.tsx",
+  );
+  const googleCallTracking = readSource(
+    "../src/lib/google-call-tracking.ts",
+  );
+  const serviceLandingPage = readSource(
+    "../src/components/ServiceLandingPage.tsx",
+  );
   const googleAds = readSource("../src/lib/google-ads.ts");
   const metaComponent = readSource("../src/components/MetaPixel.tsx");
   const metaPixel = readSource("../src/lib/meta-pixel.ts");
@@ -145,6 +154,45 @@ test("tag integrations retain one loader and enforce consent gates", () => {
     layout.indexOf("google-consent-defaults") < layout.indexOf("<GoogleAdsTag"),
   );
   assert.doesNotMatch(googleTag, /G-B0KGLSC7VG|GTM-PZ7DLGNS/);
+  assert.match(googleTag, /onLoad=\{configureGoogleAds\}/);
+  assert.match(googleTag, /__cleanBrothersGoogleAdsConfigured/);
+  assert.match(googleTag, /phone_conversion_number: phoneConversionNumber/);
+  assert.match(googleTag, /phone_conversion_css_class: phoneConversionCssClass/);
+  assert.match(googleTag, /phone_conversion_callback:/);
+  assert.match(googleTag, /hasAdStorageConsent\(\)/);
+  assert.match(googleTag, /subscribeToConsentChanges/);
+  assert.match(
+    googleTag,
+    /choice === "accepted"[\s\S]*configureGoogleCallTracking\(\)[\s\S]*restoreOriginalGoogleCallNumbers/,
+  );
+  assert.match(layout, /AW-18271875274\/71I-CKLxmOMcEMrh2ohE/);
+  assert.match(layout, /const googleAdsPhoneConversionNumber = "0559577731"/);
+  assert.equal((layout.match(/<GoogleAdsTag/g) ?? []).length, 1);
+  assert.match(
+    googleCallTracking,
+    /GOOGLE_CALL_CONVERSION_NUMBER_CLASS\s*=\s*\n\s*"google-call-conversion-number"/,
+  );
+  assert.match(trackedNumber, /className=\{GOOGLE_CALL_CONVERSION_NUMBER_CLASS\}/);
+  assert.match(trackedNumber, /data-google-call-original-number/);
+  assert.match(googleCallTracking, /trackedNumber\.textContent = formattedNumber/);
+  assert.match(
+    googleCallTracking,
+    /const forwardingHref = `tel:\$\{mobileNumber\}`[\s\S]*phoneLink\.setAttribute\("href", forwardingHref\)/,
+  );
+  assert.match(
+    googleCallTracking,
+    /querySelectorAll<HTMLAnchorElement>[\s\S]*'a\[href\^="tel:"\]'/,
+  );
+  assert.match(googleCallTracking, /currentHref\.replace\(\/\\D\/g, ""\) !== originalDigits/);
+  assert.match(googleCallTracking, /new MutationObserver/);
+  assert.match(googleCallTracking, /characterData: true/);
+  assert.match(googleCallTracking, /hasAdStorageConsent\(\)/);
+  assert.match(googleCallTracking, /originalNumber[\s\S]*originalHref/);
+  assert.match(
+    serviceLandingPage,
+    /<GoogleCallTrackingNumber>055-957-7731<\/GoogleCallTrackingNumber>/,
+  );
+  assert.match(serviceLandingPage, /const phoneHref = "tel:0559577731"/);
   assert.match(googleAds, /hasAdUserDataConsent\(\)/);
   assert.match(googleAds, /AW-18271875274\/DNSiCK3vzcUcEMrh2ohE/);
   assert.match(googleAds, /crypto\.subtle\.digest/);

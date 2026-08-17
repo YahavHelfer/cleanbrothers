@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { businessConfig } from "@/config/business";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
@@ -71,7 +72,7 @@ export function FinalCTA() {
                 aria-label="חיוג ל-CleanBrothers"
                 className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
-                התקשרו עכשיו: {businessConfig.phoneDisplay}
+                התקשרו עכשיו: <GoogleCallTrackingNumber />
               </a>
             </div>
 

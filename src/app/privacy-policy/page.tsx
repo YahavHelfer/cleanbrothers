@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { businessConfig } from "@/config/business";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { buildMetadata } from "@/lib/seo";
 
 const policySections = [
@@ -71,7 +72,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-black">פרטי קשר</h2>
             <div className="mt-3 grid gap-2 text-sm font-bold theme-muted">
               <Link href={phoneHref} className="hover:text-turquoise-dark">
-                {businessConfig.phoneDisplay}
+                <GoogleCallTrackingNumber />
               </Link>
               <Link href={emailHref} className="hover:text-turquoise-dark">
                 {businessConfig.email}

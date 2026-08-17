@@ -1,4 +1,5 @@
 import { ContactForm } from "@/components/ContactForm";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { Icon } from "@/components/Icon";
 import { PageHero } from "@/components/PageHero";
 import { businessConfig } from "@/config/business";
@@ -91,7 +92,7 @@ export default function ContactPage() {
                 className="btn-secondary inline-flex"
               >
                 <Icon name="phone" className="ml-2 h-5 w-5" />
-                {businessConfig.phoneDisplay}
+                <GoogleCallTrackingNumber />
               </a>
               <a
                 href={emailHref}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BeforeAfterCard } from "@/components/BeforeAfterCard";
 import { ContactForm } from "@/components/ContactForm";
 import { Icon } from "@/components/Icon";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { JsonLd } from "@/components/JsonLd";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
@@ -147,7 +148,7 @@ export function ServiceLandingPage({
               </a>
               <a href={phoneHref} aria-label="חיוג ל-CleanBrothers במספר 055-957-7731" className="inline-flex min-h-12 items-center justify-center rounded-full px-4 font-black text-white underline decoration-turquoise decoration-2 underline-offset-4 focus:ring-2 focus:ring-turquoise">
                 <Icon name="phone" className="ml-2 h-5 w-5" />
-                055-957-7731
+                <GoogleCallTrackingNumber>055-957-7731</GoogleCallTrackingNumber>
               </a>
             </div>
             <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
@@ -341,7 +342,9 @@ export function ServiceLandingPage({
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
               <a href={whatsappHref} className="btn-primary inline-flex">שלחו תמונה ב-WhatsApp</a>
-              <a href={phoneHref} className="btn-secondary inline-flex">התקשרו: 055-957-7731</a>
+              <a href={phoneHref} className="btn-secondary inline-flex">
+                התקשרו: <GoogleCallTrackingNumber>055-957-7731</GoogleCallTrackingNumber>
+              </a>
             </div>
           </div>
           <ContactForm initialService={config.serviceName} />

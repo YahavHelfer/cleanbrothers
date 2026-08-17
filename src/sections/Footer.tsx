@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { businessConfig } from "@/config/business";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
@@ -63,7 +64,7 @@ export function Footer() {
               aria-label="חיוג ל-CleanBrothers"
               className="text-lg font-black text-turquoise transition hover:text-white focus:outline-none focus:ring-2 focus:ring-turquoise sm:text-xl"
             >
-              {businessConfig.phoneDisplay}
+              <GoogleCallTrackingNumber />
             </a>
             <a
               href={emailHref}

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { businessConfig } from "@/config/business";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
@@ -69,7 +69,7 @@ export function Navbar() {
             aria-label="פתיחת וואטסאפ לקבלת הצעת מחיר"
             className="btn-primary hidden sm:inline-flex"
           >
-            {businessConfig.phoneDisplay}
+            <GoogleCallTrackingNumber />
           </a>
         </div>
       </nav>
