@@ -205,5 +205,5 @@ test("tag integrations retain one loader and enforce consent gates", () => {
   assert.match(metaComponent, /pageViewReportedForConsentRef/);
   assert.match(attribution, /hasAnalyticsConsent\(\)/);
   assert.match(contactForm, /fetch\("\/api\/contact-lead"/);
-  assert.match(contactForm, /reportGoogleAdsLeadConversion\(leadId, values\.phone\)/);
+  assert.match(contactForm, /reportGoogleAds: reportGoogleAdsLeadConversion/);
 });

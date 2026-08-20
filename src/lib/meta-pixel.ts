@@ -4,6 +4,7 @@ type MetaPixelFunction = (
   action: "init" | "track",
   eventOrPixelId: string,
   parameters?: Record<string, unknown>,
+  options?: { eventID?: string },
 ) => void;
 
 declare global {
@@ -78,12 +79,17 @@ export function stopPendingMetaPixelInitialization() {
   }
 }
 
-export function trackMetaPixelEvent(eventName: string) {
+export function trackMetaPixelEvent(eventName: string, eventId?: string) {
   if (
     typeof window === "undefined" ||
     typeof window.fbq !== "function" ||
     !hasAdStorageConsent()
   ) {
+    return;
+  }
+
+  if (eventId) {
+    window.fbq("track", eventName, {}, { eventID: eventId });
     return;
   }
 

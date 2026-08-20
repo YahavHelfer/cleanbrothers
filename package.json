@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npm run test:consent && npm run test:analytics && npm run test:whatsapp-attribution",
+    "test": "npm run test:consent && npm run test:analytics && npm run test:contact-leads && npm run test:whatsapp-attribution",
     "test:consent": "node --experimental-strip-types --test tests/consent-behavior.test.mjs",
     "test:analytics": "node --test tests/google-analytics-events.test.mjs",
+    "test:contact-leads": "node --experimental-strip-types --test tests/contact-lead-contract.test.mjs",
     "test:attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs",
     "test:whatsapp-attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs"
   },

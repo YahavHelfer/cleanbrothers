@@ -2,6 +2,14 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { serviceOptions } from "@/data/site";
+import { parseContactLeadOutcome } from "@/lib/contact-lead-contract";
+import {
+  getOrCreateContactSubmissionAttempt,
+  hasReportedContactSubmission,
+  markContactSubmissionReported,
+  reportEligibleContactLeadEvents,
+  type ContactSubmissionAttempt,
+} from "@/lib/contact-lead-submission";
 import { trackGoogleAnalyticsEvent } from "@/lib/google-analytics";
 import { reportGoogleAdsLeadConversion } from "@/lib/google-ads";
 import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
@@ -40,10 +48,13 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const isSubmissionInFlightRef = useRef(false);
-  const submissionSequenceRef = useRef(0);
-  const conversionReportedForSubmissionRef = useRef<number | null>(null);
+  const formRevisionRef = useRef(0);
+  const submissionAttemptRef = useRef<ContactSubmissionAttempt | null>(null);
+  const reportedSubmissionIdsRef = useRef(new Set<string>());
 
   function updateField(field: keyof FormState, value: string) {
+    formRevisionRef.current += 1;
+    submissionAttemptRef.current = null;
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
     setSubmitted(false);
@@ -78,8 +89,13 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
     }
 
     isSubmissionInFlightRef.current = true;
-    const submissionId = submissionSequenceRef.current + 1;
-    submissionSequenceRef.current = submissionId;
+    const submissionAttempt = getOrCreateContactSubmissionAttempt(
+      submissionAttemptRef.current,
+      formRevisionRef.current,
+      () => crypto.randomUUID(),
+    );
+    submissionAttemptRef.current = submissionAttempt;
+    const { submissionId } = submissionAttempt;
     setIsSubmitting(true);
     setSubmitted(false);
     setSubmissionError("");
@@ -97,38 +113,72 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
           service: values.service,
           city: values.city,
           message: values.message,
+          submissionId,
           marketingAttribution: getStoredMarketingAttribution(),
         }),
       });
 
-      const result = (await response.json().catch(() => null)) as {
-        error?: string;
-        leadId?: string;
-      } | null;
+      const result = (await response.json().catch(() => null)) as unknown;
+      const responseError =
+        result &&
+        typeof result === "object" &&
+        typeof (result as Record<string, unknown>).error === "string"
+          ? (result as Record<string, string>).error
+          : "";
 
       if (!response.ok) {
         throw new Error(
-          result?.error ||
+          responseError ||
             "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
         );
       }
 
-      const leadId = result?.leadId?.trim();
-
-      if (!leadId) {
+      const outcome = parseContactLeadOutcome(result, submissionId);
+      if (!outcome) {
         throw new Error(
           "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.",
         );
       }
 
-      trackMetaPixelEvent("Lead");
-      if (conversionReportedForSubmissionRef.current !== submissionId) {
-        conversionReportedForSubmissionRef.current = submissionId;
-        reportGoogleAdsLeadConversion(leadId, values.phone);
-        trackGoogleAnalyticsEvent("generate_lead");
+      let alreadyReported = reportedSubmissionIdsRef.current.has(submissionId);
+      if (!alreadyReported) {
+        try {
+          alreadyReported = hasReportedContactSubmission(
+            window.sessionStorage,
+            submissionId,
+          );
+        } catch {
+          // In-memory reporting protection remains available in this component.
+        }
       }
+
+      reportEligibleContactLeadEvents({
+        outcome,
+        phone: values.phone,
+        alreadyReported,
+        reporters: {
+          reportGoogleAds: reportGoogleAdsLeadConversion,
+          reportGoogleAnalytics: () =>
+            trackGoogleAnalyticsEvent("generate_lead"),
+          reportMeta: (eventId) => trackMetaPixelEvent("Lead", eventId),
+          markReported: () => {
+            reportedSubmissionIdsRef.current.add(submissionId);
+            try {
+              markContactSubmissionReported(
+                window.sessionStorage,
+                submissionId,
+              );
+            } catch {
+              // Do not let unavailable storage affect the successful lead.
+            }
+          },
+        },
+      });
+
       setSubmitted(true);
       setValues({ ...initialState, service: defaultService });
+      submissionAttemptRef.current = null;
+      formRevisionRef.current += 1;
     } catch (error) {
       // Keep the entered details available so the customer can retry easily.
       setSubmissionError(

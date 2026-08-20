@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  isValidContactSubmissionId,
+  parseContactLeadOutcome,
+} from "@/lib/contact-lead-contract";
 
 const CRM_LEAD_ENDPOINT =
   "https://cleanbrothers-crm.vercel.app/api/integrations/leads/website";
@@ -78,58 +82,6 @@ function sanitizeMarketingAttribution(value: unknown): MarketingAttribution {
   return attribution;
 }
 
-function readIdentifier(value: unknown) {
-  if (typeof value === "string") {
-    return value.trim();
-  }
-
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return String(value);
-  }
-
-  return "";
-}
-
-function readNestedIdentifier(
-  data: Record<string, unknown>,
-  path: readonly string[],
-) {
-  let current: unknown = data;
-
-  for (const key of path) {
-    if (!current || typeof current !== "object") {
-      return "";
-    }
-
-    current = (current as Record<string, unknown>)[key];
-  }
-
-  return readIdentifier(current);
-}
-
-function extractStableLeadId(data: unknown, fallbackLeadId: string) {
-  if (!data || typeof data !== "object") {
-    return fallbackLeadId;
-  }
-
-  const responseData = data as Record<string, unknown>;
-  const candidate =
-    readIdentifier(responseData.leadId) ||
-    readIdentifier(responseData.id) ||
-    readIdentifier(responseData.crmLeadId) ||
-    readIdentifier(responseData.referenceId) ||
-    readNestedIdentifier(responseData, ["lead", "id"]) ||
-    readNestedIdentifier(responseData, ["lead", "leadId"]) ||
-    readNestedIdentifier(responseData, ["lead", "crmLeadId"]) ||
-    readNestedIdentifier(responseData, ["lead", "referenceId"]) ||
-    readNestedIdentifier(responseData, ["data", "id"]) ||
-    readNestedIdentifier(responseData, ["data", "leadId"]) ||
-    readNestedIdentifier(responseData, ["data", "crmLeadId"]) ||
-    readNestedIdentifier(responseData, ["data", "referenceId"]);
-
-  return candidate || fallbackLeadId;
-}
-
 export async function POST(request: Request) {
   let body: unknown;
 
@@ -150,7 +102,22 @@ export async function POST(request: Request) {
   }
 
   const data = body as Record<string, unknown>;
-  const referenceId = crypto.randomUUID();
+  const hasSubmissionId = Object.prototype.hasOwnProperty.call(
+    data,
+    "submissionId",
+  );
+  if (hasSubmissionId && !isValidContactSubmissionId(data.submissionId)) {
+    return NextResponse.json(
+      { error: "הבקשה אינה תקינה. בדקו את הפרטים ונסו שוב." },
+      { status: 400 },
+    );
+  }
+
+  // Legacy clients without submissionId remain accepted. New clients always
+  // provide their stable logical-attempt ID and receive no conversion fallback.
+  const referenceId = hasSubmissionId
+    ? (data.submissionId as string)
+    : crypto.randomUUID();
   const marketingAttribution = sanitizeMarketingAttribution(
     data.marketingAttribution,
   );
@@ -199,9 +166,20 @@ export async function POST(request: Request) {
     }
 
     const crmResult = (await crmResponse.json().catch(() => null)) as unknown;
-    const leadId = extractStableLeadId(crmResult, referenceId);
+    const outcome = parseContactLeadOutcome(crmResult, referenceId);
 
-    return NextResponse.json({ success: true, leadId });
+    if (!outcome) {
+      console.error("CRM lead webhook returned an invalid success payload");
+      return NextResponse.json({ error: SUBMISSION_ERROR }, { status: 502 });
+    }
+
+    console.info("CRM lead webhook outcome", {
+      status: outcome.status,
+      created: outcome.created,
+      conversionEligible: outcome.conversionEligible,
+    });
+
+    return NextResponse.json({ success: true, ...outcome });
   } catch (error) {
     console.error("Failed to forward contact lead to CRM", error);
     return NextResponse.json({ error: SUBMISSION_ERROR }, { status: 502 });

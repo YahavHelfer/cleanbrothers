@@ -112,10 +112,10 @@ test("page_path is pathname-only and unsafe values fall back to root", () => {
   assert.equal(unsafe.calls[0][2].page_path, "/");
 });
 
-test("generate_lead stays inside the successful-submission duplicate guard", () => {
+test("generate_lead stays inside the eligible CRM outcome reporter", () => {
   assert.match(
     contactFormSource,
-    /if \(conversionReportedForSubmissionRef\.current !== submissionId\)[\s\S]*reportGoogleAdsLeadConversion\(leadId, values\.phone\);[\s\S]*trackGoogleAnalyticsEvent\("generate_lead"\);/,
+    /reportEligibleContactLeadEvents\([\s\S]*reportGoogleAds: reportGoogleAdsLeadConversion[\s\S]*trackGoogleAnalyticsEvent\("generate_lead"\)/,
   );
   assert.equal(
     (contactFormSource.match(/trackGoogleAnalyticsEvent\("generate_lead"\)/g) ?? []).length,
@@ -123,7 +123,7 @@ test("generate_lead stays inside the successful-submission duplicate guard", () 
   );
   assert.doesNotMatch(
     analyticsSource,
-    /leadId|phone_number|full_name|message|marketingAttribution/,
+    /leadId|eventId|phone_number|full_name|message|marketingAttribution/,
   );
 });
 
