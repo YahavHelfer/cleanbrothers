@@ -27,11 +27,12 @@ export async function GET(request: NextRequest) {
     consent,
     attributionCookie,
     humanMessage,
-    requestToken: (marketingAttribution) =>
+    requestToken: (marketingAttribution, consentSnapshot) =>
       requestWhatsAppAttributionToken({
         endpoint: new URL(CRM_ATTRIBUTION_ENDPOINT),
         secret,
         marketingAttribution,
+        consentSnapshot,
         timeoutMs: TOKEN_REQUEST_TIMEOUT_MS,
       }),
   });

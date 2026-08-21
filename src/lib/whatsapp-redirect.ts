@@ -1,3 +1,4 @@
+import { buildConsentSnapshotFromCookie } from "./consent";
 import { sanitizeMarketingAttribution } from "./marketing-attribution-shared";
 import { appendWhatsAppAttributionMarker } from "./whatsapp-attribution";
 
@@ -23,12 +24,18 @@ export async function buildWhatsAppRedirectMessage({
   humanMessage: string;
   requestToken: (
     attribution: ReturnType<typeof sanitizeMarketingAttribution>,
+    consentSnapshot: NonNullable<
+      ReturnType<typeof buildConsentSnapshotFromCookie>
+    >,
   ) => Promise<string | null>;
 }) {
-  if (consent !== "accepted") return humanMessage;
+  const consentSnapshot = buildConsentSnapshotFromCookie(consent);
+  if (!consentSnapshot) return humanMessage;
+
   const attribution = readWhatsAppAttributionCookie(attributionCookie);
   if (!Object.keys(attribution).length) return humanMessage;
-  const token = await requestToken(attribution).catch(() => null);
+
+  const token = await requestToken(attribution, consentSnapshot).catch(() => null);
   return token
     ? appendWhatsAppAttributionMarker(humanMessage, token)
     : humanMessage;

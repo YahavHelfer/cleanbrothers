@@ -11,6 +11,7 @@ import {
   hasMeaningfulAcquisitionEvidence,
   sanitizeMarketingAttribution,
 } from "../src/lib/marketing-attribution-shared.ts";
+import { buildConsentSnapshotFromCookie } from "../src/lib/consent.ts";
 import {
   appendWhatsAppAttributionMarker,
 } from "../src/lib/whatsapp-attribution.ts";
@@ -97,6 +98,68 @@ test("rejected consent and missing attribution keep ordinary WhatsApp behavior",
   assert.equal(rejected, "Hello");
   assert.equal(missing, "Hello");
   assert.equal(calls, 0);
+});
+
+test("server-issued consent snapshot is attached only for exact accepted cookie", async () => {
+  const calls = [];
+  const result = await buildWhatsAppRedirectMessage({
+    consent: "accepted",
+    attributionCookie: encodeURIComponent(JSON.stringify({ utm_source: "google" })),
+    humanMessage: "Hello",
+    requestToken: async (attribution, consentSnapshot) => {
+      calls.push({ attribution, consentSnapshot });
+      return SYNTHETIC_TOKEN;
+    },
+  });
+
+  assert.equal(result, appendWhatsAppAttributionMarker("Hello", SYNTHETIC_TOKEN));
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].attribution, { utm_source: "google" });
+  assert.equal(calls[0].consentSnapshot.adStorage, "granted");
+  assert.equal(calls[0].consentSnapshot.analyticsStorage, "granted");
+  assert.equal(calls[0].consentSnapshot.adUserData, "granted");
+  assert.equal(calls[0].consentSnapshot.adPersonalization, "granted");
+  assert.equal(calls[0].consentSnapshot.policyVersion, "2026-08-20");
+  assert.equal(calls[0].consentSnapshot.source, "website_cookie_banner");
+  assert.equal(calls[0].consentSnapshot.purpose, "measurement/offline_conversion");
+  assert.match(calls[0].consentSnapshot.capturedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+
+  const rejectedCookieValues = [
+    undefined,
+    null,
+    "",
+    "yes",
+    "approved",
+    "Accepted",
+    "ACCEPTED",
+    " accepted",
+    "accepted ",
+    "accepted\n",
+    "true",
+    "1",
+    "rejected",
+    "accepted%0A",
+    "malformed-cookie-value",
+  ];
+
+  for (const consent of rejectedCookieValues) {
+    assert.equal(buildConsentSnapshotFromCookie(consent), null);
+    const message = await buildWhatsAppRedirectMessage({
+      consent,
+      attributionCookie: encodeURIComponent(
+        JSON.stringify({ gclid: "CLICK_ID_MUST_NOT_BE_SENT", utm_source: "google" }),
+      ),
+      humanMessage: "Hello",
+      requestToken: async (attribution, consentSnapshot) => {
+        calls.push({ attribution, consentSnapshot });
+        return SYNTHETIC_TOKEN;
+      },
+    });
+    assert.equal(message, "Hello");
+    assert.doesNotMatch(message, /CBREF|CLICK_ID_MUST_NOT_BE_SENT/);
+  }
+
+  assert.equal(calls.length, 1);
 });
 
 test("token endpoint failure fails open without blocking WhatsApp", async () => {
@@ -207,6 +270,16 @@ test("CRM failures and malformed responses fail open", async () => {
 test("successful CRM response returns only a valid opaque token", async () => {
   const token = await requestWhatsAppAttributionToken({
     ...ATTRIBUTION_REQUEST,
+    consentSnapshot: {
+      adStorage: "granted",
+      analyticsStorage: "granted",
+      adUserData: "granted",
+      adPersonalization: "granted",
+      capturedAt: "2026-08-21T12:00:00.000Z",
+      policyVersion: "2026-08-20",
+      source: "website_cookie_banner",
+      purpose: "measurement/offline_conversion",
+    },
     fetchImpl: responseWith(200, { token: SYNTHETIC_TOKEN }),
   });
   assert.equal(token, SYNTHETIC_TOKEN);
@@ -246,6 +319,10 @@ function loadRedirectHelper() {
     "utf8",
   )
     .replace(
+      'import { buildConsentSnapshotFromCookie } from "./consent";',
+      "const buildConsentSnapshotFromCookie = globalThis.__buildConsentSnapshotFromCookie;",
+    )
+    .replace(
       'import { sanitizeMarketingAttribution } from "./marketing-attribution-shared";',
       "const sanitizeMarketingAttribution = globalThis.__sanitizeMarketingAttribution;",
     )
@@ -260,14 +337,31 @@ function loadRedirectHelper() {
     },
   }).outputText;
   const context = vm.createContext({
+    __buildConsentSnapshotFromCookie: (value) => {
+      if (value === "accepted") {
+        return {
+          adStorage: "granted",
+          analyticsStorage: "granted",
+          adUserData: "granted",
+          adPersonalization: "granted",
+          capturedAt: new Date().toISOString(),
+          policyVersion: "2026-08-20",
+          source: "website_cookie_banner",
+          purpose: "measurement/offline_conversion",
+        };
+      }
+      return null;
+    },
     __sanitizeMarketingAttribution: sanitizeMarketingAttribution,
     __appendWhatsAppAttributionMarker: appendWhatsAppAttributionMarker,
     decodeURIComponent,
     JSON,
     Object,
+    Date,
     exports: {},
     module: { exports: {} },
   });
+  context.globalThis = context;
   context.exports = context.module.exports;
   vm.runInContext(javascript, context);
   return context.module.exports.buildWhatsAppRedirectMessage;
@@ -278,6 +372,10 @@ function loadAttributionRequestHelper() {
     new URL("../src/lib/whatsapp-attribution-request.ts", import.meta.url),
     "utf8",
   )
+    .replace(
+      'import type { ConsentSnapshot } from "./consent";',
+      "",
+    )
     .replace(
       'import type { MarketingAttribution } from "./marketing-attribution-shared";',
       "",
@@ -300,9 +398,11 @@ function loadAttributionRequestHelper() {
     Object,
     URL,
     console,
+    fetch,
     exports: {},
     module: { exports: {} },
   });
+  context.globalThis = context;
   context.exports = context.module.exports;
   vm.runInContext(javascript, context);
   return context.module.exports.requestWhatsAppAttributionToken;

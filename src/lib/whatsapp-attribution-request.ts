@@ -1,3 +1,4 @@
+import type { ConsentSnapshot } from "./consent";
 import type { MarketingAttribution } from "./marketing-attribution-shared";
 import { WHATSAPP_ATTRIBUTION_TOKEN_PATTERN } from "./whatsapp-attribution";
 
@@ -10,12 +11,14 @@ export async function requestWhatsAppAttributionToken({
   endpoint,
   secret,
   marketingAttribution,
+  consentSnapshot,
   timeoutMs,
   fetchImpl = fetch,
 }: {
   endpoint: URL;
   secret: string | undefined;
   marketingAttribution: MarketingAttribution;
+  consentSnapshot?: ConsentSnapshot | null;
   timeoutMs: number;
   fetchImpl?: FetchLike;
 }) {
@@ -29,7 +32,10 @@ export async function requestWhatsAppAttributionToken({
         "Content-Type": "application/json",
         "x-webhook-secret": normalizedSecret,
       },
-      body: JSON.stringify({ marketingAttribution }),
+      body: JSON.stringify({
+        marketingAttribution,
+        ...(consentSnapshot ? { consentSnapshot } : {}),
+      }),
       cache: "no-store",
       signal: AbortSignal.timeout(timeoutMs),
     });

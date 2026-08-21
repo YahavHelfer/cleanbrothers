@@ -11,6 +11,17 @@ export const CONSENT_STORAGE_KEY = "cleanbrothers-cookie-consent";
 export const CONSENT_CHANGE_EVENT = "cleanbrothers:consent-change";
 export const CONSENT_PREFERENCES_EVENT = "cleanbrothers:open-consent-preferences";
 export const CONSENT_COOKIE_NAME = "cb_analytics_consent";
+export const CONSENT_SNAPSHOT_POLICY_VERSION = "2026-08-20" as const;
+export type ConsentSnapshot = {
+  adStorage: "granted";
+  analyticsStorage: "granted";
+  adUserData: "granted";
+  adPersonalization: "granted";
+  capturedAt: string;
+  policyVersion: typeof CONSENT_SNAPSHOT_POLICY_VERSION;
+  source: "website_cookie_banner";
+  purpose: "measurement/offline_conversion";
+};
 const ATTRIBUTION_COOKIE_NAME = "cb_first_touch_attribution";
 const CONSENT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
@@ -49,6 +60,25 @@ export function parseStoredConsentValue(value: string | null): ConsentChoice {
   }
 
   return "unknown";
+}
+
+export function buildConsentSnapshotFromCookie(
+  cookieValue: string | null | undefined,
+): ConsentSnapshot | null {
+  if (cookieValue !== "accepted") {
+    return null;
+  }
+
+  return {
+    adStorage: "granted",
+    analyticsStorage: "granted",
+    adUserData: "granted",
+    adPersonalization: "granted",
+    capturedAt: new Date().toISOString(),
+    policyVersion: CONSENT_SNAPSHOT_POLICY_VERSION,
+    source: "website_cookie_banner",
+    purpose: "measurement/offline_conversion",
+  };
 }
 
 export function getConsentState(choice: ConsentChoice): GoogleConsentState {
