@@ -17,6 +17,8 @@ import {
 } from "../src/lib/whatsapp-attribution.ts";
 const SITE_ORIGIN = "https://cleanbrothers.co.il";
 const SYNTHETIC_TOKEN = "AbCdEfGhIjKlMnOpQrStUv";
+const SYNTHETIC_REFERENCE =
+  `מספר פנייה אוטומטי: CB-${SYNTHETIC_TOKEN}`;
 const ATTRIBUTION_ENDPOINT = new URL(
   "https://cleanbrothers-crm.vercel.app/api/integrations/whatsapp/attribution",
 );
@@ -113,6 +115,7 @@ test("server-issued consent snapshot is attached only for exact accepted cookie"
   });
 
   assert.equal(result, appendWhatsAppAttributionMarker("Hello", SYNTHETIC_TOKEN));
+  assert.equal(result, `Hello\n\n${SYNTHETIC_REFERENCE}`);
   assert.equal(calls.length, 1);
   assert.deepEqual(calls[0].attribution, { utm_source: "google" });
   assert.equal(calls[0].consentSnapshot.adStorage, "granted");
@@ -156,7 +159,10 @@ test("server-issued consent snapshot is attached only for exact accepted cookie"
       },
     });
     assert.equal(message, "Hello");
-    assert.doesNotMatch(message, /CBREF|CLICK_ID_MUST_NOT_BE_SENT/);
+    assert.doesNotMatch(
+      message,
+      /CBREF|מספר פנייה אוטומטי: CB-|CLICK_ID_MUST_NOT_BE_SENT/,
+    );
   }
 
   assert.equal(calls.length, 1);
@@ -172,9 +178,10 @@ test("token endpoint failure fails open without blocking WhatsApp", async () => 
     },
   });
   assert.equal(message, "Hello");
+  assert.doesNotMatch(message, /CBREF|מספר פנייה אוטומטי: CB-/);
 });
 
-test("successful bridge exposes only an opaque marker, never attribution values", async () => {
+test("successful bridge exposes only the customer-facing reference", async () => {
   const clickIdSentinel = "CLICK_ID_SENTINEL";
   const message = await buildWhatsAppRedirectMessage({
     consent: "accepted",
@@ -185,8 +192,28 @@ test("successful bridge exposes only an opaque marker, never attribution values"
     requestToken: async () => SYNTHETIC_TOKEN,
   });
   assert.equal(message, appendWhatsAppAttributionMarker("Hello", SYNTHETIC_TOKEN));
+  assert.equal(message, `Hello\n\n${SYNTHETIC_REFERENCE}`);
   assert.doesNotMatch(message, new RegExp(clickIdSentinel));
   assert.doesNotMatch(message, /gclid|utm_source/i);
+});
+
+test("invalid issued tokens never add a reference", async () => {
+  for (const issuedToken of [
+    "short",
+    `${SYNTHETIC_TOKEN}A`,
+    "not+base64url+token++",
+  ]) {
+    const message = await buildWhatsAppRedirectMessage({
+      consent: "accepted",
+      attributionCookie: encodeURIComponent(
+        JSON.stringify({ utm_source: "google" }),
+      ),
+      humanMessage: "Hello",
+      requestToken: async () => issuedToken,
+    });
+    assert.equal(message, "Hello");
+    assert.doesNotMatch(message, /CBREF|מספר פנייה אוטומטי: CB-/);
+  }
 });
 
 test("all website WhatsApp CTAs use the shared same-origin helper", () => {
@@ -229,6 +256,8 @@ test("public WhatsApp route exposes no temporary diagnostic state", () => {
   assert.match(route, /NextResponse\.redirect\([\s\S]*307/);
   assert.match(route, /buildDirectWhatsAppLink\(outboundMessage\)/);
   assert.doesNotMatch(route, /cb_attribution_debug|X-CB-|AttributionDiagnostic/);
+  assert.doesNotMatch(route, /searchParams\.get\(["'](?:marker|consentSnapshot)["']\)/);
+  assert.doesNotMatch(route, /request\.(?:json|formData)\(/);
 });
 
 test("missing environment fails open without calling CRM", async () => {
