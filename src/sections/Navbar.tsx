@@ -54,7 +54,7 @@ export function Navbar() {
           aria-label="מעבר לדף הבית של CleanBrothers"
           className="flex items-center transition duration-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-turquoise"
         >
-          <span className="relative h-[2.45rem] w-[3.9rem] overflow-hidden sm:h-[3.5rem] sm:w-[5.6rem] lg:h-[4.35rem] lg:w-28 dark:hidden">
+          <span className="navbar-logo-light relative h-[2.45rem] w-[3.9rem] overflow-hidden sm:h-[3.5rem] sm:w-[5.6rem] lg:h-[4.35rem] lg:w-28">
             <Image
               src="/images/logo/cleanbrothers-logo-light.png"
               alt="CleanBrothers"
@@ -69,7 +69,7 @@ export function Navbar() {
             alt="CleanBrothers"
             width={260}
             height={148}
-            className="hidden h-[2.45rem] w-auto object-contain sm:h-[3.5rem] lg:h-[4.35rem] dark:block"
+            className="navbar-logo-dark h-[2.45rem] w-auto object-contain sm:h-[3.5rem] lg:h-[4.35rem]"
             sizes="(min-width: 1024px) 260px, (min-width: 640px) 220px, 190px"
             priority
           />

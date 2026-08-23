@@ -149,6 +149,24 @@ select {
 }
 
 @layer components {
+  .navbar-logo-light,
+  html[data-theme="light"] .navbar-logo-light {
+    display: block;
+  }
+
+  .navbar-logo-dark,
+  html[data-theme="light"] .navbar-logo-dark {
+    display: none;
+  }
+
+  html[data-theme="dark"] .navbar-logo-light {
+    display: none;
+  }
+
+  html[data-theme="dark"] .navbar-logo-dark {
+    display: block;
+  }
+
   .section-container {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-8 lg:px-12;
   }

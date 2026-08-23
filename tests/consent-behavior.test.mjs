@@ -207,3 +207,35 @@ test("tag integrations retain one loader and enforce consent gates", () => {
   assert.match(contactForm, /fetch\("\/api\/contact-lead"/);
   assert.match(contactForm, /reportGoogleAds: reportGoogleAdsLeadConversion/);
 });
+
+test("navbar logo follows the explicit data-theme value", () => {
+  const navbar = readSource("../src/sections/Navbar.tsx");
+  const globalStyles = readSource("../src/app/globals.css");
+  const themeToggle = readSource("../src/components/ThemeToggle.tsx");
+  const logoMarkup = navbar.slice(
+    navbar.indexOf('className="navbar-logo-light'),
+    navbar.indexOf("<ThemeToggle />"),
+  );
+
+  assert.match(themeToggle, /type ThemeMode = "light" \| "dark"/);
+  assert.match(themeToggle, /document\.documentElement\.dataset\.theme = nextTheme/);
+  assert.match(logoMarkup, /navbar-logo-light/);
+  assert.match(logoMarkup, /navbar-logo-dark/);
+  assert.doesNotMatch(logoMarkup, /dark:(?:block|hidden)/);
+  assert.match(
+    globalStyles,
+    /html\[data-theme="light"\] \.navbar-logo-light[\s\S]*?display: block/,
+  );
+  assert.match(
+    globalStyles,
+    /html\[data-theme="light"\] \.navbar-logo-dark[\s\S]*?display: none/,
+  );
+  assert.match(
+    globalStyles,
+    /html\[data-theme="dark"\] \.navbar-logo-light[\s\S]*?display: none/,
+  );
+  assert.match(
+    globalStyles,
+    /html\[data-theme="dark"\] \.navbar-logo-dark[\s\S]*?display: block/,
+  );
+});
