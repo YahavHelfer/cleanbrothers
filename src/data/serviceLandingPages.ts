@@ -1,5 +1,5 @@
 import type { ServiceLandingConfig } from "@/components/ServiceLandingPage";
-import { serviceImages } from "@/data/serviceImages";
+import { serviceImages, sofaImagePositions } from "@/data/serviceImages";
 
 export const airConditionerLanding = {
   path: "/air-conditioner-cleaning",
@@ -55,6 +55,7 @@ export const sofaLanding = {
   h1: "ניקוי ספות מקצועי עד הבית",
   intro: "ניקוי יסודי לטיפול בלכלוך, כתמים וריחות מספות בד וריפודים - בשירות מקצועי עד הבית.",
   images: serviceImages.sofa,
+  imagePositions: sofaImagePositions,
   imageAlt: "ניקוי ספת בד בבית הלקוח על ידי CleanBrothers",
   signsTitle: "מתי כדאי להזמין ניקוי ספה?",
   signsDescription: "שימוש יומיומי משאיר על הריפוד לכלוך, אבק וריחות. בדיקה מוקדמת עוזרת להתאים את העבודה לסוג הבד.",

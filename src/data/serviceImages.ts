@@ -1,15 +1,9 @@
 export const serviceImages = {
   sofa: [
-    "/images/services/sofa-cleaning6.jpeg",
-    "/images/services/sofa-cleaning7.jpeg",
-    "/images/services/sofa-cleaning8.jpeg",
-    "/images/services/sofa-cleaning9.jpeg",
-    "/images/services/sofa-cleaning10.jpeg",
-    "/images/services/sofa-cleaning4.jpeg",
-    "/images/services/sofa-cleaning5.jpeg",
-    "/images/services/sofa-cleaning.jpeg",
-    "/images/services/sofa-cleaning3.JPG",
-    "/images/services/sofa-cleaning2.JPG",
+    "/images/services/sofa-cleaning.png",
+    "/images/services/sofa-cleaning2.png",
+    "/images/services/sofa-cleaning5.png",
+    "/images/services/sofa-cleaning6.png",
   ],
   mattress: ["/images/services/mattress-cleaning.jpeg"],
   carpet: ["/images/services/carpet-cleaning.jpeg"],
@@ -29,3 +23,10 @@ export const serviceImages = {
     "/images/services/delicate-upholstery-cleaning.jpeg",
   ],
 } satisfies Record<string, string[]>;
+
+export const sofaImagePositions = {
+  "/images/services/sofa-cleaning.png": "object-[center_48%]",
+  "/images/services/sofa-cleaning2.png": "object-[58%_center]",
+  "/images/services/sofa-cleaning5.png": "object-center",
+  "/images/services/sofa-cleaning6.png": "object-[52%_center]",
+} satisfies Record<string, string>;

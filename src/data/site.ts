@@ -1,5 +1,5 @@
 import { businessConfig } from "@/config/business";
-import { serviceImages } from "@/data/serviceImages";
+import { serviceImages, sofaImagePositions } from "@/data/serviceImages";
 
 export const navLinks = [
   { label: "בית", href: "/" },
@@ -18,6 +18,7 @@ export const services = [
     benefit: "מחזיר לספה מראה רענן ונעים בלי להחליף ריפוד.",
     images: serviceImages.sofa,
     imagePosition: "object-center",
+    imagePositions: sofaImagePositions,
     details:
       "שירות ניקוי ספות מקצועי לספות בד, מיקרופייבר וריפודים נפוצים נוספים. אנחנו בודקים את סוג הריפוד, מרככים את הלכלוך, שואבים לעומק ומבצעים ניקוי שמחזיר לספה מראה נקי ורענן.",
   },

@@ -99,6 +99,7 @@ export function Services() {
                     className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"
                     imageClassName="object-cover transition duration-500 group-hover:scale-105"
                     imagePosition={service.imagePosition}
+                    imagePositions={service.imagePositions}
                     fallbackClassName="from-surface-soft via-white to-cyan-100 text-navy"
                     sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />

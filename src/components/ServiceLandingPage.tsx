@@ -47,6 +47,7 @@ export type ServiceLandingConfig = {
   images?: readonly string[];
   imageAlt: string;
   imagePosition?: string;
+  imagePositions?: Record<string, string>;
   signsTitle: string;
   signsDescription: string;
   signs: string[];
@@ -169,6 +170,7 @@ export function ServiceLandingPage({
               className="absolute inset-0 h-full w-full"
               imageClassName="object-cover"
               imagePosition={config.imagePosition}
+              imagePositions={config.imagePositions}
               sizes="(min-width: 1024px) 42vw, 100vw"
               priority
             />
@@ -246,6 +248,7 @@ export function ServiceLandingPage({
             className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy"
             imageClassName="object-cover"
             imagePosition={config.imagePosition}
+            imagePositions={config.imagePositions}
             sizes="(min-width: 1024px) 45vw, 100vw"
           />
         </div>
