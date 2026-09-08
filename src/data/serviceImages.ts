@@ -8,8 +8,10 @@ export const serviceImages = {
   mattress: ["/images/services/mattress-cleaning.jpeg"],
   carpet: ["/images/services/carpet-cleaning.jpeg"],
   carUpholstery: [
-    "/images/services/car-upholstery-cleaning.png",
-    "/images/services/car-upholstery-cleaning2.png",
+    "/images/services/car-upholstery-cleaning.jpg",
+    "/images/services/car-upholstery-cleaning2.jpg",
+    "/images/services/car-upholstery-cleaning3.jpg",
+    "/images/services/car-upholstery-cleaning4.jpg",
   ],
   airConditioner: [
     "/images/services/air-conditioner-cleaning-web.jpg",
