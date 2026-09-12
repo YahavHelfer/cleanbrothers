@@ -8,6 +8,7 @@ import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const legalLinks = [
   { label: "מדיניות פרטיות", href: "/privacy-policy" },
+  { label: "מחיקת מידע", href: "/data-deletion" },
   { label: "הצהרת נגישות", href: "/accessibility-statement" },
 ];
 
