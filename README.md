@@ -162,7 +162,7 @@ src/app/robots.ts
 - No paid external libraries are used.
 - All pages are Hebrew RTL and mobile-first.
 
-## CMS application boundaries — Phase 1A
+## CMS application boundaries — Phase 1A checkpoint
 
 The CMS will use a dedicated Supabase project, separate from the CRM. No Supabase
 client, authentication provider, database, or editing functionality is connected
@@ -205,3 +205,16 @@ The test command includes the original suites, service-image tests, and focused
 boundary, static-content, CRM-mapping, and JSON-LD regression tests. The production
 build needs access to Google Fonts to fetch Heebo. Browser E2E and authenticated
 admin behavior are deferred to Phase 1B.
+
+## CMS local authentication — Phase 1B-A
+
+`/admin/login` now provides server-side email/password login. `/admin` requires
+a verified Supabase identity and an active CMS administrator membership. The
+public site still uses static content. No cloud project or content editor is added.
+
+See [the local CMS authentication guide](docs/cms-auth-local.md) for the dedicated
+local stack, two-admin schema/RLS, bootstrap procedure, browser and SQL tests,
+security review, inherited dependency advisories and the Phase 1B-B proposal.
+
+Use Node.js 22 or later for the pinned Supabase SDK. Runtime configuration accepts
+only the dedicated local API origin; missing configuration fails safely.

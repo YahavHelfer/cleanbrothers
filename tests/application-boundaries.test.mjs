@@ -52,7 +52,7 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
@@ -110,11 +110,15 @@ for (const group of ["admin", "preview"]) {
     const entry = `src/app/(${group})/layout.tsx`;
     const dependencies = [...sourceDependencies(entry)];
     if (group === "admin") {
-      dependencies.push(...sourceDependencies("src/app/(admin)/admin/page.tsx"));
+      for (const file of filesIn(resolve(appDirectory, "(admin)"))) {
+        if (/\.[jt]sx?$/.test(file)) dependencies.push(...sourceDependencies(file));
+      }
+      dependencies.push(...sourceDependencies("src/proxy.ts"));
     }
     for (const file of dependencies) {
       assert.doesNotMatch(relative(projectRoot, file), /src\/(?:sections\/|app\/\(site\)\/|components\/(?:Google|Meta|BusinessEvent|MarketingAttribution|Cookie|ContactForm|WhatsApp|SummerAc)|lib\/(?:google-|meta-pixel|marketing-attribution|consent|whatsapp|contact-lead))/);
-      assert.doesNotMatch(readFileSync(file, "utf8"), /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|\bfetch\s*\(/);
+      // Admin now legitimately fetches its dedicated Auth/database service.
+      assert.doesNotMatch(readFileSync(file, "utf8"), /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|cleanbrothers-crm|\/api\/contact-lead|\/api\/whatsapp/);
     }
     const load = createSourceLoader();
     const { default: Layout, metadata } = load(entry);
@@ -128,16 +132,14 @@ for (const group of ["admin", "preview"]) {
   });
 }
 
-test("admin is a non-interactive Hebrew placeholder with an authentication warning only in development", () => {
+test("admin root stays Hebrew RTL and contains no unauthenticated dashboard or marketing scripts", () => {
   for (const nodeEnv of ["development", "production"]) {
     const load = createSourceLoader({ nodeEnv });
-    const AdminPage = load("src/app/(admin)/admin/page.tsx").default;
     const AdminLayout = load("src/app/(admin)/layout.tsx").default;
-    const html = renderToStaticMarkup(AdminLayout({ children: AdminPage() }));
+    const html = renderToStaticMarkup(AdminLayout({ children: null }));
     assert.match(html, /lang="he" dir="rtl"/);
-    assert.match(html, /אזור הניהול נמצא בפיתוח/);
-    assert.match(html, /אין כניסה לחשבון או אפשרות לערוך ולפרסם תוכן/);
+    assert.match(html, /CleanBrothers CMS/);
     assert.doesNotMatch(html, /<form|<input|<button|<script/);
-    assert.equal(html.includes("אימות משתמשים טרם חובר"), nodeEnv === "development");
+    assert.equal(html.includes("אימות משתמשים טרם חובר"), false);
   }
 });

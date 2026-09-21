@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:cms": "node --test tests/cms-authorization.test.mjs",
+    "test:e2e": "playwright test",
+    "test:cms:db": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase test db --local --network-id cleanbrothers-cms-local",
+    "cms:start": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase start --network-id cleanbrothers-cms-local",
+    "cms:stop": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase stop",
     "test:consent": "node --experimental-strip-types --test tests/consent-behavior.test.mjs",
     "test:analytics": "node --test tests/google-analytics-events.test.mjs",
     "test:contact-leads": "node --experimental-strip-types --test tests/contact-lead-contract.test.mjs",
@@ -15,17 +20,22 @@
     "test:whatsapp-attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs"
   },
   "dependencies": {
-    "next": "16.2.6",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.116.0",
+    "next": "16.3.5",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "16.3.5",
+    "supabase": "2.117.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

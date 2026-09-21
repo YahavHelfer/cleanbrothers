@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 // A separate root layout prevents public marketing code from mounting here.
-// This shell is intentionally public until authentication is added in Phase 1B.
+// Login shares this shell; protected descendants enforce authorization separately.
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -27,9 +27,9 @@ export default function AdminLayout({
         </a>
         <header className="border-b theme-card">
           <div className="section-container flex flex-wrap items-center justify-between gap-4 py-5">
-            <p className="text-lg font-black">CleanBrothers · אזור הניהול</p>
+            <p className="text-lg font-black">CleanBrothers CMS</p>
             <nav aria-label="ניווט ניהול" className="flex items-center gap-5 text-sm font-bold">
-              <Link href="/admin" aria-current="page" className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
+              <Link href="/admin" prefetch={false} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
                 לוח בקרה
               </Link>
               <Link href="/" prefetch={false} className="rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
@@ -38,11 +38,6 @@ export default function AdminLayout({
             </nav>
           </div>
         </header>
-        {process.env.NODE_ENV === "development" ? (
-          <aside role="status" className="border-b border-amber-500 bg-amber-100 px-4 py-4 text-center font-bold text-amber-950">
-            סביבת פיתוח — אימות משתמשים טרם חובר. האזור אינו מוגן ואין בו פעולות ניהול.
-          </aside>
-        ) : null}
         <main id="admin-content" className="section-container py-10 sm:py-16">
           {children}
         </main>

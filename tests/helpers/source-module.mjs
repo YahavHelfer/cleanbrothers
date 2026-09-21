@@ -21,7 +21,7 @@ export function resolveSourceImport(specifier, parent) {
 
 // Compile project modules in memory: no generated files, server, or HTTP calls.
 // React/Next components are inspected as element trees or rendered with SSR.
-export function createSourceLoader({ nodeEnv = "test" } = {}) {
+export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {} } = {}) {
   const cache = new Map();
   function load(filename) {
     const absolute = resolve(projectRoot, filename);
@@ -29,6 +29,8 @@ export function createSourceLoader({ nodeEnv = "test" } = {}) {
     const loadedModule = { exports: {} };
     cache.set(absolute, loadedModule);
     const require = (specifier) => {
+      if (Object.hasOwn(mocks, specifier)) return mocks[specifier];
+      if (specifier === "server-only") return {};
       if (specifier.endsWith(".css")) return {};
       if (specifier === "next/font/google") {
         return { Heebo: () => ({ variable: "test-heebo" }) };
@@ -49,8 +51,9 @@ export function createSourceLoader({ nodeEnv = "test" } = {}) {
       exports: loadedModule.exports,
       module: loadedModule,
       require,
-      process: { env: { NODE_ENV: nodeEnv } },
+      process: { env: { NODE_ENV: nodeEnv, ...env } },
       URL,
+      AbortSignal,
     }, { filename: absolute });
     return loadedModule.exports;
   }
