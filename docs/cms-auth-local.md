@@ -1,6 +1,8 @@
-# CMS authentication — Phase 1B-A
+# CMS authentication — local foundation
 
-This is a local-only foundation on Next.js 16.3.5. No cloud project is linked.
+This guide covers the isolated local foundation on Next.js 16.3.5. Its CLI
+directory stays unlinked. The separate Free cloud project and Preview setup are
+documented in [the cloud foundation report](cms-cloud-foundation.md).
 The public site still uses `staticContentSource`; its business APIs are unchanged.
 
 ## Trust boundaries
@@ -27,14 +29,20 @@ The public site still uses `staticContentSource`; its business APIs are unchange
 - `is_cms_admin()` is a stable SECURITY INVOKER SQL function with an empty search
   path, relying on the same RLS. Future content RLS may use it. No content tables
   or content permissions are included in this phase.
-- Two unique seats (`admin_slot` 1 and 2) cap membership at two identities,
-  including temporarily inactive seats. Both have exactly the same `admin` role.
-  A replacement account requires a deliberate owner-side seat reassignment.
+- The historical Phase 1B-A migration created two fixed administrator seats.
+  The forward migration `20260921150000_cms_flexible_membership.sql` removes
+  `admin_slot` and its constraints without changing identities, role, active
+  status, timestamps, RLS, grants or the authorization helper. Only the `admin`
+  role remains. Exactly two real administrators is a controlled bootstrap policy,
+  not a permanent database capacity limit. Synthetic SQL tests verify a third
+  membership can exist without allowing API users to create memberships.
 - Cookies use a dedicated `cb-cms-auth` namespace, HttpOnly, SameSite=Lax, and
   Path=/admin. No public consent/attribution cookie is read or changed. They use
-  Secure=false solely for the hard-allowed loopback HTTP endpoint in this phase.
-  Hosted URLs, missing settings and secret/service keys are rejected before any
-  connection. Cloud/HTTPS support needs the explicit Phase 1B-B change.
+  Secure=false solely for the hard-allowed loopback HTTP endpoint outside Vercel.
+  Hosted, missing and invalid configuration retain Secure=true, including cookie
+  deletion during logout. Only the verified CMS cloud project is allowed on
+  Vercel Preview. Other hosted URLs, Production, missing settings and
+  secret/service/legacy keys are rejected before any connection.
 - Login creates a new Supabase session. Unauthorized login revokes that session
   and clears its cookies. Logout revokes the current session's refresh token and
   clears only CMS cookies. Supabase-issued access JWTs can remain valid until
@@ -104,20 +112,26 @@ in the application. It obtains the **local** service key only in memory for Auth
 fixture creation/deletion. Membership setup uses `docker exec`/`psql` on the exact
 local CMS database container as its database owner. Runtime clients never use it.
 
-Future real bootstrap (Phase 1B-B, not performed): an authorized operator creates
+Future real bootstrap (Phase 1B-B2, not performed): an authorized operator creates
 exactly two Auth identities through the dedicated CMS project's administrative
-API/console, confirms them through a controlled flow, then assigns their verified
-UUIDs to seats 1 and 2 using a database-owner connection. Do not hardcode email
-allowlists. The SQL shape is:
+API/console and confirms them through a controlled flow. The bootstrap procedure
+must verify the dedicated project reference and both UUIDs, acquire a transaction
+advisory lock shared by all membership bootstrap operations, check that no real
+memberships already exist, and insert the two memberships atomically using a
+database-owner connection. Abort on a non-empty initial membership table rather
+than silently adding more administrators. The process must check that exactly
+two intended active memberships remain before committing. Replacements require
+an explicit revoke-and-replace operation under the same lock. Do not hardcode
+email allowlists or expose bootstrap as a browser API. Individual insertion shape:
 
 ```sql
--- Supply user_id and slot via a trusted CLI; not a browser endpoint.
-insert into public.cms_admin_members (user_id, admin_slot, role, is_active)
-values (:'user_id'::uuid, :'slot'::smallint, 'admin', true);
+-- Only within the controlled two-identity bootstrap transaction above.
+insert into public.cms_admin_members (user_id, role, is_active)
+values (:'user_id'::uuid, 'admin', true);
 ```
 
 Keep bootstrap credentials outside the web process. Disable a member with an
-owner-side `is_active=false` update; reassign occupied seats deliberately. No
+owner-side `is_active=false` update; replace identities deliberately. No
 browser membership-management endpoint, service-key client, or open signup exists.
 The local CLI maps `auth.email.enable_signup` to the email provider enable flag;
 it must be true for password login. Global `auth.enable_signup=false` blocks
@@ -157,26 +171,25 @@ receive this cookie; a future /preview/* URL would not. Prefer an authenticated
 /admin/preview/* URL, with its own isolated layout and independent data-boundary
 authorization. Any alternative preview session architecture needs a separate
 review; no preview authentication or broader cookie scope is implemented here.
-The fixed two-seat schema is also unchanged. The security report recommends a
-flexible membership table with a controlled bootstrap limit for a future phase,
-if two admins is a current product policy rather than a permanent hard cap.
+The security report records the earlier recommendation for flexible membership.
+Phase 1B-B1 implements that recommendation through a new forward migration and
+26 SQL authorization/schema tests. The original migration remains unchanged.
+See [the cloud foundation status](cms-cloud-foundation.md) for external setup
+prerequisites and which cloud steps have actually been completed.
 
-MFA is deferred. The minimal Phase 1B-B sequence is:
+Phase 1B-B1 created the dedicated Free cloud project, applied both membership
+migrations, verified cloud RLS with disposable identities, and configured only
+the required Preview variables. No Preview deployment has been made.
 
-1. Review the completed security gate and rerun the audit before hosted work.
-2. Create one dedicated CleanBrothers CMS cloud project, separate from CRM; turn
-   off public signup, configure password/security limits and controlled email.
-3. Apply this migration; inspect grants/RLS and rerun access tests on isolated
-   test identities. Configure only the new CMS URL/publishable key in Preview.
-   Add an explicit approved-project allowlist and Secure HTTPS cookies before
-   allowing hosted URLs. Keep Production disconnected.
-4. Provision the two real identities and seats by the controlled bootstrap above.
-5. Add TOTP enrollment/challenge/verification pages and an Auth assurance check
+MFA remains deferred. The minimal Phase 1B-B2 sequence after review is:
+
+1. Provision the two real identities and memberships by the controlled bootstrap above.
+2. Add TOTP enrollment/challenge/verification pages and an Auth assurance check
    (`aal2`) after verified identity and before returning authorized context.
    Add the same assurance requirement to DB policies/`is_cms_admin()` so direct
    database requests cannot bypass MFA. Test recovery, unenrollment, expired
    challenges and aal1 denial. Keep membership authorization independent of MFA.
-6. Only after approval, deploy Preview and repeat the tests with synthetic
+3. Only after approval, deploy Preview and repeat the tests with synthetic
    accounts, verify HTTPS cookies/no-store/CSRF/noindex and public tracking
    isolation, then have the two admins enroll. No CMS content modules yet.
 

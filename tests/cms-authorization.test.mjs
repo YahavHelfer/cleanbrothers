@@ -92,6 +92,124 @@ test("CMS config rejects missing settings, cloud URLs, alternate ports and privi
   assert.equal(config.cmsCookieOptions.path, "/admin");
 });
 
+test("CMS cookies permit HTTP only on explicit local loopback outside Vercel", () => {
+  const local = { CMS_SUPABASE_URL: "http://127.0.0.1:56321", CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_only" };
+  for (const nodeEnv of ["development", "production", "test"]) {
+    const config = createSourceLoader({ nodeEnv, env: local })("src/cms/config.ts");
+    assert.equal(config.getCmsConfig().url, local.CMS_SUPABASE_URL);
+    assert.equal(config.cmsCookieOptions.secure, false);
+  }
+  for (const env of [
+    {},
+    { ...local, CMS_SUPABASE_URL: "https://unapproved.supabase.co" },
+    { ...local, VERCEL: "1", VERCEL_ENV: "preview" },
+    { ...local, VERCEL: "1", VERCEL_ENV: "production" },
+    { ...local, VERCEL_ENV: "preview" },
+  ]) {
+    const config = createSourceLoader({ env })("src/cms/config.ts");
+    assert.throws(() => config.getCmsConfig(), /CMS configuration unavailable/);
+    assert.equal(config.cmsCookieOptions.secure, true);
+    assert.equal(config.cmsCookieOptions.httpOnly, true);
+    assert.equal(config.cmsCookieOptions.sameSite, "lax");
+    assert.equal(config.cmsCookieOptions.path, "/admin");
+    assert.equal(config.cmsCookieOptions.domain, undefined);
+  }
+});
+
+test("CMS cloud is restricted to the verified project on Vercel Preview with Secure cookies", () => {
+  const url = "https://plbwefnwussxlglscfpn.supabase.co";
+  const preview = { CMS_SUPABASE_URL: url, CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_only", VERCEL: "1", VERCEL_ENV: "preview" };
+  const config = createSourceLoader({ env: preview })("src/cms/config.ts");
+  assert.equal(config.getCmsConfig().url, url);
+  assert.equal(config.cmsCookieOptions.secure, true);
+  assert.equal(config.cmsCookieOptions.httpOnly, true);
+  assert.equal(config.cmsCookieOptions.sameSite, "lax");
+  assert.equal(config.cmsCookieOptions.path, "/admin");
+  for (const env of [
+    { ...preview, VERCEL_ENV: "production" },
+    { ...preview, VERCEL_ENV: "development" },
+    { ...preview, VERCEL_ENV: undefined },
+    { ...preview, VERCEL: undefined },
+    { ...preview, CMS_SUPABASE_PUBLISHABLE_KEY: "sb_secret_test_only" },
+    ...["http://plbwefnwussxlglscfpn.supabase.co", `${url}/`, `${url}?x=1`, `${url}:443`, "https://other-project.supabase.co", "https://plbwefnwussxlglscfpn.supabase.co.evil.invalid"].map((CMS_SUPABASE_URL) => ({ ...preview, CMS_SUPABASE_URL })),
+  ]) {
+    assert.throws(() => createSourceLoader({ env })("src/cms/config.ts").getCmsConfig(), /CMS configuration unavailable/);
+  }
+});
+
+test("CMS logout clears only CMS cookies with the same Secure and path policy", async () => {
+  for (const [env, secure] of [
+    [{ CMS_SUPABASE_URL: "http://127.0.0.1:56321" }, false],
+    [{ VERCEL: "1", VERCEL_ENV: "preview" }, true],
+    [{}, true],
+  ]) {
+    const cleared = [];
+    const load = createSourceLoader({ env, mocks: {
+      "next/headers": { cookies: async () => ({
+        getAll: () => ["cb-cms-auth", "cb-cms-auth.0", "marketing-consent", "cb-cms-auth-other"].map((name) => ({ name, value: "fixture" })),
+        set: (name, value, options) => cleared.push({ name, value, options: plain(options) }),
+      }) },
+    } });
+    await load("src/cms/server.ts").clearCmsCookies();
+    assert.deepEqual(cleared.map(({ name }) => name), ["cb-cms-auth", "cb-cms-auth.0"]);
+    for (const { value, options } of cleared) {
+      assert.equal(value, "");
+      assert.equal(options.maxAge, 0);
+      assert.equal(options.secure, secure);
+      assert.equal(options.httpOnly, true);
+      assert.equal(options.sameSite, "lax");
+      assert.equal(options.path, "/admin");
+      assert.equal(options.domain, undefined);
+    }
+  }
+});
+
+test("Supabase SSR login, refresh and logout preserve HTTPS CMS cookie options", async () => {
+  const url = "https://plbwefnwussxlglscfpn.supabase.co";
+  const jar = new Map();
+  const writes = [];
+  let sequence = 0;
+  const load = createSourceLoader({
+    env: { CMS_SUPABASE_URL: url, CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_only", VERCEL: "1", VERCEL_ENV: "preview" },
+    fetchImpl: async (input) => {
+      const endpoint = String(input);
+      assert.ok(endpoint.startsWith(`${url}/auth/v1/`));
+      if (endpoint.includes("/logout")) return new Response(null, { status: 204 });
+      const now = Math.floor(Date.now() / 1000);
+      const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
+      const access_token = `${encode({ alg: "HS256", typ: "JWT" })}.${encode({ sub: user.id, role: "authenticated", iat: now, exp: now + 3600, sequence: ++sequence })}.synthetic-signature`;
+      const body = endpoint.includes("/user") ? user : { access_token, refresh_token: "synthetic-refresh", token_type: "bearer", expires_in: 3600, user };
+      return new Response(JSON.stringify(body), { status: 200, headers: { "Content-Type": "application/json" } });
+    },
+  });
+  const { createCmsClient } = load("src/cms/client.ts");
+  const client = createCmsClient({
+    getAll: () => [...jar].map(([name, value]) => ({ name, value })),
+    setAll: (updates) => {
+      writes.push(...plain(updates));
+      for (const { name, value } of updates) {
+        if (value) jar.set(name, value);
+        else jar.delete(name);
+      }
+    },
+  });
+  assert.equal((await client.auth.signInWithPassword({ email: user.email, password: "synthetic-only" })).error, null);
+  assert.ok(writes.some(({ value }) => value));
+  const afterLogin = writes.length;
+  assert.equal((await client.auth.refreshSession()).error, null);
+  assert.ok(writes.length > afterLogin);
+  assert.equal((await client.auth.signOut()).error, null);
+  assert.ok(writes.some(({ value, options }) => value === "" && options.maxAge === 0));
+  for (const { name, options } of writes) {
+    assert.match(name, /^cb-cms-auth(?:\.\d+)?$/);
+    assert.equal(options.secure, true);
+    assert.equal(options.httpOnly, true);
+    assert.equal(options.sameSite, "lax");
+    assert.equal(options.path, "/admin");
+    assert.equal(options.domain, undefined);
+  }
+});
+
 test("Proxy is scoped to admin and both protected layout and data layer authorize", () => {
   const source = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
   assert.match(source("src/proxy.ts"), /matcher: \["\/admin\/:path\*"\]/);

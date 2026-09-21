@@ -20,7 +20,7 @@ test.beforeAll(async () => {
     if (error || !data.user) throw new Error("Local fixture creation failed");
     identity.id = data.user.id;
   }
-  localSql(`insert into public.cms_admin_members (user_id, admin_slot, is_active) values ('${identities.active.id}', 1, true), ('${identities.inactive.id}', 2, false)`);
+  localSql(`insert into public.cms_admin_members (user_id, is_active) values ('${identities.active.id}', true), ('${identities.inactive.id}', false)`);
 });
 
 test.afterAll(async () => {

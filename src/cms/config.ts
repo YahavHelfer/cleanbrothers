@@ -1,6 +1,14 @@
 import "server-only";
 
 export const CMS_COOKIE_NAME = "cb-cms-auth";
+const LOCAL_CMS_URL = "http://127.0.0.1:56321";
+// Dedicated Free CMS project, verified in Phase 1B-B1. Never a CRM endpoint.
+const CLOUD_CMS_URL = "https://plbwefnwussxlglscfpn.supabase.co";
+
+function isLocalCms() {
+  return !process.env.VERCEL && !process.env.VERCEL_ENV &&
+    process.env.CMS_SUPABASE_URL === LOCAL_CMS_URL;
+}
 
 export function isCmsCookie(name: string): boolean {
   return name === CMS_COOKIE_NAME || new RegExp(`^${CMS_COOKIE_NAME}\\.\\d+$`).test(name);
@@ -9,8 +17,11 @@ export function isCmsCookie(name: string): boolean {
 export function getCmsConfig() {
   const url = process.env.CMS_SUPABASE_URL;
   const key = process.env.CMS_SUPABASE_PUBLISHABLE_KEY;
-  // Phase 1B-A deliberately cannot connect to any hosted or CRM project.
-  if (url !== "http://127.0.0.1:56321" || !key || !/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)) {
+  const isCmsPreview = process.env.VERCEL === "1" &&
+    process.env.VERCEL_ENV === "preview" && url === CLOUD_CMS_URL;
+  // Cloud is enabled only for this verified project on Vercel Preview.
+  // Production, arbitrary hosted URLs and hosted loopback settings fail closed.
+  if ((!isLocalCms() && !isCmsPreview) || !url || !key || !/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)) {
     throw new Error("CMS configuration unavailable");
   }
   return { url, key };
@@ -21,6 +32,7 @@ export const cmsCookieOptions = {
   path: "/admin",
   httpOnly: true,
   sameSite: "lax" as const,
-  // The only supported origin in this phase is local HTTP. Cloud requires HTTPS.
-  secure: false,
+  // Only explicit local loopback HTTP may omit Secure, including local next start.
+  // Hosted, missing and invalid configuration all retain HTTPS-only cookies.
+  secure: !isLocalCms(),
 };

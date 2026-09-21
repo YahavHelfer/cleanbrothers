@@ -41,6 +41,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Isolated Supabase cloud CLI link/config; local stack stays unlinked.
+/supabase/.cloud/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -203,18 +203,25 @@ npm run build
 
 The test command includes the original suites, service-image tests, and focused
 boundary, static-content, CRM-mapping, and JSON-LD regression tests. The production
-build needs access to Google Fonts to fetch Heebo. Browser E2E and authenticated
-admin behavior are deferred to Phase 1B.
+build needs access to Google Fonts to fetch Heebo. Authenticated browser E2E uses
+the isolated CMS stack described below.
 
-## CMS local authentication — Phase 1B-A
+## CMS authentication foundation
 
 `/admin/login` now provides server-side email/password login. `/admin` requires
 a verified Supabase identity and an active CMS administrator membership. The
-public site still uses static content. No cloud project or content editor is added.
+public site still uses static content. No content editor is included.
 
 See [the local CMS authentication guide](docs/cms-auth-local.md) for the dedicated
-local stack, two-admin schema/RLS, bootstrap procedure, browser and SQL tests,
-security review, inherited dependency advisories and the Phase 1B-B proposal.
+local stack, membership schema/RLS, two-admin bootstrap policy, browser and SQL tests,
+security review and controlled administrator bootstrap procedure.
 
 Use Node.js 22 or later for the pinned Supabase SDK. Runtime configuration accepts
-only the dedicated local API origin; missing configuration fails safely.
+the dedicated local API origin outside Vercel, or the verified CMS cloud project
+only on Vercel Preview. Production and missing configuration fail safely.
+
+Phase 1B-B1 adds a forward migration removing the fixed two-slot membership
+constraint and a dedicated Supabase Free cloud project. See
+[the cloud foundation report](docs/cms-cloud-foundation.md) for cloud RLS evidence,
+Preview-only configuration, HTTPS cookies and the separate cloud CLI workdir.
+No website deployment, real administrator creation or automatic commit is included.
