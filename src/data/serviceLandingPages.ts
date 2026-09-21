@@ -1,4 +1,4 @@
-import type { ServiceLandingConfig } from "@/components/ServiceLandingPage";
+import type { ServiceLandingConfig } from "@/content/service-landing";
 import { serviceImages, sofaImagePositions } from "@/data/serviceImages";
 
 export const airConditionerLanding = {

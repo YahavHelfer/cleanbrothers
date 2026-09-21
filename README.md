@@ -127,7 +127,7 @@ Real before/after images should go in:
 public/images
 ```
 
-Current gallery and before/after UI uses safe gradient fallbacks in:
+Gallery and before/after UI uses local images with safe gradient fallbacks in:
 
 ```text
 src/components/BeforeAfterCard.tsx
@@ -158,6 +158,50 @@ src/app/robots.ts
 
 ## Notes
 
-- The contact form is frontend-only and does not submit to a backend yet.
+- The shared contact form submits through `/api/contact-lead` to the CRM. Its server-only integration requires `CRM_WEBHOOK_SECRET`.
 - No paid external libraries are used.
 - All pages are Hebrew RTL and mobile-first.
+
+## CMS application boundaries — Phase 1A
+
+The CMS will use a dedicated Supabase project, separate from the CRM. No Supabase
+client, authentication provider, database, or editing functionality is connected
+in this phase.
+
+- `src/app/(site)/layout.tsx` is the public root layout. All 16 existing public
+  pages keep their URLs. Consent bootstrap and all marketing integrations remain
+  in this layout, in their existing order.
+- `src/app/(admin)/layout.tsx` is a separate root layout for `/admin`. It contains
+  a Hebrew RTL placeholder only. It is **not authenticated** and must not contain
+  sensitive data or management actions. A prominent warning appears in development.
+- `src/app/(preview)/layout.tsx` reserves a separate root layout for future
+  preview routes. There is no preview page or endpoint yet. Authorization and
+  private, uncached draft reads are prerequisites for adding one.
+- Admin and preview layouts do not import the public layout, tracking, cookie UI,
+  lead forms, or promotions. Moving between root layouts causes a full navigation.
+- Existing API routes, sitemap, robots, canonical configuration, and CRM contracts
+  remain unchanged. No deployment or infrastructure configuration is added.
+
+The pilot `/delicate-upholstery-cleaning` reads `src/content/source.ts`, which
+selects only `staticContentSource`. The adapter wraps the existing data without
+migrating or rewriting it. Its stable service ID resolves a code-owned CRM value
+in `service-identity.ts`; an editable display title cannot override that value.
+Other services retain their existing rendering and integration behavior.
+
+JSON-LD serialization escapes every literal `<` as `\u003c` before it reaches a
+script context. This prevents a string from closing the script element while
+preserving the decoded JSON, existing script IDs, and script loading behavior.
+
+Local checks (no live lead or WhatsApp requests):
+
+```bash
+npm test
+npx tsc --noEmit --incremental false
+npm run lint
+npm run build
+```
+
+The test command includes the original suites, service-image tests, and focused
+boundary, static-content, CRM-mapping, and JSON-LD regression tests. The production
+build needs access to Google Fonts to fetch Heebo. Browser E2E and authenticated
+admin behavior are deferred to Phase 1B.

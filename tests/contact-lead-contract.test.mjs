@@ -361,14 +361,19 @@ test("form source preserves double-click guard, retry ID, and success clearing",
 
 test("one shared ContactForm owns every website lead POST", () => {
   const sources = readProjectSources(new URL("../src/", import.meta.url));
-  const formOwners = sources.filter(([, source]) => source.includes("<form"));
+  // Other forms (e.g. future admin login) are allowed. The public lead endpoint
+  // and the upstream CRM lead endpoint must each retain one controlled owner.
   const leadPosters = sources.filter(([, source]) =>
-    source.includes('fetch("/api/contact-lead"'),
+    source.includes("/api/contact-lead"),
   );
-  assert.equal(formOwners.length, 1);
+  const crmLeadForwarders = sources.filter(([, source]) =>
+    source.includes("/api/integrations/leads/website"),
+  );
   assert.equal(leadPosters.length, 1);
-  assert.match(formOwners[0][0].pathname, /ContactForm\.tsx$/);
   assert.match(leadPosters[0][0].pathname, /ContactForm\.tsx$/);
+  assert.match(leadPosters[0][1], /fetch\(["']\/api\/contact-lead["'][\s\S]*method: ["']POST["']/);
+  assert.equal(crmLeadForwarders.length, 1);
+  assert.match(crmLeadForwarders[0][0].pathname, /app\/api\/contact-lead\/route\.ts$/);
 });
 
 test("Meta receives the stable CRM event ID and logs expose no identifiers", () => {

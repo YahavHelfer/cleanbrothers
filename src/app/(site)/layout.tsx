@@ -19,7 +19,7 @@ import {
 } from "@/lib/structured-data";
 import { Footer } from "@/sections/Footer";
 import { Navbar } from "@/sections/Navbar";
-import "./globals.css";
+import "../globals.css";
 
 const heebo = Heebo({
   variable: "--font-heebo",

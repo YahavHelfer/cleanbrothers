@@ -10,58 +10,13 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { YouTubeLiteEmbed } from "@/components/YouTubeLiteEmbed";
 import { businessConfig } from "@/config/business";
+import type { ServiceLandingConfig } from "@/content/service-landing";
 import { buildMetadata } from "@/lib/seo";
 import {
   getPrimaryServiceImage,
   getServiceImages,
 } from "@/lib/service-images";
 import { getWhatsAppLink } from "@/lib/whatsapp";
-
-type Faq = { question: string; answer: string };
-type RelatedLink = { label: string; href: string };
-type ServiceVideo = {
-  youtubeId: string;
-  watchUrl: string;
-  poster: string;
-  title: string;
-  description: string;
-};
-type BeforeAfter = {
-  title: string;
-  description: string;
-  beforeImage: string;
-  afterImage: string;
-  beforeAlt: string;
-  afterAlt: string;
-};
-
-export type ServiceLandingConfig = {
-  path: string;
-  serviceName: string;
-  metaTitle: string;
-  metaDescription: string;
-  eyebrow: string;
-  h1: string;
-  intro: string;
-  image?: string;
-  images?: readonly string[];
-  imageAlt: string;
-  imagePosition?: string;
-  imagePositions?: Record<string, string>;
-  signsTitle: string;
-  signsDescription: string;
-  signs: string[];
-  processTitle: string;
-  processDescription: string;
-  process: string[];
-  benefitsDescription: string;
-  benefits: string[];
-  faqs: Faq[];
-  relatedLinks: RelatedLink[];
-  resultDescription: string;
-  beforeAfter?: BeforeAfter;
-  video?: ServiceVideo;
-};
 
 export function buildServiceLandingMetadata(
   config: ServiceLandingConfig,
@@ -103,8 +58,10 @@ const trustItems = [
 
 export function ServiceLandingPage({
   config,
+  crmServiceName = config.serviceName,
 }: {
   config: ServiceLandingConfig;
+  crmServiceName?: string;
 }) {
   const phoneHref = "tel:0559577731";
   const whatsappHref = getWhatsAppLink(
@@ -350,7 +307,7 @@ export function ServiceLandingPage({
               </a>
             </div>
           </div>
-          <ContactForm initialService={config.serviceName} />
+          <ContactForm initialService={crmServiceName} />
         </div>
       </section>
       <div

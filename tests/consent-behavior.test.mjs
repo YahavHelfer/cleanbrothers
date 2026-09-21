@@ -132,7 +132,7 @@ test("scenario D/E: changing consent persists and publishes matching updates", (
 });
 
 test("tag integrations retain one loader and enforce consent gates", () => {
-  const layout = readSource("../src/app/layout.tsx");
+  const layout = readSource("../src/app/(site)/layout.tsx");
   const googleTag = readSource("../src/components/GoogleAdsTag.tsx");
   const trackedNumber = readSource(
     "../src/components/GoogleCallTrackingNumber.tsx",
