@@ -53,6 +53,7 @@ export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fet
       require,
       process: { env: { NODE_ENV: nodeEnv, ...env } },
       URL,
+      Request, Response, FormData, Headers, Uint8Array,
       AbortSignal,
       fetch: fetchImpl, // Explicit test transport; never enable network by default.
     }, { filename: absolute });

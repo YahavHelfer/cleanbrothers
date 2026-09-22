@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { STATIC_MEDIA_VERSION, type MediaChoice } from "@/cms/media/model";
 import { useActionState, useState } from "react";
 import { contentAction } from "./actions";
 import type { PilotEditorSnapshot } from "./repository";
@@ -10,7 +12,7 @@ const initialAction = { ok: false, message: "" };
 const lists = { signs: "סימנים שכדאי לבדוק", process: "שלבי העבודה", benefits: "יתרונות השירות" } as const;
 export const previewHref = (id: string) => `/admin/preview/services/${PILOT_KEY}?revision=${id}`;
 
-export function ServiceEditor({ snapshot }: { snapshot: PilotEditorSnapshot }) {
+export function ServiceEditor({ snapshot, mediaChoices }: { snapshot: PilotEditorSnapshot; mediaChoices?: MediaChoice[] }) {
   const [draft, setDraft] = useState<PilotDraft>(snapshot.draft);
   const [state, action, pending] = useActionState(contentAction, initialAction);
   const dirty = JSON.stringify(draft) !== JSON.stringify(snapshot.draft);
@@ -68,13 +70,35 @@ export function ServiceEditor({ snapshot }: { snapshot: PilotEditorSnapshot }) {
       <button type="button" className="justify-self-start rounded border px-4 py-2" disabled={draft.relatedLinks.length >= PILOT_RELATED_PATHS.length}
         onClick={() => update("relatedLinks", [...draft.relatedLinks, { label: "", href: PILOT_RELATED_PATHS.find((path) => !draft.relatedLinks.some((link) => link.href === path))! }])}>הוספת קישור</button>
     </fieldset>
-    <fieldset disabled={pending} className="grid gap-3">
+    {mediaChoices ? <fieldset disabled={pending} className="grid gap-4">
+      <legend className="mb-3 font-black">תמונות מספריית המדיה</legend>
+      <p>בחירת תמונה נשמרת בטיוטה חדשה בלבד. גרסה שפורסמה שומרת את התמונה המדויקת שנבחרה בה.</p>
+      {(draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images).map((selected,index)=>{
+        const selectedIds=draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images;
+        const choice=mediaChoices.find(c=>c.versionId===selected);
+        const change=(ids:string[])=>setDraft(current=>({...current,schemaVersion:2,images:ids}));
+        return <div key={index} className="grid gap-3 rounded-xl border p-4">
+          {choice&&<Image src={choice.src} alt={draft.imageAlt} width={200} height={150} unoptimized className="h-36 w-full object-contain"/>}
+          <label className="grid gap-2">תמונת השירות {index+1}<select className="field" value={selected} onChange={e=>{
+            const next=mediaChoices.find(c=>c.versionId===e.target.value)!;
+            setDraft(current=>({...current,schemaVersion:2,images:selectedIds.map((id,i)=>i===index?next.versionId:id),...(index===0?{imageAlt:next.altText}:{})}));
+          }}>{mediaChoices.filter(c=>!c.archived||c.versionId===selected).map(c=><option key={c.versionId} value={c.versionId} disabled={selectedIds.includes(c.versionId)&&c.versionId!==selected}>{c.label} — גרסה {c.number}{c.archived?' (בארכיון)':''}</option>)}</select></label>
+          <div className="flex gap-3"><button type="button" className="rounded border p-2" disabled={index===0} aria-label={`העלאת תמונה ${index+1}`} onClick={()=>{const ids=[...selectedIds];[ids[index-1],ids[index]]=[ids[index],ids[index-1]];change(ids);}}>↑</button>
+          <button type="button" className="rounded border p-2" disabled={selectedIds.length===1} aria-label={`הסרת תמונה ${index+1}`} onClick={()=>change(selectedIds.filter((_,i)=>i!==index))}>הסרה</button></div>
+        </div>;
+      })}
+      <button type="button" className="rounded border px-4 py-2 justify-self-start" disabled={draft.images.length>=8||!mediaChoices.some(c=>!c.archived&&!(draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images).includes(c.versionId))} onClick={()=>{
+        const ids=draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images;
+        const next=mediaChoices.find(c=>!c.archived&&!ids.includes(c.versionId));if(next)setDraft(current=>({...current,schemaVersion:2,images:[...ids,next.versionId]}));
+      }}>הוספת תמונה</button>
+      <Link prefetch={false} href="/admin/media" className="underline">לספריית המדיה</Link>
+    </fieldset> : <><fieldset disabled={pending} className="grid gap-3">
       <legend className="mb-3 font-black">תמונות מאושרות</legend>
       <label className="grid gap-2">תמונת השירות<select className="field" value={draft.images[0]} onChange={(event) => update("images", [event.target.value])}>
         {PILOT_IMAGES.map((image) => <option key={image} value={image}>תמונת העבודה הקיימת — ריפוד עדין</option>)}
       </select></label>
       <p className="text-sm theme-muted">לשירות יש תמונה מאושרת אחת. תיאור התמונה ניתן לעריכה; העלאת תמונות חדשות אינה זמינה.</p>
-    </fieldset>
+    </fieldset></>}
     <div className="grid gap-4 border-t pt-5">
       <p role="status">{dirty ? "יש שינויים בטופס שטרם נשמרו. תצוגה מקדימה מציגה רק את הגרסה השמורה." : "כל השינויים בטופס נשמרו בטיוטה."}</p>
       {state.message && <p role={state.ok ? "status" : "alert"} className="rounded border p-4">{state.message}</p>}
@@ -85,7 +109,7 @@ export function ServiceEditor({ snapshot }: { snapshot: PilotEditorSnapshot }) {
       <label className="flex items-center gap-3"><input type="checkbox" name="confirmPublish" value="yes" disabled={dirty || pending} />אני מאשר/ת לפרסם את הגרסה השמורה</label>
       <button name="intent" value="publish" disabled={dirty || pending || snapshot.draftRevisionId === snapshot.publishedRevisionId}
         className="btn-primary justify-self-start disabled:opacity-50">פרסום</button>
-      <p className="text-sm theme-muted">הפרסום הוא לסביבה המקומית בלבד. האתר החי נשאר ללא שינוי.</p>
+      <p className="text-sm theme-muted">פרסום מעדכן את הגרסה המוצגת בסביבת התוכן הנוכחית.</p>
     </div>
   </form>;
 }

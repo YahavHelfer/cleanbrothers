@@ -21,7 +21,7 @@ export function getLocalStack() {
   return { url: cmsOrigin, key: status.PUBLISHABLE_KEY, serviceKey: status.SERVICE_ROLE_KEY };
 }
 
-// Test/bootstrap process only. No privileged key is passed to Next.js or a page.
+// Test/bootstrap SQL only. Docker execution never exposes a database credential.
 export function localSql(sql) {
   getLocalStack();
   return execFileSync("docker", ["exec", "-i", `supabase_db_${project}`, "psql", "-U", "postgres", "-d", "postgres", "-X", "-A", "-t", "-v", "ON_ERROR_STOP=1"], {

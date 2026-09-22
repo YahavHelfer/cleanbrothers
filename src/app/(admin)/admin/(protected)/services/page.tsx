@@ -14,6 +14,6 @@ export default async function ServicesPage() {
       <p>{snapshot.draftRevisionId === snapshot.publishedRevisionId ? "הטיוטה תואמת לגרסה שפורסמה" : "יש שינויים שלא פורסמו"}</p>
       <p>נשמר לאחרונה: <time dateTime={snapshot.updatedAt}>{new Date(snapshot.updatedAt).toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}</time></p>
       <Link href={`/admin/services/${PILOT_KEY}`} prefetch={false} className="btn-primary justify-self-start">עריכת השירות</Link>
-    </article> : <p>השירות עדיין לא יובא לסביבה המקומית.</p>}
+    </article> : <p>השירות עדיין לא יובא לסביבת התוכן.</p>}
   </section>;
 }

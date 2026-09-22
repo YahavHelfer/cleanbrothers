@@ -1,3 +1,5 @@
+import { mediaLocalEnabled } from "@/cms/media/environment";
+import { getMediaChoices } from "@/cms/media/repository";
 import Link from "next/link";
 import { getPilotEditor } from "@/cms/content/repository";
 import { PILOT_KEY } from "@/cms/content/pilot-model";
@@ -5,7 +7,8 @@ import { ServiceEditor, RestoreRevision } from "@/cms/content/ServiceEditor";
 
 export default async function ServiceEditorPage() {
   const { snapshot, userId } = await getPilotEditor();
-  if (!snapshot) return <p>יש לייבא תחילה את תוכן השירות לסביבה המקומית.</p>;
+  if (!snapshot) return <p>יש לייבא תחילה את תוכן השירות לסביבת התוכן.</p>;
+  const mediaChoices = mediaLocalEnabled() ? await getMediaChoices() : undefined;
   return <section className="grid gap-7">
     <Link href="/admin/services" prefetch={false}>חזרה לשירותים</Link>
     <h1 className="text-3xl font-black">עריכת ריפודים עדינים</h1>
@@ -14,7 +17,7 @@ export default async function ServiceEditorPage() {
       <p>{snapshot.draftRevisionId === snapshot.publishedRevisionId ? "הטיוטה תואמת לגרסה שפורסמה" : "יש שינויים שלא פורסמו"}</p>
       <p>נשמר לאחרונה: <time dateTime={snapshot.updatedAt}>{new Date(snapshot.updatedAt).toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}</time></p>
     </div>
-    <ServiceEditor key={snapshot.generation} snapshot={snapshot} />
+    <ServiceEditor key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices} />
     <section aria-label="היסטוריית גרסאות" className="grid gap-4">
       <h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
       <p>שחזור יוצר טיוטה חדשה ואינו משנה את הפרסום. הגרסאות הקודמות נשמרות.</p>

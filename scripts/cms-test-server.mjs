@@ -1,15 +1,19 @@
 import { spawn, spawnSync } from "node:child_process";
 import { getLocalStack } from "./cms-local.mjs";
 
-const { url, key } = getLocalStack();
+const { url, key, serviceKey } = getLocalStack();
 const published = process.argv.includes("--published");
 // An explicit environment prevents unrelated CRM/cloud credentials from being
-// inherited by the isolated browser-test server. Only the publishable key enters.
+// inherited by the isolated browser-test server. The local service key stays in
+// server-only media registration; it is never prefixed NEXT_PUBLIC or sent to a page.
 const env = {
     PATH: process.env.PATH,
     NODE_ENV: "production",
     NEXT_TELEMETRY_DISABLED: "1",
     CMS_SUPABASE_URL: url,
+    CMS_MEDIA_LOCAL_ENABLED: "1",
+    CMS_MEDIA_LOCAL_SERVICE_KEY: serviceKey,
+    TMPDIR: process.env.TMPDIR,
     CMS_SUPABASE_PUBLISHABLE_KEY: key,
     ...(published ? { CMS_CONTENT_TEST_BUILD: "1", CMS_PILOT_CONTENT_SOURCE: "published",
       CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning" } : {}),

@@ -30,6 +30,7 @@ export type ServiceLandingConfig = {
   image?: string;
   images?: readonly string[];
   imageAlt: string;
+  mediaPresentation?: { heroAlts: Record<string,string>; benefitAlts: Record<string,string>; resultAlt: string };
   imagePosition?: string;
   imagePositions?: Record<string, string>;
   signsTitle: string;

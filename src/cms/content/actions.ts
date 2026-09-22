@@ -28,7 +28,7 @@ export async function contentAction(_previous: ContentActionState, form: FormDat
     } else throw new ContentValidationError();
     revalidatePath("/admin/services");
     revalidatePath(`/admin/services/${PILOT_KEY}`);
-    return { ok: true, revision: result, message: kind === "publish" ? "הגרסה פורסמה בסביבה המקומית." : "הטיוטה נשמרה. הפרסום לא השתנה." };
+    return { ok: true, revision: result, message: kind === "publish" ? "הגרסה פורסמה בסביבת התוכן הנוכחית." : "הטיוטה נשמרה. הפרסום לא השתנה." };
   } catch (error) {
     return { ok: false, message: error instanceof ContentValidationError ? error.message : "הפעולה לא הושלמה. בדקו את ההרשאה וטענו מחדש את העמוד." };
   }

@@ -1,4 +1,6 @@
 import "server-only";
+import { requireMediaEnvironment } from "@/cms/media/environment";
+import { resolveMediaProjection } from "@/cms/media/resolve";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
 import { requireContentEnvironment } from "./environment";
@@ -29,7 +31,14 @@ export async function getPilotRevision(id: string) {
     .eq("document_id", PILOT_DOCUMENT_ID).eq("id", revisionId).maybeSingle();
   if (error) throw new Error("CMS revision read unavailable");
   if (!data) return null;
-  return { id: data.id as string, number: data.revision_number as number,
+  let media;
+  if (data.schema_version === 2) {
+    requireMediaEnvironment();
+    const refs = await client.rpc("cms_read_revision_media", { target_revision: revisionId });
+    if (refs.error) throw new Error("CMS media unavailable");
+    media = resolveMediaProjection(refs.data, "admin");
+  }
+  return { id: data.id as string, number: data.revision_number as number, media,
     payload: validatePilotDraft({ ...data.body, schemaVersion: data.schema_version,
       publicTitle: data.public_title, h1: data.h1, seoTitle: data.seo_title, seoDescription: data.seo_description }) };
 }
@@ -44,6 +53,7 @@ export async function mutatePilot(input: ContentMutation): Promise<string> {
   requireContentEnvironment();
   if (!Number.isSafeInteger(input.generation) || input.generation < 1) throw new ContentValidationError();
   const revision = parseRevisionId(input.revision);
+  if (input.kind === "save" && validatePilotDraft(input.payload).schemaVersion === 2) requireMediaEnvironment();
   const client = await createCmsServerClient();
   const result = input.kind === "publish"
     ? await client.rpc("cms_publish_service_revision", { expected_generation: input.generation, revision })

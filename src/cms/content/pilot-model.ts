@@ -1,3 +1,4 @@
+import type { ResolvedMedia } from "@/cms/media/model";
 import type { ServiceLandingContent } from "@/content/service-landing";
 
 export const PILOT_KEY = "delicate-upholstery-cleaning" as const;
@@ -24,7 +25,7 @@ export const pilotTextFields = {
 
 export type PilotTextField = keyof typeof pilotTextFields;
 export type PilotDraft = Record<PilotTextField, string> & {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   images: string[];
   signs: string[];
   process: string[];
@@ -60,11 +61,11 @@ function array(value: unknown, min: number, max: number): unknown[] {
 
 export function validatePilotDraft(value: unknown): PilotDraft {
   const data = object(value, [...Object.keys(pilotTextFields), "schemaVersion", "images", "signs", "process", "benefits", "faqs", "relatedLinks"]);
-  if (data.schemaVersion !== 1) throw new ContentValidationError("גרסת התוכן אינה נתמכת.");
+  if (data.schemaVersion !== 1 && data.schemaVersion !== 2) throw new ContentValidationError("גרסת התוכן אינה נתמכת.");
   const fields = {} as Record<PilotTextField, string>;
   for (const key of Object.keys(pilotTextFields) as PilotTextField[]) fields[key] = text(data[key], pilotTextFields[key].max);
-  const images = array(data.images, 1, PILOT_IMAGES.length).map((image) => {
-    if (typeof image !== "string" || !PILOT_IMAGES.some((approved) => approved === image)) throw new ContentValidationError("יש לבחור תמונה מאושרת של השירות.");
+  const images = array(data.images, 1, data.schemaVersion === 1 ? PILOT_IMAGES.length : 8).map((image) => {
+    if (typeof image !== "string" || (data.schemaVersion === 1 ? !PILOT_IMAGES.some((approved) => approved === image) : !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(image))) throw new ContentValidationError("יש לבחור תמונה מאושרת של השירות.");
     return image;
   });
   if (new Set(images).size !== images.length) throw new ContentValidationError("אין לבחור תמונה פעמיים.");
@@ -84,14 +85,22 @@ export function validatePilotDraft(value: unknown): PilotDraft {
     return { label: text(item.label, 120), href: item.href };
   });
   if (new Set(relatedLinks.map((link) => link.href)).size !== relatedLinks.length) throw new ContentValidationError("אין לחזור על אותו קישור.");
-  return { schemaVersion: 1, ...fields, images, signs: list(data.signs), process: list(data.process), benefits: list(data.benefits), faqs, relatedLinks };
+  return { schemaVersion: data.schemaVersion, ...fields, images, signs: list(data.signs), process: list(data.process), benefits: list(data.benefits), faqs, relatedLinks };
 }
 
-export function toPilotLanding(input: unknown): ServiceLandingContent {
+export function toPilotLanding(input: unknown, media?: ResolvedMedia[]): ServiceLandingContent {
   const d = validatePilotDraft(input);
+  const hero = media?.filter(r => r.usage_role === "hero").sort((a,b)=>a.position-b.position);
+  if (d.schemaVersion === 2 && (!hero || hero.length !== d.images.length || hero.some((r,i)=>r.media_version_id!==d.images[i]))) throw new ContentValidationError("הפניות המדיה אינן זמינות.");
+  const images = d.schemaVersion === 1 ? d.images : hero!.map(r=>r.src);
+  const presentation = d.schemaVersion === 2 ? { mediaPresentation: {
+    heroAlts: Object.fromEntries(hero!.map(r=>[r.src,r.alt_text])),
+    benefitAlts: Object.fromEntries(media!.filter(r=>r.usage_role==="benefits").map(r=>[r.src,r.alt_text])),
+    resultAlt: media!.find(r=>r.usage_role==="result")!.alt_text,
+  } } : {};
   return { serviceId: PILOT_KEY, displayTitle: d.publicTitle, content: {
     path: PILOT_PATH, metaTitle: d.seoTitle, metaDescription: d.seoDescription,
-    eyebrow: d.eyebrow, h1: d.h1, intro: d.intro, images: d.images, imageAlt: d.imageAlt,
+    eyebrow: d.eyebrow, h1: d.h1, intro: d.intro, images, imageAlt: d.imageAlt, ...presentation,
     signsTitle: d.signsTitle, signsDescription: d.signsDescription, signs: d.signs,
     processTitle: d.processTitle, processDescription: d.processDescription, process: d.process,
     benefitsDescription: d.benefitsDescription, benefits: d.benefits,

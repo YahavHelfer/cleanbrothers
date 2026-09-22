@@ -15,7 +15,7 @@ export default async function PilotPreview({ searchParams }: { searchParams: Pro
   try { id = parseRevisionId(params.revision); } catch { notFound(); }
   const revision = await getPilotRevision(id);
   if (!revision) notFound();
-  const { config } = toServiceLandingProps(toPilotLanding(revision.payload));
+  const { config } = toServiceLandingProps(toPilotLanding(revision.payload, revision.media));
   return <>
     <aside className="mb-6 rounded-2xl border theme-card p-5" aria-label="מצב תצוגה מקדימה">
       <p className="font-black">תצוגה מקדימה — גרסה {revision.number}</p>

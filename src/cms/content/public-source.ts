@@ -1,4 +1,6 @@
 import "server-only";
+import { requireMediaEnvironment } from "@/cms/media/environment";
+import { resolveMediaProjection } from "@/cms/media/resolve";
 import { cache } from "react";
 import { connection } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -25,5 +27,9 @@ export const getPublicPilot = cache(async () => {
   });
   const { data, error } = await client.rpc("cms_read_published_pilot");
   if (error || !data) throw new Error("Published CMS pilot unavailable");
-  return { revisionId: parseRevisionId(data.revisionId), page: toPilotLanding(data.payload) };
+  const media = data.payload.schemaVersion === 2 ? (() => {
+    requireMediaEnvironment();
+    return resolveMediaProjection(data.media, "public");
+  })() : undefined;
+  return { revisionId: parseRevisionId(data.revisionId), page: toPilotLanding(data.payload, media) };
 });

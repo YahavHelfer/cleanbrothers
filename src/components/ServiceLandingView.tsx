@@ -40,7 +40,7 @@ export function ServiceLandingView({
   const resultImages = [
     {
       src: primaryImage,
-      alt: `צילום מהשטח במהלך ${config.serviceName}`,
+      alt: config.mediaPresentation?.resultAlt || `צילום מהשטח במהלך ${config.serviceName}`,
     },
   ];
 
@@ -83,6 +83,7 @@ export function ServiceLandingView({
             <ServiceImageCarousel
               images={serviceImages}
               alt={config.imageAlt}
+              imageAlts={config.mediaPresentation?.heroAlts}
               className="absolute inset-0 h-full w-full"
               imageClassName="object-cover"
               imagePosition={config.imagePosition}
@@ -161,6 +162,7 @@ export function ServiceLandingView({
           <ServiceImageCarousel
             images={serviceImages}
             alt={`תיעוד אמיתי של ${config.serviceName} על ידי CleanBrothers`}
+            imageAlts={config.mediaPresentation?.benefitAlts}
             className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy"
             imageClassName="object-cover"
             imagePosition={config.imagePosition}
@@ -203,6 +205,7 @@ export function ServiceLandingView({
                   >
                     <Image
                       src={image.src}
+                      unoptimized={image.src.startsWith("/admin/media/file/") || image.src.startsWith("/cms-media/")}
                       alt={image.alt}
                       fill
                       className="object-cover object-center"
