@@ -1,7 +1,7 @@
 import "server-only";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { requireLocalContentEnvironment } from "./environment";
+import { requireContentEnvironment } from "./environment";
 import { ContentValidationError, parseRevisionId, PILOT_DOCUMENT_ID, validatePilotDraft, type PilotDraft } from "./pilot-model";
 
 export type RevisionSummary = { id: string; number: number; createdAt: string; createdBy: string | null;
@@ -11,7 +11,7 @@ export type PilotEditorSnapshot = { generation: number; updatedAt: string; draft
 
 export async function getPilotEditor(): Promise<{ snapshot: PilotEditorSnapshot | null; userId: string }> {
   const admin = await requireCmsAdmin();
-  requireLocalContentEnvironment();
+  requireContentEnvironment();
   const client = await createCmsServerClient();
   // A single SQL snapshot pairs the form payload, generation, pointers and history.
   const { data, error } = await client.rpc("cms_read_pilot_editor");
@@ -21,7 +21,7 @@ export async function getPilotEditor(): Promise<{ snapshot: PilotEditorSnapshot 
 
 export async function getPilotRevision(id: string) {
   await requireCmsAdmin();
-  requireLocalContentEnvironment();
+  requireContentEnvironment();
   const revisionId = parseRevisionId(id);
   const client = await createCmsServerClient();
   const { data, error } = await client.from("content_revisions")
@@ -41,7 +41,7 @@ export type ContentMutation = { kind: "save"; generation: number; revision: stri
 export async function mutatePilot(input: ContentMutation): Promise<string> {
   // Deliberately authorize independently on every write, including direct calls.
   await requireCmsAdmin();
-  requireLocalContentEnvironment();
+  requireContentEnvironment();
   if (!Number.isSafeInteger(input.generation) || input.generation < 1) throw new ContentValidationError();
   const revision = parseRevisionId(input.revision);
   const client = await createCmsServerClient();

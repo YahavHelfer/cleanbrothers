@@ -4,16 +4,19 @@ import { connection } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getCmsConfig } from "@/cms/config";
 import { staticContentSource } from "@/content/static-source";
-import { requireLocalContentEnvironment } from "./environment";
+import { requireContentEnvironment } from "./environment";
 import { parseRevisionId, PILOT_KEY, toPilotLanding } from "./pilot-model";
 
 // React request memoization shares exactly one immutable published snapshot
 // between generateMetadata and page rendering. No session or privileged key.
 export const getPublicPilot = cache(async () => {
-  if (process.env.CMS_PILOT_CONTENT_SOURCE !== "published") {
+  // Independent opt-ins: published mode alone must never switch the public site.
+  // This phase accepts exactly one service; wildcards/extra routes fail closed.
+  if (process.env.CMS_PILOT_CONTENT_SOURCE !== "published" ||
+      process.env.CMS_CONTENT_SERVICE_ALLOWLIST !== PILOT_KEY) {
     return { revisionId: null, page: staticContentSource.getServiceLanding(PILOT_KEY) };
   }
-  requireLocalContentEnvironment();
+  requireContentEnvironment();
   await connection();
   const { url, key } = getCmsConfig();
   const client = createClient(url, key, {

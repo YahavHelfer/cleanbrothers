@@ -7,6 +7,9 @@ const load = createSourceLoader();
 const model = load("src/cms/content/pilot-model.ts");
 const baseline = () => load("src/cms/content/baseline.ts").pilotBaseline();
 const localEnv = { CMS_SUPABASE_URL: "http://127.0.0.1:56321", CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_local_test" };
+const publishedEnv = { CMS_PILOT_CONTENT_SOURCE: "published", CMS_CONTENT_SERVICE_ALLOWLIST: model.PILOT_KEY };
+const previewEnv = { ...localEnv, VERCEL: "1", VERCEL_ENV: "preview",
+  VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation", CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" };
 const revision = "a0000000-0000-4000-8000-000000000001";
 
 test("baseline model round-trips every existing pilot value with no copy edits", () => {
@@ -120,16 +123,47 @@ test("static selection does not query CMS or require its environment", async () 
   assert.equal((await source.getPublicPilot()).revisionId, null); assert.equal(calls, 0);
 });
 
-for (const env of [{ VERCEL: "1", VERCEL_ENV: "preview" }, { VERCEL_ENV: "production" }, { CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" }]) {
-  test(`published selection fails closed outside isolated local environment: ${JSON.stringify(env)}`, async () => {
-    const source = createSourceLoader({ env: { ...localEnv, ...env, CMS_PILOT_CONTENT_SOURCE: "published" } })("src/cms/content/public-source.ts");
-    await assert.rejects(() => source.getPublicPilot(), /isolated local environment/);
+test("public source requires both independent flags and the exact pilot allowlist", async () => {
+  for (const flags of [{}, { CMS_PILOT_CONTENT_SOURCE: "published" },
+    { CMS_CONTENT_SERVICE_ALLOWLIST: model.PILOT_KEY },
+    { ...publishedEnv, CMS_PILOT_CONTENT_SOURCE: "static" },
+    ...["", "*", "sofa-cleaning", `${model.PILOT_KEY},sofa-cleaning`].map((value) => ({ ...publishedEnv, CMS_CONTENT_SERVICE_ALLOWLIST: value }))]) {
+    let calls = 0;
+    const source = createSourceLoader({ env: { ...previewEnv, ...flags }, mocks: {
+      "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },
+    } })("src/cms/content/public-source.ts");
+    assert.equal((await source.getPublicPilot()).revisionId, null);
+    assert.equal(calls, 0);
+  }
+});
+
+for (const [name, env] of Object.entries({
+  "local cloud URL": { ...localEnv, CMS_SUPABASE_URL: previewEnv.CMS_SUPABASE_URL },
+  "hosted loopback": { ...previewEnv, CMS_SUPABASE_URL: localEnv.CMS_SUPABASE_URL },
+  "Production with both flags": { ...previewEnv, VERCEL_ENV: "production" },
+  "other Preview branch": { ...previewEnv, VERCEL_GIT_COMMIT_REF: "feature/other" },
+  "main Preview": { ...previewEnv, VERCEL_GIT_COMMIT_REF: "main" },
+  "missing branch": { ...previewEnv, VERCEL_GIT_COMMIT_REF: "" },
+  "other Supabase project": { ...previewEnv, CMS_SUPABASE_URL: "https://unrelated.supabase.co" },
+  "unverified hosting": { ...previewEnv, VERCEL: "" },
+  "missing public key": { ...previewEnv, CMS_SUPABASE_PUBLISHABLE_KEY: "" },
+})) {
+  test(`content fails closed for ${name}, including direct repository access`, async () => {
+    let calls = 0;
+    const guarded = createSourceLoader({ env: { ...env, ...publishedEnv }, mocks: {
+      "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "test" }) },
+      "@/cms/server": { createCmsServerClient: async () => { calls++; throw Error("unexpected"); } },
+      "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },
+    } });
+    await assert.rejects(() => guarded("src/cms/content/public-source.ts").getPublicPilot(), /unavailable/);
+    await assert.rejects(() => guarded("src/cms/content/repository.ts").getPilotEditor(), /unavailable/);
+    assert.equal(calls, 0);
   });
 }
 
-test("published adapter queries only no-argument public projection and validates returned revision", async () => {
-  const calls = []; let options;
-  const source = createSourceLoader({ env: { ...localEnv, CMS_PILOT_CONTENT_SOURCE: "published" }, mocks: {
+for (const [name, env] of Object.entries({ local: localEnv, preview: previewEnv })) test(`${name} published adapter queries only no-argument projection with uncached requests`, async () => {
+  const calls = []; let options; let fetchOptions;
+  const source = createSourceLoader({ env: { ...env, ...publishedEnv }, fetchImpl: async (_input, init) => { fetchOptions = init; }, mocks: {
     "next/server": { connection: async () => {} },
     "@supabase/supabase-js": { createClient: (url, key, config) => { options = config; return { rpc: async (...args) => {
       calls.push(args); return { data: { revisionId: revision, payload: baseline() } };
@@ -138,6 +172,8 @@ test("published adapter queries only no-argument public projection and validates
   assert.equal((await source.getPublicPilot()).revisionId, revision);
   assert.deepEqual(calls, [["cms_read_published_pilot"]]);
   assert.equal(options.auth.persistSession, false);
+  await options.global.fetch("https://example.invalid", { cache: "force-cache" });
+  assert.equal(fetchOptions.cache, "no-store");
 });
 
 test("preview presentation contains no lead form, active contact link, public navigation, schema or marketing", () => {
