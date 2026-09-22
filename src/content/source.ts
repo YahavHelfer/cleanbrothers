@@ -1,5 +1,6 @@
 import type { ServiceLandingContentSource } from "./service-landing";
 import { staticContentSource } from "./static-source";
 
-// Static is the only implementation. No environment switch or CMS client exists.
+// Shared public content remains static. Only the pilot route has a separate
+// server-only, explicitly local published-content selector.
 export const contentSource: ServiceLandingContentSource = staticContentSource;

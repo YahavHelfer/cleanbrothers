@@ -52,7 +52,7 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/delicate-upholstery-cleaning", "/admin/preview/services/delicate-upholstery-cleaning"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
@@ -65,11 +65,12 @@ test("business API URLs stay outside the UI route groups; preview has no endpoin
   );
 });
 
-test("public metadata, sitemap and robots preserve canonical routes and behavior", () => {
+test("public metadata, sitemap and robots preserve canonical routes and behavior", async () => {
   const load = createSourceLoader();
   const { businessConfig } = load("src/config/business.ts");
   for (const route of publicRoutes) {
-    const { metadata } = load(`src/app/(site)${route === "/" ? "" : route}/page.tsx`);
+    const routeModule = load(`src/app/(site)${route === "/" ? "" : route}/page.tsx`);
+    const metadata = routeModule.metadata ?? await routeModule.generateMetadata();
     assert.equal(metadata.alternates.canonical, `${businessConfig.siteUrl}${route}`);
   }
   const sitemap = load("src/app/sitemap.ts").default();

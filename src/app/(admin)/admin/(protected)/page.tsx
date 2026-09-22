@@ -12,7 +12,7 @@ export default async function AdminPage() {
         </form>
       </div>
       <h1 id="admin-title" className="mt-6 text-3xl font-black leading-tight sm:text-4xl">לוח הבקרה</h1>
-      <p className="mt-5 leading-8 theme-muted">הכניסה לאזור הניהול מאובטחת. מודולי ניהול התוכן עדיין בפיתוח; בשלב זה אין אפשרות לערוך או לפרסם תוכן.</p>
+      <p className="mt-5 leading-8 theme-muted">הכניסה לאזור הניהול מאובטחת. ניהול שירות הפיילוט זמין בסביבה המקומית דרך מסך השירותים.</p>
       <p className="mt-4 text-sm leading-7 theme-muted">האתר הציבורי ממשיך לפעול כרגיל.</p>
     </section>
   );

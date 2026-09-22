@@ -17,6 +17,7 @@
 
 # next.js
 /.next/
+/.next-cms-published/
 /out/
 
 # production

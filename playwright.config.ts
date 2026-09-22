@@ -14,10 +14,15 @@ export default defineConfig({
     screenshot: "off",
     video: "off",
   },
-  webServer: {
+  webServer: [{
     command: "node scripts/cms-test-server.mjs",
     url: "http://127.0.0.1:56300/admin/login",
     reuseExistingServer: false,
     timeout: 30_000,
-  },
+  }, {
+    command: "node scripts/cms-test-server.mjs --published",
+    url: "http://127.0.0.1:56301/admin/login",
+    reuseExistingServer: false,
+    timeout: 120_000,
+  }],
 });

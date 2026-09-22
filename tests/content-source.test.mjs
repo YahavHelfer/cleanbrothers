@@ -14,7 +14,7 @@ const { ContactForm } = load("src/components/ContactForm.tsx");
 const serviceId = "delicate-upholstery-cleaning";
 const existingCrmValue = "ניקוי ריפודים עדינים";
 
-test("the static adapter is the active and only pilot content source", () => {
+test("the static adapter is the default pilot content source", () => {
   assert.equal(contentSource, staticContentSource);
   const page = contentSource.getServiceLanding(serviceId);
   assert.equal(page.serviceId, serviceId);
@@ -23,13 +23,13 @@ test("the static adapter is the active and only pilot content source", () => {
   assert.deepEqual(plain(toServiceLandingProps(page).config), plain(delicateUpholsteryLanding));
 });
 
-test("pilot page uses the static adapter and preserves existing SEO metadata", () => {
+test("pilot page uses the static adapter and preserves existing SEO metadata", async () => {
   const route = load("src/app/(site)/delicate-upholstery-cleaning/page.tsx");
-  const page = route.default();
+  const page = await route.default();
   assert.equal(page.type, ServiceLandingPage);
   assert.deepEqual(plain(page.props.config), plain(delicateUpholsteryLanding));
   assert.equal(page.props.crmServiceName, existingCrmValue);
-  assert.deepEqual(plain(route.metadata), plain(buildServiceLandingMetadata(delicateUpholsteryLanding)));
+  assert.deepEqual(plain(await route.generateMetadata()), plain(buildServiceLandingMetadata(delicateUpholsteryLanding)));
 });
 
 test("renaming pilot display text cannot change the service submitted through ContactForm", () => {

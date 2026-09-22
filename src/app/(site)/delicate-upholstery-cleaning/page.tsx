@@ -1,13 +1,13 @@
 import { ServiceLandingPage, buildServiceLandingMetadata } from "@/components/ServiceLandingPage";
-import { contentSource } from "@/content/source";
+import { getPublicPilot } from "@/cms/content/public-source";
 import { toServiceLandingProps } from "@/content/service-landing-adapter";
 
-const page = toServiceLandingProps(
-  contentSource.getServiceLanding("delicate-upholstery-cleaning"),
-);
+export async function generateMetadata() {
+  const { page } = await getPublicPilot();
+  return buildServiceLandingMetadata(toServiceLandingProps(page).config);
+}
 
-export const metadata = buildServiceLandingMetadata(page.config);
-
-export default function DelicateUpholsteryCleaningPage() {
+export default async function DelicateUpholsteryCleaningPage() {
+  const page = toServiceLandingProps((await getPublicPilot()).page);
   return <ServiceLandingPage {...page} />;
 }
