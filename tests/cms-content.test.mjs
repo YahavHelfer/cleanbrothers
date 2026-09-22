@@ -97,11 +97,11 @@ for (const operation of ["editor", "revision", "save", "publish", "restore"]) te
   await assert.rejects(run, /denied/); assert.equal(authCalls, 1); assert.equal(dbCalls, 0);
 });
 
-test("stale editor returns a Hebrew conflict and never retries against a new generation", async () => {
+for (const code of ["PT409", "40001"]) test(`stale editor (${code}) returns a Hebrew conflict without retrying a new generation`, async () => {
   let calls = 0;
   const repository = createSourceLoader({ env: localEnv, mocks: {
     "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "local" }) },
-    "@/cms/server": { createCmsServerClient: async () => ({ rpc: async () => { calls++; return { error: { code: "40001" } }; } }) },
+    "@/cms/server": { createCmsServerClient: async () => ({ rpc: async () => { calls++; return { error: { code } }; } }) },
   } })("src/cms/content/repository.ts");
   await assert.rejects(() => repository.mutatePilot({ kind: "save", generation: 1, revision, payload: baseline() }), /עורך אחר/);
   assert.equal(calls, 1);

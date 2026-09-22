@@ -50,7 +50,7 @@ export async function mutatePilot(input: ContentMutation): Promise<string> {
     : await client.rpc("cms_save_service_draft", { expected_generation: input.generation, base_revision: revision,
       payload: input.kind === "save" ? validatePilotDraft(input.payload) : null,
       restore_revision: input.kind === "restore" ? parseRevisionId(input.source) : null });
-  if (result.error?.code === "40001") throw new ContentValidationError("עורך אחר שינה את השירות. השינויים שלך נשארו בטופס ולא נשמרו. העתיקו אותם וטענו מחדש לפני ניסיון נוסף.");
+  if (result.error?.code === "PT409" || result.error?.code === "40001") throw new ContentValidationError("עורך אחר שינה את השירות. השינויים שלך נשארו בטופס ולא נשמרו. העתיקו אותם וטענו מחדש לפני ניסיון נוסף.");
   if (result.error) throw new Error("CMS content write unavailable");
   return parseRevisionId(result.data);
 }

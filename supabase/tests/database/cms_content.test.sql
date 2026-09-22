@@ -102,9 +102,9 @@ select is(public.cms_read_published_pilot()->'payload',(select payload from fixt
 select is((select generation::int from content_publication_state),2,'save advances optimistic generation');
 select is((select base_revision_id from content_revisions where id=(select draft from fixture)),(select baseline from fixture),'base revision recorded');
 select is((select created_by::text from content_revisions where id=(select draft from fixture)),'30000000-0000-4000-8000-000000000001','editor UUID recorded');
-select throws_ok($$select public.cms_save_service_draft(1,(select baseline from fixture),(select payload from fixture))$$,'40001',null,'stale editor rejected');
-select throws_ok($$select public.cms_publish_service_revision(1,(select draft from fixture))$$,'40001',null,'stale publication rejected');
-select throws_ok($$select public.cms_publish_service_revision(2,(select baseline from fixture))$$,'40001',null,'cannot publish arbitrary history directly');
+select throws_ok($$select public.cms_save_service_draft(1,(select baseline from fixture),(select payload from fixture))$$,'PT409',null,'stale editor rejected');
+select throws_ok($$select public.cms_publish_service_revision(1,(select draft from fixture))$$,'PT409',null,'stale publication rejected');
+select throws_ok($$select public.cms_publish_service_revision(2,(select baseline from fixture))$$,'PT409',null,'cannot publish arbitrary history directly');
 select is(public.cms_publish_service_revision(2,(select draft from fixture)),(select draft from fixture),'explicit publication succeeds');
 select is((select draft_revision_id from content_publication_state),(select draft from fixture),'publish does not change draft pointer');
 select is((select published_revision_id from content_publication_state),(select draft from fixture),'publish replaces published pointer');
@@ -113,7 +113,7 @@ select is((select count(*)::int from content_publication_events),2,'publish reco
 select is((select previous_revision_id from content_publication_events where kind='publish'),(select baseline from fixture),'publication records previous pointer');
 select is((select published_by::text from content_publication_events where kind='publish'),'30000000-0000-4000-8000-000000000001','publisher UUID recorded');
 select is(public.cms_read_published_pilot()->'payload'->>'seoTitle','Draft SEO','published metadata changes with payload');
-select throws_ok($$select public.cms_publish_service_revision(2,(select draft from fixture))$$,'40001',null,'replayed publish rejected');
+select throws_ok($$select public.cms_publish_service_revision(2,(select draft from fixture))$$,'PT409',null,'replayed publish rejected');
 update fixture set restored=public.cms_save_service_draft(3,draft,null,baseline);
 select isnt((select restored from fixture),(select baseline from fixture),'restore creates a new immutable identity');
 select is((select revision_number from content_revisions where id=(select restored from fixture)),3,'restore advances revision number');

@@ -166,7 +166,8 @@ test("concurrent independent AAL2 admins produce exactly one winner with no lost
     payload: { ...draft, h1: `Concurrent editor ${i}` }, restore_revision: null,
   })));
   expect(results.filter((r) => !r.error)).toHaveLength(1);
-  expect(results.filter((r) => r.error?.code === "40001")).toHaveLength(1);
+  expect(results.filter((r) => r.error?.code === "PT409")).toHaveLength(1);
+  expect(results.find((r) => r.error)?.status).toBe(409);
   expect(state().generation).toBe(original.generation + 1);
   expect(state().published_revision_id).toBe(baseline);
   expect(localSql("select count(*) from content_revisions")).toBe("2");
