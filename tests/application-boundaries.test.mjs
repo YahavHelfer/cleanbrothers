@@ -52,12 +52,12 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
   const handlers = filesIn(appDirectory).filter((file) => file.endsWith("/route.ts"));
-  assert.deepEqual(handlers.map(routeFor).sort(), ["/api/contact-lead", "/api/whatsapp"]);
+  assert.deepEqual(handlers.map(routeFor).sort(), ["/admin/auth/confirm", "/api/contact-lead", "/api/whatsapp"]);
   assert.equal(existsSync(resolve(appDirectory, "layout.tsx")), false);
   assert.deepEqual(
     filesIn(resolve(appDirectory, "(preview)")).map((file) => relative(appDirectory, file)),

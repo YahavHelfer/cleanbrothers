@@ -26,6 +26,7 @@ select throws_ok($$select public.is_cms_admin()$$, '42501', null, 'anonymous can
 reset role;
 
 set local role authenticated;
+select set_config('request.jwt.claims', '{"aal":"aal2"}', true);
 select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', true);
 select is((select count(*)::int from public.cms_admin_members), 0, 'ordinary user cannot read memberships');
 select is(public.is_cms_admin(), false, 'authentication alone grants no access');

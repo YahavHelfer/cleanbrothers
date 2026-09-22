@@ -21,7 +21,7 @@ export async function proxy(request: NextRequest) {
   } catch {
     // Missing config or unavailable Auth must never grant access.
   }
-  if (!authenticated && request.nextUrl.pathname !== "/admin/login") {
+  if (!authenticated && !["/admin/login", "/admin/auth/confirm"].includes(request.nextUrl.pathname)) {
     const target = request.nextUrl.clone();
     target.pathname = "/admin/login";
     target.search = "";
@@ -33,6 +33,7 @@ export async function proxy(request: NextRequest) {
   response.headers.set("Pragma", "no-cache");
   response.headers.set("Expires", "0");
   response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  response.headers.set("Referrer-Policy", "no-referrer");
   return response;
 }
 

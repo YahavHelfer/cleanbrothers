@@ -4,6 +4,7 @@ export const CMS_COOKIE_NAME = "cb-cms-auth";
 const LOCAL_CMS_URL = "http://127.0.0.1:56321";
 // Dedicated Free CMS project, verified in Phase 1B-B1. Never a CRM endpoint.
 const CLOUD_CMS_URL = "https://plbwefnwussxlglscfpn.supabase.co";
+const CMS_PREVIEW_ORIGIN = "https://cleanbrothers-git-feature-cms-c-061c94-yahavs-projects-6b5e850f.vercel.app";
 
 function isLocalCms() {
   return !process.env.VERCEL && !process.env.VERCEL_ENV &&
@@ -25,6 +26,11 @@ export function getCmsConfig() {
     throw new Error("CMS configuration unavailable");
   }
   return { url, key };
+}
+
+export function getCmsAppOrigin(): string {
+  getCmsConfig();
+  return isLocalCms() ? "http://127.0.0.1:56300" : CMS_PREVIEW_ORIGIN;
 }
 
 export const cmsCookieOptions = {

@@ -1,13 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { verifyCmsAdmin } from "@/cms/authorization";
+import { verifyCmsMemberForOnboarding } from "@/cms/authorization";
+import { cmsStepDestination } from "@/cms/onboarding";
 import { clearCmsCookies, createCmsServerClient } from "@/cms/server";
 
 type LoginState = { error: string };
 const loginError = "לא ניתן להיכנס למערכת עם הפרטים שנמסרו. בדקו את הפרטים ונסו שוב.";
 
 export async function login(_previous: LoginState, formData: FormData): Promise<LoginState> {
+  let destination = "/admin/login";
   const email = formData.get("email");
   const password = formData.get("password");
   if (typeof email !== "string" || typeof password !== "string" ||
@@ -23,7 +25,12 @@ export async function login(_previous: LoginState, formData: FormData): Promise<
       return { error: loginError };
     }
     try {
-      await verifyCmsAdmin(client);
+      // Also recovers a setup interrupted after Auth saved the password. The
+      // RPC requires Supabase's signed password AMR and can change only the
+      // caller's onboarding-completion timestamp, never membership authority.
+      const completed = await client.rpc("complete_cms_initial_password_setup");
+      if (completed.error || completed.data !== true) throw new Error("CMS access denied");
+      destination = cmsStepDestination((await verifyCmsMemberForOnboarding(client)).step);
     } catch {
       await client.auth.signOut({ scope: "local" });
       await clearCmsCookies();
@@ -34,7 +41,7 @@ export async function login(_previous: LoginState, formData: FormData): Promise<
     return { error: loginError };
   }
   // Fixed destination only; no returnTo/next input is accepted.
-  redirect("/admin");
+  redirect(destination);
 }
 
 export async function logout() {

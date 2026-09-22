@@ -1,13 +1,13 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { CmsAccessError, requireCmsAdmin } from "./authorization";
+import { requireCmsAdmin } from "./authorization";
+import { cmsAccessDestination } from "./onboarding";
 
 export async function requireCmsAdminPage() {
   try {
     return await requireCmsAdmin();
   } catch (error) {
-    const reason = error instanceof CmsAccessError ? error.reason : "unavailable";
-    redirect(reason === "anonymous" ? "/admin/login" : `/admin/login?error=${reason}`);
+    redirect(cmsAccessDestination(error));
   }
 }
 

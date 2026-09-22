@@ -1,7 +1,9 @@
 # CMS authentication — local foundation
 
-This guide covers the isolated local foundation on Next.js 16.3.5. Its CLI
-directory stays unlinked. The separate Free cloud project and Preview setup are
+This guide covers the isolated local foundation on Next.js 16.3.5.
+The local MFA/AAL2 implementation and the B2B2 rollout/recovery procedure are in
+[the MFA foundation guide](cms-mfa-foundation.md). The local CLI directory stays
+unlinked. The separate Free cloud project and Preview setup are
 documented in [the cloud foundation report](cms-cloud-foundation.md).
 The public site still uses `staticContentSource`; its business APIs are unchanged.
 
@@ -17,18 +19,25 @@ The public site still uses `staticContentSource`; its business APIs are unchange
   directly, including Server Actions and route handlers; a layout or Proxy check
   never substitutes for authorization at the data boundary.
 - `requireCmsAdmin()` creates a request-local ordinary SSR client, verifies the
-  identity with an Auth-server `getUser()` call, then selects that UUID's active
-  `admin` membership. It returns only UUID, verified email and role. Neither
-  cookie user data, editable user metadata, email matching nor `getSession()`
-  authorizes access. There is no persistent authorization cache.
+  identity with an Auth-server `getUser()` call and signature-verified `getClaims()`,
+  checks active membership, requires a verified TOTP factor and `aal2`, and then
+  selects that UUID's active `admin` membership through AAL2-protected RLS. It
+  returns only UUID, verified email and role. Neither cookie user data, editable
+  user metadata, email matching nor an unverified `getSession()` result authorizes
+  access. There is no persistent authorization cache.
 - Normal application access uses only the publishable key and the user's JWT.
   No service-role client/key exists in application source or browser bundles.
-- Membership RLS allows an authenticated active admin to SELECT only their own
-  active row. Anonymous has no table privilege. No API role has membership-write
+- Membership RLS allows an authenticated active AAL2 admin to SELECT only their
+  own active row. An invited account must first set its initial password.
+  Anonymous has no table privilege. No API role has membership-write table
   privileges/policies. The owner-only bootstrap process changes membership.
-- `is_cms_admin()` is a stable SECURITY INVOKER SQL function with an empty search
-  path, relying on the same RLS. Future content RLS may use it. No content tables
-  or content permissions are included in this phase.
+- `is_cms_admin_aal2()` is the mandatory helper for future content RLS. The legacy
+  `is_cms_admin()` name now delegates to it. Both are SECURITY INVOKER with empty
+  search paths. Two no-argument SECURITY DEFINER functions expose only own-user
+  membership/initial-password eligibility booleans to authenticated users; they
+  expose neither Auth rows nor CMS content. A third no-argument function can mark
+  only the caller's initial-password completion after signed password authentication;
+  it cannot create or activate memberships. No content tables are included.
 - The historical Phase 1B-A migration created two fixed administrator seats.
   The forward migration `20260921150000_cms_flexible_membership.sql` removes
   `admin_slot` and its constraints without changing identities, role, active
@@ -99,12 +108,15 @@ configuration the public site builds normally and admin login fails safely.
 
 ## Fixtures and controlled bootstrap
 
-Playwright creates three randomized `example.invalid` Auth identities using the
-local Auth Admin API: an active admin, an inactive admin and a non-member. Their
-password is generated per worker and never committed. Only the first two get
-membership rows. Cleanup deletes only identities created by that worker, with
-membership cascade deletion. The suite refuses to seed a non-empty membership
-table. No Auth state, screenshots, traces or video are persisted by default.
+Before each test, Playwright creates three randomized `example.invalid` Auth
+identities using the local Auth Admin API: an active admin, an inactive admin and
+a non-member. Their password is generated per worker and never committed. Only
+the first two get membership rows. Invitation tests additionally generate local
+invite links without sending email.
+Cleanup after each test deletes only that test's identities, with membership
+cascade deletion, then asserts zero Auth users and zero memberships. The suite
+refuses to seed a non-empty membership table. No Auth state, screenshots, traces
+or video are persisted by default.
 SQL tests run in a transaction and roll back all fixtures and changes.
 
 The privileged test helper lives in `scripts/cms-local.mjs` and `tests/e2e`, not
@@ -177,21 +189,24 @@ Phase 1B-B1 implements that recommendation through a new forward migration and
 See [the cloud foundation status](cms-cloud-foundation.md) for external setup
 prerequisites and which cloud steps have actually been completed.
 
-Phase 1B-B1 created the dedicated Free cloud project, applied both membership
-migrations, verified cloud RLS with disposable identities, and configured only
-the required Preview variables. No Preview deployment has been made.
+Phase 1B-B1 created the dedicated Free cloud project and applied the first two
+membership migrations. B2A subsequently deployed the approved feature SHA to a
+protected Preview and narrowed the two CMS variables to that branch. Production
+remains on main. The B1 report is a historical snapshot, not current MFA status.
 
-MFA remains deferred. The minimal Phase 1B-B2 sequence after review is:
+B2B1 adds local-only TOTP enrollment/challenge, invitation/first-password routes
+and `20260922000000_cms_mfa_aal2.sql`. Start the isolated stack with TOTP enabled;
+for a previously initialized local database, apply pending migrations explicitly:
 
-1. Provision the two real identities and memberships by the controlled bootstrap above.
-2. Add TOTP enrollment/challenge/verification pages and an Auth assurance check
-   (`aal2`) after verified identity and before returning authorized context.
-   Add the same assurance requirement to DB policies/`is_cms_admin()` so direct
-   database requests cannot bypass MFA. Test recovery, unenrollment, expired
-   challenges and aal1 denial. Keep membership authorization independent of MFA.
-3. Only after approval, deploy Preview and repeat the tests with synthetic
-   accounts, verify HTTPS cookies/no-store/CSRF/noindex and public tracking
-   isolation, then have the two admins enroll. No CMS content modules yet.
+```sh
+SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 \
+  npx supabase migration up --local --network-id cleanbrothers-cms-local
+```
+
+Do not use `--linked` for these tests. Cloud still has only the two B1 migrations,
+zero users and zero memberships. The new code/migration is not deployed. Review
+and separate B2B2 authorization are required before cloud rollout or real users;
+follow [the MFA guide](cms-mfa-foundation.md) for the exact order and URL settings.
 
 References:
 - https://supabase.com/docs/guides/auth/server-side/creating-a-client

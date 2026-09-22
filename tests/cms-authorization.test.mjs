@@ -4,12 +4,21 @@ import test from "node:test";
 import { createSourceLoader, plain } from "./helpers/source-module.mjs";
 
 const user = { id: "10000000-0000-4000-8000-000000000001", email: "test@example.invalid" };
-function setup({ identity = user, authError = null, row = { user_id: user.id, role: "admin", is_active: true }, dbError = null, fails = false } = {}) {
+function setup({ identity = user, authError = null, row = { user_id: user.id, role: "admin", is_active: true }, dbError = null, fails = false,
+  aal = "aal2", factors = [{ id: "factor-own", status: "verified", factor_type: "totp" }], pendingPassword = false,
+  methods = ["password"], claimsError = null, subject = user.id } = {}) {
   const calls = [];
   const client = {
     auth: {
-      async getUser() { calls.push("verified-user"); if (fails) throw Error("internal secret"); return { data: { user: identity }, error: authError }; },
+      async getUser() { calls.push("verified-user"); if (fails) throw Error("internal secret"); return { data: { user: identity && { ...identity, factors } }, error: authError }; },
+      async getClaims() { calls.push("verified-claims"); return { data: { claims: { sub: subject, role: "authenticated", aal, amr: methods.map((method) => ({ method })) } }, error: claimsError }; },
       getSession() { throw Error("Unverified cookie identity must not be used"); },
+    },
+    async rpc(name) {
+      calls.push(name);
+      assert.ok(["is_cms_member_for_onboarding", "cms_invite_password_pending"].includes(name));
+      return { error: dbError, data: name === "cms_invite_password_pending" ? pendingPassword :
+        !!row && row.user_id === identity.id && row.role === "admin" && row.is_active === true };
     },
     from(table) {
       calls.push(table);
@@ -19,8 +28,10 @@ function setup({ identity = user, authError = null, row = { user_id: user.id, ro
       } }; } };
     },
   };
-  const load = createSourceLoader({ mocks: {
-    "./server": { createCmsServerClient: async () => client },
+  const server = { createCmsServerClient: async () => client, clearCmsCookies: async () => calls.push("clear-cookies") };
+  const load = createSourceLoader({ env: { CMS_SUPABASE_URL: "http://127.0.0.1:56321", CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_only" }, mocks: {
+    "./server": server,
+    "@/cms/server": server,
     "next/navigation": { redirect(destination) { throw Object.assign(new Error("Redirect"), { destination }); } },
   } });
   return { ...load("src/cms/authorization.ts"), client, calls, load };
@@ -29,8 +40,10 @@ function setup({ identity = user, authError = null, row = { user_id: user.id, ro
 test("CMS boundary validates Auth identity before membership and returns a minimal context", async () => {
   const { requireCmsAdmin, calls } = setup();
   assert.deepEqual(plain(await requireCmsAdmin()), { userId: user.id, email: user.email, role: "admin" });
-  assert.deepEqual(calls, ["verified-user", "cms_admin_members", "user_id, role, is_active"]);
+  assert.deepEqual(calls, adminCalls);
 });
+
+const adminCalls = ["verified-user", "verified-claims", "is_cms_member_for_onboarding", "cms_invite_password_pending", "cms_admin_members", "user_id, role, is_active"];
 
 for (const [name, options, reason] of [
   ["anonymous", { identity: null }, "anonymous"],
@@ -68,7 +81,7 @@ for (const [name, options, destination] of [
     const { getCmsDashboard } = load("src/cms/dashboard.ts");
     await assert.rejects(getCmsDashboard(), (error) => error.destination === destination);
     assert.equal(calls[0], "verified-user");
-    if (options.identity !== null) assert.ok(calls.includes("cms_admin_members"));
+    if (options.identity !== null) assert.ok(calls.includes("is_cms_member_for_onboarding"));
   });
 }
 
@@ -76,7 +89,7 @@ test("direct dashboard read independently validates active membership", async ()
   const { load, calls } = setup();
   const { getCmsDashboard } = load("src/cms/dashboard.ts");
   assert.deepEqual(plain(await getCmsDashboard()), { admin: { userId: user.id, email: user.email, role: "admin" } });
-  assert.deepEqual(calls, ["verified-user", "cms_admin_members", "user_id, role, is_active"]);
+  assert.deepEqual(calls, adminCalls);
 });
 
 test("CMS config rejects missing settings, cloud URLs, alternate ports and privileged keys", () => {
@@ -219,5 +232,167 @@ test("Proxy is scoped to admin and both protected layout and data layer authoriz
   assert.match(source("src/app/(admin)/admin/(protected)/page.tsx"), /await getCmsDashboard\(\)/);
   const actions = source("src/app/(admin)/admin/actions.ts");
   assert.doesNotMatch(actions, /signUp\(|getSession\(|service_role/);
-  assert.match(actions, /redirect\("\/admin"\)/);
+  assert.match(actions, /cmsStepDestination/);
+});
+
+for (const [name, options, destination] of [
+  ["AAL1 without factor", { aal: "aal1", factors: [] }, "/admin/mfa/setup"],
+  ["AAL1 with verified factor", { aal: "aal1" }, "/admin/mfa/challenge"],
+  ["pending unverified factor", { aal: "aal1", factors: [{ id: "pending", status: "unverified", factor_type: "totp" }] }, "/admin/mfa/challenge"],
+  ["invited member without password", { aal: "aal1", pendingPassword: true, methods: ["otp"], factors: [] }, "/admin/onboarding/password"],
+  ["AAL2 cannot skip initial password", { pendingPassword: true, methods: ["otp", "totp"] }, "/admin/onboarding/password"],
+]) {
+  test(`${name}: onboarding is allowed but direct dashboard/data access is denied`, async () => {
+    const { load, requireCmsAdmin, requireCmsMemberForOnboarding, calls } = setup(options);
+    const member = await requireCmsMemberForOnboarding();
+    assert.equal(load("src/cms/onboarding.ts").cmsStepDestination(member.step), destination);
+    await assert.rejects(requireCmsAdmin(), (error) => error.reason === member.step);
+    await assert.rejects(load("src/cms/dashboard.ts").getCmsDashboard(), (error) => error.destination === destination);
+    assert.ok(!calls.includes("cms_admin_members"), "onboarding never reads protected rows");
+  });
+}
+
+for (const options of [
+  { claimsError: Error("invalid signature") }, { subject: "forged-subject" }, { aal: "aal3" }, { aal: null },
+]) {
+  test(`untrusted/mismatched assurance claims never grant admin or onboarding (${JSON.stringify(options)})`, async () => {
+    const { requireCmsAdmin, requireCmsMemberForOnboarding, calls } = setup(options);
+    await assert.rejects(requireCmsAdmin(), (error) => error.reason === "anonymous");
+    await assert.rejects(requireCmsMemberForOnboarding(), (error) => error.reason === "anonymous");
+    assert.ok(!calls.includes("is_cms_member_for_onboarding"));
+  });
+}
+
+test("ordinary password/recovery sessions cannot masquerade as initial invitation sessions", async () => {
+  for (const methods of [["password"], ["recovery"], []]) {
+    await assert.rejects(setup({ pendingPassword: true, methods }).requireCmsMemberForOnboarding(), (error) => error.reason === "forbidden");
+  }
+});
+
+test("invitation accepts only exact configured origin, path, token_hash and invite type", () => {
+  const { load } = setup();
+  const { parseCmsInvitation } = load("src/cms/invitation.ts");
+  const origin = "http://127.0.0.1:56300";
+  const token = "a".repeat(64);
+  const valid = `${origin}/admin/auth/confirm?token_hash=${token}&type=invite`;
+  assert.equal(parseCmsInvitation(valid), token);
+  for (const invalid of [
+    valid.replace(origin, "https://evil.invalid"), valid.replace(origin, "http://localhost:56300"),
+    valid.replace("type=invite", "type=recovery"), valid.replace("type=invite", "type=signup"),
+    valid.replace(token, "short"), `${valid}&type=invite`, `${valid}&token_hash=${token}`,
+    `${valid}&next=https://evil.invalid`, `${valid}&next=/admin`, `${valid}&redirect_to=//evil.invalid`,
+    `${valid}#access_token=forged`, valid.replace("/admin/auth/confirm", "/admin/login"),
+  ]) assert.throws(() => parseCmsInvitation(invalid), /Invalid CMS invitation/);
+  const preview = createSourceLoader({ env: { CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co", CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_only", VERCEL: "1", VERCEL_ENV: "preview" } });
+  const previewOrigin = preview("src/cms/config.ts").getCmsAppOrigin();
+  const parser = preview("src/cms/invitation.ts").parseCmsInvitation;
+  assert.equal(parser(valid.replace(origin, previewOrigin)), token);
+  for (const other of ["https://www.cleanbrothers.co.il", "https://cleanbrothers.vercel.app", `${previewOrigin}.evil.invalid`, origin]) {
+    assert.throws(() => parser(valid.replace(origin, other)), /Invalid CMS invitation/);
+  }
+});
+
+test("invalid invitation is rejected before token consumption; expired or nonmember invites fail closed", async () => {
+  const { load, client } = setup({ aal: "aal1", factors: [], pendingPassword: true, methods: ["otp"] });
+  const { confirmCmsInvitation } = load("src/cms/invitation.ts");
+  let verifications = 0;
+  client.auth.verifyOtp = async (input) => { verifications++; assert.equal(input.type, "invite"); return { error: null }; };
+  const valid = `http://127.0.0.1:56300/admin/auth/confirm?token_hash=${"b".repeat(64)}&type=invite`;
+  await assert.rejects(confirmCmsInvitation(client, `${valid}&next=//evil.invalid`));
+  assert.equal(verifications, 0);
+  await confirmCmsInvitation(client, valid);
+  client.auth.verifyOtp = async () => ({ error: Error("expired token with private detail") });
+  await assert.rejects(confirmCmsInvitation(client, valid), /Invalid CMS invitation/);
+  const outsider = setup({ row: null });
+  outsider.client.auth.verifyOtp = async () => ({ error: null });
+  await assert.rejects(outsider.load("src/cms/invitation.ts").confirmCmsInvitation(outsider.client, valid), (error) => error.reason === "forbidden");
+});
+
+test("confirmation validates the HTTP host/protocol without trusting Next's internal localhost origin", () => {
+  const { cmsInvitationRequestUrl } = setup().load("src/cms/invitation.ts");
+  const path = `/admin/auth/confirm?token_hash=${"a".repeat(64)}&type=invite`;
+  assert.equal(cmsInvitationRequestUrl(`http://localhost:56300${path}`, "127.0.0.1:56300", "http"), `http://127.0.0.1:56300${path}`);
+  for (const host of [null, "localhost:56300", "evil.invalid", "127.0.0.1:56300.evil.invalid", "127.0.0.1:56300,evil.invalid"]) {
+    assert.throws(() => cmsInvitationRequestUrl(`http://127.0.0.1:56300${path}`, host, "http"));
+  }
+  assert.throws(() => cmsInvitationRequestUrl(`http://localhost:56300${path}`, "127.0.0.1:56300", "https,http"));
+});
+
+test("initial passwords require length, mixed case, digit and symbol", () => {
+  const { isStrongCmsPassword } = setup().load("src/cms/invitation.ts");
+  assert.equal(isStrongCmsPassword("Private-Synthetic!123"), true);
+  for (const password of [null, "short!A1", "lowercase-only!123", "UPPERCASE-ONLY!123", "NoNumbersHere!", "NoSymbolsHere123", "A1!" + "a".repeat(126)]) {
+    assert.equal(isStrongCmsPassword(password), false);
+  }
+});
+
+test("first-password action denies ordinary active AAL1/AAL2, inactive and nonmember sessions", async () => {
+  for (const options of [{ aal: "aal1" }, {}, { row: null }, { row: { user_id: user.id, role: "admin", is_active: false } }]) {
+    const { load, client } = setup(options);
+    let mutated = false;
+    client.auth.updateUser = async () => { mutated = true; return { error: null }; };
+    const input = new FormData(); input.set("password", "Private-Synthetic!123"); input.set("confirmPassword", "Private-Synthetic!123");
+    const result = await load("src/app/(admin)/admin/onboarding-actions.ts").setCmsInitialPassword({ error: "" }, input);
+    assert.match(result.error, /לא ניתן/);
+    assert.equal(mutated, false);
+  }
+});
+
+test("enrollment rejects existing factors, nonmembers and incomplete invitations", async () => {
+  for (const options of [{ aal: "aal1" }, { row: null }, { aal: "aal1", factors: [{ id: "pending", status: "unverified", factor_type: "totp" }] }, { aal: "aal1", pendingPassword: true, methods: ["otp"], factors: [] }]) {
+    const { load, client } = setup(options);
+    let enrolled = false;
+    client.auth.mfa = { enroll: async () => { enrolled = true; return { error: Error("fixture") }; } };
+    assert.match((await load("src/app/(admin)/admin/onboarding-actions.ts").enrollCmsTotp()).error, /לא ניתן/);
+    assert.equal(enrolled, false);
+  }
+});
+
+test("enrollment returns only factor ID and data-image QR, never raw secret or otpauth URI", async () => {
+  const { load, client } = setup({ aal: "aal1", factors: [] });
+  client.auth.mfa = { enroll: async () => ({ error: null, data: { id: "own-factor", totp: { qr_code: "data:image/svg+xml;utf-8,synthetic", secret: "DO-NOT-RETURN", uri: "otpauth://DO-NOT-RETURN" } } }) };
+  const result = await load("src/app/(admin)/admin/onboarding-actions.ts").enrollCmsTotp();
+  assert.deepEqual(plain(result), { error: "", factorId: "own-factor", qrCode: "data:image/svg+xml;utf-8,synthetic" });
+});
+
+test("MFA action rejects another factor, invalid codes, and a pending factor when a verified one exists", async () => {
+  for (const [factorId, code, factors] of [
+    ["another-factor", "123456", [{ id: "factor-own", status: "verified", factor_type: "totp" }]],
+    ["factor-own", "not-otp", [{ id: "factor-own", status: "verified", factor_type: "totp" }]],
+    ["pending", "123456", [{ id: "pending", status: "unverified", factor_type: "totp" }, { id: "factor-own", status: "verified", factor_type: "totp" }]],
+  ]) {
+    const { load, client } = setup({ aal: "aal1", factors });
+    let challenged = false;
+    client.auth.mfa = { challengeAndVerify: async () => { challenged = true; return { error: null }; } };
+    const input = new FormData(); input.set("factorId", factorId); input.set("code", code);
+    assert.match((await load("src/app/(admin)/admin/onboarding-actions.ts").verifyCmsTotp({ error: "" }, input)).error, /לא ניתן/);
+    assert.equal(challenged, false);
+  }
+});
+
+test("MFA API success without server-verified AAL2 never grants dashboard access", async () => {
+  const { load, client } = setup({ aal: "aal1" });
+  client.auth.mfa = { challengeAndVerify: async () => ({ error: null }) };
+  const input = new FormData(); input.set("factorId", "factor-own"); input.set("code", "123456");
+  assert.match((await load("src/app/(admin)/admin/onboarding-actions.ts").verifyCmsTotp({ error: "" }, input)).error, /לא ניתן/);
+});
+
+test("full admin authorization rechecks the protected row after onboarding eligibility", async () => {
+  const row = { user_id: user.id, role: "admin", is_active: true };
+  const { client, requireCmsAdmin } = setup({ row });
+  const originalRpc = client.rpc;
+  client.rpc = async (name) => {
+    const result = await originalRpc(name);
+    if (name === "cms_invite_password_pending") row.is_active = false;
+    return result;
+  };
+  await assert.rejects(requireCmsAdmin(), (error) => error.reason === "forbidden");
+});
+
+test("MFA verification rechecks membership even if the Auth verification succeeds", async () => {
+  const row = { user_id: user.id, role: "admin", is_active: true };
+  const { load, client } = setup({ row, aal: "aal1" });
+  client.auth.mfa = { challengeAndVerify: async () => { row.is_active = false; return { error: null }; } };
+  const input = new FormData(); input.set("factorId", "factor-own"); input.set("code", "123456");
+  assert.match((await load("src/app/(admin)/admin/onboarding-actions.ts").verifyCmsTotp({ error: "" }, input)).error, /לא ניתן/);
 });

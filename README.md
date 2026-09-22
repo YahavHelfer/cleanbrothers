@@ -209,8 +209,10 @@ the isolated CMS stack described below.
 ## CMS authentication foundation
 
 `/admin/login` now provides server-side email/password login. `/admin` requires
-a verified Supabase identity and an active CMS administrator membership. The
-public site still uses static content. No content editor is included.
+a verified Supabase identity, active CMS administrator membership and TOTP AAL2.
+The local invitation/password and MFA setup/challenge routes enforce onboarding
+before dashboard access. The public site still uses static content. No content
+editor is included.
 
 See [the local CMS authentication guide](docs/cms-auth-local.md) for the dedicated
 local stack, membership schema/RLS, two-admin bootstrap policy, browser and SQL tests,
@@ -224,4 +226,7 @@ Phase 1B-B1 adds a forward migration removing the fixed two-slot membership
 constraint and a dedicated Supabase Free cloud project. See
 [the cloud foundation report](docs/cms-cloud-foundation.md) for cloud RLS evidence,
 Preview-only configuration, HTTPS cookies and the separate cloud CLI workdir.
-No website deployment, real administrator creation or automatic commit is included.
+B2A deployed the approved foundation to a protected Preview. The new B2B1 MFA
+implementation and AAL2 migration are local only; real administrators are not yet
+created. See [the MFA foundation guide](docs/cms-mfa-foundation.md) for the state
+machine, exact future Preview invitation URL and controlled recovery/rollout steps.

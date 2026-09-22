@@ -32,9 +32,6 @@ export default function AdminLayout({
               <Link href="/admin" prefetch={false} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
                 לוח בקרה
               </Link>
-              <Link href="/" prefetch={false} className="rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
-                צפייה באתר
-              </Link>
             </nav>
           </div>
         </header>
