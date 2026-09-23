@@ -1,8 +1,11 @@
 import { ServiceLandingPage, buildServiceLandingMetadata } from "@/components/ServiceLandingPage";
-import { carUpholsteryLanding } from "@/data/serviceLandingPages";
+import { getPublicService } from "@/cms/content/public-source";
+import { toServiceLandingProps } from "@/content/service-landing-adapter";
 
-export const metadata = buildServiceLandingMetadata(carUpholsteryLanding);
-
-export default function CarUpholsteryCleaningPage() {
-  return <ServiceLandingPage config={carUpholsteryLanding} />;
+export async function generateMetadata() {
+  const { page } = await getPublicService("car-upholstery-cleaning");
+  return buildServiceLandingMetadata(toServiceLandingProps(page).config);
+}
+export default async function ServicePage() {
+  return <ServiceLandingPage {...toServiceLandingProps((await getPublicService("car-upholstery-cleaning")).page)} />;
 }

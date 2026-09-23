@@ -364,7 +364,7 @@ test("admin content wording is environment-neutral", () => {
     "src/cms/content/actions.ts",
     "src/app/(admin)/admin/(protected)/page.tsx",
     "src/app/(admin)/admin/(protected)/services/page.tsx",
-    "src/app/(admin)/admin/(protected)/services/delicate-upholstery-cleaning/page.tsx",
+    "src/app/(admin)/admin/(protected)/services/[serviceKey]/page.tsx",
   ])
     assert.doesNotMatch(
       readFileSync(f, "utf8"),
@@ -657,7 +657,7 @@ test("Preview public image route never downloads draft objects and disables cach
   for(const published of [false,true]){
     let reads=0;
     const route=createSourceLoader({env:cloudEnv,mocks:{
-      "@supabase/supabase-js":{createClient:()=>({rpc:async(name,args)=>{assert.equal(name,"cms_read_public_media_version");assert.equal(args.target_version,id);return {data:published?{id,storage_provider:"supabase"}:null,error:null};}})},
+      "@supabase/supabase-js":{createClient:()=>({rpc:async(name,args)=>{assert.equal(name,"cms_read_public_media_version");assert.equal(args.target_version,id);return {data:published?{id,storage_provider:"supabase",serviceKeys:["delicate-upholstery-cleaning"]}:null,error:null};}})},
       "@/cms/media/repository":{mediaBytes:async()=>{reads++;return {bytes:Buffer.from("fixture")};}},
     }})("src/app/cms-media/[id]/route.ts");
     const response=await route.GET(new Request(previewOrigin+"/cms-media/"+id),{params:Promise.resolve({id})});

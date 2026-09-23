@@ -54,7 +54,7 @@ test("unmigrated services retain their existing form service value", () => {
 
 test("unknown service identities fail instead of falling back to editable text", () => {
   for (const unknown of ["unknown", "__proto__", "constructor"]) {
-    assert.throws(() => getCrmServiceName(unknown), /Unsupported service identity/);
-    assert.throws(() => contentSource.getServiceLanding(unknown), /Unsupported static service/);
+    assert.throws(() => getCrmServiceName(unknown), /Unsupported managed service/);
+    assert.throws(() => contentSource.getServiceLanding(unknown), /Unsupported managed service/);
   }
 });

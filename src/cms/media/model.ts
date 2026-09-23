@@ -98,7 +98,7 @@ export type MediaAsset = {
 export type MediaRef = {
   revision_id: string;
   media_version_id: string;
-  usage_role: "hero" | "benefits" | "result";
+  usage_role: "hero" | "benefits" | "result" | "before" | "after";
   position: number;
   alt_text: string;
   caption: string;

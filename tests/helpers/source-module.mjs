@@ -21,7 +21,7 @@ export function resolveSourceImport(specifier, parent) {
 
 // Compile project modules in memory: no generated files, server, or HTTP calls.
 // React/Next components are inspected as element trees or rendered with SSR.
-export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fetchImpl } = {}) {
+export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fetchImpl, sourceOverrides = {} } = {}) {
   const cache = new Map();
   function load(filename) {
     const absolute = resolve(projectRoot, filename);
@@ -38,7 +38,7 @@ export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fet
       const dependency = resolveSourceImport(specifier, absolute);
       return dependency ? load(dependency) : nativeRequire(specifier);
     };
-    const javascript = ts.transpileModule(readFileSync(absolute, "utf8"), {
+    const javascript = ts.transpileModule(sourceOverrides[absolute] ?? readFileSync(absolute, "utf8"), {
       compilerOptions: {
         module: ts.ModuleKind.CommonJS,
         target: ts.ScriptTarget.ES2022,

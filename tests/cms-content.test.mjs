@@ -127,7 +127,7 @@ test("public source requires both independent flags and the exact pilot allowlis
   for (const flags of [{}, { CMS_PILOT_CONTENT_SOURCE: "published" },
     { CMS_CONTENT_SERVICE_ALLOWLIST: model.PILOT_KEY },
     { ...publishedEnv, CMS_PILOT_CONTENT_SOURCE: "static" },
-    ...["", "*", "sofa-cleaning", `${model.PILOT_KEY},sofa-cleaning`].map((value) => ({ ...publishedEnv, CMS_CONTENT_SERVICE_ALLOWLIST: value }))]) {
+    ...["", "*", "sofa-cleaning", `${model.PILOT_KEY},unknown-service`].map((value) => ({ ...publishedEnv, CMS_CONTENT_SERVICE_ALLOWLIST: value }))]) {
     let calls = 0;
     const source = createSourceLoader({ env: { ...previewEnv, ...flags }, mocks: {
       "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },

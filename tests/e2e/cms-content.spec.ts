@@ -67,9 +67,9 @@ test("local baseline import is idempotent; static and CMS public rendering are s
     for (const route of ["/", "/services", "/gallery", "/about", "/contact", "/sofa-cleaning", "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning", "/armchair-chair-cleaning", `/${key}`, "/air-conditioner-cleaning", "/window-cleaning", "/privacy-policy", "/accessibility-statement", "/data-deletion"]) {
       expect((await request.get(appOrigin + route)).status(), route).toBe(200);
     }
-    const staticOther = await request.get(`${appOrigin}/mattress-cleaning`);
-    const cmsOther = await request.get(`${publishedOrigin}/mattress-cleaning`);
-    // Build IDs differ; the service heading/SEO retain their static source.
+    const staticOther = await request.get(`${appOrigin}/window-cleaning`);
+    const cmsOther = await request.get(`${publishedOrigin}/window-cleaning`);
+    // All shared services are opted in on this isolated server; special pages stay static.
     expect((await cmsOther.text()).match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1]).toBe((await staticOther.text()).match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1]);
   } finally { await publicContext.close(); }
 });
@@ -96,7 +96,7 @@ test("editor draft, exact preview, explicit publish and historical restore prese
   test.setTimeout(60_000);
   await session(admin, context);
   await page.goto("/admin/services");
-  await expect(page.getByText("שאר השירותים נשארים בתוכן הקיים.", { exact: false })).toBeVisible();
+  await expect(page.getByText("ניקוי מזגנים וניקוי חלונות — עדיין לא מנוהל במערכת")).toBeVisible();
   await page.getByRole("link", { name: "עריכת השירות" }).click();
   const publicContext = await browser.newContext();
   await publicContext.route("**/*", (route) => [appOrigin, publishedOrigin].includes(new URL(route.request().url()).origin) && !new URL(route.request().url()).pathname.startsWith("/api/") && route.request().method() === "GET" ? route.continue() : route.abort());

@@ -1,3 +1,4 @@
+import { serviceRegistry } from "@/content/service-registry";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -98,16 +99,12 @@ export default async function MediaDetailPage({
             <Link
               prefetch={false}
               className="underline"
-              href={`/admin/preview/services/delicate-upholstery-cleaning?revision=${u.revision_id}`}
+              href={`/admin/preview/services/${u.serviceKey}?revision=${u.revision_id}`}
             >
-              גרסת תוכן {u.revisionNumber}
+              {serviceRegistry[u.serviceKey].crmName} — גרסת תוכן {u.revisionNumber}
             </Link>{" "}
             ·{" "}
-            {u.usage_role === "hero"
-              ? "פתיחה"
-              : u.usage_role === "benefits"
-                ? "יתרונות"
-                : "תוצאות"}{" "}
+            {{ hero: "פתיחה", benefits: "יתרונות", result: "תוצאות", before: "לפני", after: "אחרי" }[u.usage_role]}{" "}
             · {u.published ? "מפורסמת" : "גרסה שמורה"} · {u.alt_text}
           </p>
         ))}

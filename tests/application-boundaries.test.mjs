@@ -52,7 +52,7 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/delicate-upholstery-cleaning", "/admin/preview/services/delicate-upholstery-cleaning", "/admin/media", "/admin/media/[id]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {

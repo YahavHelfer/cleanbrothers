@@ -1,3 +1,5 @@
+import { managedServiceKeys } from "@/content/service-registry";
+import { usesCmsSource } from "@/cms/content/environment";
 import { createClient } from "@supabase/supabase-js";
 import { getCmsConfig } from "@/cms/config";
 import { requireMediaEnvironment } from "@/cms/media/environment";
@@ -11,12 +13,7 @@ export async function GET(
 ) {
   try {
     requireMediaEnvironment();
-    if (
-      process.env.CMS_PILOT_CONTENT_SOURCE !== "published" ||
-      process.env.CMS_CONTENT_SERVICE_ALLOWLIST !==
-        "delicate-upholstery-cleaning"
-    )
-      throw new Error("Not enabled");
+    if (!managedServiceKeys.some(usesCmsSource)) throw new Error("Not enabled");
     const { url, key } = getCmsConfig();
     const client = createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -27,7 +24,7 @@ export async function GET(
     const { data, error } = await client.rpc("cms_read_public_media_version", {
       target_version: mediaId((await params).id),
     });
-    if (error || !data) throw new Error("Not public");
+    if (error || !data || !Array.isArray(data.serviceKeys) || !data.serviceKeys.some(usesCmsSource)) throw new Error("Not public");
     const file = await mediaBytes(data);
     if (file.staticPath)
       return new Response(null, {status:307,headers:{...privateMediaHeaders,Location:file.staticPath}});

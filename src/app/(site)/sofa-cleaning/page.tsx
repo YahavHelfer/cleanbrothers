@@ -1,8 +1,11 @@
 import { ServiceLandingPage, buildServiceLandingMetadata } from "@/components/ServiceLandingPage";
-import { sofaLanding } from "@/data/serviceLandingPages";
+import { getPublicService } from "@/cms/content/public-source";
+import { toServiceLandingProps } from "@/content/service-landing-adapter";
 
-export const metadata = buildServiceLandingMetadata(sofaLanding);
-
-export default function SofaCleaningPage() {
-  return <ServiceLandingPage config={sofaLanding} />;
+export async function generateMetadata() {
+  const { page } = await getPublicService("sofa-cleaning");
+  return buildServiceLandingMetadata(toServiceLandingProps(page).config);
+}
+export default async function ServicePage() {
+  return <ServiceLandingPage {...toServiceLandingProps((await getPublicService("sofa-cleaning")).page)} />;
 }

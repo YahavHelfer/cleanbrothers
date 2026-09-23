@@ -1,4 +1,6 @@
 import "server-only";
+import { isManagedServiceKey, type ManagedServiceKey } from "@/content/service-registry";
+import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
@@ -17,8 +19,6 @@ import {
   mediaGeneration,
   mediaMetadata,
   privateMediaUrl,
-  STATIC_MEDIA_PATH,
-  STATIC_MEDIA_VERSION,
   type MediaAsset,
   type MediaVersion,
   type MediaRef,
@@ -33,7 +33,7 @@ export type LibraryItem = MediaAsset & {
 export type MediaDetail = {
   asset: MediaAsset;
   versions: MediaVersion[];
-  usages: (MediaRef & { revisionNumber: number; published: boolean })[];
+  usages: (MediaRef & { serviceKey: ManagedServiceKey; revisionNumber: number; published: boolean })[];
   audit: {
     id: string;
     actor_id: string | null;
@@ -65,6 +65,7 @@ export async function getMediaDetail(id: string): Promise<MediaDetail | null> {
     target_asset: mediaId(id),
   });
   check(error);
+  if (data && (!Array.isArray(data.usages) || data.usages.some((usage: { serviceKey?: unknown }) => !isManagedServiceKey(usage.serviceKey)))) throw new MediaError();
   return data;
 }
 export async function getMediaChoices(): Promise<MediaChoice[]> {
@@ -87,7 +88,7 @@ export async function getMediaChoices(): Promise<MediaChoice[]> {
       altText: a.alt_text,
       src:
         v.storage_provider === "static"
-          ? STATIC_MEDIA_PATH
+          ? staticMediaPath(v.id)
           : privateMediaUrl(v.id),
       archived: a.status === "archived",
     };
@@ -173,10 +174,9 @@ export async function mediaBytes(
 ) {
   requireMediaEnvironment();
   if (
-    version.storage_provider === "static" &&
-    version.id === STATIC_MEDIA_VERSION
+    version.storage_provider === "static"
   )
-    return { staticPath: STATIC_MEDIA_PATH };
+    return { staticPath: staticMediaPath(version.id) };
   const id = mediaId(version.id);
   if (version.storage_provider === "supabase" && mediaCloudEnabled())
     return { bytes: await readCloudImage(id, version.content_hash) };

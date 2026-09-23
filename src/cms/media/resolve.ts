@@ -1,8 +1,7 @@
+import { staticMediaPath } from "./static-inventory";
 import type { ResolvedMedia } from "./model";
 import {
   mediaId,
-  STATIC_MEDIA_PATH,
-  STATIC_MEDIA_VERSION,
   privateMediaUrl,
 } from "./model";
 
@@ -15,7 +14,7 @@ export function resolveMediaProjection(
   return input.map((row) => {
     const id = mediaId(row.media_version_id);
     if (
-      !["hero", "benefits", "result"].includes(row.usage_role) ||
+      !["hero", "benefits", "result", "before", "after"].includes(row.usage_role) ||
       !Number.isInteger(row.position) ||
       row.position < 0 ||
       row.position > 7 ||
@@ -23,8 +22,8 @@ export function resolveMediaProjection(
     )
       throw new Error("Invalid media projection");
     let src: string;
-    if (row.provider === "static" && id === STATIC_MEDIA_VERSION)
-      src = STATIC_MEDIA_PATH;
+    if (row.provider === "static")
+      src = staticMediaPath(id);
     else if (row.provider === "local" || row.provider === "supabase")
       src = audience === "admin" ? privateMediaUrl(id) : `/cms-media/${id}`;
     else throw new Error("Unsupported media provider");

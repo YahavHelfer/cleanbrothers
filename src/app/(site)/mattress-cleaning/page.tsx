@@ -1,8 +1,11 @@
 import { ServiceLandingPage, buildServiceLandingMetadata } from "@/components/ServiceLandingPage";
-import { mattressLanding } from "@/data/serviceLandingPages";
+import { getPublicService } from "@/cms/content/public-source";
+import { toServiceLandingProps } from "@/content/service-landing-adapter";
 
-export const metadata = buildServiceLandingMetadata(mattressLanding);
-
-export default function MattressCleaningPage() {
-  return <ServiceLandingPage config={mattressLanding} />;
+export async function generateMetadata() {
+  const { page } = await getPublicService("mattress-cleaning");
+  return buildServiceLandingMetadata(toServiceLandingProps(page).config);
+}
+export default async function ServicePage() {
+  return <ServiceLandingPage {...toServiceLandingProps((await getPublicService("mattress-cleaning")).page)} />;
 }
