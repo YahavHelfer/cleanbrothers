@@ -6,6 +6,7 @@ import { getMediaDetail } from "@/cms/media/repository";
 import { privateMediaUrl, STATIC_MEDIA_PATH, mediaId } from "@/cms/media/model";
 import { MetadataEditor } from "@/cms/media/MetadataEditor";
 import { UploadForm } from "@/cms/media/UploadForm";
+import { mediaByteLimit } from "@/cms/media/environment";
 export default async function MediaDetailPage({
   params,
 }: {
@@ -47,7 +48,7 @@ export default async function MediaDetailPage({
       </p>
       <MetadataEditor key={asset.id} asset={asset} />
       {asset.status === "available" && (
-        <UploadForm key={`upload-${asset.generation}`} asset={asset} />
+        <UploadForm key={`upload-${asset.generation}`} asset={asset} maxBytes={mediaByteLimit()} />
       )}
       <section aria-label="גרסאות תמונה" className="grid gap-4">
         <h2 className="text-2xl font-black">גרסאות תמונה</h2>

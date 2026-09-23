@@ -25,7 +25,7 @@ export function resolveMediaProjection(
     let src: string;
     if (row.provider === "static" && id === STATIC_MEDIA_VERSION)
       src = STATIC_MEDIA_PATH;
-    else if (row.provider === "local")
+    else if (row.provider === "local" || row.provider === "supabase")
       src = audience === "admin" ? privateMediaUrl(id) : `/cms-media/${id}`;
     else throw new Error("Unsupported media provider");
     return { ...row, src };

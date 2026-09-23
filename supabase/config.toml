@@ -32,7 +32,9 @@ enabled = true
 port = 56324
 
 [storage]
-enabled = false
+# Isolated Storage service for transactional Preview-provider/RLS tests.
+enabled = true
+file_size_limit = "8MiB"
 
 [analytics]
 enabled = false

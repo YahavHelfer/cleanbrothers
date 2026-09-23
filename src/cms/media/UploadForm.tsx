@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MAX_IMAGE_BYTES, type MediaAsset } from "./model";
 
-export function UploadForm({ asset }: { asset?: MediaAsset }) {
+export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: MediaAsset; maxBytes?: number }) {
   const [file, setFile] = useState<File | null>(null),
     [message, setMessage] = useState(""),
     [pending, setPending] = useState(false);
@@ -20,10 +20,10 @@ export function UploadForm({ asset }: { asset?: MediaAsset }) {
     setMessage("");
     if (!f) return;
     if (
-      f.size > MAX_IMAGE_BYTES ||
+      f.size > maxBytes ||
       !["image/jpeg", "image/png", "image/webp"].includes(f.type)
     ) {
-      setMessage("בחרו JPEG, PNG או WebP בגודל עד 8 MiB.");
+      setMessage(`בחרו JPEG, PNG או WebP בגודל עד ${maxBytes / 1024 / 1024} MiB.`);
       setFile(null);
       setPreview(null);
       return;
@@ -72,7 +72,7 @@ export function UploadForm({ asset }: { asset?: MediaAsset }) {
         {asset ? "החלפה בגרסה חדשה" : "העלאת תמונה חדשה"}
       </h2>
       <p className="text-sm theme-muted">
-        JPEG, PNG או WebP בלבד · עד 8 MiB · עד 6,000 פיקסלים לצלע ו־16 מיליון
+        JPEG, PNG או WebP בלבד · עד {maxBytes / 1024 / 1024} MiB · עד 6,000 פיקסלים לצלע ו־16 מיליון
         פיקסלים. תמונות מונפשות אינן נתמכות.
       </p>
       {asset && (

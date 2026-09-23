@@ -4,12 +4,12 @@ import { mkdir, lstat, open, unlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
-import { requireMediaEnvironment } from "./environment";
+import { requireLocalMediaEnvironment } from "./environment";
 import { mediaId, MAX_IMAGE_BYTES } from "./model";
 
 const root = join(tmpdir(), "cleanbrothers-cms-media-local");
 async function filePath(id: string) {
-  requireMediaEnvironment();
+  requireLocalMediaEnvironment();
   mediaId(id);
   await mkdir(root, { recursive: true, mode: 0o700 });
   const dir = await lstat(root);

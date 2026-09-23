@@ -1,5 +1,5 @@
 import { requireCmsAdmin } from "@/cms/authorization";
-import { requireMediaEnvironment } from "@/cms/media/environment";
+import { mediaUploadOriginAllowed, requireMediaEnvironment } from "@/cms/media/environment";
 import { boundedUploadForm, privateMediaHeaders } from "@/cms/media/http";
 import { uploadMedia } from "@/cms/media/repository";
 import { MediaError } from "@/cms/media/model";
@@ -8,14 +8,8 @@ export async function POST(request: Request) {
   try {
     await requireCmsAdmin();
     requireMediaEnvironment();
-    const origin = request.headers.get("origin");
-    // Fixed local origins plus the received Host avoid trusting forwarded headers
-    // or Next's internally normalized request URL.
-    if (
-      !origin ||
-      !["http://127.0.0.1:56300", "http://127.0.0.1:56301"].includes(origin) ||
-      request.headers.get("host") !== new URL(origin).host
-    )
+    // Exact approved origin and received Host; never trust forwarded headers.
+    if (!mediaUploadOriginAllowed(request))
       return Response.json(
         { message: "הבקשה אינה מורשית." },
         { status: 403, headers: privateMediaHeaders },

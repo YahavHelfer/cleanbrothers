@@ -3,6 +3,8 @@ export const STATIC_MEDIA_VERSION = "d1000000-0000-4000-8000-000000000001";
 export const STATIC_MEDIA_PATH =
   "/images/services/delicate-upholstery-cleaning.jpeg";
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+// Leave multipart/header margin below Vercel's 4.5 MB function payload limit.
+export const MAX_PREVIEW_IMAGE_BYTES = 4 * 1024 * 1024;
 export const MAX_IMAGE_EDGE = 6000;
 export const MAX_IMAGE_PIXELS = 16_000_000;
 export class MediaError extends Error {
@@ -70,7 +72,7 @@ export type MediaVersion = {
   id: string;
   asset_id: string;
   version_number: number;
-  storage_provider: "static" | "local";
+  storage_provider: "static" | "local" | "supabase";
   storage_path: string;
   mime_type: string;
   byte_size: number;

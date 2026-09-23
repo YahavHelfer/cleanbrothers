@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import sharp from "sharp";
+import { execFileSync } from "node:child_process";
 import {
   createActor,
   cleanupActors,
@@ -448,4 +449,16 @@ test("drag/drop upload and ordered library selection persist exact version order
   expect(refs).toEqual([version, "d1000000-0000-4000-8000-000000000001"]);
   expect(localSql("select count(*) from revision_media_refs")).toBe("8");
   expect(state().published_revision_id).toBe(baseline);
+});
+
+test("Preview Storage adapter uses real isolated Storage/RPCs with AAL2, private delivery and immutable publication", async () => {
+  const client = await session(admin);
+  const { data } = await client.auth.getSession();
+  if (!data.session) throw Error("Local Storage fixture session missing");
+  // Synthetic local credentials travel only over stdin, never argv, files or logs.
+  const result = execFileSync(process.execPath, ["tests/helpers/cms-storage-integration.mjs"], {
+    input: JSON.stringify({actor:admin.id,baseline,session:data.session}),
+    encoding:"utf8", stdio:["pipe","pipe","pipe"],
+  });
+  expect(result.trim()).toBe("Local Preview Storage adapter integration passed; bucket and objects removed.");
 });

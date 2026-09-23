@@ -1,4 +1,4 @@
-import { mediaLocalEnabled } from "@/cms/media/environment";
+import { mediaEnabled } from "@/cms/media/environment";
 import { getMediaChoices } from "@/cms/media/repository";
 import Link from "next/link";
 import { getPilotEditor } from "@/cms/content/repository";
@@ -8,7 +8,7 @@ import { ServiceEditor, RestoreRevision } from "@/cms/content/ServiceEditor";
 export default async function ServiceEditorPage() {
   const { snapshot, userId } = await getPilotEditor();
   if (!snapshot) return <p>יש לייבא תחילה את תוכן השירות לסביבת התוכן.</p>;
-  const mediaChoices = mediaLocalEnabled() ? await getMediaChoices() : undefined;
+  const mediaChoices = mediaEnabled() ? await getMediaChoices() : undefined;
   return <section className="grid gap-7">
     <Link href="/admin/services" prefetch={false}>חזרה לשירותים</Link>
     <h1 className="text-3xl font-black">עריכת ריפודים עדינים</h1>

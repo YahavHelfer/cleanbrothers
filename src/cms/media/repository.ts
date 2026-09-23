@@ -1,10 +1,10 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { getCmsConfig } from "@/cms/config";
-import { requireMediaEnvironment } from "./environment";
+import { mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaEnvironment } from "./environment";
+import { createTrustedMediaClient } from "./trusted-client";
+import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { validateImage } from "./validate-image";
 import {
   writeLocalImage,
@@ -125,31 +125,19 @@ export async function uploadMedia(
   const meta = mediaMetadata(metadata);
   const target = asset ? mediaId(asset) : null;
   const expected = asset ? mediaGeneration(generation) : null;
+  if (bytes.length > mediaByteLimit())
+    throw new MediaError("הקובץ גדול מדי לסביבת ההעלאה.", 413);
   const validated = await validateImage(bytes, filename, mime);
+  if (validated.bytes.length > mediaByteLimit())
+    throw new MediaError("התמונה המעובדת גדולה מדי. בחרו תמונה קטנה יותר.", 413);
   const id = randomUUID();
-  const { url } = getCmsConfig();
-  const key = process.env.CMS_MEDIA_LOCAL_SERVICE_KEY;
-  if (!key) throw new Error("Local media registration unavailable");
-  // Isolated local server only. This client is never imported into client components.
-  const trusted = createClient(url, key, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-    global: {
-      fetch: (input, init) =>
-        fetch(input, {
-          ...init,
-          cache: "no-store",
-          signal: AbortSignal.timeout(8000),
-        }),
-    },
-  });
-  await writeLocalImage(id, validated.bytes);
+  const cloud = mediaCloudEnabled();
+  const trusted = createTrustedMediaClient();
+  await (cloud ? writeCloudImage : writeLocalImage)(id, validated.bytes);
   const { bytes: processed, ...details } = validated;
   void processed;
-  const { data, error } = await trusted.rpc("cms_register_media_version", {
+  const { data, error } = await trusted.rpc(cloud
+    ? "cms_register_preview_media_version" : "cms_register_media_version", {
     target_asset: target,
     expected_generation: expected,
     version_id: id,
@@ -163,7 +151,7 @@ export async function uploadMedia(
     error &&
     ["PT409", "42501", "22023", "23514", "23503", "55000"].includes(error.code)
   )
-    await discardUnregisteredImage(id);
+    await (cloud ? discardUnregisteredCloudImage : discardUnregisteredImage)(id);
   check(error);
   return mediaId(data);
 }
@@ -189,8 +177,10 @@ export async function mediaBytes(
     version.id === STATIC_MEDIA_VERSION
   )
     return { staticPath: STATIC_MEDIA_PATH };
-  if (version.storage_provider !== "local") throw new MediaError();
-  return {
-    bytes: await readLocalImage(mediaId(version.id), version.content_hash),
-  };
+  const id = mediaId(version.id);
+  if (version.storage_provider === "supabase" && mediaCloudEnabled())
+    return { bytes: await readCloudImage(id, version.content_hash) };
+  if (version.storage_provider === "local" && mediaLocalEnabled())
+    return { bytes: await readLocalImage(id, version.content_hash) };
+  throw new MediaError();
 }

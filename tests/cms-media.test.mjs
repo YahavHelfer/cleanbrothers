@@ -558,3 +558,126 @@ test('private image responses carry no-store and noindex even without Proxy, inc
   assert.equal(response.status,status);assert.match(response.headers.get('cache-control'),/private.*no-store/);assert.match(response.headers.get('x-robots-tag'),/noindex/);
  }
 });
+
+const cloudEnv = {
+  CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co",
+  CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_synthetic_test_only",
+  CMS_MEDIA_PREVIEW_ENABLED: "1",
+  VERCEL: "1", VERCEL_ENV: "preview",
+  VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
+  CMS_PILOT_CONTENT_SOURCE: "published",
+  CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning",
+};
+const previewOrigin = "https://cleanbrothers-git-feature-cms-c-061c94-yahavs-projects-6b5e850f.vercel.app";
+test("cloud media requires every Preview, project, branch and pilot condition", () => {
+  const enabled = createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
+  assert.equal(enabled.mediaEnabled(),true);
+  assert.doesNotThrow(()=>enabled.requireMediaEnvironment());
+  assert.throws(()=>enabled.requireLocalMediaEnvironment());
+  for(const key of Object.keys(cloudEnv).filter(k=>k!=="CMS_SUPABASE_PUBLISHABLE_KEY")) {
+    const loaded = createSourceLoader({env:{...cloudEnv,[key]:"wrong"}})("src/cms/media/environment.ts");
+    assert.equal(loaded.mediaEnabled(),false,key);
+    assert.throws(()=>loaded.requireCloudMediaEnvironment());
+  }
+  for(const extra of [{VERCEL_ENV:"production"},{VERCEL_GIT_COMMIT_REF:"main"},{CMS_MEDIA_LOCAL_ENABLED:"1",CMS_SUPABASE_URL:env.CMS_SUPABASE_URL}]) {
+    assert.equal(createSourceLoader({env:{...cloudEnv,...extra}})("src/cms/media/environment.ts").mediaEnabled(),false);
+  }
+});
+test("cloud upload accepts only exact stable Preview Origin and Host", () => {
+  const {mediaUploadOriginAllowed:allowed}=createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
+  const make=(origin,host)=>new Request(previewOrigin+"/admin/media/upload",{method:"POST",headers:{origin,host,"x-forwarded-host":new URL(previewOrigin).host}});
+  assert.equal(allowed(make(previewOrigin,new URL(previewOrigin).host)),true);
+  for(const origin of ["http://"+new URL(previewOrigin).host,previewOrigin+".attacker.invalid","https://www.cleanbrothers.co.il","http://127.0.0.1:56300","null",""])
+    assert.equal(allowed(make(origin,new URL(previewOrigin).host)),false);
+  assert.equal(allowed(make(previewOrigin,"attacker.invalid")),false);
+});
+test("Preview cannot use local filesystem storage even with the local flag", async()=>{
+  const storage=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_LOCAL_ENABLED:"1"}})("src/cms/media/local-storage.ts");
+  await assert.rejects(()=>storage.writeLocalImage("a3000000-0000-4000-8000-000000000001",Buffer.from("x")),/Local CMS/);
+});
+test("trusted media credentials are selected server-side only after the environment gate",async()=>{
+  const calls=[];
+  const mocks={"@supabase/supabase-js":{createClient:(url,key,options)=>{calls.push({url,key,options});return {};}}};
+  createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:"synthetic-server-key",CMS_MEDIA_LOCAL_SERVICE_KEY:"wrong-local-key"},mocks})("src/cms/media/trusted-client.ts").createTrustedMediaClient();
+  assert.equal(calls.length,1);assert.equal(calls[0].key,"synthetic-server-key");
+  assert.equal(calls[0].options.auth.persistSession,false);
+  let request;
+  const loaded=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:"synthetic-server-key"},mocks,fetchImpl:async(input,init)=>{request={input,init};return new Response();}})("src/cms/media/trusted-client.ts");
+  loaded.createTrustedMediaClient();await calls[1].options.global.fetch("https://example.invalid");
+  assert.equal(request.init.cache,"no-store");assert.equal(request.init.redirect,"error");
+  for(const e of [{...cloudEnv}, {...cloudEnv,VERCEL_ENV:"production",CMS_MEDIA_SERVER_KEY:"synthetic"}])
+    assert.throws(()=>createSourceLoader({env:e,mocks})("src/cms/media/trusted-client.ts").createTrustedMediaClient());
+  assert.equal(calls.length,2);
+});
+test("cloud storage uses only the private fixed bucket and generated immutable WebP path",async()=>{
+  const calls=[];const id="a3000000-0000-4000-8000-000000000001",bytes=Buffer.from("validated fixture");
+  const api={upload:async(...args)=>{calls.push(args);return {error:null};},download:async(path)=>{calls.push(path);return {data:new Blob([bytes]),error:null};},remove:async(paths)=>{calls.push(paths);return {error:null};}};
+  const loaded=createSourceLoader({env:cloudEnv,mocks:{"./trusted-client":{createTrustedMediaClient:()=>({storage:{from:bucket=>{assert.equal(bucket,"cms-media-preview");return api;}}})}}})("src/cms/media/cloud-storage.ts");
+  await loaded.writeCloudImage(id,bytes);
+  assert.equal(calls[0][0],id+".webp");assert.equal(calls[0][2].upsert,false);assert.equal(calls[0][2].contentType,"image/webp");assert.equal(calls[0][2].cacheControl,"0");
+  assert.deepEqual(Buffer.from(await loaded.readCloudImage(id,createHash("sha256").update(bytes).digest("hex"))),bytes);
+  await assert.rejects(()=>loaded.readCloudImage(id,"a".repeat(64)));
+  const n=calls.length;
+  for(const bad of ["../photo",id+"/../photo",id+"?token=x","Ｐｈｏｔｏ"])
+    await assert.rejects(()=>loaded.writeCloudImage(bad,bytes));
+  await assert.rejects(()=>loaded.writeCloudImage(id,Buffer.alloc(model.MAX_IMAGE_BYTES+1)));
+  assert.equal(calls.length,n);
+  await loaded.discardUnregisteredCloudImage(id);assert.deepEqual(plain(calls.at(-1)),[id+".webp"]);
+});
+test("cloud delivery rejects missing, oversized and corrupted objects without exposing upstream errors",async()=>{
+  for(const result of [{error:{message:"upstream private details"}}, {data:{size:model.MAX_IMAGE_BYTES+1}}, {data:new Blob([])}, {data:new Blob(["bad bytes"])}]) {
+    const loaded=createSourceLoader({env:cloudEnv,mocks:{"./trusted-client":{createTrustedMediaClient:()=>({storage:{from:()=>({download:async()=>result})}})}}})("src/cms/media/cloud-storage.ts");
+    await assert.rejects(()=>loaded.readCloudImage(model.STATIC_MEDIA_VERSION,"a".repeat(64)),e=>e.name==="Error"&&!e.message.includes("upstream"));
+  }
+});
+test("cloud upload authorizes, validates, writes and registers with actor attribution; compensates only definite failures",async()=>{
+  for(const code of [null,"PT409","42501","FETCH_ERROR"]){
+    const calls=[];let removed=0;
+    const repo=createSourceLoader({env:cloudEnv,mocks:{
+      "@/cms/authorization":{requireCmsAdmin:async()=>{calls.push("auth");return {userId:model.STATIC_MEDIA_ASSET};}},
+      "./validate-image":{validateImage:async()=>{calls.push("validate");return {bytes:Buffer.from("fixture"),contentHash:"a".repeat(64)};}},
+      "./trusted-client":{createTrustedMediaClient:()=>({rpc:async(name,args)=>{calls.push("register");assert.equal(name,"cms_register_preview_media_version");assert.equal(args.actor,model.STATIC_MEDIA_ASSET);assert.match(args.version_id,/^[0-9a-f-]{36}$/);return {data:model.STATIC_MEDIA_ASSET,error:code?{code}:null};}})},
+      "./cloud-storage":{writeCloudImage:async()=>{calls.push("write");},discardUnregisteredCloudImage:async()=>{removed++;}},
+      "./local-storage":{writeLocalImage:async()=>{throw Error("must never use Vercel disk");}},
+    }})("src/cms/media/repository.ts");
+    const run=()=>repo.uploadMedia(new Uint8Array(),"image.jpg","image/jpeg",{altText:"Alt",caption:"",folder:""});
+    if(code)await assert.rejects(run);else assert.equal(await run(),model.STATIC_MEDIA_ASSET);
+    assert.deepEqual(calls,["auth","validate","write","register"]);
+    assert.equal(removed,["PT409","42501"].includes(code)?1:0);
+  }
+});
+test("cloud media versions resolve to same-origin routes without signed URLs or raw Storage paths",()=>{
+  const resolve=load("src/cms/media/resolve.ts").resolveMediaProjection;
+  const row={media_version_id:"a3000000-0000-4000-8000-000000000001",usage_role:"hero",position:0,alt_text:"Alt",provider:"supabase"};
+  assert.equal(resolve([row],"admin")[0].src,"/admin/media/file/"+row.media_version_id);
+  assert.equal(resolve([row],"public")[0].src,"/cms-media/"+row.media_version_id);
+});
+test("Preview public image route never downloads draft objects and disables caching",async()=>{
+  const id="a3000000-0000-4000-8000-000000000001";
+  for(const published of [false,true]){
+    let reads=0;
+    const route=createSourceLoader({env:cloudEnv,mocks:{
+      "@supabase/supabase-js":{createClient:()=>({rpc:async(name,args)=>{assert.equal(name,"cms_read_public_media_version");assert.equal(args.target_version,id);return {data:published?{id,storage_provider:"supabase"}:null,error:null};}})},
+      "@/cms/media/repository":{mediaBytes:async()=>{reads++;return {bytes:Buffer.from("fixture")};}},
+    }})("src/app/cms-media/[id]/route.ts");
+    const response=await route.GET(new Request(previewOrigin+"/cms-media/"+id),{params:Promise.resolve({id})});
+    assert.equal(response.status,published?200:404);assert.equal(reads,published?1:0);
+    assert.match(response.headers.get("cache-control"),/private.*no-store/);assert.match(response.headers.get("x-robots-tag"),/noindex/);
+  }
+});
+
+test("Preview payload limit reserves Vercel multipart margin and rejects oversized normalized output before Storage",async()=>{
+  assert.equal(createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts").mediaByteLimit(),4*1024*1024);
+  assert.equal(load("src/cms/media/environment.ts").mediaByteLimit(),8*1024*1024);
+  const parser=createSourceLoader({env:cloudEnv})("src/cms/media/http.ts").boundedUploadForm;
+  await assert.rejects(()=>parser(new Request(previewOrigin,{method:"POST",body:"x",headers:{"content-type":"multipart/form-data; boundary=x","content-length":String(4*1024*1024+64*1024+1)}})),e=>e.status===413);
+  let validated=0,writes=0;
+  const repo=createSourceLoader({env:cloudEnv,mocks:{
+    "@/cms/authorization":{requireCmsAdmin:async()=>({userId:model.STATIC_MEDIA_ASSET})},
+    "./validate-image":{validateImage:async()=>{validated++;return {bytes:Buffer.alloc(4*1024*1024+1)};}},
+    "./trusted-client":{createTrustedMediaClient:()=>{writes++;throw Error("unexpected");}},
+  }})("src/cms/media/repository.ts");
+  const meta={altText:"Alt",caption:"",folder:""};
+  await assert.rejects(()=>repo.uploadMedia(Buffer.alloc(4*1024*1024+1),"x.png","image/png",meta),e=>e.status===413);assert.equal(validated,0);
+  await assert.rejects(()=>repo.uploadMedia(Buffer.from("small"),"x.png","image/png",meta),e=>e.status===413);assert.equal(validated,1);assert.equal(writes,0);
+});
