@@ -21,7 +21,10 @@ export function usesCmsSource(key: unknown): boolean {
   if (!isManagedServiceKey(key) || process.env.CMS_PILOT_CONTENT_SOURCE !== "published") return false;
   const keys = (process.env.CMS_CONTENT_SERVICE_ALLOWLIST || "").split(",");
   if (!keys.every(isManagedServiceKey) || new Set(keys).size !== keys.length || !keys.includes(key)) return false;
-  // Phase 2C1 expands only isolated local use. Cloud rollout needs its own review.
-  if (key !== PILOT_KEY && (process.env.VERCEL || process.env.VERCEL_ENV || process.env.CMS_SUPABASE_URL !== "http://127.0.0.1:56321")) return false;
+  // Shared-service rollout still requires the exact CMS project and Preview
+  // branch (or isolated local stack), in addition to both explicit content gates.
+  if (key !== PILOT_KEY) {
+    try { requireContentEnvironment(); } catch { return false; }
+  }
   return true;
 }

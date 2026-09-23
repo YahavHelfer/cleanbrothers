@@ -1,4 +1,6 @@
 import "server-only";
+import { managedServiceKeys } from "@/content/service-registry";
+import { usesCmsSource } from "@/cms/content/environment";
 import { getCmsConfig } from "@/cms/config";
 import { MAX_IMAGE_BYTES, MAX_PREVIEW_IMAGE_BYTES } from "./model";
 
@@ -22,7 +24,7 @@ export function mediaCloudEnabled() {
     process.env.VERCEL_GIT_COMMIT_REF === "feature/cms-cloud-foundation" &&
     process.env.CMS_SUPABASE_URL === "https://plbwefnwussxlglscfpn.supabase.co" &&
     process.env.CMS_PILOT_CONTENT_SOURCE === "published" &&
-    process.env.CMS_CONTENT_SERVICE_ALLOWLIST === "delicate-upholstery-cleaning"
+    managedServiceKeys.some(usesCmsSource)
   );
 }
 export function mediaEnabled() {

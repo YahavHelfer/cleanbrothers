@@ -569,7 +569,7 @@ const cloudEnv = {
   CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning",
 };
 const previewOrigin = "https://cleanbrothers-git-feature-cms-c-061c94-yahavs-projects-6b5e850f.vercel.app";
-test("cloud media requires every Preview, project, branch and pilot condition", () => {
+test("cloud media requires every Preview, project, branch and allowlist condition", () => {
   const enabled = createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
   assert.equal(enabled.mediaEnabled(),true);
   assert.doesNotThrow(()=>enabled.requireMediaEnvironment());
@@ -680,4 +680,30 @@ test("Preview payload limit reserves Vercel multipart margin and rejects oversiz
   const meta={altText:"Alt",caption:"",folder:""};
   await assert.rejects(()=>repo.uploadMedia(Buffer.alloc(4*1024*1024+1),"x.png","image/png",meta),e=>e.status===413);assert.equal(validated,0);
   await assert.rejects(()=>repo.uploadMedia(Buffer.from("small"),"x.png","image/png",meta),e=>e.status===413);assert.equal(validated,1);assert.equal(writes,0);
+});
+
+test("Preview media stays enabled through each explicit one-service rollout step", () => {
+ const keys=createSourceLoader()("src/content/service-registry.ts").managedServiceKeys;
+ const ordered=["delicate-upholstery-cleaning",...keys.filter(key=>key!=="delicate-upholstery-cleaning")];
+ for(let count=1;count<=ordered.length;count++) {
+  const allowlist=ordered.slice(0,count);
+  const load=createSourceLoader({env:{...cloudEnv,CMS_CONTENT_SERVICE_ALLOWLIST:allowlist.join(",")}});
+  const media=load("src/cms/media/environment.ts"),content=load("src/cms/content/environment.ts");
+  assert.equal(media.mediaCloudEnabled(),true);
+  assert.doesNotThrow(()=>media.requireCloudMediaEnvironment());
+  for(const key of ordered)assert.equal(content.usesCmsSource(key),allowlist.includes(key));
+  for(const key of ["window-cleaning","air-conditioner-cleaning"])assert.equal(content.usesCmsSource(key),false);
+ }
+});
+
+test("multi-service Preview media retains every environment and strict allowlist guard", () => {
+ const base={...cloudEnv,CMS_CONTENT_SERVICE_ALLOWLIST:"delicate-upholstery-cleaning,sofa-cleaning"};
+ const invalid=[...Object.keys(base).filter(key=>key!=="CMS_SUPABASE_PUBLISHABLE_KEY").map(key=>({[key]:"wrong"})),
+  {VERCEL_ENV:"production"},{VERCEL_GIT_COMMIT_REF:"main"},{CMS_MEDIA_LOCAL_ENABLED:"1",CMS_SUPABASE_URL:env.CMS_SUPABASE_URL},
+  ...["*","sofa-cleaning,*","sofa-cleaning,sofa-cleaning","sofa-cleaning,window-cleaning","sofa-cleaning,",""].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
+ for(const invalidEnv of invalid) {
+  const media=createSourceLoader({env:{...base,...invalidEnv}})("src/cms/media/environment.ts");
+  assert.equal(media.mediaCloudEnabled(),false);
+  assert.throws(()=>media.requireCloudMediaEnvironment());
+ }
 });

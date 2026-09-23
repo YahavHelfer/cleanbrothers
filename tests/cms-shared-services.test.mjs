@@ -40,9 +40,13 @@ test("special/unknown/prototype keys never enable CMS or enter the typed model",
  const source=createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:"air-conditioner-cleaning,window-cleaning"}})("src/cms/content/public-source.ts");
  for(const key of ["air-conditioner-cleaning","window-cleaning","__proto__","constructor","../../sofa-cleaning",""]){assert.equal(source.usesCmsSource(key),false);assert.throws(()=>validateServiceDraft(key,serviceBaseline(keys[0])));}
 });
-test("new services remain static in approved cloud Preview even if flags are broadened",()=>{
- const source=createSourceLoader({env:{...local,VERCEL:"1",VERCEL_ENV:"preview",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:keys.join(",")}})("src/cms/content/public-source.ts");
- for(const key of keys.filter(k=>k!=="delicate-upholstery-cleaning"))assert.equal(source.usesCmsSource(key),false);
+test("approved cloud Preview enables only the explicit service at each rollout step",()=>{
+ const ordered=["delicate-upholstery-cleaning",...keys.filter(key=>key!=="delicate-upholstery-cleaning")];
+ for(let count=1;count<=ordered.length;count++) {
+  const allowlist=ordered.slice(0,count);
+  const source=createSourceLoader({env:{...local,VERCEL:"1",VERCEL_ENV:"preview",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:allowlist.join(",")}})("src/cms/content/public-source.ts");
+  for(const key of keys)assert.equal(source.usesCmsSource(key),allowlist.includes(key));
+ }
 });
 test("before/after and crop validators refuse arbitrary keys, CSS, paths and HTML",()=>{
  for(const mutate of [p=>p.beforeAfter.beforeImage="/images/evil",p=>p.beforeAfter.title="<b>bad</b>",p=>p.beforeAfter.extra="x",p=>p.imagePosition="fixed inset-0",p=>p.imagePositions={x:"object-center"},p=>p.beforeAfter=null]){const p=serviceBaseline("sofa-cleaning");mutate(p);assert.throws(()=>validateServiceDraft("sofa-cleaning",p));}
@@ -73,5 +77,63 @@ test("public media requires an actual published owner in the explicit service al
   }})("src/app/cms-media/[id]/route.ts");
   const response=await route.GET(new Request(`http://127.0.0.1:56301/cms-media/${id}`),{params:Promise.resolve({id})});
   assert.equal(response.status,status);assert.equal(reads,status===200?1:0);
+ }
+});
+
+const previewEnv = { ...local, VERCEL: "1", VERCEL_ENV: "preview",
+ VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation", CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co",
+ CMS_PILOT_CONTENT_SOURCE: "published", CMS_MEDIA_PREVIEW_ENABLED: "1" };
+const rolloutKeys = ["delicate-upholstery-cleaning", ...keys.filter(key => key !== "delicate-upholstery-cleaning")];
+
+test("new shared services stay static outside the dedicated approved Preview and isolated local environment", async () => {
+ for (const invalid of [{VERCEL_ENV:"production"},{VERCEL_GIT_COMMIT_REF:"main"},{VERCEL_GIT_COMMIT_REF:"feature/other"},
+  {VERCEL_GIT_COMMIT_REF:""},{CMS_SUPABASE_URL:"https://unrelated.supabase.co"},{CMS_SUPABASE_URL:local.CMS_SUPABASE_URL},
+  {VERCEL:""},{VERCEL:"",VERCEL_ENV:""},{CMS_SUPABASE_PUBLISHABLE_KEY:""}]) {
+  let reads=0;
+  const source=createSourceLoader({env:{...previewEnv,...invalid,CMS_CONTENT_SERVICE_ALLOWLIST:keys.join(",")},
+   mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected cloud access");}}}})("src/cms/content/public-source.ts");
+  for(const key of keys.filter(key=>key!=="delicate-upholstery-cleaning")) {
+   assert.equal(source.usesCmsSource(key),false);
+   assert.equal((await source.getPublicService(key)).revisionId,null);
+  }
+  assert.equal(reads,0);
+ }
+});
+
+test("Preview allowlist rejects wildcards, special keys, duplicates and malformed lists", () => {
+ for(const allowlist of ["","*","sofa-cleaning,*","window-cleaning","air-conditioner-cleaning",
+  "sofa-cleaning,window-cleaning","sofa-cleaning,sofa-cleaning","sofa-cleaning,"," sofa-cleaning","__proto__","constructor"]) {
+  const source=createSourceLoader({env:{...previewEnv,CMS_CONTENT_SERVICE_ALLOWLIST:allowlist}})("src/cms/content/environment.ts");
+  for(const key of keys)assert.equal(source.usesCmsSource(key),false,allowlist);
+ }
+});
+
+test("non-allowlisted Preview services retain static content without querying CMS", async () => {
+ for(let count=1;count<rolloutKeys.length;count++) {
+  let reads=0;
+  const source=createSourceLoader({env:{...previewEnv,CMS_CONTENT_SERVICE_ALLOWLIST:rolloutKeys.slice(0,count).join(",")},
+   mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected cloud access");}}}})("src/cms/content/public-source.ts");
+  for(const key of rolloutKeys.slice(count)) {
+   const page=await source.getPublicService(key);
+   assert.equal(page.revisionId,null);
+   assert.deepEqual(plain(page.page),plain(load("src/content/static-source.ts").staticContentSource.getServiceLanding(key)));
+  }
+  assert.equal(reads,0);
+ }
+});
+
+test("each explicitly enabled Preview service uses only its keyed published snapshot and exact media baseline", async () => {
+ for(const key of rolloutKeys.slice(1)) {
+  const draft=serviceBaseline(key),calls=[];
+  const media=baselineMedia(draft).map(row=>({...row,provider:"static"}));
+  const source=createSourceLoader({env:{...previewEnv,CMS_CONTENT_SERVICE_ALLOWLIST:`delicate-upholstery-cleaning,${key}`},
+   mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:()=>({rpc:async(name,args)=>{
+    calls.push([name,args]);return {data:{revisionId:"a0000000-0000-4000-8000-000000000001",payload:draft,media},error:null};
+   }})}}})("src/cms/content/public-source.ts");
+  const result=await source.getPublicService(key);
+  assert.deepEqual(plain(calls),[["cms_read_published_service",{target_key:key}]]);
+  const actual=toServiceLandingProps(result.page),expected=toServiceLandingProps(load("src/content/static-source.ts").staticContentSource.getServiceLanding(key));
+  assert.equal(renderToStaticMarkup(ServiceLandingPage(actual)),renderToStaticMarkup(ServiceLandingPage(expected)));
+  assert.deepEqual(plain(buildServiceLandingMetadata(actual.config)),plain(buildServiceLandingMetadata(expected.config)));
  }
 });
