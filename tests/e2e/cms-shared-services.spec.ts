@@ -29,6 +29,51 @@ test.beforeEach(async({context})=>{
 });
 test.afterEach(async()=>{await cleanupActors();});
 
+test("generic editor waits for JavaScript before editing or submitting under no-referrer",async({page,context})=>{
+ await session(actor,context);
+ const key="carpet-cleaning",initial=state(key),before=immutableSnapshot();
+ let release!:()=>void;
+ const scriptsReady=new Promise<void>(resolve=>{release=resolve;});
+ await page.route("**/_next/**/*.js*",async route=>{await scriptsReady;await route.fallback();});
+ try {
+  const response=await page.goto(`/admin/services/${key}`,{waitUntil:"commit"});
+  expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
+  const heading=page.getByLabel("כותרת ראשית",{exact:false});
+  await expect(heading).toBeVisible();
+  await expect(heading).toBeDisabled();
+  await expect(page.getByRole("button",{name:"שמירת טיוטה",exact:true})).toBeDisabled();
+  await expect(page.getByRole("button",{name:"פרסום",exact:true})).toBeDisabled();
+  await expect(page.getByRole("button",{name:"שחזור כטיוטה חדשה",exact:true})).toBeDisabled();
+  expect(immutableSnapshot()).toBe(before);
+  release();
+  await expect(heading).toBeEnabled();
+  await heading.fill("טיוטה אחרי טעינת העורך");
+  const [mutation]=await Promise.all([
+   page.waitForRequest(request=>request.method()==="POST"&&request.url()===`${appOrigin}/admin/services/${key}`),
+   page.getByRole("button",{name:"שמירת טיוטה",exact:true}).click(),
+  ]);
+  await expect(page.getByLabel("מצב פרסום")).toContainText("טיוטה: גרסה 2");
+  expect(state(key).published_revision_id).toBe(initial.published_revision_id);
+  // Replay a known valid Server Action with hostile origins, retaining the
+  // local test session. The server must reject it before any content mutation.
+  const afterSave=immutableSnapshot();
+  const actionId=await mutation.headerValue("next-action");
+  const contentType=await mutation.headerValue("content-type");
+  expect(actionId).toBeTruthy();expect(contentType).toBeTruthy();
+  for(const origin of ["https://untrusted.invalid","null"]){
+   const rejected=await context.request.post(`${appOrigin}/admin/services/${key}`,{
+    headers:{origin,"next-action":actionId!,"content-type":contentType!},
+    data:mutation.postDataBuffer()!,maxRedirects:0,
+   });
+   expect(rejected.status()).toBe(500);
+   expect(immutableSnapshot()).toBe(afterSave);
+  }
+  await page.locator(`[data-revision="${initial.draft_revision_id}"]`).getByRole("button",{name:"שחזור כטיוטה חדשה"}).click();
+  await expect(page.getByLabel("מצב פרסום")).toContainText("טיוטה: גרסה 3");
+  await expect(heading).toHaveValue("ניקוי שטיחים מקצועי עד הבית");
+ } finally {release();}
+});
+
 test("all six imported database baselines render exactly like static public pages; bootstrap preserves all history",async({page,context})=>{
  const before=immutableSnapshot();bootstrap();expect(immutableSnapshot()).toBe(before);
  expect(localSql("select count(*) from content_documents")).toBe("6");

@@ -5,18 +5,26 @@ import { imagePositions, type ServiceDraft } from "./service-model";
 import Link from "next/link";
 import Image from "next/image";
 import { STATIC_MEDIA_VERSION, type MediaChoice } from "@/cms/media/model";
-import { useActionState, useState } from "react";
+import { useActionState, useState, useSyncExternalStore } from "react";
 import { contentAction } from "./actions";
 import type { ServiceEditorSnapshot } from "./repository";
 import { PILOT_IMAGES, PILOT_KEY, PILOT_RELATED_PATHS, pilotTextFields, type PilotTextField } from "./pilot-model";
 
 const initialAction = { ok: false, message: "" };
+const subscribeToReadiness = () => () => {};
+function useEditorReady() {
+  // This editor submits client-managed draft state. Keep its controls disabled
+  // until hydration, including native form submission under no-referrer.
+  return useSyncExternalStore(subscribeToReadiness, () => true, () => false);
+}
 const lists = { signs: "סימנים שכדאי לבדוק", process: "שלבי העבודה", benefits: "יתרונות השירות" } as const;
 export const previewHref = (id: string, key: ManagedServiceKey = PILOT_KEY) => `/admin/preview/services/${key}?revision=${id}`;
 
 export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }: { serviceKey?: ManagedServiceKey; snapshot: ServiceEditorSnapshot; mediaChoices?: MediaChoice[] }) {
   const [draft, setDraft] = useState<ServiceDraft>(snapshot.draft);
-  const [state, action, pending] = useActionState(contentAction, initialAction);
+  const [state, action, actionPending] = useActionState(contentAction, initialAction);
+  const ready = useEditorReady();
+  const pending = actionPending || !ready;
   const relatedPaths = draft.schemaVersion === 3 ? managedServiceKeys.map(key => `/${key}`) : [...PILOT_RELATED_PATHS];
   const dirty = JSON.stringify(draft) !== JSON.stringify(snapshot.draft);
   const update = <K extends keyof ServiceDraft>(key: K, value: ServiceDraft[K]) => setDraft((current) => ({ ...current, [key]: value }));
@@ -142,7 +150,9 @@ export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }
 }
 
 export function RestoreRevision({ generation, revision, source, serviceKey = PILOT_KEY }: { serviceKey?: ManagedServiceKey; generation: number; revision: string; source: string }) {
-  const [state, action, pending] = useActionState(contentAction, initialAction);
+  const [state, action, actionPending] = useActionState(contentAction, initialAction);
+  const ready = useEditorReady();
+  const pending = actionPending || !ready;
   return <form action={action} className="grid gap-2">
     <input type="hidden" name="serviceKey" value={serviceKey} /><input type="hidden" name="intent" value="restore" /><input type="hidden" name="source" value={source} />
     <input type="hidden" name="generation" value={generation} /><input type="hidden" name="revision" value={revision} />
