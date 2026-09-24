@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { test, expect, type Page } from "@playwright/test";
 import { createActor, cleanupActors, resetContent, importPilotBaseline, session, state, payload, type Actor } from "./helpers/content-fixtures";
 import { localSql, appOrigin } from "../../scripts/cms-local.mjs";
@@ -67,9 +68,11 @@ test("local baseline import is idempotent; static and CMS public rendering are s
     for (const route of ["/", "/services", "/gallery", "/about", "/contact", "/sofa-cleaning", "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning", "/armchair-chair-cleaning", `/${key}`, "/air-conditioner-cleaning", "/window-cleaning", "/privacy-policy", "/accessibility-statement", "/data-deletion"]) {
       expect((await request.get(appOrigin + route)).status(), route).toBe(200);
     }
+    // Phase 2D1 opts both special routes into the isolated test server only.
+    // Bootstrap their exact baselines before comparing an opted-in route.
+    execFileSync(process.execPath, ["scripts/cms-import-special-services.mjs"], { stdio: ["ignore", "pipe", "pipe"] });
     const staticOther = await request.get(`${appOrigin}/window-cleaning`);
     const cmsOther = await request.get(`${publishedOrigin}/window-cleaning`);
-    // All shared services are opted in on this isolated server; special pages stay static.
     expect((await cmsOther.text()).match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1]).toBe((await staticOther.text()).match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1]);
   } finally { await publicContext.close(); }
 });
@@ -96,7 +99,8 @@ test("editor draft, exact preview, explicit publish and historical restore prese
   test.setTimeout(60_000);
   await session(admin, context);
   await page.goto("/admin/services");
-  await expect(page.getByText("ניקוי מזגנים וניקוי חלונות — עדיין לא מנוהל במערכת")).toBeVisible();
+  await expect(page.locator("main article")).toHaveCount(8);
+  await expect(page.getByText("עמוד שירות ייחודי", { exact: true })).toHaveCount(2);
   await page.getByRole("link", { name: "עריכת השירות" }).click();
   const publicContext = await browser.newContext();
   await publicContext.route("**/*", (route) => [appOrigin, publishedOrigin].includes(new URL(route.request().url()).origin) && !new URL(route.request().url()).pathname.startsWith("/api/") && route.request().method() === "GET" ? route.continue() : route.abort());

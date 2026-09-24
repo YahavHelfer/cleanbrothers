@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { createActor, cleanupActors, resetContent, session, type Actor } from "./helpers/content-fixtures";
 import { localSql, appOrigin } from "../../scripts/cms-local.mjs";
-import { managedServiceKeys, serviceRegistry, type ManagedServiceKey } from "../../src/content/service-registry";
+import { sharedServiceKeys, serviceRegistry, type ManagedServiceKey } from "../../src/content/service-registry";
 test.setTimeout(120_000);
 const published="http://127.0.0.1:56301";
 let actor: Actor;
@@ -78,9 +78,9 @@ test("all six imported database baselines render exactly like static public page
  const before=immutableSnapshot();bootstrap();expect(immutableSnapshot()).toBe(before);
  expect(localSql("select count(*) from content_documents")).toBe("6");
  expect(localSql("select count(*) from media_versions")).toBe("20");
- for(const key of managedServiceKeys){const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);expect(original.service).toBe(serviceRegistry[key].crmName);}
+ for(const key of sharedServiceKeys){const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);expect(original.service).toBe(serviceRegistry[key].crmName);}
  const client=await session(actor,context);
- for(const key of managedServiceKeys.filter(k=>k!=="sofa-cleaning"&&k!=="mattress-cleaning")){
+ for(const key of sharedServiceKeys.filter(k=>k!=="sofa-cleaning"&&k!=="mattress-cleaning")){
   const initial=state(key),original=await snapshot(page,key,published);
   const body=JSON.parse(localSql(`select cms_revision_payload(r) from content_revisions r where id='${initial.draft_revision_id}'`));
   body.h1=`טיוטה ממוקדת ${key}`;
@@ -141,8 +141,8 @@ test("generic editor keeps stale input; unknown routes, cross-service revisions 
  await page.getByLabel("כותרת ראשית",{exact:false}).fill("עריכה ראשונה");await page.getByRole("button",{name:"שמירת טיוטה",exact:true}).click();await expect(page.getByLabel("מצב פרסום")).toContainText("טיוטה: גרסה 2");
  await second.getByLabel("כותרת ראשית",{exact:false}).fill("קלט שלא יימחק");await second.getByRole("button",{name:"שמירת טיוטה",exact:true}).click();
  await expect(second.locator("main").getByRole("alert")).toContainText("עורך אחר");await expect(second.getByLabel("כותרת ראשית",{exact:false})).toHaveValue("קלט שלא יימחק");
- for(const key of ["window-cleaning","air-conditioner-cleaning","unknown"]){expect((await page.goto(`/admin/services/${key}`))?.status()).toBe(404);}
+ for(const key of ["unknown"]){expect((await page.goto(`/admin/services/${key}`))?.status()).toBe(404);}
  await context.clearCookies();await session(actor,context,false);
- for(const key of managedServiceKeys){await page.goto(`/admin/preview/services/${key}?revision=${state(key).draft_revision_id}`);await expect(page).toHaveURL(/\/admin\/mfa\/challenge/);}
+ for(const key of sharedServiceKeys){await page.goto(`/admin/preview/services/${key}?revision=${state(key).draft_revision_id}`);await expect(page).toHaveURL(/\/admin\/mfa\/challenge/);}
  await second.close();
 });

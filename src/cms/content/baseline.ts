@@ -10,11 +10,11 @@ export function pilotBaseline() {
 }
 
 import { staticServiceConfigs } from "@/content/static-source";
-import { requireServiceKey, type ManagedServiceKey } from "@/content/service-registry";
+import { requireSharedServiceKey, type SharedServiceKey } from "@/content/service-registry";
 import { staticMediaId } from "@/cms/media/static-inventory";
 import { validateServiceDraft } from "./service-model";
-export function serviceBaseline(serviceKey: ManagedServiceKey) {
-  const key = requireServiceKey(serviceKey);
+export function serviceBaseline(serviceKey: SharedServiceKey) {
+  const key = requireSharedServiceKey(serviceKey);
   if (key === "delicate-upholstery-cleaning") return pilotBaseline();
   const { serviceName, metaTitle, metaDescription, path, images, imagePositions, beforeAfter, ...body } = staticServiceConfigs[key];
   if (path !== `/${key}` || !images) throw new Error("Unexpected service baseline");

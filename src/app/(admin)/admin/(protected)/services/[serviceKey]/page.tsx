@@ -1,8 +1,9 @@
+import { SpecialServiceEditor } from "@/cms/content/SpecialServiceEditor";
 import { mediaEnabled } from "@/cms/media/environment";
 import { getMediaChoices } from "@/cms/media/repository";
 import Link from "next/link";
 import { getServiceEditor } from "@/cms/content/repository";
-import { isManagedServiceKey, serviceRegistry } from "@/content/service-registry";
+import { isManagedServiceKey, isSpecialServiceKey, serviceRegistry } from "@/content/service-registry";
 import { notFound } from "next/navigation";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { ServiceEditor, RestoreRevision } from "@/cms/content/ServiceEditor";
@@ -22,7 +23,7 @@ export default async function ServiceEditorPage({ params }: { params: Promise<{ 
       <p>{snapshot.draftRevisionId === snapshot.publishedRevisionId ? "הטיוטה תואמת לגרסה שפורסמה" : "יש שינויים שלא פורסמו"}</p>
       <p>נשמר לאחרונה: <time dateTime={snapshot.updatedAt}>{new Date(snapshot.updatedAt).toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}</time></p>
     </div>
-    <ServiceEditor serviceKey={serviceKey} key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices} />
+    {isSpecialServiceKey(serviceKey) ? <SpecialServiceEditor serviceKey={serviceKey} key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices} /> : <ServiceEditor serviceKey={serviceKey} key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices} />}
     <section aria-label="היסטוריית גרסאות" className="grid gap-4">
       <h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
       <p>שחזור יוצר טיוטה חדשה ואינו משנה את הפרסום. הגרסאות הקודמות נשמרות.</p>

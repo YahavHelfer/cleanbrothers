@@ -1,3 +1,5 @@
+import { AirConditionerCleaningView } from "@/components/AirConditionerCleaningView";
+import { WindowCleaningView } from "@/components/WindowCleaningView";
 import { isManagedServiceKey } from "@/content/service-registry";
 import { toServiceLanding } from "@/cms/content/service-model";
 import type { Metadata } from "next";
@@ -19,12 +21,17 @@ export default async function ServicePreview({ params: routeParams, searchParams
   try { id = parseRevisionId(params.revision); } catch { notFound(); }
   const revision = await getServiceRevision(serviceKey, id);
   if (!revision) notFound();
-  const { config } = toServiceLandingProps(toServiceLanding(serviceKey, revision.payload, revision.media));
+  const view = revision.payload.schemaVersion === 4
+    ? <AirConditionerCleaningView content={revision.payload} media={revision.media} preview />
+    : revision.payload.schemaVersion === 5
+    ? <WindowCleaningView content={revision.payload} media={revision.media} preview />
+    : (() => { const { config } = toServiceLandingProps(toServiceLanding(serviceKey, revision.payload, revision.media));
+      return <ServiceLandingView config={config} preview phoneNumber="055-957-7731" contact={<PreviewContact serviceName={config.serviceName} />} />; })();
   return <>
     <aside className="mb-6 rounded-2xl border theme-card p-5" aria-label="מצב תצוגה מקדימה">
       <p className="font-black">תצוגה מקדימה — גרסה {revision.number}</p>
       <p>הגרסה השמורה הזו בלבד. פעולות יצירת קשר מושבתות.</p>
     </aside>
-    <ServiceLandingView config={config} preview phoneNumber="055-957-7731" contact={<PreviewContact serviceName={config.serviceName} />} />
+    {view}
   </>;
 }

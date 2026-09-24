@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
 import { AirConditionerCleaningLandingPage } from "@/components/AirConditionerCleaningLandingPage";
 import { businessConfig } from "@/config/business";
-import { serviceImages } from "@/data/serviceImages";
+import { getPublicSpecialService } from "@/cms/content/public-source";
+import { specialMedia } from "@/cms/content/special-view";
 import { buildMetadata } from "@/lib/seo";
 
-const title = "ניקוי מזגנים מקצועי עד הבית | CleanBrothers";
-const description =
-  "ניקוי מזגנים מקצועי עד הבית באזור המרכז. שלחו תמונה בוואטסאפ, קבלו הערכת מחיר ותיאום מהיר עם CleanBrothers.";
-
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+ const { content, media } = await getPublicSpecialService("air-conditioner-cleaning");
+ if (content.schemaVersion !== 4) throw new Error("Invalid AC content");
+ const title = content.seoTitle, description = content.seoDescription;
+ const seoImage = specialMedia(content, "seo", media)[0];
+ return {
   ...buildMetadata({
     title,
     description,
     path: "/air-conditioner-cleaning",
   }),
-  keywords: [
-    "ניקוי מזגנים",
-    "ניקוי מזגן",
-    "ניקוי מזגן עילי",
-    "ניקוי מזגנים בבית",
-    "ניקוי מזגן מריח רע",
-    "ניקוי מזגנים במרכז",
-    "ניקוי מזגנים מקצועי",
-  ],
+  keywords: content.keywords,
   openGraph: {
     title,
     description,
@@ -32,13 +26,16 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: serviceImages.airConditioner[0],
-        alt: "ניקוי מזגן מקצועי של CleanBrothers בבית הלקוח",
+        url: seoImage.src,
+        alt: seoImage.alt,
       },
     ],
   },
 };
 
-export default function AirConditionerCleaningPage() {
-  return <AirConditionerCleaningLandingPage />;
+}
+export default async function AirConditionerCleaningPage() {
+  const { content, media } = await getPublicSpecialService("air-conditioner-cleaning");
+  if (content.schemaVersion !== 4) throw new Error("Invalid AC content");
+  return <AirConditionerCleaningLandingPage content={content} media={media} />;
 }

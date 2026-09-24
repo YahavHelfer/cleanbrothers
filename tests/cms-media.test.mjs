@@ -683,7 +683,7 @@ test("Preview payload limit reserves Vercel multipart margin and rejects oversiz
 });
 
 test("Preview media stays enabled through each explicit one-service rollout step", () => {
- const keys=createSourceLoader()("src/content/service-registry.ts").managedServiceKeys;
+ const keys=createSourceLoader()("src/content/service-registry.ts").sharedServiceKeys;
  const ordered=["delicate-upholstery-cleaning",...keys.filter(key=>key!=="delicate-upholstery-cleaning")];
  for(let count=1;count<=ordered.length;count++) {
   const allowlist=ordered.slice(0,count);

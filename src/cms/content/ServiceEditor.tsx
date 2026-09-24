@@ -1,7 +1,7 @@
 "use client";
 
-import { managedServiceKeys, serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
-import { imagePositions, type ServiceDraft } from "./service-model";
+import { sharedServiceKeys, serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
+import { validateServiceDraft, imagePositions, type ServiceDraft } from "./service-model";
 import Link from "next/link";
 import Image from "next/image";
 import { STATIC_MEDIA_VERSION, type MediaChoice } from "@/cms/media/model";
@@ -12,7 +12,7 @@ import { PILOT_IMAGES, PILOT_KEY, PILOT_RELATED_PATHS, pilotTextFields, type Pil
 
 const initialAction = { ok: false, message: "" };
 const subscribeToReadiness = () => () => {};
-function useEditorReady() {
+export function useEditorReady() {
   // This editor submits client-managed draft state. Keep its controls disabled
   // until hydration, including native form submission under no-referrer.
   return useSyncExternalStore(subscribeToReadiness, () => true, () => false);
@@ -21,11 +21,11 @@ const lists = { signs: "סימנים שכדאי לבדוק", process: "שלבי 
 export const previewHref = (id: string, key: ManagedServiceKey = PILOT_KEY) => `/admin/preview/services/${key}?revision=${id}`;
 
 export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }: { serviceKey?: ManagedServiceKey; snapshot: ServiceEditorSnapshot; mediaChoices?: MediaChoice[] }) {
-  const [draft, setDraft] = useState<ServiceDraft>(snapshot.draft);
+  const [draft, setDraft] = useState<ServiceDraft>(() => validateServiceDraft(serviceKey, snapshot.draft));
   const [state, action, actionPending] = useActionState(contentAction, initialAction);
   const ready = useEditorReady();
   const pending = actionPending || !ready;
-  const relatedPaths = draft.schemaVersion === 3 ? managedServiceKeys.map(key => `/${key}`) : [...PILOT_RELATED_PATHS];
+  const relatedPaths = draft.schemaVersion === 3 ? sharedServiceKeys.map(key => `/${key}`) : [...PILOT_RELATED_PATHS];
   const dirty = JSON.stringify(draft) !== JSON.stringify(snapshot.draft);
   const update = <K extends keyof ServiceDraft>(key: K, value: ServiceDraft[K]) => setDraft((current) => ({ ...current, [key]: value }));
   return <form action={action} className="grid gap-7 rounded-3xl border theme-card p-5 sm:p-8" aria-label="עריכת השירות">

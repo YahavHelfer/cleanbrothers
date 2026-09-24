@@ -20,12 +20,14 @@ select is((select count(*)::int from media_audit_events),20,'system baseline aut
 select is((select count(*)::int from content_revisions where created_by is not null),0,'baseline is not attributed to invented admin');
 select is((select count(*)::int from revision_media_refs where revision_id=f.baseline),5,f.k||' exact roles including before/after') from shared_fixture f;
 select throws_ok($$insert into content_documents(content_type,content_key) values('page','sofa-cleaning')$$,'23514',null,'AAL2 does not broaden document types');
-select throws_ok($$insert into content_documents(content_type,content_key) values('service','window-cleaning')$$,'23514',null,'special service not allowed');
+select throws_ok($$insert into content_documents(content_type,content_key) values('service','unregistered-cleaning')$$,'23514',null,'unregistered service not allowed');
 select ok(not cms_valid_service_payload(k,p||'{"crmServiceName":"other"}'),k||' CRM cannot be edited') from shared_fixture;
 select ok(not cms_valid_service_payload(k,p||'{"imagePosition":"fixed"}'),k||' arbitrary CSS rejected') from shared_fixture;
 select ok(not cms_valid_service_payload(k,p||'{"beforeAfter":null}'),k||' malformed pair rejected') from shared_fixture;
 select ok(not cms_valid_service_payload(k,p||'{"relatedLinks":[{"label":"bad","href":"javascript:alert(1)"}]}'),k||' unsafe URL rejected') from shared_fixture;
 select ok(not cms_valid_service_payload(k,p||'{"intro":"<script>"}'),k||' HTML rejected') from shared_fixture;
+
+select ok(not cms_valid_service_payload(k,p||'{"relatedLinks":[{"label":"AC","href":"/air-conditioner-cleaning"}]}'),k||' shared related-link scope unchanged') from shared_fixture;
 
 insert into auth.users(id,invited_at) values
 ('50000000-0000-4000-8000-000000000001',null),('50000000-0000-4000-8000-000000000002',null),

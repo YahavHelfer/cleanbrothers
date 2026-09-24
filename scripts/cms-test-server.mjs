@@ -16,7 +16,7 @@ const env = {
     TMPDIR: process.env.TMPDIR,
     CMS_SUPABASE_PUBLISHABLE_KEY: key,
     ...(published ? { CMS_CONTENT_TEST_BUILD: "1", CMS_PILOT_CONTENT_SOURCE: "published",
-      CMS_CONTENT_SERVICE_ALLOWLIST: "sofa-cleaning,mattress-cleaning,carpet-cleaning,car-upholstery-cleaning,armchair-chair-cleaning,delicate-upholstery-cleaning" } : {}),
+      CMS_CONTENT_SERVICE_ALLOWLIST: "sofa-cleaning,mattress-cleaning,carpet-cleaning,car-upholstery-cleaning,armchair-chair-cleaning,delicate-upholstery-cleaning,air-conditioner-cleaning,window-cleaning" } : {}),
 };
 if (published) {
   const build = spawnSync(process.execPath, ["node_modules/next/dist/bin/next", "build"], { env, stdio: "inherit" });

@@ -3,7 +3,7 @@ import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createSourceLoader, plain } from "./helpers/source-module.mjs";
 const load = createSourceLoader();
-const { managedServiceKeys: keys, serviceRegistry: registry } = load("src/content/service-registry.ts");
+const { sharedServiceKeys: keys, serviceRegistry: registry } = load("src/content/service-registry.ts");
 const { serviceBaseline } = load("src/cms/content/baseline.ts");
 const { validateServiceDraft, toServiceLanding } = load("src/cms/content/service-model.ts");
 const { toServiceLandingProps } = load("src/content/service-landing-adapter.ts");
@@ -36,9 +36,9 @@ for(const key of keys){
  });
  for(const [risk,edit] of Object.entries({crm:p=>{p.crmServiceName="שינוי";},key:p=>{p.serviceKey="window-cleaning";},html:p=>{p.intro="<script>";},url:p=>{p.relatedLinks=[{label:"x",href:"https://evil.invalid"}];},image:p=>{p.images=["../../etc/passwd"];},unknownVersion:p=>{p.schemaVersion=4;}}))test(`${key}: refuses ${risk}`,()=>{const p=serviceBaseline(key);edit(p);assert.throws(()=>validateServiceDraft(key,p));});
 }
-test("special/unknown/prototype keys never enable CMS or enter the typed model",()=>{
+test("special keys require their own typed model; unknown keys never enable CMS",()=>{
  const source=createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:"air-conditioner-cleaning,window-cleaning"}})("src/cms/content/public-source.ts");
- for(const key of ["air-conditioner-cleaning","window-cleaning","__proto__","constructor","../../sofa-cleaning",""]){assert.equal(source.usesCmsSource(key),false);assert.throws(()=>validateServiceDraft(key,serviceBaseline(keys[0])));}
+ for(const key of ["air-conditioner-cleaning","window-cleaning","__proto__","constructor","../../sofa-cleaning",""]){assert.equal(source.usesCmsSource(key),["air-conditioner-cleaning","window-cleaning"].includes(key));assert.throws(()=>validateServiceDraft(key,serviceBaseline(keys[0])));}
 });
 test("approved cloud Preview enables only the explicit service at each rollout step",()=>{
  const ordered=["delicate-upholstery-cleaning",...keys.filter(key=>key!=="delicate-upholstery-cleaning")];

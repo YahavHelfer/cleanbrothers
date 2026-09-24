@@ -1,5 +1,5 @@
 import "server-only";
-import { isManagedServiceKey } from "@/content/service-registry";
+import { isManagedServiceKey, isSpecialServiceKey } from "@/content/service-registry";
 import { PILOT_KEY } from "./pilot-model";
 import { getCmsConfig } from "@/cms/config";
 
@@ -19,7 +19,10 @@ export function requireContentEnvironment() {
 
 export function usesCmsSource(key: unknown): boolean {
   if (!isManagedServiceKey(key) || process.env.CMS_PILOT_CONTENT_SOURCE !== "published") return false;
+  // Phase 2D1 special pages can only be activated in explicit isolated local tests.
+  if (isSpecialServiceKey(key) && (process.env.VERCEL || process.env.VERCEL_ENV || process.env.CMS_SUPABASE_URL !== "http://127.0.0.1:56321")) return false;
   const keys = (process.env.CMS_CONTENT_SERVICE_ALLOWLIST || "").split(",");
+  if ((process.env.VERCEL || process.env.VERCEL_ENV) && keys.some(isSpecialServiceKey)) return false;
   if (!keys.every(isManagedServiceKey) || new Set(keys).size !== keys.length || !keys.includes(key)) return false;
   // Shared-service rollout still requires the exact CMS project and Preview
   // branch (or isolated local stack), in addition to both explicit content gates.

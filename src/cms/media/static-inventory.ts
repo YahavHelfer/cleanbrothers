@@ -1,3 +1,4 @@
+import { specialStaticMediaInventory } from "./special-static-inventory";
 // Reviewed existing shared-service files. No file copies or upload-limit changes.
 export const staticMediaInventory = [
   {
@@ -222,12 +223,12 @@ export const staticMediaInventory = [
   }
 ] as const;
 export function staticMediaPath(versionId: string): string {
- const entry = staticMediaInventory.find(item => item.versionId === versionId);
+ const entry = [...staticMediaInventory, ...specialStaticMediaInventory].find(item => item.versionId === versionId);
  if (!entry) throw new Error("Unknown static media version");
  return entry.path;
 }
 export function staticMediaId(path: string): string {
- const entry = staticMediaInventory.find(item => item.path === path);
+ const entry = [...staticMediaInventory, ...specialStaticMediaInventory].find(item => item.path === path);
  if (!entry) throw new Error("Unknown static media path");
  return entry.versionId;
 }

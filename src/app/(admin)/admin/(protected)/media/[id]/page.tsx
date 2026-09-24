@@ -104,7 +104,7 @@ export default async function MediaDetailPage({
               {serviceRegistry[u.serviceKey].crmName} — גרסת תוכן {u.revisionNumber}
             </Link>{" "}
             ·{" "}
-            {{ hero: "פתיחה", benefits: "יתרונות", result: "תוצאות", before: "לפני", after: "אחרי" }[u.usage_role]}{" "}
+            {{ gallery: "גלריה", seo: "תמונת שיתוף", hero: "פתיחה", benefits: "יתרונות", result: "תוצאות", before: "לפני", after: "אחרי" }[u.usage_role]}{" "}
             · {u.published ? "מפורסמת" : "גרסה שמורה"} · {u.alt_text}
           </p>
         ))}

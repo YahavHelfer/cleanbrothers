@@ -14,7 +14,7 @@ export function resolveMediaProjection(
   return input.map((row) => {
     const id = mediaId(row.media_version_id);
     if (
-      !["hero", "benefits", "result", "before", "after"].includes(row.usage_role) ||
+      !["hero", "benefits", "result", "before", "after", "gallery", "seo"].includes(row.usage_role) ||
       !Number.isInteger(row.position) ||
       row.position < 0 ||
       row.position > 7 ||

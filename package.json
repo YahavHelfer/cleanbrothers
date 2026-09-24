@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "test:cms": "node --test tests/cms-authorization.test.mjs tests/cms-content.test.mjs tests/cms-media.test.mjs tests/cms-shared-services.test.mjs tests/cms-public-equivalence.test.mjs",
+    "test:cms": "node --test tests/cms-authorization.test.mjs tests/cms-content.test.mjs tests/cms-media.test.mjs tests/cms-shared-services.test.mjs tests/cms-public-equivalence.test.mjs tests/cms-ac-media-baseline.test.mjs tests/cms-special-services.test.mjs",
     "test:e2e": "playwright test",
     "test:cms:db": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase test db --local --network-id cleanbrothers-cms-local",
     "cms:start": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase start --network-id cleanbrothers-cms-local",
@@ -20,7 +20,8 @@
     "test:attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs",
     "test:whatsapp-attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs",
     "cms:import-shared-services": "node scripts/cms-import-shared-services.mjs",
-    "cms:import-media": "node scripts/cms-import-media.mjs"
+    "cms:import-media": "node scripts/cms-import-media.mjs",
+    "cms:import-special-services": "node scripts/cms-import-special-services.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

@@ -1,4 +1,4 @@
-import { requireServiceKey, managedServiceKeys, serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
+import { requireSharedServiceKey, sharedServiceKeys, serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
 import type { ServiceLandingConfig, ServiceLandingContent } from "@/content/service-landing";
 import type { ResolvedMedia } from "@/cms/media/model";
 import { mediaId } from "@/cms/media/model";
@@ -16,7 +16,7 @@ function plainText(value: unknown, max: number): string {
   return value;
 }
 export function validateServiceDraft(serviceKey: ManagedServiceKey, value: unknown): ServiceDraft {
-  requireServiceKey(serviceKey);
+  requireSharedServiceKey(serviceKey);
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new ContentValidationError();
   const data = value as Record<string, unknown>;
   if (data.schemaVersion !== 3) {
@@ -26,10 +26,10 @@ export function validateServiceDraft(serviceKey: ManagedServiceKey, value: unkno
   const { beforeAfter, imagePosition, imagePositions: crops, relatedLinks, ...base } = data;
   // Reuse the strict plain-text/list/FAQ/UUID contract, preserving schema 1/2.
   const validated = validatePilotDraft({ ...base, schemaVersion: 2, relatedLinks: [] });
-  if (!Array.isArray(relatedLinks) || relatedLinks.length > managedServiceKeys.length) throw new ContentValidationError();
+  if (!Array.isArray(relatedLinks) || relatedLinks.length > sharedServiceKeys.length) throw new ContentValidationError();
   const links = relatedLinks.map(item => {
     if (!item || typeof item !== "object" || Object.keys(item).sort().join() !== "href,label" ||
-        !managedServiceKeys.some(key => `/${key}` === item.href)) throw new ContentValidationError();
+        !sharedServiceKeys.some(key => `/${key}` === item.href)) throw new ContentValidationError();
     return { label: plainText(item.label, 120), href: item.href as string };
   });
   if (new Set(links.map(link => link.href)).size !== links.length) throw new ContentValidationError();

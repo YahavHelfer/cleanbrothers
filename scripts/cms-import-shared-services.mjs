@@ -12,9 +12,9 @@ export function importSharedServices() {
     const bytes = readFileSync(`public${image.path}`);
     if (bytes.length !== image.byteSize || createHash("sha256").update(bytes).digest("hex") !== image.hash) throw new Error("Static inventory changed");
   }
-  const { managedServiceKeys } = load("src/content/service-registry.ts");
+  const { sharedServiceKeys } = load("src/content/service-registry.ts");
   const { serviceBaseline } = load("src/cms/content/baseline.ts");
-  const statements = managedServiceKeys.map(key => `select public.cms_import_shared_baseline('${key}', '${JSON.stringify(serviceBaseline(key)).replaceAll("'", "''")}'::jsonb);`);
+  const statements = sharedServiceKeys.map(key => `select public.cms_import_shared_baseline('${key}', '${JSON.stringify(serviceBaseline(key)).replaceAll("'", "''")}'::jsonb);`);
   // One operator transaction; existing documents/pointers/history are untouched.
   localSql(`begin; select public.cms_import_shared_media(); ${statements.join("\n")} commit;`);
 }
