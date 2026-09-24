@@ -11,6 +11,7 @@ const {specialStaticMediaInventory:inventory}=load("src/cms/media/special-static
 const {resolveMediaProjection}=load("src/cms/media/resolve.ts");
 const {serviceRegistry}=load("src/content/service-registry.ts");
 const local={CMS_SUPABASE_URL:"http://127.0.0.1:56321",CMS_SUPABASE_PUBLISHABLE_KEY:"sb_publishable_local_test",CMS_MEDIA_LOCAL_ENABLED:"1"};
+const preview={...local,CMS_MEDIA_LOCAL_ENABLED:"",CMS_MEDIA_PREVIEW_ENABLED:"1",VERCEL:"1",VERCEL_ENV:"preview",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co"};
 const clone=x=>JSON.parse(JSON.stringify(x));
 const fixtures={"air-conditioner-cleaning":acBaseline,"window-cleaning":windowBaseline};
 function media(content){return Object.entries(content.media).flatMap(([role,items])=>items.map((item,position)=>({provider:"static",media_version_id:item.versionId,usage_role:role,position,alt_text:item.alt,caption:"",width:1000,height:1000})));}
@@ -21,16 +22,25 @@ for(const [key,baseline] of Object.entries(fixtures)){
   assert.equal(renderToStaticMarkup(Component({content,media:resolveMediaProjection(media(content),"public")})),renderToStaticMarkup(Component({})));
  });
  for(const [name,mutate] of Object.entries({wrongType:p=>p.schemaVersion=key==="window-cleaning"?4:5,crm:p=>p.crmName="bad",route:p=>p.serviceKey="sofa-cleaning",html:p=>p.copy.heroDescription="<script>alert(1)</script>",unknown:p=>p.copy.notAllowed="bad",missing:p=>delete p.copy.heroCta,unsafeMedia:p=>p.media.hero=[{versionId:"https://bad.invalid",alt:"bad"}],promotionInjection:p=>p.promotion={...p.promotion,schedule:"now"},null:p=>p.media=null,unknownRole:p=>p.media.css=[],unsafeSeo:p=>p.seoTitle="<iframe>",bidi:p=>p.h1="x\u202ey"}))test(`${key}: rejects ${name}`,()=>{const p=clone(baseline);mutate(p);assert.throws(()=>validateSpecialContent(key,p));});
- test(`${key}: explicit local gates only; no hosted environment can activate`,async()=>{
-  for(const env of [{},{CMS_CONTENT_ENABLED:"true"},{CMS_PILOT_CONTENT_SOURCE:"published"},{CMS_CONTENT_SERVICE_ALLOWLIST:key},{CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:"*"},...['preview','production','development'].map(VERCEL_ENV=>({VERCEL:"1",VERCEL_ENV,VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key}))]){
-   let reads=0;const source=createSourceLoader({env:{...local,...env},mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected external access");}}}})("src/cms/content/public-source.ts");
+ test(`${key}: only explicit local or dedicated Preview gates can activate; every other environment stays static`,async()=>{
+  const enabled={...preview,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key};
+  const invalid=[{VERCEL_ENV:"production"},{VERCEL_ENV:"development"},{VERCEL_ENV:""},{VERCEL:""},{VERCEL_PROJECT_ID:""},{VERCEL_PROJECT_ID:"prj_unrelated"},
+   {VERCEL_GIT_COMMIT_REF:"main"},{VERCEL_GIT_COMMIT_REF:"feature/other"},{VERCEL_GIT_COMMIT_REF:""},
+   {CMS_SUPABASE_URL:"https://unrelated.supabase.co"},{CMS_SUPABASE_URL:local.CMS_SUPABASE_URL},
+   {CMS_SUPABASE_PUBLISHABLE_KEY:""},{CMS_PILOT_CONTENT_SOURCE:""},{CMS_PILOT_CONTENT_SOURCE:"draft"},
+   ...["","*",`${key},*`,`${key},${key}`,`${key},unknown-service`,`${key},`,` ${key}`,key==="window-cleaning"?"air-conditioner-cleaning":"window-cleaning"].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
+  for(const env of [{...local},{...local,CMS_CONTENT_ENABLED:"true"},{...local,CMS_PILOT_CONTENT_SOURCE:"published"},{...local,CMS_CONTENT_SERVICE_ALLOWLIST:key},...invalid.map(change=>({...enabled,...change}))]){
+   let reads=0;const source=createSourceLoader({env,mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected external access");}}}})("src/cms/content/public-source.ts");
    assert.equal(source.usesCmsSource(key),false);assert.equal((await source.getPublicSpecialService(key)).revisionId,null);assert.equal(reads,0);
   }
   assert.equal(createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key}})("src/cms/content/environment.ts").usesCmsSource(key),true);
+  assert.equal(createSourceLoader({env:enabled})("src/cms/content/environment.ts").usesCmsSource(key),true);
  });
  test(`${key}: source uses one keyed published projection with no privileged key`,async()=>{
-  const calls=[];const source=createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key},mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:(url,k,options)=>{assert.equal(url,local.CMS_SUPABASE_URL);assert.equal(k,local.CMS_SUPABASE_PUBLISHABLE_KEY);assert.equal(options.auth.persistSession,false);return {rpc:async(name,args)=>{calls.push([name,args]);return {data:{revisionId:"a0000000-0000-4000-8000-000000000001",payload:baseline,media:media(baseline)},error:null}}};}}}})("src/cms/content/public-source.ts");
+  for(const environment of [local,preview]){
+  const calls=[];const source=createSourceLoader({env:{...environment,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key},mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:(url,k,options)=>{assert.equal(url,environment.CMS_SUPABASE_URL);assert.equal(k,environment.CMS_SUPABASE_PUBLISHABLE_KEY);assert.equal(options.auth.persistSession,false);return {rpc:async(name,args)=>{calls.push([name,args]);return {data:{revisionId:"a0000000-0000-4000-8000-000000000001",payload:baseline,media:media(baseline)},error:null}}};}}}})("src/cms/content/public-source.ts");
   assert.deepEqual(plain((await source.getPublicSpecialService(key)).content),plain(baseline));assert.deepEqual(plain(calls),[["cms_read_published_service",{target_key:key}]]);
+  }
  });
  test(`${key}: edited visible title never changes CRM identity or canonical`,async()=>{
   const content=clone(baseline);content.publicTitle="שם ערוך";content.h1="כותרת ערוכה";
@@ -45,6 +55,20 @@ for(const [key,baseline] of Object.entries(fixtures)){
   assert.equal(await repo.getServiceRevision(key,"a0000000-0000-4000-8000-000000000001"),null);assert.equal(filters[0][1],serviceRegistry[key].documentId);
  });
 }
+test("special Preview rollout preserves six shared services and enables only each explicitly selected service",()=>{
+ const {sharedServiceKeys,specialServiceKeys}=load("src/content/service-registry.ts");
+ const all=[...sharedServiceKeys,...specialServiceKeys];
+ for(const allowlist of [[...sharedServiceKeys],[...sharedServiceKeys,"air-conditioner-cleaning"],all,["air-conditioner-cleaning"],["window-cleaning"]]){
+  const source=createSourceLoader({env:{...preview,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:allowlist.join(",")}});
+  for(const key of all)assert.equal(source("src/cms/content/environment.ts").usesCmsSource(key),allowlist.includes(key));
+  assert.equal(source("src/cms/media/environment.ts").mediaCloudEnabled(),true);
+  const disabled=createSourceLoader({env:{...preview,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:allowlist.join(","),CMS_MEDIA_PREVIEW_ENABLED:""}});
+  assert.equal(disabled("src/cms/media/environment.ts").mediaCloudEnabled(),false);
+ }
+ const automatic=createSourceLoader({env:{...preview,CMS_CONTENT_ENABLED:"true"}});
+ for(const key of all)assert.equal(automatic("src/cms/content/environment.ts").usesCmsSource(key),false);
+ assert.equal(automatic("src/cms/media/environment.ts").mediaCloudEnabled(),false);
+});
 test("AC and window cannot accept shared payloads or each other's payload",()=>{
  const {serviceBaseline}=load("src/cms/content/baseline.ts");
  for(const key of Object.keys(fixtures))assert.throws(()=>validateSpecialContent(key,serviceBaseline("sofa-cleaning")));

@@ -100,9 +100,9 @@ test("new shared services stay static outside the dedicated approved Preview and
  }
 });
 
-test("Preview allowlist rejects wildcards, special keys, duplicates and malformed lists", () => {
+test("Preview allowlist rejects wildcards, unknown keys, duplicates and malformed lists; special-only lists do not enable shared services", () => {
  for(const allowlist of ["","*","sofa-cleaning,*","window-cleaning","air-conditioner-cleaning",
-  "sofa-cleaning,window-cleaning","sofa-cleaning,sofa-cleaning","sofa-cleaning,"," sofa-cleaning","__proto__","constructor"]) {
+  "sofa-cleaning,unknown-service","sofa-cleaning,sofa-cleaning","sofa-cleaning,"," sofa-cleaning","__proto__","constructor"]) {
   const source=createSourceLoader({env:{...previewEnv,CMS_CONTENT_SERVICE_ALLOWLIST:allowlist}})("src/cms/content/environment.ts");
   for(const key of keys)assert.equal(source.usesCmsSource(key),false,allowlist);
  }

@@ -700,7 +700,7 @@ test("multi-service Preview media retains every environment and strict allowlist
  const base={...cloudEnv,CMS_CONTENT_SERVICE_ALLOWLIST:"delicate-upholstery-cleaning,sofa-cleaning"};
  const invalid=[...Object.keys(base).filter(key=>key!=="CMS_SUPABASE_PUBLISHABLE_KEY").map(key=>({[key]:"wrong"})),
   {VERCEL_ENV:"production"},{VERCEL_GIT_COMMIT_REF:"main"},{CMS_MEDIA_LOCAL_ENABLED:"1",CMS_SUPABASE_URL:env.CMS_SUPABASE_URL},
-  ...["*","sofa-cleaning,*","sofa-cleaning,sofa-cleaning","sofa-cleaning,window-cleaning","sofa-cleaning,",""].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
+  ...["*","sofa-cleaning,*","sofa-cleaning,sofa-cleaning","sofa-cleaning,unknown-service","sofa-cleaning,",""].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
  for(const invalidEnv of invalid) {
   const media=createSourceLoader({env:{...base,...invalidEnv}})("src/cms/media/environment.ts");
   assert.equal(media.mediaCloudEnabled(),false);
