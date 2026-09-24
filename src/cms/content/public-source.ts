@@ -42,10 +42,19 @@ import { acBaseline, windowBaseline } from "./special-baseline";
 import { validateSpecialContent } from "./special-model";
 export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   if (!isSpecialServiceKey(key)) throw new Error("Unsupported special service");
+  // AC can be enabled later on the stable Preview alias. Keep its approved
+  // Preview route request-rendered even before allowlisting, so a static
+  // baseline response cannot outlive the deployment that produced it.
+  const acPreview = key === "air-conditioner-cleaning" &&
+    process.env.VERCEL === "1" && process.env.VERCEL_ENV === "preview" &&
+    process.env.VERCEL_PROJECT_ID === "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A" &&
+    process.env.VERCEL_GIT_COMMIT_REF === "feature/cms-cloud-foundation" &&
+    process.env.CMS_SUPABASE_URL === "https://plbwefnwussxlglscfpn.supabase.co";
+  if (acPreview) await connection();
   if (!usesCmsSource(key)) return { revisionId: null, content: key === "air-conditioner-cleaning" ? acBaseline : windowBaseline, media: undefined };
   requireContentEnvironment();
   requireMediaEnvironment();
-  await connection();
+  if (!acPreview) await connection();
   const { url, key: publishableKey } = getCmsConfig();
   const client = createClient(url, publishableKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store", signal: AbortSignal.timeout(8000) }) } });

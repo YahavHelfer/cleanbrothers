@@ -30,7 +30,7 @@ for(const [key,baseline] of Object.entries(fixtures)){
    {CMS_SUPABASE_PUBLISHABLE_KEY:""},{CMS_PILOT_CONTENT_SOURCE:""},{CMS_PILOT_CONTENT_SOURCE:"draft"},
    ...["","*",`${key},*`,`${key},${key}`,`${key},unknown-service`,`${key},`,` ${key}`,key==="window-cleaning"?"air-conditioner-cleaning":"window-cleaning"].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
   for(const env of [{...local},{...local,CMS_CONTENT_ENABLED:"true"},{...local,CMS_PILOT_CONTENT_SOURCE:"published"},{...local,CMS_CONTENT_SERVICE_ALLOWLIST:key},...invalid.map(change=>({...enabled,...change}))]){
-   let reads=0;const source=createSourceLoader({env,mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected external access");}}}})("src/cms/content/public-source.ts");
+   let reads=0;const source=createSourceLoader({env,mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected external access");}}}})("src/cms/content/public-source.ts");
    assert.equal(source.usesCmsSource(key),false);assert.equal((await source.getPublicSpecialService(key)).revisionId,null);assert.equal(reads,0);
   }
   assert.equal(createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key}})("src/cms/content/environment.ts").usesCmsSource(key),true);
@@ -55,6 +55,24 @@ for(const [key,baseline] of Object.entries(fixtures)){
   assert.equal(await repo.getServiceRevision(key,"a0000000-0000-4000-8000-000000000001"),null);assert.equal(filters[0][1],serviceRegistry[key].documentId);
  });
 }
+test("AC Preview stays request-rendered before allowlisting and reads the newly published revision afterward",async()=>{
+ const shared="delicate-upholstery-cleaning,sofa-cleaning,mattress-cleaning,carpet-cleaning,car-upholstery-cleaning,armchair-chair-cleaning";
+ const env={...preview,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:shared};
+ let connections=0,reads=0;
+ const before=createSourceLoader({env,mocks:{"next/server":{connection:async()=>{connections++;}},"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("AC must remain static while disabled");}}}})("src/cms/content/public-source.ts");
+ assert.equal((await before.getPublicSpecialService("air-conditioner-cleaning")).revisionId,null);
+ assert.equal(reads,0);
+ assert.equal(connections,1,"a static Preview build can preserve the old AC page across allowlist redeployment");
+
+ const published=clone(acBaseline);
+ published.copy.heroDescription+=" בדיקת פרסום חדשה.";
+ const revisionId="a0000000-0000-4000-8000-000000000002";
+ const after=createSourceLoader({env:{...env,CMS_CONTENT_SERVICE_ALLOWLIST:`${shared},air-conditioner-cleaning`},mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:()=>({rpc:async()=>({data:{revisionId,payload:published,media:media(published)},error:null})})}}})("src/cms/content/public-source.ts");
+ const result=await after.getPublicSpecialService("air-conditioner-cleaning");
+ assert.equal(result.revisionId,revisionId);
+ assert.equal(result.content.copy.heroDescription,published.copy.heroDescription);
+ assert.equal((await before.getPublicSpecialService("air-conditioner-cleaning")).content.copy.heroDescription,acBaseline.copy.heroDescription);
+});
 test("special Preview rollout preserves six shared services and enables only each explicitly selected service",()=>{
  const {sharedServiceKeys,specialServiceKeys}=load("src/content/service-registry.ts");
  const all=[...sharedServiceKeys,...specialServiceKeys];
