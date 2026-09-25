@@ -33,7 +33,7 @@ export type LibraryItem = MediaAsset & {
 export type MediaDetail = {
   asset: MediaAsset;
   versions: MediaVersion[];
-  usages: (MediaRef & { serviceKey: ManagedServiceKey; revisionNumber: number; published: boolean })[];
+  usages: (MediaRef & { serviceKey: ManagedServiceKey | "about" | "about-intro"; revisionNumber: number; published: boolean })[];
   audit: {
     id: string;
     actor_id: string | null;
@@ -65,7 +65,8 @@ export async function getMediaDetail(id: string): Promise<MediaDetail | null> {
     target_asset: mediaId(id),
   });
   check(error);
-  if (data && (!Array.isArray(data.usages) || data.usages.some((usage: { serviceKey?: unknown }) => !isManagedServiceKey(usage.serviceKey)))) throw new MediaError();
+  if (data && (!Array.isArray(data.usages) || data.usages.some((usage: { serviceKey?: unknown }) =>
+    !isManagedServiceKey(usage.serviceKey) && usage.serviceKey !== "about" && usage.serviceKey !== "about-intro"))) throw new MediaError();
   return data;
 }
 export async function getMediaChoices(): Promise<MediaChoice[]> {

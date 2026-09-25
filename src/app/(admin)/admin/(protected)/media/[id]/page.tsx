@@ -1,4 +1,4 @@
-import { serviceRegistry } from "@/content/service-registry";
+import { isManagedServiceKey, serviceRegistry } from "@/content/service-registry";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -99,12 +99,14 @@ export default async function MediaDetailPage({
             <Link
               prefetch={false}
               className="underline"
-              href={`/admin/preview/services/${u.serviceKey}?revision=${u.revision_id}`}
+              href={isManagedServiceKey(u.serviceKey) ? `/admin/preview/services/${u.serviceKey}?revision=${u.revision_id}`
+                : u.serviceKey === "about" ? `/admin/preview/pages/about?revision=${u.revision_id}` : "/admin/pages/about/promotion"}
             >
-              {serviceRegistry[u.serviceKey].crmName} — גרסת תוכן {u.revisionNumber}
+              {isManagedServiceKey(u.serviceKey) ? serviceRegistry[u.serviceKey].crmName
+                : u.serviceKey === "about" ? "עמוד אודות" : "מבצע אודות"} — גרסת תוכן {u.revisionNumber}
             </Link>{" "}
             ·{" "}
-            {{ gallery: "גלריה", seo: "תמונת שיתוף", hero: "פתיחה", benefits: "יתרונות", result: "תוצאות", before: "לפני", after: "אחרי" }[u.usage_role]}{" "}
+            {{ gallery: "גלריה", seo: "תמונת שיתוף", hero: "פתיחה", benefits: "יתרונות", result: "תוצאות", before: "לפני", after: "אחרי", "page-hero": "פתיח עמוד", "page-image": "תמונת עמוד", promotion: "מבצע" }[u.usage_role]}{" "}
             · {u.published ? "מפורסמת" : "גרסה שמורה"} · {u.alt_text}
           </p>
         ))}

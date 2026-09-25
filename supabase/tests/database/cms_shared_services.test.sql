@@ -2,7 +2,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path=public,extensions;
 select no_plan();
-truncate media_audit_events,revision_media_refs,media_versions,media_assets,content_publication_events,content_publication_state,content_revisions,content_documents;
+truncate page_revision_blocks,promotion_revision_media,cms_promotion_identity,media_audit_events,revision_media_refs,media_versions,media_assets,content_publication_events,content_publication_state,content_revisions,content_documents;
 select cms_import_shared_media();
 create temporary table shared_fixture(k text primary key,doc uuid,p jsonb,baseline uuid,draft uuid,restored uuid);
 insert into shared_fixture(k,doc,p)

@@ -19,7 +19,7 @@ export type Actor = { id: string; email: string };
 export const actors: Actor[] = [];
 export function resetContent() {
   const files = JSON.parse(localSql("select coalesce(json_agg(id),'[]') from public.media_versions where storage_provider='local'")) as string[];
-  localSql("truncate public.media_audit_events, public.revision_media_refs, public.media_versions, public.media_assets, public.content_publication_events, public.content_publication_state, public.content_revisions, public.content_documents");
+  localSql("truncate public.page_revision_blocks, public.promotion_revision_media, public.cms_promotion_identity, public.media_audit_events, public.revision_media_refs, public.media_versions, public.media_assets, public.content_publication_events, public.content_publication_state, public.content_revisions, public.content_documents");
   // Only fixture-owned UUIDs registered in this isolated test DB, after refs are reset.
   for (const id of files) {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id)) throw new Error("Invalid local fixture file");

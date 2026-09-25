@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { webcrypto } from "node:crypto";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,7 +53,7 @@ export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fet
       module: loadedModule,
       require,
       process: { env: { NODE_ENV: nodeEnv, ...env } },
-      URL,
+      URL, crypto: webcrypto,
       Request, Response, FormData, Headers, Uint8Array,
       AbortSignal,
       fetch: fetchImpl, // Explicit test transport; never enable network by default.

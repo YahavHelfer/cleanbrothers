@@ -52,7 +52,7 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
@@ -117,9 +117,15 @@ for (const group of ["admin", "preview"]) {
       dependencies.push(...sourceDependencies("src/proxy.ts"));
     }
     for (const file of dependencies) {
-      assert.doesNotMatch(relative(projectRoot, file), /src\/(?:sections\/|app\/\(site\)\/|components\/(?:Google|Meta|BusinessEvent|MarketingAttribution|Cookie|ContactForm|WhatsApp|SummerAc)|lib\/(?:google-|meta-pixel|marketing-attribution|consent|whatsapp|contact-lead))/);
+      const sourcePath = relative(projectRoot, file);
+      // Typed page CTA targets reuse the existing WhatsApp URL builder. The
+      // authenticated preview disables that target before rendering a link.
+      if (sourcePath !== "src/lib/whatsapp.ts")
+        assert.doesNotMatch(sourcePath, /src\/(?:sections\/|app\/\(site\)\/|components\/(?:Google|Meta|BusinessEvent|MarketingAttribution|Cookie|ContactForm|WhatsApp|SummerAc)|lib\/(?:google-|meta-pixel|marketing-attribution|consent|whatsapp|contact-lead))/);
       // Admin now legitimately fetches its dedicated Auth/database service.
-      assert.doesNotMatch(readFileSync(file, "utf8"), /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|cleanbrothers-crm|\/api\/contact-lead|\/api\/whatsapp/);
+      assert.doesNotMatch(readFileSync(file, "utf8"), sourcePath === "src/lib/whatsapp.ts"
+        ? /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|cleanbrothers-crm|\/api\/contact-lead/
+        : /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|cleanbrothers-crm|\/api\/contact-lead|\/api\/whatsapp/);
     }
     const load = createSourceLoader();
     const { default: Layout, metadata } = load(entry);
