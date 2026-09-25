@@ -1,7 +1,26 @@
 import { spawn, spawnSync } from "node:child_process";
-import { getLocalStack } from "./cms-local.mjs";
+import { getLocalStack, localSql } from "./cms-local.mjs";
 
-const { url, key, serviceKey } = getLocalStack();
+async function readyLocalStack() {
+  const deadline = Date.now() + 20_000;
+  while (Date.now() < deadline) {
+    try {
+      const stack = getLocalStack(); // Verifies the unlinked local project and endpoint.
+      const responses = await Promise.all(["/auth/v1/health", "/auth/v1/settings", "/rest/v1/"]
+        .map((path) => fetch(stack.url + path, { signal: AbortSignal.timeout(2_000) })));
+      if (responses.every((response) => response.ok) &&
+          Number(localSql("select count(*) from supabase_migrations.schema_migrations")) >= 9) {
+        return stack;
+      }
+    } catch {
+      // The isolated stack can report ports before Auth, REST or migrations are ready.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error("Isolated local CMS services are not ready");
+}
+
+const { url, key, serviceKey } = await readyLocalStack();
 const published = process.argv.includes("--published");
 // An explicit environment prevents unrelated CRM/cloud credentials from being
 // inherited by the isolated browser-test server. The local service key stays in
@@ -22,6 +41,7 @@ if (published) {
   const build = spawnSync(process.execPath, ["node_modules/next/dist/bin/next", "build"], { env, stdio: "inherit" });
   if (build.status !== 0) process.exit(1);
 }
+await readyLocalStack();
 const child = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", published ? "56301" : "56300"], {
   stdio: "inherit", env,
 });
