@@ -4,22 +4,24 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createSourceLoader, plain } from "./helpers/source-module.mjs";
 
+let publicSource = { source: "static" };
 const load = createSourceLoader({ mocks: {
   "next/image": { __esModule: true, default: props => createElement("img", props) },
   "next/script": { __esModule: true, default: props => createElement("script", props) },
+  "@/cms/pages/public-source": { getPublicAbout: async () => publicSource },
 } });
 const model = load("src/cms/pages/model.ts");
 const { aboutBaseline, aboutPromotionBaseline } = load("src/cms/pages/baseline.ts");
 const { PageBlocksView, pageRevisionMetadata } = load("src/cms/pages/PageBlocksView.tsx");
-const { default: AboutPage, metadata: staticMetadata } = load("src/app/(site)/about/page.tsx");
+const { default: AboutPage, generateMetadata } = load("src/app/(site)/about/page.tsx");
 const copy = () => structuredClone(plain(aboutBaseline));
 const plainText = html => html.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/g, "")
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "")
   .replace(/<[^>]+>/g, " ").replace(/&quot;/g, '"').replace(/&amp;/g, "&")
   .replace(/\s+/g, " ").trim();
 
-test("/about Revision 1 preserves static visible copy, section order, links, headings and SEO", () => {
-  const staticHtml = renderToStaticMarkup(createElement(AboutPage));
+test("/about Revision 1 preserves static visible copy, section order, links, headings and SEO", async () => {
+  const staticHtml = renderToStaticMarkup(await AboutPage());
   const cmsHtml = renderToStaticMarkup(createElement(PageBlocksView, { page: aboutBaseline,
     revisionId: "b0000000-0000-4000-8000-000000000001", preview: false }));
   assert.equal(plainText(cmsHtml), plainText(staticHtml));
@@ -27,7 +29,7 @@ test("/about Revision 1 preserves static visible copy, section order, links, hea
     .map(match => [match[1], plainText(match[3]), match[2].match(/href="([^"]*)"/)?.[1] || ""]);
   assert.deepEqual(tags(cmsHtml), tags(staticHtml));
   assert.equal(cmsHtml.includes("data-page-revision="), true);
-  assert.deepEqual(plain(pageRevisionMetadata(aboutBaseline)), plain(staticMetadata));
+  assert.deepEqual(plain(pageRevisionMetadata(aboutBaseline)), plain(await generateMetadata()));
   assert.equal(aboutBaseline.blocks.length, 2);
   assert.equal(aboutBaseline.blocks[0].type, "hero");
   assert.equal(aboutBaseline.blocks[1].type, "aboutOverview");
@@ -62,7 +64,7 @@ test("safe CTA resolver preserves current phone and WhatsApp routing and disable
   ]) assert.throws(() => model.validateTarget(value));
 });
 
-test("page validator rejects duplicate IDs/order, hidden hero, HTML, malformed media and draft SEO leakage", () => {
+test("page validator rejects duplicate IDs/order, hidden hero, HTML, malformed media and draft SEO leakage", async () => {
   const page = copy();
   page.blocks[1].id = page.blocks[0].id;
   assert.throws(() => model.validatePageDraft(page));
@@ -80,8 +82,8 @@ test("page validator rejects duplicate IDs/order, hidden hero, HTML, malformed m
   assert.throws(() => model.validatePageDraft(page));
   page.blocks[0].mediaVersionId = null;
   page.seoTitle = "טיוטת SEO";
-  assert.equal(pageRevisionMetadata(aboutBaseline).title, staticMetadata.title);
-  assert.notEqual(pageRevisionMetadata(page).title, staticMetadata.title);
+  assert.equal(pageRevisionMetadata(aboutBaseline).title, (await generateMetadata()).title);
+  assert.notEqual(pageRevisionMetadata(page).title, (await generateMetadata()).title);
 });
 
 test("hidden blocks remain in revision data but are absent from rendering", () => {
@@ -112,12 +114,85 @@ test("page pins exact promotion revision while later copy changes do not alter h
     revisionId: "b0000000-0000-4000-8000-000000000004", preview: true, promotions: {} })));
 });
 
-test("pilot page environment cannot activate in hosted Preview or Production", () => {
-  const local = createSourceLoader({ env: { CMS_SUPABASE_URL: "http://127.0.0.1:56321" } })("src/cms/pages/environment.ts");
-  assert.equal(local.pagesLocalOnly(), true);
+test("page Admin and public gates require the exact local or approved Preview environment", () => {
+  const moduleFor = env => createSourceLoader({ env })("src/cms/pages/environment.ts");
+  const local = { CMS_SUPABASE_URL: "http://127.0.0.1:56321" };
+  const preview = { VERCEL: "1", VERCEL_ENV: "preview",
+    VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
+    CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" };
+  assert.equal(moduleFor(local).pagesEnvironmentAllowed(), true);
+  assert.equal(moduleFor(preview).pagesEnvironmentAllowed(), true);
+  assert.equal(moduleFor(preview).usesCmsPageSource("about"), false);
+  const enabled = { ...preview, CMS_PAGE_SOURCE: "published", CMS_PAGE_ALLOWLIST: "about" };
+  assert.equal(moduleFor(enabled).usesCmsPageSource("about"), true);
+  assert.equal(moduleFor({ ...local, CMS_PAGE_SOURCE: "published", CMS_PAGE_ALLOWLIST: "about" }).usesCmsPageSource("about"), true);
   for (const env of [
-    { VERCEL: "1", VERCEL_ENV: "preview", CMS_SUPABASE_URL: "http://127.0.0.1:56321" },
-    { VERCEL: "1", VERCEL_ENV: "production", CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" },
-    { CMS_CONTENT_ENABLED: "true", CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" },
-  ]) assert.equal(createSourceLoader({ env })("src/cms/pages/environment.ts").pagesLocalOnly(), false);
+    { ...enabled, VERCEL_ENV: "production" }, { ...enabled, VERCEL_PROJECT_ID: "other" },
+    { ...enabled, VERCEL_GIT_COMMIT_REF: "main" }, { ...enabled, CMS_SUPABASE_URL: "https://crm.example" },
+    { ...enabled, VERCEL: undefined }, { ...enabled, CMS_PAGE_SOURCE: "draft" },
+    { ...enabled, CMS_PAGE_ALLOWLIST: "" }, { ...enabled, CMS_PAGE_ALLOWLIST: "about,contact" },
+    { ...enabled, CMS_PAGE_ALLOWLIST: "*" }, { ...enabled, CMS_PAGE_ALLOWLIST: "about,about" },
+    { ...enabled, CMS_PAGE_ALLOWLIST: " about" },
+  ]) assert.equal(moduleFor(env).usesCmsPageSource("about"), false);
+  assert.equal(moduleFor(enabled).usesCmsPageSource("contact"), false);
+  assert.equal(moduleFor({ ...preview, CMS_CONTENT_ENABLED: "true", CMS_PILOT_CONTENT_SOURCE: "published",
+    CMS_CONTENT_SERVICE_ALLOWLIST: "sofa-cleaning" }).usesCmsPageSource("about"), false);
+});
+
+test("/about switches HTML and metadata together to the published page snapshot", async () => {
+  const page = copy();
+  page.seoTitle = "כותרת CMS מפורסמת";
+  page.blocks[1].hidden = true;
+  publicSource = { source: "cms", revisionId: "b0000000-0000-4000-8000-000000000006",
+    page, media: {}, promotions: {} };
+  try {
+    const html = renderToStaticMarkup(await AboutPage());
+    assert.ok(html.includes('data-page-revision="b0000000-0000-4000-8000-000000000006"'));
+    assert.ok(!html.includes("שירות מקצועי בגובה העיניים"));
+    assert.equal((await generateMetadata()).title, page.seoTitle);
+  } finally { publicSource = { source: "static" }; }
+});
+
+test("public page source calls only the published-key RPC and fails closed on incomplete snapshots", async () => {
+  const calls = [];
+  const env = { CMS_SUPABASE_URL: "http://127.0.0.1:56321", CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
+    CMS_PAGE_SOURCE: "published", CMS_PAGE_ALLOWLIST: "about" };
+  let result = { revisionId: "b0000000-0000-4000-8000-000000000001", payload: plain(aboutBaseline),
+    promotions: {}, media: [] };
+  const mocks = { "react": { cache: fn => fn }, "next/server": { connection: async () => {} },
+    "@supabase/supabase-js": { createClient: () => ({ rpc: async (name, args) => {
+      calls.push([name, args]); return { data: result, error: null };
+    } }) } };
+  const source = createSourceLoader({ env, mocks })("src/cms/pages/public-source.ts");
+  const published = await source.getPublicAbout();
+  assert.equal(published.source, "cms");
+  assert.equal(published.revisionId, result.revisionId);
+  assert.deepEqual(plain(calls), [["cms_read_public_page", { target_key: "about" }]]);
+  const badPage = plain(aboutBaseline);
+  badPage.blocks.push({ id: "a0000000-0000-4000-8000-000000000009", position: 2,
+    type: "promotionBanner", schemaVersion: 1, hidden: false, payload: { template: "accent" },
+    mediaVersionId: null, promotionRevisionId: "b0000000-0000-4000-8000-000000000009" });
+  result = { ...result, payload: badPage };
+  await assert.rejects(() => source.getPublicAbout(), /promotion/i);
+  const disabled = createSourceLoader({ env: { ...env, CMS_PAGE_ALLOWLIST: "" }, mocks })("src/cms/pages/public-source.ts");
+  assert.equal((await disabled.getPublicAbout()).source, "static");
+  assert.equal(calls.length, 2);
+});
+
+test("approved Preview /about is request-rendered before allowlisting; Production remains static", async () => {
+  let requests = 0;
+  const preview = { VERCEL: "1", VERCEL_ENV: "preview",
+    VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
+    CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" };
+  const mocks = { "react": { cache: fn => fn }, "next/server": { connection: async () => { requests++; } },
+    "@supabase/supabase-js": { createClient: () => { throw new Error("static source must not open CMS"); } } };
+  const previewSource = createSourceLoader({ env: preview, mocks })("src/cms/pages/public-source.ts");
+  assert.equal((await previewSource.getPublicAbout()).source, "static");
+  assert.equal(requests, 1);
+  const productionSource = createSourceLoader({ env: { ...preview, VERCEL_ENV: "production",
+    CMS_PAGE_SOURCE: "published", CMS_PAGE_ALLOWLIST: "about" }, mocks })("src/cms/pages/public-source.ts");
+  assert.equal((await productionSource.getPublicAbout()).source, "static");
+  assert.equal(requests, 1);
 });

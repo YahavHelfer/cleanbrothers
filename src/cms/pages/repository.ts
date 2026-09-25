@@ -1,7 +1,7 @@
 import "server-only";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { requirePagesLocalEnvironment } from "./environment";
+import { requirePagesEnvironment } from "./environment";
 import { PageValidationError, pageGeneration, pageUuid, validatePageDraft,
   validatePromotionDraft, type PageDraft, type PromotionDraft } from "./model";
 
@@ -15,7 +15,7 @@ export type PromotionSnapshot = { updatedAt: string; generation: number; draftRe
 
 async function authorizedClient() {
   const admin = await requireCmsAdmin();
-  requirePagesLocalEnvironment();
+  requirePagesEnvironment();
   return { userId: admin.userId, client: await createCmsServerClient() };
 }
 export async function getPageEditor(): Promise<{ userId: string; snapshot: PageSnapshot | null }> {

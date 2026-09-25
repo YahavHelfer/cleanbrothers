@@ -31,7 +31,7 @@ async function act(kind: "page" | "promotion", form: FormData): Promise<PageActi
     } else throw new PageValidationError();
     revalidatePath("/admin/pages");
     revalidatePath(kind === "page" ? "/admin/pages/about" : "/admin/pages/about/promotion");
-    return { ok: true, revision: result, message: intent === "publish" ? "הגרסה פורסמה בסביבת התוכן המקומית." : "הטיוטה נשמרה. הפרסום לא השתנה." };
+    return { ok: true, revision: result, message: intent === "publish" ? "הגרסה פורסמה בסביבת התוכן המאושרת." : "הטיוטה נשמרה. הפרסום לא השתנה." };
   } catch (error) {
     return { ok: false, message: error instanceof PageValidationError ? error.message : "הפעולה לא הושלמה. בדקו את ההרשאה וטענו מחדש את העמוד." };
   }

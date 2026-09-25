@@ -2,6 +2,8 @@ import { Icon } from "@/components/Icon";
 import { PageHero } from "@/components/PageHero";
 import { buildMetadata } from "@/lib/seo";
 import { getWhatsAppLink } from "@/lib/whatsapp";
+import { PageBlocksView, pageRevisionMetadata } from "@/cms/pages/PageBlocksView";
+import { getPublicAbout } from "@/cms/pages/public-source";
 
 const values = [
   {
@@ -26,14 +28,22 @@ const values = [
   },
 ];
 
-export const metadata = buildMetadata({
+const staticMetadata = buildMetadata({
   title: "אודות CleanBrothers | ניקוי ספות וריפודים בבית הלקוח",
   description:
     "הכירו את CleanBrothers, עסק צעיר ומקצועי לניקוי ספות, ריפודים, מזרנים, שטיחים וריפודי רכב בבית הלקוח באזור המרכז.",
   path: "/about",
 });
 
-export default function AboutPage() {
+export async function generateMetadata() {
+  const source = await getPublicAbout();
+  return source.source === "cms" ? pageRevisionMetadata(source.page) : staticMetadata;
+}
+
+export default async function AboutPage() {
+  const source = await getPublicAbout();
+  if (source.source === "cms") return <PageBlocksView page={source.page} revisionId={source.revisionId}
+    media={source.media} promotions={source.promotions} preview={false} />;
   return (
     <>
       <PageHero

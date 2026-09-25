@@ -1,5 +1,5 @@
 import { mediaEnabled } from "@/cms/media/environment";
-import { pagesLocalOnly } from "@/cms/pages/environment";
+import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import Link from "next/link";
@@ -32,7 +32,7 @@ export default function AdminLayout({
             <p className="text-lg font-black">CleanBrothers CMS</p>
             <nav aria-label="ניווט ניהול" className="flex items-center gap-5 text-sm font-bold">
               <Link href="/admin/services" prefetch={false}>שירותים</Link>
-              {pagesLocalOnly() && <Link href="/admin/pages" prefetch={false}>עמודים</Link>}
+              {pagesEnvironmentAllowed() && <Link href="/admin/pages" prefetch={false}>עמודים</Link>}
               {mediaEnabled() && <Link href="/admin/media" prefetch={false}>מדיה</Link>}
               <Link href="/admin" prefetch={false} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
                 לוח בקרה

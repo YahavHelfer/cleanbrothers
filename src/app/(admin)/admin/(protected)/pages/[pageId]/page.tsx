@@ -3,15 +3,15 @@ import { notFound } from "next/navigation";
 import { mediaEnabled } from "@/cms/media/environment";
 import { getMediaChoices } from "@/cms/media/repository";
 import { PageEditor, RestorePageRevision } from "@/cms/pages/PageEditor";
-import { pagesLocalOnly } from "@/cms/pages/environment";
+import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import { getPageEditor, getPromotionEditor } from "@/cms/pages/repository";
 
 export default async function EditPage({ params }: { params: Promise<{ pageId: string }> }) {
-  if (!pagesLocalOnly() || (await params).pageId !== "about") notFound();
+  if (!pagesEnvironmentAllowed() || (await params).pageId !== "about") notFound();
   const [{ snapshot, userId }, { snapshot: promotion }, mediaChoices] = await Promise.all([
     getPageEditor(), getPromotionEditor(), mediaEnabled() ? getMediaChoices() : Promise.resolve([]),
   ]);
-  if (!snapshot) return <p>יש לייבא תחילה את עמוד אודות ל־CMS המקומי.</p>;
+  if (!snapshot) return <p>יש לייבא תחילה את עמוד אודות ל־CMS.</p>;
   return <section className="grid gap-7">
     <Link href="/admin/pages" prefetch={false}>חזרה לעמודים</Link>
     <h1 className="text-3xl font-black">עריכת עמוד אודות</h1>
