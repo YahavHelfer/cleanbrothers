@@ -1,5 +1,6 @@
 import { JsonLd } from "@/components/JsonLd";
-import { faqJsonLd, serviceJsonLd } from "@/lib/structured-data";
+import { faqJsonLd, buildServiceJsonLd } from "@/lib/structured-data";
+import { getPublicSiteChrome } from "@/cms/site/public-source";
 import { BeforeAfter } from "@/sections/BeforeAfter";
 import { CleaningProcess } from "@/sections/CleaningProcess";
 import { FAQ } from "@/sections/FAQ";
@@ -19,11 +20,12 @@ export const metadata = buildMetadata({
     "ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק. שירות מקצועי עד הלקוח באזור המרכז מבית CleanBrothers.",
 });
 
-export default function Home() {
+export default async function Home() {
+  const { settings } = await getPublicSiteChrome();
   return (
     <>
       <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
-      <JsonLd id="cleanbrothers-service-jsonld" data={serviceJsonLd} />
+      <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
       <Hero />
       <TrustStrip />
       <Services />

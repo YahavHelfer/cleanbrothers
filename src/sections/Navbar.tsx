@@ -9,7 +9,7 @@ import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber"
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
-export function Navbar() {
+export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: string; href: string }> }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -25,7 +25,7 @@ export function Navbar() {
     return pathname === href;
   }
 
-  function renderNavLink(link: (typeof navLinks)[number]) {
+  function renderNavLink(link: { label: string; href: string }) {
     const isActive = isLinkActive(link.href);
 
     return (
@@ -76,7 +76,7 @@ export function Navbar() {
         </Link>
 
         <div className="hidden justify-center gap-2 text-nowrap lg:flex">
-          {navLinks.map(renderNavLink)}
+          {links.map(renderNavLink)}
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2 lg:justify-self-end">
@@ -109,7 +109,7 @@ export function Navbar() {
           id="mobile-navigation"
           className={`${isMenuOpen ? "grid" : "hidden"} col-span-3 grid-cols-2 gap-2 border-t border-[var(--glass-border)] py-3 sm:grid-cols-3 lg:hidden`}
         >
-          {navLinks.map(renderNavLink)}
+          {links.map(renderNavLink)}
         </div>
       </nav>
     </header>

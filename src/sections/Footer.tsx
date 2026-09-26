@@ -3,25 +3,27 @@ import Link from "next/link";
 import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { businessConfig } from "@/config/business";
+import { siteFooterBaseline, siteSettingsBaseline } from "@/cms/site/baseline";
+import type { SiteFooter, SiteSettings } from "@/cms/site/model";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
-const legalLinks = [
-  { label: "מדיניות פרטיות", href: "/privacy-policy" },
-  { label: "מחיקת מידע", href: "/data-deletion" },
-  { label: "הצהרת נגישות", href: "/accessibility-statement" },
-];
-
-const featuredServiceLinks = [
+type FooterProps = { settings?: SiteSettings; content?: SiteFooter;
+  links?: ReadonlyArray<{ label: string; href: string }>;
+  services?: ReadonlyArray<{ label: string; href: string }> };
+const baselineServices = [
   { label: "ניקוי ספות", href: "/sofa-cleaning" },
   { label: "ניקוי מזגנים", href: "/air-conditioner-cleaning" },
   { label: "ניקוי חלונות", href: "/window-cleaning" },
 ];
 
-export function Footer() {
+export function Footer({ settings = siteSettingsBaseline, content = siteFooterBaseline,
+  links = navLinks, services = baselineServices }: FooterProps) {
+  // The dial target stays code/environment owned for call tracking. CMS can
+  // change only formatting of the displayed number after digit equivalence.
   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
-  const emailHref = `mailto:${businessConfig.email}`;
+  const emailHref = `mailto:${settings.email}`;
 
   return (
     <footer className="border-t border-white/10 bg-[linear-gradient(180deg,_#08131f_0%,_#0b2133_100%)]">
@@ -43,15 +45,14 @@ export function Footer() {
               />
             </Link>
             <p className="mt-2 text-sm leading-6 text-white/64 sm:mt-3 sm:leading-7">
-              ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית
-              ולעסק עם שירות מקצועי, נעים וברור.
+              {content.description}
             </p>
           </div>
 
           <nav aria-label="ניווט מהיר">
             <p className="mb-2 text-sm font-black text-white sm:mb-3">ניווט מהיר</p>
             <div className="grid gap-1.5 text-sm font-semibold text-white/66 sm:gap-2">
-              {navLinks.map((link) => (
+              {links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -64,7 +65,7 @@ export function Footer() {
             </div>
             <p className="mb-2 mt-4 text-sm font-black text-white">שירותים</p>
             <div className="grid gap-1.5 text-sm font-semibold text-white/66 sm:gap-2">
-              {featuredServiceLinks.map((link) => (
+              {services.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -83,14 +84,14 @@ export function Footer() {
               aria-label="חיוג ל-CleanBrothers"
               className="text-lg font-black text-turquoise transition hover:text-white focus:outline-none focus:ring-2 focus:ring-turquoise sm:text-xl"
             >
-              <GoogleCallTrackingNumber />
+              <GoogleCallTrackingNumber>{settings.phoneDisplay}</GoogleCallTrackingNumber>
             </a>
             <a
               href={emailHref}
               aria-label="שליחת אימייל ל-CleanBrothers"
               className="mt-1 block text-xs font-bold text-white/64 transition hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:text-sm"
             >
-              {businessConfig.email}
+              {settings.email}
             </a>
             <div className="mt-2 sm:mt-3">
               <a
@@ -98,7 +99,7 @@ export function Footer() {
                 aria-label="שליחת תמונה בוואטסאפ וקבלת מחיר מ-CleanBrothers"
                 className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
-                שלחו תמונה וקבלו מחיר
+                {content.whatsappCtaLabel}
               </a>
             </div>
           </div>
@@ -106,7 +107,7 @@ export function Footer() {
           <div>
             <p className="mb-2 text-sm font-black text-white sm:mb-3">אזורי שירות</p>
             <div className="flex max-w-md flex-wrap gap-1 sm:gap-1.5">
-              {businessConfig.serviceAreas.map((area) => (
+              {settings.serviceAreas.map((area) => (
                 <span
                   key={area}
                   className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-xs font-bold leading-5 text-white/64"
@@ -119,12 +120,12 @@ export function Footer() {
         </div>
 
         <div className="mt-5 border-t border-white/10 pt-3 text-xs text-white/48 sm:mt-7 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:pt-4 sm:text-sm">
-          <p>© CleanBrothers כל הזכויות שמורות</p>
+          <p>{content.copyright}</p>
           <div className="mt-2 flex flex-wrap gap-3 sm:mt-0">
-            {legalLinks.map((link) => (
+            {content.legal.filter(link => link.visible).map((link) => (
               <Link
-                key={link.href}
-                href={link.href}
+                key={link.path}
+                href={link.path}
                 className="transition hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise"
               >
                 {link.label}
@@ -132,7 +133,7 @@ export function Footer() {
             ))}
             <CookiePreferencesButton />
           </div>
-          <p className="mt-1 sm:mt-0">ניקוי ריפודים מקצועי בבית הלקוח</p>
+          <p className="mt-1 sm:mt-0">{content.tagline}</p>
         </div>
       </div>
     </footer>

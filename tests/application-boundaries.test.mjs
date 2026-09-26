@@ -52,7 +52,7 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
@@ -88,9 +88,9 @@ test("public metadata, sitemap and robots preserve canonical routes and behavior
   });
 });
 
-test("the public root retains one of each tracking integration and the early consent bootstrap", () => {
+test("the public root retains one of each tracking integration and the early consent bootstrap", async () => {
   const load = createSourceLoader();
-  const layout = load("src/app/(site)/layout.tsx").default({ children: null });
+  const layout = await load("src/app/(site)/layout.tsx").default({ children: null });
   assert.equal(layout.type, "html");
   assert.equal(layout.props.lang, "he");
   assert.equal(layout.props.dir, "rtl");

@@ -19,7 +19,7 @@ test("JSON-LD strings cannot terminate the script context, including nested and 
 test("existing structured-data values retain their JSON meaning", () => {
   const load = createSourceLoader();
   const structured = load("src/lib/structured-data.ts");
-  for (const data of Object.values(structured)) {
+  for (const data of Object.values(structured).filter(value => typeof value !== "function")) {
     assert.deepEqual(JSON.parse(serializeJsonLd(data)), plain(data));
   }
   const data = { price: 12.5, enabled: false, absent: null, values: ["עברית", "a & b", "a > b"] };

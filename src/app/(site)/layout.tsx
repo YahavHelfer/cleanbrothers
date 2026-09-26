@@ -11,11 +11,12 @@ import { MetaPixel } from "@/components/MetaPixel";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { businessConfig } from "@/config/business";
+import { getPublicSiteChrome } from "@/cms/site/public-source";
 import { getGoogleConsentBootstrapScript } from "@/lib/consent";
 import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking";
 import { buildMetadata } from "@/lib/seo";
 import {
-  localBusinessJsonLd,
+  buildLocalBusinessJsonLd,
 } from "@/lib/structured-data";
 import { Footer } from "@/sections/Footer";
 import { Navbar } from "@/sections/Navbar";
@@ -44,11 +45,12 @@ export const metadata: Metadata = {
   }),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const chrome = await getPublicSiteChrome();
   return (
     <html
       lang="he"
@@ -59,7 +61,7 @@ export default function RootLayout({
         <Script id="google-consent-defaults" strategy="beforeInteractive">
           {getGoogleConsentBootstrapScript()}
         </Script>
-        <JsonLd id="cleanbrothers-local-business-jsonld" data={localBusinessJsonLd} />
+        <JsonLd id="cleanbrothers-local-business-jsonld" data={buildLocalBusinessJsonLd(chrome.settings)} />
       </head>
       <body className="flex min-h-full flex-col">
         <GoogleAdsTag
@@ -72,11 +74,12 @@ export default function RootLayout({
         <MarketingAttributionTracker />
         <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />
-        <Navbar />
+        <Navbar links={chrome.navLinks} />
         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
           {children}
         </main>
-        <Footer />
+        <Footer settings={chrome.settings} content={chrome.footer} links={chrome.navLinks}
+          services={chrome.featuredServiceLinks} />
         <AccessibilityControls />
         <WhatsAppButton />
         <CookieConsent />
