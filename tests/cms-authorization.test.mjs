@@ -223,9 +223,10 @@ test("Supabase SSR login, refresh and logout preserve HTTPS CMS cookie options",
   }
 });
 
-test("Proxy is scoped to admin and both protected layout and data layer authorize", () => {
+test("Proxy protects admin and locally resolves single-segment CMS routes; data layer authorizes independently", () => {
   const source = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
-  assert.match(source("src/proxy.ts"), /matcher: \["\/admin\/:path\*"\]/);
+  assert.match(source("src/proxy.ts"), /matcher: \["\/admin\/:path\*", "\/:slug"\]/);
+  assert.match(source("src/proxy.ts"), /newPagePublicAllowed\(slug\)/);
   assert.match(source("src/proxy.ts"), /private, no-store/);
   assert.match(source("src/app/(admin)/admin/(protected)/layout.tsx"), /await requireCmsAdminPage\(\)/);
   assert.match(source("src/cms/dashboard.ts"), /await requireCmsAdmin\(\)/);

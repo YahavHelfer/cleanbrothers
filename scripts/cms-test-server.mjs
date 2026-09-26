@@ -35,6 +35,8 @@ const env = {
     TMPDIR: process.env.TMPDIR,
     CMS_SUPABASE_PUBLISHABLE_KEY: key,
     ...(published ? { CMS_CONTENT_TEST_BUILD: "1", CMS_PILOT_CONTENT_SOURCE: "published",
+      CMS_NEW_PAGE_SOURCE: "published",
+      CMS_NEW_PAGE_ALLOWLIST: "cms-test-page,cms-test-renamed,cms-test-final,cms-test-copy",
       CMS_CONTENT_SERVICE_ALLOWLIST: "sofa-cleaning,mattress-cleaning,carpet-cleaning,car-upholstery-cleaning,armchair-chair-cleaning,delicate-upholstery-cleaning,air-conditioner-cleaning,window-cleaning" } : {}),
 };
 if (published) {

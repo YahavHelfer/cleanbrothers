@@ -1,8 +1,37 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createCmsClient } from "@/cms/client";
 import { isCmsCookie } from "@/cms/config";
+import { newPagePublicAllowed } from "@/cms/pages/new-environment";
+
+async function localNewPageRoute(request: NextRequest, slug: string): Promise<NextResponse> {
+  try {
+    const response = await fetch(`${process.env.CMS_SUPABASE_URL}/rest/v1/rpc/cms_resolve_new_page_route`, {
+      method: "POST", cache: "no-store", signal: AbortSignal.timeout(8000),
+      headers: { apikey: process.env.CMS_SUPABASE_PUBLISHABLE_KEY || "", "Content-Type": "application/json" },
+      body: JSON.stringify({ target_slug: slug }),
+    });
+    if (!response.ok) throw new Error("CMS route unavailable");
+    const route = await response.json();
+    if (route?.kind === "page") return NextResponse.next();
+    if (route?.kind === "redirect" && newPagePublicAllowed(route.destination)) {
+      const destination = request.nextUrl.clone();
+      destination.pathname = `/${route.destination}`;
+      return NextResponse.redirect(destination,308);
+    }
+  } catch {
+    // Public CMS resolution fails closed; never fall through to a stale page.
+  }
+  return new NextResponse("Not Found", { status: 404, headers: {
+    "Cache-Control": "private, no-store, max-age=0", "X-Robots-Tag": "noindex, nofollow",
+  } });
+}
 
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname !== "/admin" && !request.nextUrl.pathname.startsWith("/admin/")) {
+    const slug = request.nextUrl.pathname.slice(1);
+    if (newPagePublicAllowed(slug)) return localNewPageRoute(request, slug);
+    return NextResponse.next();
+  }
   let response = NextResponse.next({ request });
   let authenticated = false;
   try {
@@ -37,5 +66,6 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-// No public page or business API is included; public cookies remain untouched.
-export const config = { matcher: ["/admin/:path*"] };
+// Only a local, explicitly allowlisted single-segment page gets public route
+// resolution. Existing public pages and business APIs remain untouched.
+export const config = { matcher: ["/admin/:path*", "/:slug"] };

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { businessConfig } from "@/config/business";
+import { listPublicNewPageSlugs } from "@/cms/pages/new-public-source";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [
     "",
     "/services",
@@ -20,7 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/accessibility-statement",
   ];
 
-  return routes.map((route) => ({
+  const published = await listPublicNewPageSlugs();
+  return [...routes,...published.map(slug => `/${slug}`)].map((route) => ({
     url: `${businessConfig.siteUrl}${route}`,
     changeFrequency: route === "" ? "weekly" : "monthly",
     priority: route === "" ? 1 : 0.8,

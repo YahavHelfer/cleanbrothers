@@ -13,7 +13,7 @@ import type { BlockMedia, BlockPromotions } from "./PageBlocksView";
 type PublicMediaRow = { media_version_id: unknown; usage_role: unknown;
   position: unknown; alt_text: unknown; provider: unknown };
 
-function publicMedia(input: unknown): BlockMedia {
+export function publicMedia(input: unknown): BlockMedia {
   if (!Array.isArray(input)) throw new Error("CMS page media unavailable");
   return Object.fromEntries(input.map((row: PublicMediaRow) => {
     const id = mediaId(row.media_version_id);

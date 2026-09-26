@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "test:cms": "node --test tests/cms-authorization.test.mjs tests/cms-content.test.mjs tests/cms-media.test.mjs tests/cms-shared-services.test.mjs tests/cms-public-equivalence.test.mjs tests/cms-ac-media-baseline.test.mjs tests/cms-special-services.test.mjs tests/cms-page-blocks.test.mjs",
+    "test:cms": "node --test tests/cms-authorization.test.mjs tests/cms-content.test.mjs tests/cms-media.test.mjs tests/cms-shared-services.test.mjs tests/cms-public-equivalence.test.mjs tests/cms-ac-media-baseline.test.mjs tests/cms-special-services.test.mjs tests/cms-page-blocks.test.mjs tests/cms-new-pages.test.mjs",
     "test:e2e": "node scripts/cms-e2e-runner.mjs",
     "test:cms:db": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase test db --local --network-id cleanbrothers-cms-local",
     "cms:start": "SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 supabase start --network-id cleanbrothers-cms-local",

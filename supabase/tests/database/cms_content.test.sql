@@ -3,7 +3,7 @@ create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 select no_plan();
 -- Rollback restores the imported local baseline after every SQL run.
-truncate public.page_revision_blocks, public.promotion_revision_media, public.cms_promotion_identity, public.revision_media_refs, public.content_publication_events, public.content_publication_state, public.content_revisions, public.content_documents;
+truncate public.cms_page_route_events, public.cms_page_routes, public.cms_new_page_identity, public.page_revision_blocks, public.promotion_revision_media, public.cms_promotion_identity, public.revision_media_refs, public.content_publication_events, public.content_publication_state, public.content_revisions, public.content_documents;
 create temporary table fixture(payload jsonb, baseline uuid, draft uuid, restored uuid);
 insert into fixture(payload) values ('{"schemaVersion":1,"publicTitle":"Baseline","h1":"Baseline h1","eyebrow":"Eyebrow","intro":"Intro","imageAlt":"Alt","signsTitle":"Signs","signsDescription":"Signs intro","processTitle":"Process","processDescription":"Process intro","benefitsDescription":"Benefits intro","resultDescription":"Result","seoTitle":"Baseline SEO","seoDescription":"Baseline description","images":["/images/services/delicate-upholstery-cleaning.jpeg"],"signs":["Sign"],"process":["Step"],"benefits":["Benefit"],"faqs":[{"question":"Question","answer":"Answer"}],"relatedLinks":[{"label":"Mattress","href":"/mattress-cleaning"}]}');
 grant select,update on fixture to authenticated,anon;

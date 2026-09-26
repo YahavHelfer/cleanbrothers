@@ -2,7 +2,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path=public,extensions;
 select no_plan();
-truncate page_revision_blocks,promotion_revision_media,cms_promotion_identity,media_audit_events,revision_media_refs,media_versions,media_assets,
+truncate cms_page_route_events,cms_page_routes,cms_new_page_identity,page_revision_blocks,promotion_revision_media,cms_promotion_identity,media_audit_events,revision_media_refs,media_versions,media_assets,
  content_publication_events,content_publication_state,content_revisions,content_documents;
 
 create temporary table page_fixture(p jsonb,promo jsonb,page_baseline uuid,promo_baseline uuid,

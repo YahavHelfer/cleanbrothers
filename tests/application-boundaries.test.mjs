@@ -48,11 +48,11 @@ function sourceDependencies(filename, visited = new Set()) {
 test("all 16 public page URLs are preserved inside the public route group", () => {
   const pages = filesIn(resolve(appDirectory, "(site)"))
     .filter((file) => file.endsWith("/page.tsx"));
-  assert.deepEqual(pages.map(routeFor).sort(), [...publicRoutes].sort());
+  assert.deepEqual(pages.map(routeFor).sort(), [...publicRoutes, "/[slug]"].sort());
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
@@ -73,7 +73,7 @@ test("public metadata, sitemap and robots preserve canonical routes and behavior
     const metadata = routeModule.metadata ?? await routeModule.generateMetadata();
     assert.equal(metadata.alternates.canonical, `${businessConfig.siteUrl}${route}`);
   }
-  const sitemap = load("src/app/sitemap.ts").default();
+  const sitemap = await load("src/app/sitemap.ts").default();
   assert.deepEqual(
     plain(sitemap).sort((a, b) => a.url.localeCompare(b.url)),
     publicRoutes.filter((route) => route !== "/data-deletion").map((route) => ({

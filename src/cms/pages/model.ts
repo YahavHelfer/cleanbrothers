@@ -1,5 +1,6 @@
 import { businessConfig } from "@/config/business";
 import { getWhatsAppLink } from "@/lib/whatsapp";
+import { newPagePath } from "./routes";
 
 export const ABOUT_PAGE_ID = "c0000000-0000-4000-8000-000000000100";
 export const ABOUT_PAGE_KEY = "about";
@@ -100,8 +101,8 @@ export const blockDefinitions = {
 export type BlockType = keyof typeof blockDefinitions;
 export type PageBlock = { id: string; position: number; type: BlockType; schemaVersion: 1; hidden: boolean;
   payload: Record<string, unknown>; mediaVersionId: string | null; promotionRevisionId: string | null };
-export type PageDraft = { schemaVersion: 6; publicTitle: string; h1: string; seoTitle: string; seoDescription: string;
-  canonical: "/about"; blocks: PageBlock[] };
+export type PageDraft = { schemaVersion: 6 | 8; publicTitle: string; h1: string; seoTitle: string; seoDescription: string;
+  canonical: string; blocks: PageBlock[] };
 export type PromotionDraft = { schemaVersion: 7; publicTitle: string; h1: string; seoTitle: string;
   seoDescription: string; description: string; template: "accent" | "quiet"; enabled: boolean;
   cta: SafeCta; mediaVersionId: string | null; mediaAlt: string | null };
@@ -181,16 +182,18 @@ export function validateBlock(input: unknown): PageBlock {
 
 export function validatePageDraft(input: unknown): PageDraft {
   const page = exact(input, ["schemaVersion", "publicTitle", "h1", "seoTitle", "seoDescription", "canonical", "blocks"]);
-  if (page.schemaVersion !== PAGE_SCHEMA_VERSION || page.canonical !== ABOUT_PATH) throw new PageValidationError();
+  if (page.schemaVersion === PAGE_SCHEMA_VERSION ? page.canonical !== ABOUT_PATH :
+    page.schemaVersion === 8 ? page.canonical !== newPagePath(String(page.canonical).slice(1)) : true)
+    throw new PageValidationError();
   const blocks = list(page.blocks, 50).map(validateBlock);
   if (new Set(blocks.map(block => block.id)).size !== blocks.length ||
     blocks.some((block, index) => block.position !== index) ||
     blocks.filter(block => block.type === "hero" && !block.hidden).length !== 1 ||
     blocks.find(block => block.type === "hero" && !block.hidden)?.payload.title !== page.h1)
     throw new PageValidationError("סדר הבלוקים או הכותרת הראשית אינם תקינים.");
-  return { schemaVersion: 6, publicTitle: text(page.publicTitle, 120), h1: text(page.h1, 180),
+  return { schemaVersion: page.schemaVersion as 6 | 8, publicTitle: text(page.publicTitle, 120), h1: text(page.h1, 180),
     seoTitle: text(page.seoTitle, 120), seoDescription: text(page.seoDescription, 320),
-    canonical: "/about", blocks };
+    canonical: page.canonical as string, blocks };
 }
 export function validatePromotionDraft(input: unknown): PromotionDraft {
   const p = exact(input, ["schemaVersion", "publicTitle", "h1", "seoTitle", "seoDescription", "description", "template", "enabled", "cta", "mediaVersionId", "mediaAlt"]);

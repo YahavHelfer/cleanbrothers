@@ -5,9 +5,42 @@ import { getMediaChoices } from "@/cms/media/repository";
 import { PageEditor, RestorePageRevision } from "@/cms/pages/PageEditor";
 import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import { getPageEditor, getPromotionEditor } from "@/cms/pages/repository";
+import { newPagesEnvironmentAllowed } from "@/cms/pages/new-environment";
+import { getNewPageEditor } from "@/cms/pages/new-repository";
+import { NewPageDuplicateForm, NewPageLifecycleForm } from "@/cms/pages/NewPageForms";
+import { pageUuid } from "@/cms/pages/model";
 
 export default async function EditPage({ params }: { params: Promise<{ pageId: string }> }) {
-  if (!pagesEnvironmentAllowed() || (await params).pageId !== "about") notFound();
+  if (!pagesEnvironmentAllowed()) notFound();
+  const pageId = (await params).pageId;
+  if (pageId !== "about") {
+    if (!newPagesEnvironmentAllowed()) notFound();
+    try { pageUuid(pageId); } catch { notFound(); }
+    const [{ snapshot, userId }, { snapshot: promotion }, mediaChoices] = await Promise.all([
+      getNewPageEditor(pageId), getPromotionEditor(), mediaEnabled() ? getMediaChoices() : Promise.resolve([]),
+    ]);
+    if (!snapshot) notFound();
+    return <section className="grid gap-7"><Link href="/admin/pages" prefetch={false}>חזרה לעמודים</Link>
+      <h1 className="text-3xl font-black">עריכת עמוד: {snapshot.draft.publicTitle}</h1>
+      <p>מצב: {snapshot.lifecycle} · כתובת נוכחית: <bdi>/{snapshot.currentSlug}</bdi> · תבנית: {snapshot.template}</p>
+      <p>פורסם: {snapshot.publishedRevisionId ? `גרסה ${snapshot.history.find(row => row.id === snapshot.publishedRevisionId)?.number}` : "טרם פורסם"}
+        {' '}· טיוטה: גרסה {snapshot.history.find(row => row.id === snapshot.draftRevisionId)?.number}</p>
+      {snapshot.lifecycle !== "archived" && <PageEditor key={snapshot.generation} snapshot={snapshot} pageId={pageId}
+        mediaChoices={mediaChoices} promotionRevisions={promotion?.history.map(row => ({ id: row.id, number: row.number })) || []} />}
+      <section aria-label="היסטוריית גרסאות" className="grid gap-4"><h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
+        {snapshot.history.map(revision => <article key={revision.id} className="rounded-2xl border theme-card p-5">
+          <h3>גרסה {revision.number} — {revision.createdBy === userId ? "את/ה" : revision.createdBy ? "מנהל/ת נוסף/ת" : "ייבוא"}</h3>
+          <Link href={`/admin/preview/pages/${pageId}?revision=${revision.id}`} prefetch={false}>תצוגה מקדימה מדויקת</Link>
+          {snapshot.lifecycle !== "archived" && <RestorePageRevision snapshot={snapshot} source={revision.id} pageId={pageId} />}
+        </article>)}
+      </section>
+      {snapshot.lifecycle !== "archived" && <NewPageDuplicateForm source={pageId} />}
+      {snapshot.lifecycle === "published" && <NewPageLifecycleForm snapshot={snapshot} kind="unpublish" label="ביטול פרסום" />}
+      {(["draft-only", "unpublished"] as string[]).includes(snapshot.lifecycle) &&
+        <NewPageLifecycleForm snapshot={snapshot} kind="archive" label="העברה לארכיון" />}
+      {snapshot.lifecycle === "archived" && <NewPageLifecycleForm snapshot={snapshot} kind="restore-archive" label="שחזור מהארכיון" />}
+    </section>;
+  }
   const [{ snapshot, userId }, { snapshot: promotion }, mediaChoices] = await Promise.all([
     getPageEditor(), getPromotionEditor(), mediaEnabled() ? getMediaChoices() : Promise.resolve([]),
   ]);

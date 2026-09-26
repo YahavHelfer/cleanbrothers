@@ -7,16 +7,23 @@ import { PageBlocksView, type BlockMedia, type BlockPromotions } from "@/cms/pag
 import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import { pageUuid } from "@/cms/pages/model";
 import { getPageRevision, getPromotionRevision } from "@/cms/pages/repository";
+import { newPagesEnvironmentAllowed } from "@/cms/pages/new-environment";
+import { getNewPageRevision } from "@/cms/pages/new-repository";
 
 export const metadata: Metadata = { title: "תצוגה מקדימה פרטית | CleanBrothers", robots: { index: false, follow: false } };
 export default async function PagePreview({ params: routeParams, searchParams }: {
   params: Promise<{ pageId: string }>; searchParams: Promise<{ revision?: string | string[] }>;
 }) {
   await requireCmsAdmin();
-  if (!pagesEnvironmentAllowed() || (await routeParams).pageId !== "about") notFound();
+  if (!pagesEnvironmentAllowed()) notFound();
+  const pageId = (await routeParams).pageId;
+  if (pageId !== "about" && !newPagesEnvironmentAllowed()) notFound();
   let id: string;
-  try { id = pageUuid((await searchParams).revision); } catch { notFound(); }
-  const revision = await getPageRevision(id);
+  try {
+    id = pageUuid((await searchParams).revision);
+    if (pageId !== "about") pageUuid(pageId);
+  } catch { notFound(); }
+  const revision = pageId === "about" ? await getPageRevision(id) : await getNewPageRevision(pageId,id);
   if (!revision) notFound();
   const promotionIds = [...new Set(revision.payload.blocks.flatMap(block => block.promotionRevisionId ? [block.promotionRevisionId] : []))];
   const [promotionRows, choices] = await Promise.all([

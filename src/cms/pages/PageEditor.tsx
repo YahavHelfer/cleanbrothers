@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState, useState, useSyncExternalStore } from "react";
 import type { MediaChoice } from "@/cms/media/model";
 import { pageAction, promotionAction } from "./actions";
+import { newPageAction } from "./new-actions";
+import type { NewPageSnapshot } from "./new-repository";
 import { blockDefinitions, defaultBlock, internalRoutes, validatePageDraft,
   type BlockType, type Inline, type PageBlock, type PageDraft, type PromotionDraft, type RichNode,
   type SafeCta, type SafeTarget } from "./model";
@@ -177,11 +179,11 @@ function BlockFields({ block, onChange, choices, promotionRevisions }: { block: 
   }
 }
 
-export function PageEditor({ snapshot, mediaChoices, promotionRevisions }: { snapshot: PageSnapshot;
-  mediaChoices: MediaChoice[]; promotionRevisions: { id: string; number: number }[] }) {
+export function PageEditor({ snapshot, mediaChoices, promotionRevisions, pageId }: { snapshot: PageSnapshot | NewPageSnapshot;
+  mediaChoices: MediaChoice[]; promotionRevisions: { id: string; number: number }[]; pageId?: string }) {
   const [draft, setDraft] = useState<PageDraft>(() => validatePageDraft(snapshot.draft));
   const [selectedType, setSelectedType] = useState<BlockType>("richText");
-  const [state, action, actionPending] = useActionState(pageAction, initialAction);
+  const [state, action, actionPending] = useActionState(pageId ? newPageAction.bind(null,pageId) : pageAction, initialAction);
   const ready = useReady();
   const pending = actionPending || !ready;
   const dirty = JSON.stringify(draft) !== JSON.stringify(snapshot.draft);
@@ -189,7 +191,7 @@ export function PageEditor({ snapshot, mediaChoices, promotionRevisions }: { sna
   const reorder = (next: PageBlock[]) => setDraft(current => ({ ...current,
     blocks: next.map((block, position) => ({ ...block, position })) }));
   const update = (index: number, value: PageBlock) => reorder(blocks.map((block, i) => i === index ? value : block));
-  return <form action={action} aria-label="עריכת עמוד אודות" className="grid gap-7 rounded-3xl border theme-card p-5 sm:p-8" dir="rtl">
+  return <form action={action} aria-label={pageId ? "עריכת עמוד" : "עריכת עמוד אודות"} className="grid gap-7 rounded-3xl border theme-card p-5 sm:p-8" dir="rtl">
     <input type="hidden" name="generation" value={snapshot.generation} />
     <input type="hidden" name="revision" value={snapshot.draftRevisionId} />
     <input type="hidden" name="payload" value={JSON.stringify(draft)} />
@@ -201,7 +203,12 @@ export function PageEditor({ snapshot, mediaChoices, promotionRevisions }: { sna
             ? { ...current, h1: value, blocks: current.blocks.map(block => block.type === "hero"
               ? { ...block, payload: { ...block.payload, title: value } } : block) }
             : { ...current, [key]: value })} />)}
-      <p>כתובת קבועה: <bdi>/about</bdi></p>
+      {pageId ? <><label className="grid gap-2 font-bold">כתובת העמוד לאחר פרסום
+        <input className={field} dir="ltr" value={draft.canonical.slice(1)} minLength={3} maxLength={64}
+          pattern="[a-z0-9]+(-[a-z0-9]+)*" required
+          onChange={event => setDraft(current => ({ ...current, canonical: `/${event.target.value}` }))} /></label>
+        <p>שינוי כתובת בטיוטה אינו משנה את הנתיב הציבורי עד פרסום. הכתובת הישנה תהפוך להפניה קבועה.</p></>
+        : <p>כתובת קבועה: <bdi>/about</bdi></p>}
     </fieldset>
     <fieldset disabled={pending} className="grid gap-4"><legend className="text-xl font-black">בלוקים לפי סדר הופעה</legend>
       {blocks.map((block, index) => <section key={block.id} data-block-id={block.id} className="grid gap-4 rounded-2xl border theme-card p-4">
@@ -237,18 +244,18 @@ export function PageEditor({ snapshot, mediaChoices, promotionRevisions }: { sna
     <p role="status">{dirty ? "יש שינויים בטופס שטרם נשמרו. תצוגה מקדימה מציגה רק גרסה שמורה." : "כל השינויים בטופס נשמרו בטיוטה."}</p>
     {state.message && <p role={state.ok ? "status" : "alert"}>{state.message}</p>}
     <div className="flex flex-wrap gap-3"><button className="btn-primary" name="intent" value="save" disabled={pending}>שמירת טיוטה</button>
-      <Link className="btn-secondary" prefetch={false} href={`/admin/preview/pages/about?revision=${snapshot.draftRevisionId}`}>תצוגה מקדימה מדויקת</Link></div>
+      <Link className="btn-secondary" prefetch={false} href={`/admin/preview/pages/${pageId || "about"}?revision=${snapshot.draftRevisionId}`}>תצוגה מקדימה מדויקת</Link></div>
     <label className="flex gap-2"><input type="checkbox" name="confirmPublish" value="yes" disabled={pending || dirty} />אני מאשר/ת לפרסם את הגרסה השמורה</label>
     <button className="btn-primary justify-self-start" name="intent" value="publish"
       disabled={pending || dirty || snapshot.draftRevisionId === snapshot.publishedRevisionId}>פרסום</button>
   </form>;
 }
 
-export function RestorePageRevision({ snapshot, source }: { snapshot: PageSnapshot; source: string }) {
-  const [state, action, pending] = useActionState(pageAction, initialAction);
+export function RestorePageRevision({ snapshot, source, pageId }: { snapshot: PageSnapshot | NewPageSnapshot; source: string; pageId?: string }) {
+  const [state, action, pending] = useActionState(pageId ? newPageAction.bind(null,pageId) : pageAction, initialAction);
   return <form action={action} className="grid gap-2"><input type="hidden" name="generation" value={snapshot.generation} />
     <input type="hidden" name="revision" value={snapshot.draftRevisionId} /><input type="hidden" name="source" value={source} />
-    <button className={button} name="intent" value="restore" disabled={pending}>שחזור כטיוטה חדשה</button>
+    <button className={button} name="intent" value={pageId ? "restore-revision" : "restore"} disabled={pending}>שחזור כטיוטה חדשה</button>
     {state.message && <p role={state.ok ? "status" : "alert"}>{state.message}</p>}</form>;
 }
 

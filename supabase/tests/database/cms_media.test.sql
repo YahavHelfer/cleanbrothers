@@ -3,7 +3,7 @@ create extension if not exists pgtap with schema extensions;
 set local search_path=public,extensions;
 select no_plan();
 -- Entire fixture (including accounts and media) rolls back. Never targets cloud.
-truncate page_revision_blocks,promotion_revision_media,cms_promotion_identity,media_audit_events,revision_media_refs,media_versions,media_assets,content_publication_events,content_publication_state,content_revisions,content_documents;
+truncate cms_page_route_events,cms_page_routes,cms_new_page_identity,page_revision_blocks,promotion_revision_media,cms_promotion_identity,media_audit_events,revision_media_refs,media_versions,media_assets,content_publication_events,content_publication_state,content_revisions,content_documents;
 create temporary table fixture(payload jsonb,baseline uuid,draft uuid,restored uuid,asset uuid,projection jsonb);
 grant select,update on fixture to authenticated,anon,service_role;
 insert into fixture(payload) values ('{"schemaVersion":1,"publicTitle":"Baseline","h1":"Baseline h1","eyebrow":"Eyebrow","intro":"Intro","imageAlt":"Alt","signsTitle":"Signs","signsDescription":"Signs intro","processTitle":"Process","processDescription":"Process intro","benefitsDescription":"Benefits intro","resultDescription":"Result","seoTitle":"Baseline SEO","seoDescription":"Baseline description","images":["/images/services/delicate-upholstery-cleaning.jpeg"],"signs":["Sign"],"process":["Step"],"benefits":["Benefit"],"faqs":[{"question":"Question","answer":"Answer"}],"relatedLinks":[{"label":"Mattress","href":"/mattress-cleaning"}]}');
