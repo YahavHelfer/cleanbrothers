@@ -1,12 +1,12 @@
 import "server-only";
 import { getCmsConfig } from "@/cms/config";
+import { pagesEnvironmentAllowed } from "./environment";
 import { validateNewPageSlug } from "./routes";
 
-// Phase 3B1 is deliberately local. The future protected Preview rollout must
-// replace this gate explicitly; Vercel variables alone cannot activate it.
+// Reuse the exact local/CMS-project/Preview-branch boundary used by managed pages.
+// Public routing still requires the independent source and slug allowlist below.
 export function newPagesEnvironmentAllowed(): boolean {
-  return !process.env.VERCEL && !process.env.VERCEL_ENV &&
-    process.env.CMS_SUPABASE_URL === "http://127.0.0.1:56321";
+  return pagesEnvironmentAllowed();
 }
 export function requireNewPagesEnvironment(): void {
   if (!newPagesEnvironmentAllowed()) throw new Error("New CMS pages unavailable");

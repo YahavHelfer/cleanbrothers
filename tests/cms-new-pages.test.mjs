@@ -27,20 +27,35 @@ test("new page payload is typed and canonical path matches its slug", () => {
   assert.deepEqual(plain(model.validatePageDraft(input).blocks.map(block => block.type)), ["hero"]);
 });
 
-test("new public pages require local CMS, explicit published source and exact allowlist", () => {
+test("new public pages require local or approved Preview CMS, published source and exact allowlist", () => {
   const local = { CMS_SUPABASE_URL: "http://127.0.0.1:56321",
     CMS_NEW_PAGE_SOURCE: "published", CMS_NEW_PAGE_ALLOWLIST: "a-safe-page,another-page" };
+  const preview = { ...local, VERCEL: "1", VERCEL_ENV: "preview",
+    VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
+    CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" };
   const source = env => createSourceLoader({ env })("src/cms/pages/new-environment.ts");
   assert.equal(source(local).newPagePublicAllowed("a-safe-page"), true);
   assert.deepEqual(plain(source(local).allowedNewPageSlugs()), ["a-safe-page", "another-page"]);
+  assert.equal(source(preview).newPagesEnvironmentAllowed(), true);
+  assert.equal(source(preview).newPagePublicAllowed("a-safe-page"), true);
+  assert.deepEqual(plain(source(preview).allowedNewPageSlugs()), ["a-safe-page", "another-page"]);
   for (const env of [
     { ...local, CMS_NEW_PAGE_SOURCE: "draft" }, { ...local, CMS_NEW_PAGE_ALLOWLIST: "*" },
     { ...local, CMS_NEW_PAGE_ALLOWLIST: "a-safe-page,a-safe-page" },
     { ...local, CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" },
     { ...local, VERCEL: "1", VERCEL_ENV: "preview" },
     { ...local, VERCEL: "1", VERCEL_ENV: "production" },
+    { ...preview, VERCEL_ENV: "production" },
+    { ...preview, VERCEL_PROJECT_ID: "another-project" },
+    { ...preview, VERCEL_GIT_COMMIT_REF: "main" },
+    { ...preview, CMS_SUPABASE_URL: "https://unapproved.supabase.co" },
+    { ...preview, CMS_NEW_PAGE_SOURCE: "draft" },
+    { ...preview, CMS_NEW_PAGE_ALLOWLIST: "*" },
+    { ...preview, CMS_NEW_PAGE_ALLOWLIST: "a-safe-page,a-safe-page" },
   ]) assert.equal(source(env).newPagePublicAllowed("a-safe-page"), false);
   assert.equal(source(local).newPagePublicAllowed("not-listed"), false);
+  assert.equal(source(preview).newPagePublicAllowed("not-listed"), false);
   assert.equal(source({ ...local, CMS_CONTENT_ENABLED: "true", CMS_PAGE_SOURCE: "published",
     CMS_PAGE_ALLOWLIST: "about", CMS_NEW_PAGE_SOURCE: undefined }).newPagePublicAllowed("a-safe-page"), false);
 });
