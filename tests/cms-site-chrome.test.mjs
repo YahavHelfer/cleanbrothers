@@ -65,16 +65,36 @@ test("static baselines reproduce Navbar, Footer, contact and LocalBusiness data"
   assert.equal(chrome.footer.whatsappCtaLabel,"שלחו תמונה וקבלו מחיר");
 });
 
-test("hosted Preview and Production cannot activate global CMS through flags", () => {
+test("only the dedicated Preview or local stack can activate explicitly allowlisted site documents", () => {
   const flags={CMS_SUPABASE_URL:"http://127.0.0.1:56321",CMS_SITE_SOURCE:"published",
     CMS_SITE_ALLOWLIST:"settings,navigation,footer"};
-  for (const env of [{...flags,VERCEL:"1",VERCEL_ENV:"production"},
-    {...flags,VERCEL:"1",VERCEL_ENV:"preview"},{...flags,CMS_SITE_ALLOWLIST:"*"},
-    {...flags,CMS_SITE_SOURCE:"draft"},{...flags,CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co"}]) {
+  const preview={...flags,CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",
+    VERCEL:"1",VERCEL_ENV:"preview",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation"};
+  for (const env of [{...preview,VERCEL_ENV:"production"},
+    {...preview,VERCEL_PROJECT_ID:"other"},{...preview,VERCEL_GIT_COMMIT_REF:"main"},
+    {...preview,CMS_SUPABASE_URL:"https://other.supabase.co"},
+    {...preview,CMS_SITE_ALLOWLIST:"*"},{...preview,CMS_SITE_ALLOWLIST:"footer"},
+    {...preview,CMS_SITE_ALLOWLIST:"settings,navigation"},
+    {...preview,CMS_SITE_ALLOWLIST:"navigation,navigation"},
+    {...preview,CMS_SITE_SOURCE:"draft"},
+    {...flags,VERCEL:"1",VERCEL_ENV:"preview"},
+    {...flags,CMS_SITE_ALLOWLIST:"*"},{...flags,CMS_SITE_SOURCE:"draft"},
+    {...flags,CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co"}]) {
     const allowed=createSourceLoader({env})("src/cms/site/environment.ts");
     assert.equal(allowed.usesCmsSiteSource(),false);
   }
   assert.equal(createSourceLoader({env:flags})("src/cms/site/environment.ts").usesCmsSiteSource(),true);
+  for (const [allowlist,kinds] of [
+    ["navigation",["navigation"]],
+    ["navigation,footer",["navigation","footer"]],
+    ["settings,navigation,footer",["settings","navigation","footer"]],
+  ]) {
+    const source=createSourceLoader({env:{...preview,CMS_SITE_ALLOWLIST:allowlist}})("src/cms/site/environment.ts");
+    assert.equal(source.siteEnvironmentAllowed(),true);
+    for (const kind of ["settings","navigation","footer"])
+      assert.equal(source.usesCmsSiteSource(kind),kinds.includes(kind));
+  }
 });
 
 test("default public chrome does not make a CMS request or expose draft data", async () => {
@@ -85,6 +105,19 @@ test("default public chrome does not make a CMS request or expose draft data", a
   const chrome=await source.getPublicSiteChrome();
   assert.equal(chrome.revisions.settings,null);
   assert.deepEqual(plain(chrome.navLinks),plain(load("src/data/site.ts").navLinks));
+});
+
+test("unapproved hosted branch stays static even with every site flag set", async () => {
+  const source=createSourceLoader({env:{CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",
+    CMS_SITE_SOURCE:"published",CMS_SITE_ALLOWLIST:"settings,navigation,footer",
+    VERCEL:"1",VERCEL_ENV:"preview",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF:"main"},mocks:{
+    "@supabase/supabase-js":{createClient(){throw new Error("Unexpected CMS connection");}},
+    "next/server":{connection(){throw new Error("Unexpected dynamic source");}},
+  }})("src/cms/site/public-source.ts");
+  const chrome=await source.getPublicSiteChrome();
+  assert.deepEqual(plain(chrome.revisions),{settings:null,navigation:null,footer:null});
+  assert.equal(chrome.settings.businessName,settings.businessName);
 });
 
 test("explicit local source resolves only three published snapshots and keeps their revision identities", async () => {
@@ -106,4 +139,38 @@ test("explicit local source resolves only three published snapshots and keeps th
   assert.deepEqual(plain(chrome.revisions),revisions);
   assert.deepEqual(plain(chrome.navLinks),plain(load("src/data/site.ts").navLinks));
   assert.deepEqual(plain(chrome.settings),settings);
+});
+
+test("Preview rollout reads only allowlisted published documents and leaves others static", async () => {
+  const revisions={settings:"a4000000-0000-4000-8000-000000000001",
+    navigation:"a4000000-0000-4000-8000-000000000002",footer:"a4000000-0000-4000-8000-000000000003"};
+  const preview={CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",
+    CMS_SITE_SOURCE:"published",VERCEL:"1",VERCEL_ENV:"preview",
+    VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation"};
+  const changed={settings:{...settings,businessName:"שם בדיקה"},
+    navigation:{...navigation,items:[{...navigation.items[0],label:"בית בדיקה"},...navigation.items.slice(1)]},
+    footer:{...footer,description:"תיאור בדיקה"}};
+  for (const [allowlist,kinds] of [
+    ["navigation",["navigation"]],
+    ["navigation,footer",["navigation","footer"]],
+    ["settings,navigation,footer",["settings","navigation","footer"]],
+  ]) {
+    const calls=[];
+    const source=createSourceLoader({env:{...preview,CMS_SITE_ALLOWLIST:allowlist},mocks:{
+      "@/cms/config":{getCmsConfig:()=>({url:preview.CMS_SUPABASE_URL,key:"test-publishable"})},
+      "next/server":{connection:async()=>{}},
+      "@supabase/supabase-js":{createClient:()=>({rpc:async(name,{kind})=>{
+        calls.push(kind);
+        return {data:{payload:changed[kind],revisionId:revisions[kind],pageRoutes:{}},error:null};
+      }})},
+    }})("src/cms/site/public-source.ts");
+    const chrome=await source.getPublicSiteChrome();
+    assert.deepEqual(calls,kinds);
+    for (const kind of ["settings","navigation","footer"])
+      assert.equal(chrome.revisions[kind],kinds.includes(kind) ? revisions[kind] : null);
+    assert.equal(chrome.settings.businessName,kinds.includes("settings") ? "שם בדיקה" : settings.businessName);
+    assert.equal(chrome.navLinks[0].label,"בית בדיקה");
+    assert.equal(chrome.footer.description,kinds.includes("footer") ? "תיאור בדיקה" : footer.description);
+  }
 });

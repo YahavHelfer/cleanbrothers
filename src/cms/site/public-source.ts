@@ -37,29 +37,34 @@ function publicClient() {
     global: { fetch: (input,init) => fetch(input,{ ...init,cache: "no-store",signal: AbortSignal.timeout(8000) }) } });
 }
 
-// Request memoization keeps the public shell and LocalBusiness JSON-LD on one
-// settings revision. The hosted site always returns the code-owned baseline.
+// Request memoization keeps the public shell and JSON-LD on one settings
+// revision. Documents outside the explicit rollout allowlist stay static.
 export const getPublicSiteChrome = cache(async (): Promise<SiteChrome> => {
   if (!usesCmsSiteSource()) return staticChrome;
   await connection();
   const client = publicClient();
+  const settingsEnabled = usesCmsSiteSource("settings");
+  const navigationEnabled = usesCmsSiteSource("navigation");
+  const footerEnabled = usesCmsSiteSource("footer");
   const [settingsResult,navigationResult,footerResult] = await Promise.all([
-    client.rpc("cms_read_public_site",{kind:"settings"}),
-    client.rpc("cms_read_public_site",{kind:"navigation"}),
-    client.rpc("cms_read_public_site",{kind:"footer"}),
+    settingsEnabled ? client.rpc("cms_read_public_site",{kind:"settings"}) : null,
+    navigationEnabled ? client.rpc("cms_read_public_site",{kind:"navigation"}) : null,
+    footerEnabled ? client.rpc("cms_read_public_site",{kind:"footer"}) : null,
   ]);
-  if (settingsResult.error || navigationResult.error || footerResult.error ||
-    !settingsResult.data || !navigationResult.data || !footerResult.data)
+  if ((settingsEnabled && (settingsResult?.error || !settingsResult?.data)) ||
+    (navigationEnabled && (navigationResult?.error || !navigationResult?.data)) ||
+    (footerEnabled && (footerResult?.error || !footerResult?.data)))
     throw new Error("Published CMS site chrome unavailable");
-  const pageRoutes = navigationResult.data.pageRoutes;
+  const pageRoutes = navigationEnabled ? navigationResult!.data.pageRoutes : {};
   if (!pageRoutes || typeof pageRoutes !== "object" || Array.isArray(pageRoutes))
     throw new Error("Published CMS page references unavailable");
   return resolveSiteChrome(
-    validateSiteSettings(settingsResult.data.payload),
-    validateSiteNavigation(navigationResult.data.payload),
-    validateSiteFooter(footerResult.data.payload),
+    settingsEnabled ? validateSiteSettings(settingsResult!.data.payload) : siteSettingsBaseline,
+    navigationEnabled ? validateSiteNavigation(navigationResult!.data.payload) : siteNavigationBaseline,
+    footerEnabled ? validateSiteFooter(footerResult!.data.payload) : siteFooterBaseline,
     pageRoutes as Record<string,string>,
-    { settings: settingsResult.data.revisionId, navigation: navigationResult.data.revisionId,
-      footer: footerResult.data.revisionId },
+    { settings: settingsEnabled ? settingsResult!.data.revisionId : null,
+      navigation: navigationEnabled ? navigationResult!.data.revisionId : null,
+      footer: footerEnabled ? footerResult!.data.revisionId : null },
   );
 });
