@@ -9,10 +9,35 @@ import { newPagesEnvironmentAllowed } from "@/cms/pages/new-environment";
 import { getNewPageEditor } from "@/cms/pages/new-repository";
 import { NewPageDuplicateForm, NewPageLifecycleForm } from "@/cms/pages/NewPageForms";
 import { pageUuid } from "@/cms/pages/model";
+import { homeEnvironmentAllowed } from "@/cms/home/environment";
+import { getHomeEditor } from "@/cms/home/repository";
+import { homeBaseline } from "@/cms/home/baseline";
+import { HomeEditor, RestoreHomeRevision } from "@/cms/home/HomeEditor";
 
 export default async function EditPage({ params }: { params: Promise<{ pageId: string }> }) {
   if (!pagesEnvironmentAllowed()) notFound();
   const pageId = (await params).pageId;
+  if (pageId === "home") {
+    if (!homeEnvironmentAllowed()) notFound();
+    const [{ snapshot, userId }, { snapshot: promotion }, mediaChoices] = await Promise.all([
+      getHomeEditor(), getPromotionEditor(), mediaEnabled() ? getMediaChoices() : Promise.resolve([]),
+    ]);
+    if (!snapshot) return <p>יש לייבא תחילה את דף הבית ל־CMS המקומי.</p>;
+    return <section className="grid gap-7"><Link href="/admin/pages" prefetch={false}>חזרה לעמודים</Link>
+      <h1 className="text-3xl font-black">עריכת דף הבית</h1>
+      <p>פורסם: גרסה {snapshot.history.find(row=>row.id===snapshot.publishedRevisionId)?.number}
+        {' '}· טיוטה: גרסה {snapshot.history.find(row=>row.id===snapshot.draftRevisionId)?.number}</p>
+      <HomeEditor key={snapshot.generation} snapshot={snapshot} templates={homeBaseline.blocks}
+        mediaChoices={mediaChoices} promotionRevisions={promotion?.history.map(row=>({id:row.id,number:row.number}))||[]}/>
+      <section aria-label="היסטוריית גרסאות" className="grid gap-4"><h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
+        {snapshot.history.map(revision=><article key={revision.id} className="grid gap-3 rounded-2xl border theme-card p-5">
+          <h3>גרסה {revision.number} — {revision.createdBy===null?"ייבוא":revision.createdBy===userId?"את/ה":"מנהל/ת נוסף/ת"}</h3>
+          <Link href={`/admin/preview/pages/home?revision=${revision.id}`} prefetch={false}>תצוגה מקדימה מדויקת</Link>
+          <RestoreHomeRevision snapshot={snapshot} source={revision.id}/>
+        </article>)}
+      </section>
+    </section>;
+  }
   if (pageId !== "about") {
     if (!newPagesEnvironmentAllowed()) notFound();
     try { pageUuid(pageId); } catch { notFound(); }

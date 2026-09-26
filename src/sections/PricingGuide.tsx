@@ -37,6 +37,18 @@ const pricingCards: {
   },
 ];
 
+export const pricingGuideContent = {
+  eyebrow: "שקיפות במחיר",
+  title: "איך נקבע המחיר?",
+  mobileDescription: "המחיר נקבע לפי הפריט, המצב והכמות.",
+  description: "אין מחיר קבוע לכל עבודה - המחיר נקבע לפי סוג הפריט, מצב הריפוד וכמות הפריטים, כדי לתת לכם הצעה הוגנת וברורה.",
+  factorsHeading: "מה משפיע על ההצעה?",
+  factors: priceFactors,
+  cards: pricingCards,
+  ctaLabel: "שלחו תמונה וקבלו מחיר",
+  ctaNote: "בלי התחייבות - בדיקה מהירה לפי תמונה והערכה ברורה לפי מצב הריפוד.",
+};
+
 function PricingCardIcon({ icon }: { icon: PricingIcon }) {
   const props = {
     className: "h-6 w-6",
@@ -127,7 +139,9 @@ function PricingCardIcon({ icon }: { icon: PricingIcon }) {
   );
 }
 
-export function PricingGuide() {
+export function PricingGuide({ content = pricingGuideContent, preview = false }: {
+  content?: typeof pricingGuideContent; preview?: boolean;
+} = {}) {
   return (
     <section className="reveal theme-section-soft relative overflow-hidden py-8 sm:py-16 lg:py-20">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/35 to-transparent" />
@@ -135,17 +149,16 @@ export function PricingGuide() {
       <div className="section-container">
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-xs font-black text-turquoise sm:text-sm">
-            שקיפות במחיר
+            {content.eyebrow}
           </p>
           <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:mt-3 sm:text-5xl">
-            איך נקבע המחיר?
+            {content.title}
           </h2>
           <p className="mx-auto mt-3 max-w-3xl text-base leading-7 theme-muted sm:hidden">
-            המחיר נקבע לפי הפריט, המצב והכמות.
+            {content.mobileDescription}
           </p>
           <p className="mx-auto mt-3 hidden max-w-3xl text-base leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
-            אין מחיר קבוע לכל עבודה - המחיר נקבע לפי סוג הפריט, מצב הריפוד
-            וכמות הפריטים, כדי לתת לכם הצעה הוגנת וברורה.
+            {content.description}
           </p>
         </div>
 
@@ -153,12 +166,12 @@ export function PricingGuide() {
           <div className="mb-3 flex items-center justify-center gap-2 text-center sm:mb-4">
             <span className="h-px w-10 bg-turquoise/45" />
             <h3 className="text-sm font-black text-[var(--foreground)]">
-              מה משפיע על ההצעה?
+              {content.factorsHeading}
             </h3>
             <span className="h-px w-10 bg-turquoise/45" />
           </div>
           <div className="flex flex-wrap justify-center gap-2">
-            {priceFactors.map((factor, index) => (
+            {content.factors.map((factor, index) => (
               <span
                 key={factor}
                 className={`reveal inline-flex items-center gap-2 rounded-full border border-turquoise/20 bg-turquoise/8 px-3 py-1.5 text-xs font-black text-[var(--foreground)] transition duration-300 hover:border-turquoise/40 hover:bg-turquoise/14 hover:text-turquoise-dark sm:px-4 sm:py-2 sm:text-sm stagger-${(index % 5) + 1}`}
@@ -171,7 +184,7 @@ export function PricingGuide() {
         </div>
 
         <div className="mt-4 grid gap-3 sm:mt-7 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
-          {pricingCards.map((card, index) => (
+          {content.cards.map((card, index) => (
             <article
               key={card.title}
               className={`card-lift reveal rounded-[1.25rem] border theme-card p-3.5 hover:border-turquoise/40 hover:shadow-turquoise/10 sm:rounded-[2rem] sm:p-7 stagger-${index + 1}`}
@@ -199,17 +212,17 @@ export function PricingGuide() {
         </div>
 
         <div className="mx-auto mt-5 hidden max-w-2xl text-center sm:mt-8 sm:block">
-          <a
+          {preview ? <span className="btn-primary inline-flex" aria-disabled="true">{content.ctaLabel}</span> : <a
             href={getWhatsAppLink(
               "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי ריפודים.",
             )}
             aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר"
             className="btn-primary inline-flex"
           >
-            שלחו תמונה וקבלו מחיר
-          </a>
+            {content.ctaLabel}
+          </a>}
           <p className="mx-auto mt-3 max-w-lg text-sm font-bold leading-7 theme-muted">
-            בלי התחייבות - בדיקה מהירה לפי תמונה והערכה ברורה לפי מצב הריפוד.
+            {content.ctaNote}
           </p>
         </div>
       </div>

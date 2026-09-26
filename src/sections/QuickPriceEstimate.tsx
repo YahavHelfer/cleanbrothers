@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { getWhatsAppLink } from "@/lib/whatsapp";
+import { quickEstimateContent } from "./quick-estimate-content";
 
 type DirtLevel = "קל" | "בינוני" | "קשה";
 type ServiceKey = "sofa" | "mattress" | "carpet" | "car" | "ac";
@@ -203,7 +204,9 @@ function Chip({
   );
 }
 
-export function QuickPriceEstimate() {
+export function QuickPriceEstimate({ content = quickEstimateContent, preview = false }: {
+  content?: typeof quickEstimateContent; preview?: boolean;
+} = {}) {
   const [serviceKey, setServiceKey] = useState<ServiceKey>("ac");
   const [optionIndex, setOptionIndex] = useState(0);
   const [dirtLevel, setDirtLevel] = useState<DirtLevel>("בינוני");
@@ -238,17 +241,16 @@ export function QuickPriceEstimate() {
       <div className="section-container">
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-xs font-black text-turquoise-dark sm:text-sm">
-            הערכת מחיר מהירה
+            {content.eyebrow}
           </p>
           <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:text-5xl">
-            בדקו טווח מחיר לפני ששולחים תמונה
+            {content.title}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 theme-muted sm:hidden">
-            בחרו שירות ורמת לכלוך וקבלו טווח מחיר.
+            {content.mobileDescription}
           </p>
           <p className="mx-auto mt-3 hidden max-w-2xl text-sm leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
-            בחרו שירות, סוג פריט ורמת לכלוך. לאחר מכן שלחו תמונה בוואטסאפ כדי
-            לקבל מחיר מדויק יותר.
+            {content.description}
           </p>
         </div>
 
@@ -348,7 +350,7 @@ export function QuickPriceEstimate() {
             </div>
 
             <div className="mt-4 sm:mt-5">
-              <a
+              {preview ? <span aria-disabled="true" className="btn-primary inline-flex w-full min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base">שלחו תמונה לקבלת מחיר מדויק</span> : <a
                 href={getWhatsAppLink(whatsAppMessage)}
                 target="_blank"
                 rel="noreferrer"
@@ -356,7 +358,7 @@ export function QuickPriceEstimate() {
                 className="btn-primary inline-flex w-full min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 שלחו תמונה לקבלת מחיר מדויק
-              </a>
+              </a>}
               <p className="mt-2 text-center text-xs font-bold theme-muted sm:mt-3">
                 ללא התחייבות - הערכה מהירה לפי תמונה.
               </p>

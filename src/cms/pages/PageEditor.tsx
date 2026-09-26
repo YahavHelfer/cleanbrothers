@@ -117,7 +117,7 @@ function RichFields({ nodes, onChange }: { nodes: RichNode[]; onChange: (nodes: 
   </div>;
 }
 
-function BlockFields({ block, onChange, choices, promotionRevisions }: { block: PageBlock; onChange: (block: PageBlock) => void;
+export function BlockFields({ block, onChange, choices, promotionRevisions }: { block: PageBlock; onChange: (block: PageBlock) => void;
   choices: MediaChoice[]; promotionRevisions: { id: string; number: number }[] }) {
   const p = block.payload;
   const update = (key: string, value: unknown) => onChange({ ...block, payload: { ...p, [key]: value } });

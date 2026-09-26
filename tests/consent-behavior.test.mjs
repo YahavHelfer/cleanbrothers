@@ -168,10 +168,9 @@ test("tag integrations retain one loader and enforce consent gates", () => {
   assert.match(layout, /AW-18271875274\/71I-CKLxmOMcEMrh2ohE/);
   assert.match(layout, /const googleAdsPhoneConversionNumber = "0559577731"/);
   assert.equal((layout.match(/<GoogleAdsTag/g) ?? []).length, 1);
-  assert.match(
-    googleCallTracking,
-    /GOOGLE_CALL_CONVERSION_NUMBER_CLASS\s*=\s*\n\s*"google-call-conversion-number"/,
-  );
+  const trackingConstant = readFileSync(new URL("../src/lib/google-call-tracking-constant.ts", import.meta.url), "utf8");
+  assert.match(trackingConstant, /GOOGLE_CALL_CONVERSION_NUMBER_CLASS\s*=\s*"google-call-conversion-number"/);
+  assert.match(googleCallTracking, /from "@\/lib\/google-call-tracking-constant"/);
   assert.match(trackedNumber, /className=\{GOOGLE_CALL_CONVERSION_NUMBER_CLASS\}/);
   assert.match(trackedNumber, /data-google-call-original-number/);
   assert.match(googleCallTracking, /trackedNumber\.textContent = formattedNumber/);

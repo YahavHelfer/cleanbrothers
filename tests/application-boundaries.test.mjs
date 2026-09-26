@@ -116,11 +116,22 @@ for (const group of ["admin", "preview"]) {
       }
       dependencies.push(...sourceDependencies("src/proxy.ts"));
     }
+    // The homepage exact preview reuses these presentation sections. Their
+    // functional actions render inert in preview; no tracking runtime enters
+    // this graph. Keep the exception closed to the audited section set.
+    const homePresentation = new Set([
+      "Hero", "TrustStrip", "Services", "CleaningProcess", "BeforeAfter", "WhyChooseUs",
+      "PricingGuide", "QuickPriceEstimate", "ServiceAreas", "FAQ", "FinalCTA",
+    ].map(name => `src/sections/${name}.tsx`).concat([
+      "src/sections/quick-estimate-content.ts",
+      "src/components/GoogleCallTrackingNumber.tsx",
+      "src/lib/google-call-tracking-constant.ts",
+    ]));
     for (const file of dependencies) {
       const sourcePath = relative(projectRoot, file);
       // Typed page CTA targets reuse the existing WhatsApp URL builder. The
       // authenticated preview disables that target before rendering a link.
-      if (sourcePath !== "src/lib/whatsapp.ts")
+      if (sourcePath !== "src/lib/whatsapp.ts" && !(group === "admin" && homePresentation.has(sourcePath)))
         assert.doesNotMatch(sourcePath, /src\/(?:sections\/|app\/\(site\)\/|components\/(?:Google|Meta|BusinessEvent|MarketingAttribution|Cookie|ContactForm|WhatsApp|SummerAc)|lib\/(?:google-|meta-pixel|marketing-attribution|consent|whatsapp|contact-lead))/);
       // Admin now legitimately fetches its dedicated Auth/database service.
       assert.doesNotMatch(readFileSync(file, "utf8"), sourcePath === "src/lib/whatsapp.ts"

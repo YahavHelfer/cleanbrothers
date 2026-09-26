@@ -1,42 +1,31 @@
 import { JsonLd } from "@/components/JsonLd";
-import { faqJsonLd, buildServiceJsonLd } from "@/lib/structured-data";
+import { buildServiceJsonLd } from "@/lib/structured-data";
 import { getPublicSiteChrome } from "@/cms/site/public-source";
-import { BeforeAfter } from "@/sections/BeforeAfter";
-import { CleaningProcess } from "@/sections/CleaningProcess";
-import { FAQ } from "@/sections/FAQ";
-import { FinalCTA } from "@/sections/FinalCTA";
-import { Hero } from "@/sections/Hero";
-import { PricingGuide } from "@/sections/PricingGuide";
-import { QuickPriceEstimate } from "@/sections/QuickPriceEstimate";
-import { ServiceAreas } from "@/sections/ServiceAreas";
-import { Services } from "@/sections/Services";
-import { TrustStrip } from "@/sections/TrustStrip";
-import { WhyChooseUs } from "@/sections/WhyChooseUs";
+import { HomeBlocksView, homeFaqJsonLd } from "@/cms/home/HomeBlocksView";
+import { getPublicHome } from "@/cms/home/public-source";
 import { buildMetadata } from "@/lib/seo";
 
-export const metadata = buildMetadata({
+const staticMetadata = buildMetadata({
   title: "CleanBrothers | ניקיון מקצועי לבית, לעסק ולרכב",
   description:
     "ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק. שירות מקצועי עד הלקוח באזור המרכז מבית CleanBrothers.",
 });
 
+export async function generateMetadata() {
+  const source = await getPublicHome();
+  return source.source === "cms" ? buildMetadata({ title: source.page.seoTitle,
+    description: source.page.seoDescription, path: "/" }) : staticMetadata;
+}
+
 export default async function Home() {
-  const { settings } = await getPublicSiteChrome();
+  const [{ settings }, source] = await Promise.all([getPublicSiteChrome(), getPublicHome()]);
+  const faq = homeFaqJsonLd(source.page);
   return (
     <>
-      <JsonLd id="cleanbrothers-faq-jsonld" data={faqJsonLd} />
+      {faq && <JsonLd id="cleanbrothers-faq-jsonld" data={faq} />}
       <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
-      <Hero />
-      <TrustStrip />
-      <Services />
-      <CleaningProcess />
-      <BeforeAfter />
-      <WhyChooseUs />
-      <PricingGuide />
-      <QuickPriceEstimate />
-      <ServiceAreas />
-      <FAQ />
-      <FinalCTA />
+      <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}
+        media={source.media} promotions={source.promotions} />
     </>
   );
 }

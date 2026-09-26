@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { businessConfig } from "@/config/business";
-import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking";
+import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking-constant";
 
 type GoogleCallTrackingNumberProps = {
   children?: ReactNode;

@@ -98,6 +98,21 @@ export const blockDefinitions = {
   spacer: { label: "מפריד", description: "מרווח או קו בעיצוב מאושר", mediaRole: null, accessibility: "מפריד דקורטיבי מוסתר מקורא מסך" },
   aboutOverview: { label: "ערכי העסק", description: "תבנית אודות קיימת", mediaRole: null, accessibility: "כותרת מקטע וכותרת לכל ערך" },
 } as const;
+// Homepage blocks use the same immutable page_revision_blocks rows and revision
+// engine, but are deliberately unavailable in the /about/new-page editor.
+export const homeBlockDefinitions = {
+  homeHero: { label: "פתיח דף הבית", description: "כותרת, תיאור ומדיה", singleton: true },
+  homeTrust: { label: "פס אמון", description: "תוויות אמון", singleton: true },
+  homeServices: { label: "שירותים", description: "בחירה וסדר שירותים", singleton: true },
+  homeProcess: { label: "תהליך העבודה", description: "שלבי התהליך", singleton: true },
+  homeBeforeAfter: { label: "לפני ואחרי", description: "זוגות מדיה מאושרים", singleton: true },
+  homeWhyUs: { label: "למה לבחור בנו", description: "יתרונות השירות", singleton: true },
+  homePricing: { label: "מדריך מחירים", description: "הסבר בלבד; נוסחאות בקוד", singleton: true },
+  homeEstimate: { label: "מחשבון מחיר", description: "כותרות בלבד; חישוב בקוד", singleton: true },
+  homeAreas: { label: "אזורי שירות", description: "מלל; ערים בקוד", singleton: true },
+  homeFaq: { label: "שאלות נפוצות", description: "שאלות ותשובות", singleton: true },
+  homeFinalCta: { label: "קריאה לפעולה", description: "מלל; יעדי קשר בקוד", singleton: true },
+} as const;
 export type BlockType = keyof typeof blockDefinitions;
 export type PageBlock = { id: string; position: number; type: BlockType; schemaVersion: 1; hidden: boolean;
   payload: Record<string, unknown>; mediaVersionId: string | null; promotionRevisionId: string | null };

@@ -13,6 +13,19 @@ const primaryServiceTitles = new Set([
   "ניקוי חלונות",
 ]);
 
+const primaryServicesBaseline = services.filter(service => primaryServiceTitles.has(service.title));
+export const servicesContent = {
+  eyebrow: "השירותים המרכזיים",
+  title: "שירותי ניקיון מקצועיים לבית, לעסק ולרכב",
+  mobileDescription: "ספות, מזרנים, שטיחים, רכבים, מזגנים וחלונות. שולחים תמונה ומקבלים הערכה.",
+  description: "ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות. בוחרים את השירות המתאים, שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה.",
+  serviceKeys: primaryServicesBaseline.map(service => service.landingPath.slice(1)),
+  cards: Object.fromEntries(primaryServicesBaseline.map(service => [service.landingPath.slice(1), {
+    title: service.title, benefit: service.benefit, description: service.description,
+  }])),
+  note: "בנוסף: ניקוי כורסאות, כיסאות וריפודים עדינים.",
+};
+
 function ServiceAccentIcon({ title }: { title: string }) {
   const isAirConditioner = title === "ניקוי מזגנים";
 
@@ -61,10 +74,13 @@ function ServiceAccentIcon({ title }: { title: string }) {
   );
 }
 
-export function Services() {
-  const primaryServices = services.filter((service) =>
-    primaryServiceTitles.has(service.title),
-  );
+export function Services({ content = servicesContent }: { content?: typeof servicesContent } = {}) {
+  const primaryServices = content.serviceKeys.map(key => {
+    const service = services.find(row => row.landingPath === `/${key}`);
+    const copy = content.cards[key];
+    if (!service || !copy) throw new Error("Unsupported homepage service identity");
+    return { ...service, ...copy };
+  });
 
   return (
     <section
@@ -73,10 +89,10 @@ export function Services() {
     >
       <div className="section-container">
         <SectionHeading
-          eyebrow="השירותים המרכזיים"
-          title="שירותי ניקיון מקצועיים לבית, לעסק ולרכב"
-          mobileDescription="ספות, מזרנים, שטיחים, רכבים, מזגנים וחלונות. שולחים תמונה ומקבלים הערכה."
-          description="ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות. בוחרים את השירות המתאים, שולחים תמונה בוואטסאפ ומקבלים הערכת מחיר ברורה."
+          eyebrow={content.eyebrow}
+          title={content.title}
+          mobileDescription={content.mobileDescription}
+          description={content.description}
           tone="light"
         />
 
@@ -139,7 +155,7 @@ export function Services() {
         </div>
 
         <p className="theme-glass mx-auto mt-5 max-w-3xl rounded-2xl border px-4 py-3 text-center text-sm font-bold theme-muted sm:mt-7 sm:rounded-full sm:px-5">
-          בנוסף: ניקוי כורסאות, כיסאות וריפודים עדינים.
+          {content.note}
         </p>
       </div>
     </section>

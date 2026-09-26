@@ -220,6 +220,17 @@ export const staticMediaInventory = [
     "hash": "b1420c216c60afec56597ccba27c5cabd2ee44f54a2904ac1b7824225e696107",
     "mime": "image/jpeg",
     "alt": "ניקוי מבוקר של ריפוד עדין על ידי CleanBrothers"
+  },
+  {
+    "path": "/images/hero/hero-sofa-cleaning.jpg",
+    "assetId": "d3000000-0000-4000-8000-000000000001",
+    "versionId": "d3000000-0000-4000-8000-000000000002",
+    "byteSize": 280216,
+    "width": 1280,
+    "height": 714,
+    "hash": "a327cb1d39fd7d86e31fffb53fc64b37722cb1a1820a1041e4656164cead46a8",
+    "mime": "image/jpeg",
+    "alt": "ניקוי ספה מקצועי בבית הלקוח"
   }
 ] as const;
 export function staticMediaPath(versionId: string): string {

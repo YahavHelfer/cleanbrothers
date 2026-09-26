@@ -70,7 +70,7 @@ function AboutOverview({ payload }: { payload: Record<string, unknown> }) {
     </div>
   </section>;
 }
-function BlockView({ block, media, promotions, preview, revisionId }: {
+export function BlockView({ block, media, promotions, preview, revisionId }: {
   block: PageBlock; media: BlockMedia; promotions: BlockPromotions; preview: boolean; revisionId: string;
 }) {
   const p = block.payload;

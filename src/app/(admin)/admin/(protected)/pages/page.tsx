@@ -4,14 +4,25 @@ import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import { getPageEditor } from "@/cms/pages/repository";
 import { newPagesEnvironmentAllowed } from "@/cms/pages/new-environment";
 import { listNewPages } from "@/cms/pages/new-repository";
+import { homeEnvironmentAllowed } from "@/cms/home/environment";
+import { getHomeEditor } from "@/cms/home/repository";
 
 export default async function PagesPage({ searchParams }: { searchParams: Promise<{ archive?: string }> }) {
   if (!pagesEnvironmentAllowed()) notFound();
   const { snapshot, userId } = await getPageEditor();
+  const home = homeEnvironmentAllowed() ? await getHomeEditor() : null;
   const newPages = newPagesEnvironmentAllowed() ? await listNewPages((await searchParams).archive === "1") : null;
   return <section className="grid gap-6" aria-labelledby="pages-title">
     <h1 id="pages-title" className="text-3xl font-black">ניהול עמודים</h1>
     <p>ניהול עמודי תוכן בתבניות מאושרות. פרסום עמוד חדש אינו מוסיף אותו אוטומטית לניווט האתר.</p>
+    {home && <article className="grid gap-3 rounded-3xl border theme-card p-6">
+      <h2 className="text-xl font-black">דף הבית</h2>
+      <p>כתובת ציבורית קבועה: <bdi>/</bdi></p>
+      <p>סטטוס CMS: {home.snapshot ? "גרסת בסיס מיובאת" : "ממתין לייבוא דף הבית"}</p>
+      {home.snapshot && <><p>פורסם: גרסה {home.snapshot.history.find(row=>row.id===home.snapshot!.publishedRevisionId)?.number}
+        {' '}· טיוטה: גרסה {home.snapshot.history.find(row=>row.id===home.snapshot!.draftRevisionId)?.number}</p>
+        <Link href="/admin/pages/home" prefetch={false} className="btn-primary justify-self-start">עריכת דף הבית</Link></>}
+    </article>}
     {newPages && <div className="flex gap-4"><Link href="/admin/pages/new" prefetch={false} className="btn-primary">עמוד חדש</Link>
       <Link href="/admin/pages?archive=1" prefetch={false} className="btn-secondary">הצג ארכיון</Link></div>}
     <article className="grid gap-4 rounded-3xl border theme-card p-6">

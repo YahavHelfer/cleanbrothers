@@ -5,7 +5,14 @@ const trustItems = [
   "עבודה נקייה ומסודרת",
 ];
 
-export function WhyChooseUs() {
+export const whyUsContent = {
+  eyebrow: "למה לבחור בנו?",
+  title: "שירות מקצועי, פשוט וברור",
+  description: "שולחים תמונה, מקבלים הערכת מחיר ומתאמים ניקוי עד הבית.",
+  items: trustItems,
+};
+
+export function WhyChooseUs({ content = whyUsContent }: { content?: typeof whyUsContent } = {}) {
   return (
     <section
       id="why-us"
@@ -13,17 +20,17 @@ export function WhyChooseUs() {
     >
       <div className="section-container">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-black text-turquoise">למה לבחור בנו?</p>
+            <p className="text-sm font-black text-turquoise">{content.eyebrow}</p>
           <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--foreground)] sm:text-4xl">
-            שירות מקצועי, פשוט וברור
+            {content.title}
           </h2>
           <p className="mt-3 text-base leading-7 theme-muted sm:text-lg">
-            שולחים תמונה, מקבלים הערכת מחיר ומתאמים ניקוי עד הבית.
+            {content.description}
           </p>
         </div>
 
         <ul className="mx-auto mt-6 grid max-w-5xl grid-cols-2 gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-4">
-          {trustItems.map((item) => (
+          {content.items.map((item) => (
             <li
               key={item}
               className="flex min-h-20 items-center gap-2.5 rounded-[1.25rem] border theme-card px-3 py-3 sm:min-h-24 sm:gap-3 sm:px-4"

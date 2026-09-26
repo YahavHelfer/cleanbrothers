@@ -9,6 +9,9 @@ import { pageUuid } from "@/cms/pages/model";
 import { getPageRevision, getPromotionRevision } from "@/cms/pages/repository";
 import { newPagesEnvironmentAllowed } from "@/cms/pages/new-environment";
 import { getNewPageRevision } from "@/cms/pages/new-repository";
+import { homeEnvironmentAllowed } from "@/cms/home/environment";
+import { getHomeRevision } from "@/cms/home/repository";
+import { HomeBlocksView, staticHomeMedia } from "@/cms/home/HomeBlocksView";
 
 export const metadata: Metadata = { title: "תצוגה מקדימה פרטית | CleanBrothers", robots: { index: false, follow: false } };
 export default async function PagePreview({ params: routeParams, searchParams }: {
@@ -17,6 +20,26 @@ export default async function PagePreview({ params: routeParams, searchParams }:
   await requireCmsAdmin();
   if (!pagesEnvironmentAllowed()) notFound();
   const pageId = (await routeParams).pageId;
+  if (pageId === "home") {
+    if (!homeEnvironmentAllowed()) notFound();
+    let revisionId: string;
+    try { revisionId = pageUuid((await searchParams).revision); } catch { notFound(); }
+    const revision = await getHomeRevision(revisionId);
+    if (!revision) notFound();
+    const promotionIds = [...new Set(revision.payload.blocks.flatMap(block => block.promotionRevisionId ? [block.promotionRevisionId] : []))];
+    const [promotionRows, choices] = await Promise.all([
+      Promise.all(promotionIds.map(id => getPromotionRevision(id))),
+      mediaEnabled() ? getMediaChoices() : Promise.resolve([]),
+    ]);
+    if (promotionRows.some(row => !row)) notFound();
+    const promotions: BlockPromotions = Object.fromEntries(promotionRows.map(row => [row!.id,row!.payload]));
+    const media: BlockMedia = { ...staticHomeMedia,
+      ...Object.fromEntries(choices.map(choice=>[choice.versionId,{src:choice.src,altText:choice.altText}])) };
+    return <><aside className="mb-6 rounded-2xl border theme-card p-5" aria-label="מצב תצוגה מקדימה">
+      <p className="font-black">דף הבית — גרסה {revision.number}</p>
+      <p>תצוגה פרטית של הגרסה השמורה בלבד. פעולות קשר ומעקב מושבתות.</p>
+    </aside><HomeBlocksView page={revision.payload} revisionId={revision.id} media={media} promotions={promotions} preview/></>;
+  }
   if (pageId !== "about" && !newPagesEnvironmentAllowed()) notFound();
   let id: string;
   try {

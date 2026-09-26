@@ -12,8 +12,20 @@ const overrides=Object.fromEntries(files.map(f=>[resolve(projectRoot,f),repairHi
 const before=createSourceLoader({sourceOverrides:overrides}),after=createSourceLoader();
 const pages=files.filter(f=>f.startsWith("src/app/(site)/")&&f.endsWith("/page.tsx"));
 assert.equal(pages.length,16);
+// Reorderable homepage blocks add React component boundaries, which changes
+// useId's opaque carousel IDs. Canonicalize only those IDs by first use: their
+// order, multiplicity and every aria reference must still match exactly.
+function canonicalReactIds(html) {
+ const ids=new Map();
+ return html.replace(/_R_[a-z0-9]+_/gi,id=>{
+  if(!ids.has(id)) ids.set(id,`_R_CANON_${ids.size}_`);
+  return ids.get(id);
+ });
+}
 for(const file of pages)test(`approved public baseline unchanged: ${file}`,async()=>{
  const a=before(file),b=after(file);
- assert.equal(renderToStaticMarkup(await b.default()),renderToStaticMarkup(await a.default()));
+ const actual=renderToStaticMarkup(await b.default()),expected=renderToStaticMarkup(await a.default());
+ assert.equal(file==="src/app/(site)/page.tsx"?canonicalReactIds(actual):actual,
+  file==="src/app/(site)/page.tsx"?canonicalReactIds(expected):expected);
  assert.deepEqual(JSON.parse(JSON.stringify(b.metadata??await b.generateMetadata())),JSON.parse(JSON.stringify(a.metadata??await a.generateMetadata())));
 });

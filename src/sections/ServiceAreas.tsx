@@ -1,17 +1,24 @@
 import { serviceAreas } from "@/data/site";
 import { SectionHeading } from "@/components/SectionHeading";
 
-export function ServiceAreas() {
+export const serviceAreasContent = {
+  eyebrow: "אזורי שירות",
+  title: "שירותי ניקיון עד הלקוח באזור המרכז",
+  mobileDescription: "מגיעים לערי המרכז. שולחים תמונה ומקבלים הערכה.",
+  description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, ראש העין, רמת גן, גבעת שמואל, תל אביב וערים נוספות במרכז. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
+};
+
+export function ServiceAreas({ content = serviceAreasContent }: { content?: typeof serviceAreasContent } = {}) {
   return (
     <section className="reveal theme-section-clean py-8 sm:py-16 lg:py-18">
       <div className="section-container">
         <div className="grid gap-4 rounded-[1.5rem] border theme-card p-4 sm:gap-6 sm:rounded-[2rem] sm:p-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
           <SectionHeading
             align="start"
-            eyebrow="אזורי שירות"
-            title="שירותי ניקיון עד הלקוח באזור המרכז"
-            mobileDescription="מגיעים לערי המרכז. שולחים תמונה ומקבלים הערכה."
-            description="CleanBrothers מגיעים לבית או לעסק בפתח תקווה, ראש העין, רמת גן, גבעת שמואל, תל אביב וערים נוספות במרכז. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה."
+            eyebrow={content.eyebrow}
+            title={content.title}
+            mobileDescription={content.mobileDescription}
+            description={content.description}
             tone="light"
           />
 
