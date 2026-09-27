@@ -12,6 +12,8 @@ import { ScrollProgress } from "@/components/ScrollProgress";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { businessConfig } from "@/config/business";
 import { getPublicSiteChrome } from "@/cms/site/public-source";
+import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
+import { getPublicActivePromotion } from "@/cms/schedules/public-source";
 import { getGoogleConsentBootstrapScript } from "@/lib/consent";
 import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking";
 import { buildMetadata } from "@/lib/seo";
@@ -51,6 +53,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const chrome = await getPublicSiteChrome();
+  const globalPromotion = await getPublicActivePromotion("global", "site");
   return (
     <html
       lang="he"
@@ -75,6 +78,7 @@ export default async function RootLayout({
         <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />
         <Navbar links={chrome.navLinks} />
+        {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
           {children}
         </main>

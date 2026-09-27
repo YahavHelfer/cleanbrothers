@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { PageHero } from "@/components/PageHero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { buildMetadata } from "@/lib/seo";
+import { PromotionBannerView } from "./PromotionBannerView";
 import { resolveSafeTarget, validatePageDraft, validatePromotionDraft,
   type Inline, type PageBlock, type PageDraft, type PromotionDraft, type RichNode, type SafeCta } from "./model";
 
@@ -111,15 +112,9 @@ export function BlockView({ block, media, promotions, preview, revisionId }: {
       const promotion = block.promotionRevisionId ? promotions[block.promotionRevisionId] : null;
       if (!promotion) throw new Error("CMS promotion revision unavailable");
       const exact = validatePromotionDraft(promotion);
-      if (!exact.enabled) return null;
-      return <section className={p.template === "accent" ? "section-block theme-section-contrast" : "section-block theme-section-soft"}
-        data-promotion-identity="about-intro">
-        <div className="section-container grid gap-4 rounded-2xl border theme-card p-6">
-          <h2 className="text-2xl font-black">{exact.h1}</h2><p>{exact.description}</p>
-          <SafeAction cta={exact.cta} preview={preview} />
-          {exact.mediaVersionId && <MediaImage block={{ ...block, mediaVersionId: exact.mediaVersionId }} media={media} alt={exact.mediaAlt!} />}
-        </div>
-      </section>;
+      return <PromotionBannerView promotion={exact} template={p.template as "accent" | "quiet"}
+        identity="about-intro" preview={preview}
+        media={exact.mediaVersionId ? media[exact.mediaVersionId] || null : null} />;
     }
     case "spacer": return <div aria-hidden="true" className={`${p.variant === "divider" ? "border-t theme-card" : ""} ${p.size === "compact" ? "my-4" : p.size === "wide" ? "my-16" : "my-8"}`} />;
     case "aboutOverview": return <AboutOverview payload={p} />;

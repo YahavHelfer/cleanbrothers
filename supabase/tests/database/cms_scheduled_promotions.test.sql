@@ -483,5 +483,145 @@ select is((select count(distinct stamp)::int from (
     join wrapper_fixture f on f.schedule_id=a.schedule_id) stamps),1,
  'one sampled database timestamp is used throughout a wrapper invocation');
 
+-- Public eligibility is checked against the real database clock, even if a
+-- stale active-placement row remains after the schedule's end.
+create temp table public_reader_fixture(id uuid);
+delete from public.cms_active_promotion_placements where placement_kind='global' and target_key='site';
+with inserted as (insert into public.cms_promotion_schedules
+  (promotion_document_id,promotion_revision_id,promotion_revision_number,label,starts_at,ends_at,status,created_by)
+  select doc,rev,1,'public reader fixture',now()-interval '5 minutes',now()+interval '5 minutes',
+    'active','56000000-0000-4000-8000-000000000001'::uuid from schedule_fixture
+  returning id)
+insert into public_reader_fixture select id from inserted;
+insert into public.cms_promotion_schedule_placements(schedule_id,placement_kind,target_key)
+  select id,'global','site' from public_reader_fixture;
+insert into public.cms_active_promotion_placements
+  (placement_kind,target_key,schedule_id,promotion_revision_id,activated_at)
+  select 'global','site',f.id,s.promotion_revision_id,now() from public_reader_fixture f
+    join public.cms_promotion_schedules s on s.id=f.id;
+set local role anon;
+select is(cms_read_active_promotion_placement('global','site')->>'promotionKey','about-intro',
+  'anonymous reader sees only the active exact Promotion identity');
+select is(cms_read_active_promotion_placement('global','site')->>'promotionRevisionId',
+  (select rev::text from schedule_fixture),'public projection pins the exact revision');
+select is(cms_read_active_promotion_placement('global','site')->'media','null'::jsonb,
+  'Promotion without media has a null media projection');
+select is((select count(*)::int from jsonb_object_keys(cms_read_active_promotion_placement('global','site'))),6,
+  'public projection has exactly six allowlisted fields');
+select ok(not (cms_read_active_promotion_placement('global','site') ?| array[
+  'scheduleId','startsAt','endsAt','status','attempts','audit','actorId']),
+  'no schedule or audit metadata is public');
+select is(cms_read_active_promotion_placement('home','home'),null::jsonb,
+  'global placement cannot appear at the home identity');
+reset role;
+update public.cms_promotion_schedules set ends_at=now()-interval '1 second'
+  where id=(select id from public_reader_fixture);
+set local role anon;
+select is(cms_read_active_promotion_placement('global','site'),null::jsonb,
+  'stale active row is hidden after the real DB-time end');
+reset role;
+update public.cms_promotion_schedules set ends_at=now()+interval '5 minutes',status='completed'
+  where id=(select id from public_reader_fixture);
+set local role anon;
+select is(cms_read_active_promotion_placement('global','site'),null::jsonb,
+  'completed schedule is hidden even with a stale active row');
+reset role;
+update public.cms_promotion_schedules set status='cancelled',cancelled_at=now()
+  where id=(select id from public_reader_fixture);
+set local role anon;
+select is(cms_read_active_promotion_placement('global','site'),null::jsonb,
+  'cancelled schedule is hidden even with a stale active row');
+reset role;
+update public.cms_promotion_schedules set status='active',cancelled_at=null,
+  promotion_revision_id=(select draft_promo_rev from schedule_fixture),promotion_revision_number=2
+  where id=(select id from public_reader_fixture);
+update public.cms_active_promotion_placements set promotion_revision_id=(select draft_promo_rev from schedule_fixture)
+  where placement_kind='global' and target_key='site';
+set local role anon;
+select is(cms_read_active_promotion_placement('global','site'),null::jsonb,
+  'unpublished exact Promotion revision is hidden despite a stale active row');
+reset role;
+update public.cms_promotion_schedules set promotion_revision_id=(select rev from schedule_fixture),
+  promotion_revision_number=1 where id=(select id from public_reader_fixture);
+update public.cms_active_promotion_placements set promotion_revision_id=(select rev from schedule_fixture)
+  where placement_kind='global' and target_key='site';
+update public.cms_promotion_schedules set status='active' where id=(select id from public_reader_fixture);
+update public.cms_promotion_identity set status='archived'
+  where document_id=(select doc from schedule_fixture);
+set local role anon;
+select is(cms_read_active_promotion_placement('global','site'),null::jsonb,
+  'archived Promotion identity is hidden even with an active placement');
+reset role;
+-- A separate immutable media Promotion proves that only its own exact
+-- revision-media reference is projected, without storage path internals.
+select public.cms_import_static_pilot_media();
+insert into public.content_documents(id,content_type,content_key)
+  values('71000000-0000-4000-8000-000000000001','promotion','media-offer');
+insert into public.cms_promotion_identity(document_id,analytics_key)
+  values('71000000-0000-4000-8000-000000000001','media-offer');
+create temp table media_reader_fixture(rev uuid,schedule_id uuid);
+with inserted as (insert into public.content_revisions(document_id,revision_number,schema_version,
+    public_title,h1,seo_title,seo_description,body)
+  values('71000000-0000-4000-8000-000000000001',1,7,'מבצע מדיה','מבצע מדיה','מבצע מדיה','תיאור',
+    '{"description":"תוכן","template":"quiet","enabled":true,
+      "cta":{"label":"צרו קשר","target":{"kind":"internal","path":"/contact"}},
+      "mediaVersionId":"d1000000-0000-4000-8000-000000000001","mediaAlt":"תמונת מבצע"}'::jsonb)
+  returning id)
+insert into media_reader_fixture(rev) select id from inserted;
+insert into public.content_publication_events(document_id,revision_id,kind)
+  select '71000000-0000-4000-8000-000000000001',rev,'baseline' from media_reader_fixture;
+with inserted as (insert into public.cms_promotion_schedules
+  (promotion_document_id,promotion_revision_id,promotion_revision_number,label,starts_at,ends_at,status,created_by)
+  select '71000000-0000-4000-8000-000000000001',rev,1,'media reader fixture',
+    now()-interval '5 minutes',now()+interval '5 minutes','active',
+    '56000000-0000-4000-8000-000000000001'::uuid from media_reader_fixture returning id)
+update media_reader_fixture set schedule_id=inserted.id from inserted;
+insert into public.cms_promotion_schedule_placements(schedule_id,placement_kind,target_key)
+  select schedule_id,'service','window-cleaning' from media_reader_fixture;
+insert into public.cms_active_promotion_placements
+  (placement_kind,target_key,schedule_id,promotion_revision_id,activated_at)
+  select 'service','window-cleaning',schedule_id,rev,now() from media_reader_fixture;
+set local role anon;
+select is(cms_read_active_promotion_placement('service','window-cleaning')->'media'->>'mediaVersionId',
+  'd1000000-0000-4000-8000-000000000001','media projection pins exact immutable version');
+select is(cms_read_active_promotion_placement('service','window-cleaning')->'media'->>'provider',
+  'static','media projection contains only approved provider');
+select is((select count(*)::int from jsonb_object_keys(
+  cms_read_active_promotion_placement('service','window-cleaning')->'media')),3,
+  'media projection excludes storage paths and unrelated metadata');
+select is(cms_read_active_promotion_placement('service','sofa-cleaning'),null::jsonb,
+  'a service placement cannot appear on another service');
+reset role;
+-- Even an operator-forged stale placement for a baseline-published but disabled
+-- Promotion must never become public.
+insert into public.content_documents(id,content_type,content_key)
+  values('72000000-0000-4000-8000-000000000001','promotion','disabled-offer');
+insert into public.cms_promotion_identity(document_id,analytics_key)
+  values('72000000-0000-4000-8000-000000000001','disabled-offer');
+create temp table disabled_reader_fixture(rev uuid,schedule_id uuid);
+with inserted as (insert into public.content_revisions(document_id,revision_number,schema_version,
+    public_title,h1,seo_title,seo_description,body)
+  values('72000000-0000-4000-8000-000000000001',1,7,'מבצע כבוי','מבצע כבוי','מבצע כבוי','תיאור',
+    '{"description":"תוכן","template":"quiet","enabled":false,
+      "cta":{"label":"צרו קשר","target":{"kind":"internal","path":"/contact"}},
+      "mediaVersionId":null,"mediaAlt":null}'::jsonb) returning id)
+insert into disabled_reader_fixture(rev) select id from inserted;
+insert into public.content_publication_events(document_id,revision_id,kind)
+  select '72000000-0000-4000-8000-000000000001',rev,'baseline' from disabled_reader_fixture;
+with inserted as (insert into public.cms_promotion_schedules
+  (promotion_document_id,promotion_revision_id,promotion_revision_number,label,starts_at,ends_at,status,created_by)
+  select '72000000-0000-4000-8000-000000000001',rev,1,'disabled reader fixture',
+    now()-interval '5 minutes',now()+interval '5 minutes','active',
+    '56000000-0000-4000-8000-000000000001'::uuid from disabled_reader_fixture returning id)
+update disabled_reader_fixture set schedule_id=inserted.id from inserted;
+insert into public.cms_promotion_schedule_placements(schedule_id,placement_kind,target_key)
+  select schedule_id,'service','armchair-chair-cleaning' from disabled_reader_fixture;
+insert into public.cms_active_promotion_placements
+  (placement_kind,target_key,schedule_id,promotion_revision_id,activated_at)
+  select 'service','armchair-chair-cleaning',schedule_id,rev,now() from disabled_reader_fixture;
+set local role anon;
+select is(cms_read_active_promotion_placement('service','armchair-chair-cleaning'),null::jsonb,
+  'disabled published Promotion cannot render from a stale active row');
+reset role;
 select * from finish();
 rollback;

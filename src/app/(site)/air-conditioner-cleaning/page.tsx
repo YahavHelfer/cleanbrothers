@@ -4,6 +4,8 @@ import { businessConfig } from "@/config/business";
 import { getPublicSpecialService } from "@/cms/content/public-source";
 import { specialMedia } from "@/cms/content/special-view";
 import { buildMetadata } from "@/lib/seo";
+import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
+import { getPublicActivePromotion } from "@/cms/schedules/public-source";
 
 export async function generateMetadata(): Promise<Metadata> {
  const { content, media } = await getPublicSpecialService("air-conditioner-cleaning");
@@ -37,5 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AirConditionerCleaningPage() {
   const { content, media } = await getPublicSpecialService("air-conditioner-cleaning");
   if (content.schemaVersion !== 4) throw new Error("Invalid AC content");
-  return <AirConditionerCleaningLandingPage content={content} media={media} />;
+  const active = await getPublicActivePromotion("service", "air-conditioner-cleaning");
+  const page = <AirConditionerCleaningLandingPage content={content} media={media} />;
+  return active ? <><PublicScheduledPromotion active={active} />{page}</> : page;
 }
