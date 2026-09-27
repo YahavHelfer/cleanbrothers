@@ -52,7 +52,7 @@ test("all 16 public page URLs are preserved inside the public route group", () =
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]", "/admin/promotions/schedules", "/admin/preview/promotions/schedules/[id]"].sort());
 });
 
 test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {

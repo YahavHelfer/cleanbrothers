@@ -30,6 +30,7 @@ const env = {
     NODE_ENV: "production",
     NEXT_TELEMETRY_DISABLED: "1",
     CMS_SUPABASE_URL: url,
+    CMS_SCHEDULE_LOCAL_ENABLED: "true",
     CMS_MEDIA_LOCAL_ENABLED: "1",
     CMS_MEDIA_LOCAL_SERVICE_KEY: serviceKey,
     TMPDIR: process.env.TMPDIR,
