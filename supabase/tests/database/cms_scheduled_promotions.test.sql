@@ -15,10 +15,48 @@ select is((select count(*)::int from pg_class where relname in
  ('cms_promotion_schedules','cms_promotion_schedule_placements','cms_active_promotion_placements',
   'cms_promotion_schedule_attempts','cms_promotion_schedule_audit') and relforcerowsecurity),5,
  'all five schedule tables force RLS');
-select ok(not has_function_privilege('anon','public.cms_process_due_promotion_schedules(timestamptz,integer)','execute'),
- 'anonymous cannot call scheduler');
-select ok(not has_function_privilege('authenticated','public.cms_process_due_promotion_schedules(timestamptz,integer)','execute'),
- 'browser sessions cannot call scheduler');
+select ok(not has_function_privilege('anon','public.cms_process_due_promotion_schedules_at(timestamptz,integer)','execute'),
+ 'anonymous cannot call deterministic core');
+select ok(not has_function_privilege('authenticated','public.cms_process_due_promotion_schedules_at(timestamptz,integer)','execute'),
+ 'browser sessions cannot call deterministic core');
+select ok(not has_function_privilege('service_role','public.cms_process_due_promotion_schedules_at(timestamptz,integer)','execute'),
+ 'service role cannot choose scheduler time');
+select ok(not has_function_privilege('anon','public.cms_process_due_promotion_schedules(integer)','execute'),
+ 'anonymous cannot call production wrapper');
+select ok(not has_function_privilege('authenticated','public.cms_process_due_promotion_schedules(integer)','execute'),
+ 'browser sessions cannot call production wrapper');
+select ok(not has_function_privilege('service_role','public.cms_process_due_promotion_schedules(integer)','execute'),
+ 'service role is not the production scheduler identity');
+select is(to_regprocedure('public.cms_process_due_promotion_schedules(timestamptz,integer)'),null::regprocedure,
+ 'production wrapper has no explicit-time overload');
+select is((select pg_get_userbyid(proowner) from pg_proc
+  where oid='public.cms_process_due_promotion_schedules_at(timestamptz,integer)'::regprocedure),
+ 'postgres','deterministic core retains controlled postgres ownership');
+select is((select pg_get_userbyid(proowner) from pg_proc
+  where oid='public.cms_process_due_promotion_schedules(integer)'::regprocedure),
+ 'postgres','production wrapper has controlled postgres ownership');
+select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc
+  where oid='public.cms_process_due_promotion_schedules_at(timestamptz,integer)'::regprocedure),
+ 'deterministic core keeps SECURITY DEFINER and a fixed empty search path');
+select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc
+  where oid='public.cms_process_due_promotion_schedules(integer)'::regprocedure),
+ 'production wrapper uses SECURITY DEFINER and a fixed empty search path');
+set local role service_role;
+select throws_ok($$select public.cms_process_due_promotion_schedules_at(now(),1)$$,'42501',null,
+ 'service role cannot invoke the explicit-time core');
+reset role;
+set local role anon;
+select throws_ok($$select public.cms_process_due_promotion_schedules_at(now(),1)$$,'42501',null,
+ 'anonymous execution of the core is denied');
+select throws_ok($$select public.cms_process_due_promotion_schedules()$$,'42501',null,
+ 'anonymous execution of the wrapper is denied');
+reset role;
+set local role authenticated;
+select throws_ok($$select public.cms_process_due_promotion_schedules_at(now(),1)$$,'42501',null,
+ 'authenticated execution of the core is denied');
+select throws_ok($$select public.cms_process_due_promotion_schedules()$$,'42501',null,
+ 'authenticated execution of the wrapper is denied');
+reset role;
 select ok(has_function_privilege('anon','public.cms_read_active_promotion_placement(text,text)','execute'),
  'public read uses only narrow placement function');
 
@@ -105,12 +143,11 @@ reset role;
 set local role anon;
 select is(cms_read_active_promotion_placement('global','site'),null::jsonb,'future schedule not public');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-01T09:59Z',100),0,
+select is(cms_process_due_promotion_schedules_at('2030-01-01T09:59Z',100),0,
  'future tick does nothing');
-select is(cms_process_due_promotion_schedules('2030-01-01T10:00Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2030-01-01T10:00Z',100),1,
  'start activates once');
-select is(cms_process_due_promotion_schedules('2030-01-01T10:00Z',100),0,
+select is(cms_process_due_promotion_schedules_at('2030-01-01T10:00Z',100),0,
  'same tick is idempotent');
 reset role;
 set local role anon;
@@ -119,10 +156,9 @@ select is(cms_read_active_promotion_placement('global','site'),null::jsonb,
 reset role;
 select is((select promotion_revision_id::text from cms_active_promotion_placements where placement_kind='global'),
  (select rev::text from schedule_fixture),'active placement pins exact published revision');
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-01T12:00Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2030-01-01T12:00Z',100),1,
  'end expires once');
-select is(cms_process_due_promotion_schedules('2030-01-01T12:00Z',100),0,
+select is(cms_process_due_promotion_schedules_at('2030-01-01T12:00Z',100),0,
  'repeated expiration is harmless');
 reset role;
 set local role anon;
@@ -147,11 +183,10 @@ update schedule_fixture set skipped_id=cms_create_promotion_schedule(doc,rev,'mi
  '2030-01-04T10:00Z','2030-01-04T11:00Z','[{"kind":"global","target":"site"}]');
 select is(cms_schedule_promotion((select skipped_id from schedule_fixture),1),2::bigint,'missed window scheduled');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-02T12:00Z',100),1,'late start activates');
-select is(cms_process_due_promotion_schedules('2030-01-03T10:30Z',100),1,'late finite schedule activates');
-select is(cms_process_due_promotion_schedules('2030-01-03T11:30Z',100),1,'late finite schedule expires');
-select is(cms_process_due_promotion_schedules('2030-01-04T12:00Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2030-01-02T12:00Z',100),1,'late start activates');
+select is(cms_process_due_promotion_schedules_at('2030-01-03T10:30Z',100),1,'late finite schedule activates');
+select is(cms_process_due_promotion_schedules_at('2030-01-03T11:30Z',100),1,'late finite schedule expires');
+select is(cms_process_due_promotion_schedules_at('2030-01-04T12:00Z',100),1,
  'downtime spanning both boundaries completes without activation');
 reset role;
 select is((select status from cms_promotion_schedules where id=(select endless_id from schedule_fixture)),
@@ -169,8 +204,7 @@ select is(cms_schedule_promotion((select cancelled_id from schedule_fixture),1),
 select is(cms_cancel_promotion_schedule((select cancelled_id from schedule_fixture),2),3::bigint,
  'cancel before start prevents activation');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-05T12:00Z',100),0,
+select is(cms_process_due_promotion_schedules_at('2030-01-05T12:00Z',100),0,
  'cancelled schedule never executes');
 reset role;
 
@@ -180,8 +214,7 @@ update schedule_fixture set active_cancel_id=cms_create_promotion_schedule(doc,r
  '2030-01-06T10:00Z','2030-01-06T11:00Z','[{"kind":"global","target":"site"}]');
 select is(cms_schedule_promotion((select active_cancel_id from schedule_fixture),1),2::bigint,'active cancellation fixture scheduled');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-06T10:00Z',100),1,'active cancellation fixture activates');
+select is(cms_process_due_promotion_schedules_at('2030-01-06T10:00Z',100),1,'active cancellation fixture activates');
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"56000000-0000-4000-8000-000000000001","aal":"aal2","role":"authenticated"}',true);
@@ -205,14 +238,12 @@ select set_config('request.jwt.claims','{"sub":"56000000-0000-4000-8000-00000000
 select is(cms_retry_promotion_schedule((select retry_id from schedule_fixture),3),4::bigint,
  'manual retry advances version of retriable failure');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-07T10:10Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2030-01-07T10:10Z',100),1,
  'retry converges to active once');
 reset role;
 select is((select status from cms_promotion_schedules where id=(select retry_id from schedule_fixture)),
  'active','transient retry recovered');
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-07T11:00Z',100),1,'recovered schedule expires');
+select is(cms_process_due_promotion_schedules_at('2030-01-07T11:00Z',100),1,'recovered schedule expires');
 reset role;
 
 -- A Promotion archived after scheduling is a terminal activation failure.
@@ -223,8 +254,7 @@ update schedule_fixture set bad_id=cms_create_promotion_schedule(doc,rev,'termin
 select is(cms_schedule_promotion((select bad_id from schedule_fixture),1),2::bigint,'terminal fixture scheduled');
 reset role;
 update cms_promotion_identity set status='archived' where document_id=(select doc from schedule_fixture);
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-08T10:00Z',100),1,'terminal failure recorded as one attempt');
+select is(cms_process_due_promotion_schedules_at('2030-01-08T10:00Z',100),1,'terminal failure recorded as one attempt');
 reset role;
 select is((select status from cms_promotion_schedules where id=(select bad_id from schedule_fixture)),
  'failed','terminal failure state retained');
@@ -255,8 +285,7 @@ update schedule_fixture set multi_id=cms_create_promotion_schedule(doc,rev,'two 
 select is(cms_schedule_promotion((select multi_id from schedule_fixture),1),2::bigint,
  'home and stable service target schedule together');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-09T10:00Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2030-01-09T10:00Z',100),1,
  'one schedule atomically activates both placements');
 reset role;
 select is((select count(*)::int from cms_active_promotion_placements where schedule_id=(select multi_id from schedule_fixture)),
@@ -279,8 +308,7 @@ select is(cms_schedule_promotion((select failed_window_id from schedule_fixture)
 reset role;
 update cms_promotion_schedules set status='failed',failure_action='activate',failure_category='transient',
  retryable=true,retry_after='2030-01-10T10:05Z',version=3 where id=(select failed_window_id from schedule_fixture);
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-10T12:00Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2030-01-10T12:00Z',100),1,
  'retry after whole window converges directly to completed');
 reset role;
 select is((select status from cms_promotion_schedules where id=(select failed_window_id from schedule_fixture)),
@@ -306,22 +334,19 @@ update schedule_fixture set following_id=cms_create_promotion_schedule(doc,rev,'
 select is(cms_schedule_promotion((select following_id from schedule_fixture),1),2::bigint,
  'adjacent [start,end) windows are not overlapping');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-11T10:00Z',100),1,'first adjacent window activates');
+select is(cms_process_due_promotion_schedules_at('2030-01-11T10:00Z',100),1,'first adjacent window activates');
 reset role;
 create function pg_temp.cms_test_expire_fail() returns trigger language plpgsql as $$
 begin raise exception using errcode='40001',message='simulated transient expiry failure'; end; $$;
 create trigger cms_test_expire_fail before delete on cms_active_promotion_placements
   for each row execute function pg_temp.cms_test_expire_fail();
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-11T11:00Z',100),2,
+select is(cms_process_due_promotion_schedules_at('2030-01-11T11:00Z',100),2,
  'two due workers record expiry failure and a blocked adjacent activation');
 reset role;
 drop trigger cms_test_expire_fail on cms_active_promotion_placements;
 select is((select failure_category from cms_promotion_schedules where id=(select following_id from schedule_fixture)),
  'transient','stale expired active row is classified retriable');
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2030-01-11T11:01Z',100),2,
+select is(cms_process_due_promotion_schedules_at('2030-01-11T11:01Z',100),2,
  'expiry retry clears blocker and following schedule then activates');
 reset role;
 select is((select status from cms_promotion_schedules where id=(select blocking_id from schedule_fixture)),
@@ -340,8 +365,7 @@ update schedule_fixture set public_id=cms_create_promotion_schedule(doc,rev,'pub
 select is(cms_schedule_promotion((select public_id from schedule_fixture),1),2::bigint,
  'historical start-only fixture scheduled');
 reset role;
-set local role service_role;
-select is(cms_process_due_promotion_schedules('2020-01-01T00:00Z',100),1,
+select is(cms_process_due_promotion_schedules_at('2020-01-01T00:00Z',100),1,
  'historical start-only fixture activates');
 reset role;
 set local role anon;
@@ -351,6 +375,60 @@ select ok(not (cms_read_active_promotion_placement('service','sofa-cleaning') ?|
   array['scheduleId','audit','createdBy','attempts','startsAt','draftRevisionId']),
  'public response excludes schedule metadata');
 reset role;
+
+-- A transactional local fixture models the future dedicated LOGIN identity.
+-- The forward migration intentionally creates no cloud role or grant for it.
+create role cms_scheduler_test login noinherit nobypassrls;
+grant cms_scheduler_test to postgres;
+grant usage on schema public to cms_scheduler_test;
+grant execute on function public.cms_process_due_promotion_schedules(integer) to cms_scheduler_test;
+select ok(has_function_privilege('cms_scheduler_test','public.cms_process_due_promotion_schedules(integer)','execute'),
+ 'dedicated scheduler can execute only the production wrapper');
+select ok(not has_function_privilege('cms_scheduler_test','public.cms_process_due_promotion_schedules_at(timestamptz,integer)','execute'),
+ 'dedicated scheduler cannot choose a fake time');
+select ok(not (select rolbypassrls from pg_roles where rolname='cms_scheduler_test'),
+ 'dedicated scheduler has no RLS bypass');
+select ok(not exists (select 1 from (values
+ ('cms_promotion_schedules'),('cms_promotion_schedule_placements'),
+ ('cms_active_promotion_placements'),('cms_promotion_schedule_attempts'),
+ ('cms_promotion_schedule_audit')) as t(name)
+ where has_table_privilege('cms_scheduler_test','public.'||t.name,'SELECT, INSERT, UPDATE, DELETE')),
+ 'dedicated scheduler has no direct scheduling table access');
+create temporary table wrapper_fixture (schedule_id uuid);
+with s as (insert into public.cms_promotion_schedules(
+    promotion_document_id,promotion_revision_id,promotion_revision_number,label,
+    starts_at,ends_at,status,created_by)
+    select doc,rev,(select revision_number from public.content_revisions where id=rev),
+      'database clock wrapper',pg_catalog.clock_timestamp()-interval '1 minute',
+      null,'scheduled','56000000-0000-4000-8000-000000000001' from schedule_fixture
+    returning id)
+insert into wrapper_fixture select id from s;
+insert into public.cms_promotion_schedule_placements(schedule_id,placement_kind,target_key)
+  select schedule_id,'global','site' from wrapper_fixture;
+set local role cms_scheduler_test;
+do $$ begin
+  if public.cms_process_due_promotion_schedules() <> 1 then
+    raise exception 'production wrapper did not activate exactly one due schedule';
+  end if;
+  if public.cms_process_due_promotion_schedules() <> 0 then
+    raise exception 'repeated production wrapper invocation was not idempotent';
+  end if;
+end $$;
+reset role;
+select is((select count(*)::int from public.cms_promotion_schedule_attempts a
+  join wrapper_fixture f on f.schedule_id=a.schedule_id),1,
+ 'dedicated role wrapper activation and repeat produced one attempt');
+select is((select count(distinct stamp)::int from (
+  select s.updated_at stamp from public.cms_promotion_schedules s join wrapper_fixture f on f.schedule_id=s.id
+  union all select a.activated_at from public.cms_active_promotion_placements a
+    join wrapper_fixture f on f.schedule_id=a.schedule_id
+  union all select a.attempted_at from public.cms_promotion_schedule_attempts a
+    join wrapper_fixture f on f.schedule_id=a.schedule_id
+  union all select a.completed_at from public.cms_promotion_schedule_attempts a
+    join wrapper_fixture f on f.schedule_id=a.schedule_id
+  union all select a.occurred_at from public.cms_promotion_schedule_audit a
+    join wrapper_fixture f on f.schedule_id=a.schedule_id) stamps),1,
+ 'one sampled database timestamp is used throughout a wrapper invocation');
 
 select * from finish();
 rollback;

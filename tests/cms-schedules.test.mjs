@@ -68,7 +68,15 @@ test("schedule gate accepts only local CMS or the approved project/branch/CMS Pr
   assert.match(sql, /for update skip locked/i);
   assert.match(sql, /primary key \(placement_kind, target_key\)/i);
   assert.match(sql, /pg_advisory_xact_lock\(20260928,1\)/i);
+  const boundary = readFileSync("supabase/migrations/20260928120000_cms_scheduler_execution_boundary.sql", "utf8");
   assert.match(sql, /grant execute on function public\.cms_process_due_promotion_schedules\(timestamptz,integer\) to service_role/i);
+  assert.match(boundary, /rename to cms_process_due_promotion_schedules_at/i);
+  assert.match(boundary, /revoke all on function public\.cms_process_due_promotion_schedules_at\(timestamptz,integer\)[\s\S]*?service_role/i);
+  assert.match(boundary, /create function public\.cms_process_due_promotion_schedules\(batch_limit integer default 100\)/i);
+  assert.match(boundary, /trusted_now := pg_catalog\.clock_timestamp\(\)/i);
+  assert.match(boundary, /cms_process_due_promotion_schedules_at\(trusted_now, batch_limit\)/i);
+  assert.doesNotMatch(boundary, /grant execute[^;]*to service_role/i);
+  assert.doesNotMatch(boundary, /create extension|cron\.schedule|create role/i);
   assert.doesNotMatch(repo, /setInterval|window\.|localStorage/);
 });
 test("schedule form binds the selected revision to its document identity", () => {
