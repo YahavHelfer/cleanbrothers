@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { createSourceLoader, plain } from "./helpers/source-module.mjs";
+import { assess, connectionFromEnvironment, plan, PROJECT_REF, COMMAND, JOB, CADENCE } from "../scripts/cms-scheduler-provision.mjs";
 
 const load = createSourceLoader();
 const { jerusalemLocalToUtc, utcToJerusalemLocal, validateScheduleTimes, validatePlacements,
@@ -86,4 +87,52 @@ test("schedule form binds the selected revision to its document identity", () =>
   assert.match(manager, /item\.documentId}:\$\{item\.revisionId/);
   assert.match(actions, /promotionSelection\(form\)/);
   assert.doesNotMatch(manager, /name="documentId"/);
+});
+
+test("scheduler provisioning validates exact CMS connection and rejects unrelated projects", () => {
+  const direct = `postgresql://postgres:private@db.${PROJECT_REF}.supabase.co/postgres`;
+  const pooler = `postgresql://postgres.${PROJECT_REF}:private@aws-0-us-east-1.pooler.supabase.com/postgres`;
+  assert.equal(connectionFromEnvironment(direct).database, "postgres");
+  assert.equal(connectionFromEnvironment(pooler).user, `postgres.${PROJECT_REF}`);
+  for (const bad of [direct.replace(PROJECT_REF, "other"), direct.replace("supabase.co", "supabase.co.evil.example"),
+    pooler.replace(PROJECT_REF, "other"), direct.replace("/postgres", "/template1"),
+    direct.replace("private", ""), "not-a-url"])
+    assert.throws(() => connectionFromEnvironment(bad));
+});
+
+test("scheduler provisioning fails closed on role or job drift and is idempotent", () => {
+  const state = { cron_installed: true, role_exists: true, attributes_ok: true, public_usage: true,
+    cron_usage: false, wrapper_execute: true, core_execute: false, inherited_memberships: 0,
+    operator_set_memberships: 0,
+    direct_table_privileges: 0, other_definer_functions: 0, other_effective_functions: 0 };
+  const job = { jobid: 2, jobname: JOB, schedule: CADENCE, command: COMMAND,
+    username: "cms_scheduler", database: "postgres", active: true };
+  assert.deepEqual(assess(state, []), { jobExists: false, jobId: null });
+  assert.deepEqual(assess(state, [job]), { jobExists: true, jobId: 2 });
+  for (const key of ["attributes_ok", "public_usage", "wrapper_execute", "cron_usage",
+    "core_execute", "inherited_memberships", "operator_set_memberships", "direct_table_privileges", "other_definer_functions",
+    "other_effective_functions"])
+    assert.throws(() => assess({ ...state, [key]: typeof state[key] === "boolean" ? !state[key] : 1 }, []));
+  for (const [key, value] of [["schedule", "*/2 * * * *"], ["command", "select 1;"],
+    ["username", "postgres"], ["active", false], ["jobname", "other"]])
+    assert.throws(() => assess(state, [{ ...job, [key]: value }]));
+  assert.throws(() => assess(state, [job, job]));
+});
+
+test("scheduler SQL permits only the approved command and separates disable from deprovision", () => {
+  const create = plan("provision");
+  const disable = plan("disable", 2);
+  assert.match(create, /set role cms_scheduler;[\s\S]*cron\.schedule\('cms-promotion-scheduler','\* \* \* \* \*','select public\.cms_process_due_promotion_schedules\(100\);'\)/i);
+  assert.match(create, /scheduler job changed during provisioning/);
+  assert.match(create, /scheduler job identity mismatch/);
+  assert.match(create, /reset role;[\s\S]*revoke usage on schema cron[\s\S]*revoke cms_scheduler from postgres granted by postgres/i);
+  assert.match(disable, /cron\.unschedule\(2::bigint\)/);
+  assert.match(disable, /scheduler job changed before disable/);
+  assert.doesNotMatch(disable, /drop role|delete from|update public\./i);
+  assert.throws(() => plan("disable", "2;drop role"));
+  const migration = readFileSync("supabase/migrations/20260928150000_cms_scheduler_role.sql", "utf8");
+  assert.match(migration, /create role cms_scheduler login password null nosuperuser nocreatedb nocreaterole\s+noreplication nobypassrls noinherit/i);
+  assert.match(migration, /grant execute on function public\.cms_process_due_promotion_schedules\(integer\)\s+to cms_scheduler/i);
+  assert.match(migration, /create extension if not exists pg_cron/i);
+  assert.doesNotMatch(migration, /cron\.schedule|cms_process_due_promotion_schedules_at\(timestamptz,integer\)\s+to cms_scheduler/i);
 });

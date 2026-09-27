@@ -2,6 +2,59 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path=public,extensions;
 select no_plan();
+select ok(exists(select 1 from pg_extension where extname='pg_cron'),
+  'pg_cron prerequisite is reproducible in isolated local migrations');
+select is((select count(*)::int from cron.job where jobname='cms-promotion-scheduler'),0,
+  'local migrations never schedule the permanent background job');
+
+select ok((select rolcanlogin and rolpassword is null and not rolsuper and not rolcreatedb
+  and not rolcreaterole and not rolreplication and not rolbypassrls and not rolinherit
+  from pg_authid where rolname='cms_scheduler'),
+  'permanent scheduler is passwordless, nonprivileged LOGIN');
+select is((select count(*)::int from pg_auth_members m join pg_roles r on r.oid=m.member
+  where r.rolname='cms_scheduler'),0,'scheduler inherits no other roles');
+select is((select count(*)::int from pg_auth_members m join pg_roles r on r.oid=m.roleid
+  where r.rolname='cms_scheduler' and m.set_option),0,
+  'no operator retains SET ROLE capability to the scheduler');
+select ok(has_function_privilege('cms_scheduler','public.cms_process_due_promotion_schedules(integer)','EXECUTE'),
+  'scheduler can execute the database-clock wrapper');
+select ok(not has_function_privilege('cms_scheduler','public.cms_process_due_promotion_schedules_at(timestamptz,integer)','EXECUTE'),
+  'scheduler cannot invoke the fake-time core');
+select ok(not has_table_privilege('cms_scheduler','public.cms_promotion_schedules','SELECT,INSERT,UPDATE,DELETE'),
+  'scheduler has no direct scheduling table privileges');
+select ok(not has_table_privilege('cms_scheduler','public.content_documents','SELECT,INSERT,UPDATE,DELETE'),
+  'scheduler has no direct content privileges');
+select ok(not has_table_privilege('cms_scheduler','auth.users','SELECT,INSERT,UPDATE,DELETE'),
+  'scheduler has no Auth table privileges');
+select ok(not has_table_privilege('cms_scheduler','storage.objects','SELECT,INSERT,UPDATE,DELETE'),
+  'scheduler has no Storage table privileges');
+select is((select count(*)::int from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+  where n.nspname in ('public','auth','storage') and p.prosecdef
+  and p.oid <> 'public.cms_process_due_promotion_schedules(integer)'::regprocedure
+  and has_function_privilege('cms_scheduler',p.oid,'EXECUTE')),0,
+  'scheduler has no other effective SECURITY DEFINER capability');
+select ok(not exists(select 1 from pg_extension where extname='pg_cron') or
+  not has_schema_privilege('cms_scheduler','cron','USAGE'),
+  'local migration gives no cron-management access');
+-- The local operator receives SET capability only inside this rolled-back test.
+grant cms_scheduler to postgres with set true, inherit false;
+grant usage on schema extensions to cms_scheduler;
+set local role cms_scheduler;
+select throws_ok($$select cron.schedule('unauthorized','* * * * *','select 1;')$$,
+  '42501',null,'scheduler cannot create a cron job after migration');
+select throws_ok($$select public.cms_process_due_promotion_schedules_at(now(),1)$$,
+  '42501',null,'scheduler cannot run the explicit-time core');
+select throws_ok($$select * from public.cms_promotion_schedules$$,
+  '42501',null,'scheduler cannot read schedule rows directly');
+select throws_ok($$update public.content_documents set content_key=content_key$$,
+  '42501',null,'scheduler cannot mutate content directly');
+select throws_ok($$select * from auth.users$$,
+  '42501',null,'scheduler cannot read Auth users');
+select throws_ok($$select * from storage.objects$$,
+  '42501',null,'scheduler cannot read Storage objects');
+reset role;
+revoke usage on schema extensions from cms_scheduler;
+revoke cms_scheduler from postgres granted by postgres;
 
 create temporary table schedule_fixture (
   doc uuid, rev uuid, draft_promo_rev uuid, draft_id uuid, second_id uuid, endless_id uuid,
