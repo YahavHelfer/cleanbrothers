@@ -27,13 +27,15 @@ function Placements({ selected = [] }: { selected?: Placement[] }) {
 }
 function ScheduleFields({ choices, schedule }: { choices: PromotionChoice[]; schedule?: PromotionSchedule }) {
   const chosen = choices.find(item => item.revisionId === schedule?.promotionRevisionId) ?? choices[0];
+  const selected = schedule ? `${schedule.promotionDocumentId}:${schedule.promotionRevisionId}` :
+    chosen ? `${chosen.documentId}:${chosen.revisionId}` : "";
   return <div className="grid gap-4">
-    <input type="hidden" name="documentId" value={schedule?.promotionDocumentId ?? chosen?.documentId ?? ""} />
     <label className="grid gap-1 font-bold">שם פנימי
       <input className={field} name="label" maxLength={120} required defaultValue={schedule?.label ?? ""} /></label>
     <label className="grid gap-1 font-bold">גרסת מבצע מדויקת שפורסמה בעבר
-      <select className={field} name="revisionId" defaultValue={schedule?.promotionRevisionId ?? chosen?.revisionId ?? ""} required>
-        {choices.map(item => <option value={item.revisionId} key={item.revisionId}>גרסה {item.number} — {item.title}</option>)}
+      <select className={field} name="promotionSelection" defaultValue={selected} required>
+        {choices.map(item => <option value={`${item.documentId}:${item.revisionId}`} key={item.revisionId}>
+          {item.documentKey} · גרסה {item.number} — {item.title}</option>)}
       </select></label>
     <p className="text-sm">כל הזמנים מוזנים לפי Asia/Jerusalem ונשמרים ב־UTC. שעה חסרה או כפולה במעבר שעון קיץ תידחה.</p>
     <label className="grid gap-1 font-bold">תחילת המבצע — שעון ירושלים

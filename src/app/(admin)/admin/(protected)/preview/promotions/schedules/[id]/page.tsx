@@ -8,7 +8,7 @@ import { BlockView, type BlockMedia } from "@/cms/pages/PageBlocksView";
 import { getPromotionRevision } from "@/cms/pages/repository";
 import type { PageBlock } from "@/cms/pages/model";
 import { scheduleUuid } from "@/cms/schedules/model";
-import { schedulesLocalEnabled } from "@/cms/schedules/environment";
+import { schedulesEnvironmentAllowed } from "@/cms/schedules/environment";
 import { listSchedules } from "@/cms/schedules/repository";
 
 export const metadata: Metadata = { title: "תצוגת מבצע מתוזמן פרטית | CleanBrothers",
@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "תצוגת מבצע מתוזמן פ�
 
 export default async function SchedulePreview({ params }: { params: Promise<{ id: string }> }) {
   await requireCmsAdmin();
-  if (!schedulesLocalEnabled()) notFound();
+  if (!schedulesEnvironmentAllowed()) notFound();
   let id: string;
   try { id = scheduleUuid((await params).id); } catch { notFound(); }
   const { schedules } = await listSchedules();

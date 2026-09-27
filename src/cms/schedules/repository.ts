@@ -1,17 +1,17 @@
 import "server-only";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { requireLocalSchedules } from "./environment";
+import { requireSchedulesEnvironment } from "./environment";
 import { scheduleLabel, scheduleUuid, scheduleVersion, validatePlacements,
   validateScheduleTimes, type Placement, type PromotionSchedule } from "./model";
 
 async function client() {
   await requireCmsAdmin();
-  requireLocalSchedules();
+  requireSchedulesEnvironment();
   return createCmsServerClient();
 }
 
-export type PromotionChoice = { documentId: string; revisionId: string; number: number; title: string };
+export type PromotionChoice = { documentId: string; documentKey: string; revisionId: string; number: number; title: string };
 export async function listSchedules(): Promise<{ schedules: PromotionSchedule[]; choices: PromotionChoice[] }> {
   const db = await client();
   const [rows, revisions] = await Promise.all([
@@ -59,6 +59,6 @@ export async function transitionSchedule(id: string, version: number, action: "s
 /** Trusted scheduler adapter only. Never invoked by an Admin page, browser or public request. */
 export async function processDuePromotionSchedules(now: Date, run: (iso: string) => Promise<number>): Promise<number> {
   if (!(now instanceof Date) || !Number.isFinite(now.getTime())) throw new Error("Trusted UTC clock required");
-  requireLocalSchedules();
+  requireSchedulesEnvironment();
   return run(now.toISOString());
 }

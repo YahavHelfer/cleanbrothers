@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createSchedule, editSchedule, transitionSchedule } from "./repository";
 import type { Placement } from "./model";
+import { scheduleUuid } from "./model";
 
 export type ScheduleActionState = { ok: boolean; message: string };
 function required(form: FormData, key: string): string {
@@ -19,12 +20,18 @@ function placements(form: FormData): Placement[] {
     return { kind: value.slice(0, split), target: value.slice(split + 1) } as Placement;
   });
 }
+function promotionSelection(form: FormData): { documentId: string; revisionId: string } {
+  const value = required(form, "promotionSelection");
+  const parts = value.split(":");
+  if (parts.length !== 2) throw new Error("יש לבחור גרסת מבצע תקינה.");
+  return { documentId: scheduleUuid(parts[0]), revisionId: scheduleUuid(parts[1]) };
+}
 export async function scheduleAction(_previous: ScheduleActionState, form: FormData): Promise<ScheduleActionState> {
   try {
     await requireCmsAdmin();
     const intent = required(form, "intent");
     if (intent === "create" || intent === "edit") {
-      const input = { documentId: required(form, "documentId"), revisionId: required(form, "revisionId"),
+      const input = { ...promotionSelection(form),
         label: required(form, "label"), startLocal: required(form, "startLocal"),
         endLocal: required(form, "endLocal"), placements: placements(form) };
       if (intent === "create") await createSchedule(input);

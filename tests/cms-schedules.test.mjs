@@ -38,19 +38,44 @@ test("schedule identity, concurrency token and label reject invalid browser inpu
   assert.throws(() => scheduleVersion("1.5"));
   assert.throws(() => scheduleLabel("<script>"));
 });
-test("local-only gate, server authorization and no browser scheduler are explicit", () => {
+test("schedule gate accepts only local CMS or the approved project/branch/CMS Preview", () => {
   const repo = readFileSync("src/cms/schedules/repository.ts", "utf8");
   const sql = readFileSync("supabase/migrations/20260928000000_cms_scheduled_promotions.sql", "utf8");
-  const allowed = env => createSourceLoader({ env })("src/cms/schedules/environment.ts").schedulesLocalEnabled();
+  const allowed = env => createSourceLoader({ env })("src/cms/schedules/environment.ts").schedulesEnvironmentAllowed();
   const local = { CMS_SCHEDULE_LOCAL_ENABLED: "true", CMS_SUPABASE_URL: "http://127.0.0.1:56321" };
+  const preview = { VERCEL: "1", VERCEL_ENV: "preview", VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
+    CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" };
   assert.equal(allowed(local), true);
-  assert.equal(allowed({ ...local, VERCEL: "1", VERCEL_ENV: "preview" }), false);
+  assert.equal(allowed(preview), true);
+  assert.equal(allowed({ ...preview, VERCEL_PROJECT_ID: "prj_other" }), false);
+  assert.equal(allowed({ ...preview, VERCEL_GIT_COMMIT_REF: "main" }), false);
+  assert.equal(allowed({ ...preview, CMS_SUPABASE_URL: "https://crm.supabase.co" }), false);
+  assert.equal(allowed({ ...preview, CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co.evil.example" }), false);
+  assert.equal(allowed({ ...preview, CMS_SUPABASE_URL: "https://evil.example/plbwefnwussxlglscfpn.supabase.co" }), false);
+  assert.equal(allowed({ ...preview, CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co@evil.example" }), false);
+  assert.equal(allowed({ ...preview, CMS_SUPABASE_URL: "not-a-url" }), false);
+  assert.equal(allowed({ ...preview, VERCEL_ENV: "production" }), false);
+  for (const key of ["VERCEL", "VERCEL_ENV", "VERCEL_PROJECT_ID", "VERCEL_GIT_COMMIT_REF", "CMS_SUPABASE_URL"]) {
+    const incomplete = { ...preview };
+    delete incomplete[key];
+    assert.equal(allowed(incomplete), false, `missing ${key} must fail closed`);
+  }
   assert.equal(allowed({ ...local, CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" }), false);
   assert.equal(allowed({ ...local, CMS_SCHEDULE_LOCAL_ENABLED: "false" }), false);
+  assert.equal(allowed({ ...local, VERCEL_ENV: "production" }), false);
   assert.match(repo, /requireCmsAdmin\(\)/);
   assert.match(sql, /for update skip locked/i);
   assert.match(sql, /primary key \(placement_kind, target_key\)/i);
   assert.match(sql, /pg_advisory_xact_lock\(20260928,1\)/i);
   assert.match(sql, /grant execute on function public\.cms_process_due_promotion_schedules\(timestamptz,integer\) to service_role/i);
   assert.doesNotMatch(repo, /setInterval|window\.|localStorage/);
+});
+test("schedule form binds the selected revision to its document identity", () => {
+  const manager = readFileSync("src/cms/schedules/ScheduleManager.tsx", "utf8");
+  const actions = readFileSync("src/cms/schedules/actions.ts", "utf8");
+  assert.match(manager, /name="promotionSelection"/);
+  assert.match(manager, /item\.documentId}:\$\{item\.revisionId/);
+  assert.match(actions, /promotionSelection\(form\)/);
+  assert.doesNotMatch(manager, /name="documentId"/);
 });

@@ -1,7 +1,7 @@
 import { mediaEnabled } from "@/cms/media/environment";
 import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import { siteEnvironmentAllowed } from "@/cms/site/environment";
-import { schedulesLocalEnabled } from "@/cms/schedules/environment";
+import { schedulesEnvironmentAllowed } from "@/cms/schedules/environment";
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import Link from "next/link";
@@ -36,7 +36,7 @@ export default function AdminLayout({
               <Link href="/admin/services" prefetch={false}>שירותים</Link>
               {pagesEnvironmentAllowed() && <Link href="/admin/pages" prefetch={false}>עמודים</Link>}
               {siteEnvironmentAllowed() && <Link href="/admin/site" prefetch={false}>האתר</Link>}
-              {schedulesLocalEnabled() && <Link href="/admin/promotions/schedules" prefetch={false}>מבצעים מתוזמנים</Link>}
+              {schedulesEnvironmentAllowed() && <Link href="/admin/promotions/schedules" prefetch={false}>מבצעים מתוזמנים</Link>}
               {mediaEnabled() && <Link href="/admin/media" prefetch={false}>מדיה</Link>}
               <Link href="/admin" prefetch={false} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
                 לוח בקרה

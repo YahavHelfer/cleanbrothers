@@ -50,6 +50,39 @@ test("local schedule Admin creates draft, previews exact revision, schedules and
   expect(await publicAfter.text()).not.toContain("מבצע בדיקת תזמון");
 });
 
+test("a selected revision from a second Promotion document keeps its matching document UUID", async ({ page, context }) => {
+  const pilotDoc = "57000000-0000-4000-8000-000000000100";
+  localSql(`insert into public.content_documents(id,content_type,content_key)
+    values ('${pilotDoc}','promotion','phase-4a2-scheduler-pilot')`);
+  localSql(`insert into public.cms_promotion_identity(document_id,analytics_key)
+    values ('${pilotDoc}','phase-4a2-scheduler-pilot')`);
+  const pilotRevision = localSql(`with inserted as (insert into public.content_revisions(document_id,revision_number,schema_version,
+    public_title,h1,seo_title,seo_description,body)
+    select '${pilotDoc}',1,r.schema_version,'Pilot E2E','Pilot E2E','Pilot E2E',r.seo_description,r.body
+    from public.content_revisions r join public.content_documents d on d.id=r.document_id
+    where d.content_type='promotion' and d.content_key='about-intro' and r.revision_number=1 returning id)
+    select id from inserted`);
+  localSql(`insert into public.content_publication_state(document_id,draft_revision_id,published_revision_id)
+    values ('${pilotDoc}','${pilotRevision}','${pilotRevision}')`);
+  localSql(`insert into public.content_publication_events(document_id,revision_id,kind)
+    values ('${pilotDoc}','${pilotRevision}','baseline')`);
+  await session(actor, context);
+  await page.goto("/admin/promotions/schedules");
+  const create = page.locator("form").first();
+  await create.locator('[name="promotionSelection"]').selectOption(`${pilotDoc}:${pilotRevision}`);
+  await create.getByRole("textbox", { name: "שם פנימי" }).fill("מסמך מבצע שני");
+  await create.locator('[name="startLocal"]').fill("2030-05-01T12:00");
+  await create.getByRole("checkbox", { name: "באנר גלובלי" }).check();
+  await create.getByRole("button", { name: "שמירת טיוטה" }).click();
+  await expect.poll(() => localSql("select count(*) from public.cms_promotion_schedules")).toBe("1");
+  expect(localSql("select promotion_document_id from public.cms_promotion_schedules limit 1")).toBe(pilotDoc);
+  expect(localSql("select promotion_revision_id from public.cms_promotion_schedules limit 1")).toBe(pilotRevision);
+  const id = localSql("select id from public.cms_promotion_schedules limit 1");
+  const response = await page.goto(`/admin/preview/promotions/schedules/${id}`);
+  expect(response?.status()).toBe(200);
+  await expect(page.getByText("Pilot E2E").first()).toBeVisible();
+});
+
 test("schedule routes reject password-only CMS sessions", async ({ page, context }) => {
   await session(actor, context, false);
   await page.goto("/admin/promotions/schedules");
