@@ -3,6 +3,8 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createSourceLoader, plain } from "./helpers/source-module.mjs";
+import { syntheticGoogleReviews } from "../src/cms/reviews/fixture.ts";
+import { validateGoogleReviews } from "../src/cms/reviews/model.ts";
 
 const load = createSourceLoader({ mocks: {
   "next/image": { __esModule: true, default: props => createElement("img", props) },
@@ -15,16 +17,96 @@ const draft = () => structuredClone(plain(homeBaseline));
 const render = (page, preview = false, promotions = {}) => renderToStaticMarkup(createElement(HomeBlocksView,
   { page, revisionId: "d4000000-0000-4000-8000-000000000001", preview, promotions }));
 
-test("homepage Revision 1 has the audited 11 sections in exact order and renders approved media", () => {
+test("homepage baseline adds one hidden reviews block without changing public HTML", () => {
   const page = draft();
   assert.deepEqual(page.blocks.map(block => block.type), ["homeHero", "homeTrust", "homeServices", "homeProcess",
-    "homeBeforeAfter", "homeWhyUs", "homePricing", "homeEstimate", "homeAreas", "homeFaq", "homeFinalCta"]);
+    "homeBeforeAfter", "homeWhyUs", "homeGoogleReviews", "homePricing", "homeEstimate", "homeAreas", "homeFaq", "homeFinalCta"]);
+  assert.equal(page.blocks[6].hidden, true);
+  assert.equal(page.blocks[6].id, "d4000000-0000-4000-8000-000000000012");
+  assert.deepEqual(page.blocks.filter(block => block.type !== "homeGoogleReviews").map(block => block.id),
+    Array.from({ length: 11 }, (_, index) => `d4000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`));
   assert.equal(validateHomeDraft(page).canonical, "/");
   const html = render(page);
   assert.ok(html.includes(page.h1));
   assert.ok(html.includes("/images/hero/hero-sofa-cleaning.jpg"));
   assert.ok(html.includes("/api/whatsapp"));
   assert.ok(html.includes("tel:"));
+  assert.ok(!html.includes("Google Maps"));
+});
+
+test("review source validation keeps attribution, drops missing links and rejects malformed data", () => {
+  const fixture = structuredClone(syntheticGoogleReviews);
+  const checked = validateGoogleReviews(fixture);
+  assert.equal(checked.reviews.length, 4);
+  assert.deepEqual(checked.reviews.map(review => review.rating), [5, 4, 5, 3]);
+  assert.match(checked.reviews[0].text, /דוגמת בדיקה/);
+  assert.match(checked.reviews[1].text, /Sample review/);
+  assert.equal(checked.reviews[0].author.photoUri, null);
+  assert.equal(checked.reviews[1].relativePublishTimeDescription, null);
+  fixture.reviews[0].googleMapsUri = null;
+  assert.equal(validateGoogleReviews(fixture).reviews.length, 3);
+  fixture.reviews = [];
+  assert.equal(validateGoogleReviews(fixture).reviews.length, 0);
+  fixture.rating = 6;
+  assert.equal(validateGoogleReviews(fixture), null);
+  fixture.rating = 4.7;
+  fixture.reviews = [{ rating: NaN, text: "bad" }];
+  assert.equal(validateGoogleReviews(fixture).reviews.length, 0);
+});
+
+test("server review source fails closed on public pages and permits only explicit local fixtures", async () => {
+  const source = env => createSourceLoader({ env })("src/cms/reviews/source.ts").getGoogleReviews;
+  assert.equal(await source({})("public"), null);
+  assert.equal(await source({ GOOGLE_REVIEWS_SOURCE: "google" })("public"), null);
+  assert.equal(await source({ GOOGLE_REVIEWS_SOURCE: "fixture", VERCEL: "1" })("public"), null);
+  assert.equal((await source({ GOOGLE_REVIEWS_SOURCE: "fixture" })("public")).reviews.length, 4);
+  assert.equal((await source({})("preview")).reviews.length, 4);
+});
+
+test("review config is closed, singleton and contains no external review or API fields", () => {
+  const page = draft(), block = page.blocks[6];
+  block.hidden = false;
+  const validated = validateHomeDraft(page);
+  assert.deepEqual(Object.keys(validated.blocks[6].payload).sort(),
+    ["eyebrow", "title", "description", "showRatingSummary"].sort());
+  block.payload.googleMapsUri = "https://www.google.com/maps/place/example";
+  assert.throws(() => validateHomeDraft(page));
+  delete block.payload.googleMapsUri;
+  block.payload.apiKey = "example-secret";
+  assert.throws(() => validateHomeDraft(page));
+  delete block.payload.apiKey;
+  block.payload.showRatingSummary = "true";
+  assert.throws(() => validateHomeDraft(page));
+  block.payload.showRatingSummary = true;
+  page.blocks.push({ ...structuredClone(block), id: "d4000000-0000-4000-8000-000000000099", position: page.blocks.length });
+  assert.throws(() => validateHomeDraft(page));
+});
+
+test("reviews render only when visible with separate valid runtime data", () => {
+  const page = draft();
+  assert.ok(!render(page).includes("Google Maps"));
+  page.blocks[6].hidden = false;
+  assert.ok(!render(page).includes("Google Maps"));
+  const html = renderToStaticMarkup(createElement(HomeBlocksView,
+    { page, revisionId: "fixture", reviews: validateGoogleReviews(syntheticGoogleReviews), preview: true }));
+  assert.match(html, /Google Maps/);
+  assert.match(html, /לקוח לדוגמה/);
+  assert.ok(!html.includes("href=\"https://www.google.com/maps/reviews/"));
+  assert.ok(!JSON.stringify(page).includes("Sample reviewer"));
+  const one = structuredClone(syntheticGoogleReviews);
+  one.reviews = [one.reviews[0]];
+  one.reviews[0].author.photoUri = "https://lh3.googleusercontent.com/example-avatar";
+  const oneHtml = renderToStaticMarkup(createElement(HomeBlocksView,
+    { page, revisionId: "fixture", reviews: validateGoogleReviews(one) }));
+  assert.match(oneHtml, /disabled="" aria-label="ביקורת הבאה"|aria-label="ביקורת הבאה" disabled=""/);
+  assert.match(oneHtml, /example-avatar/);
+  assert.match(oneHtml, /href="https:\/\/www.google.com\/maps\/place\/example"/);
+  assert.match(oneHtml, /href="https:\/\/www.google.com\/maps\/reviews\/example-a"/);
+  assert.match(oneHtml, /href="https:\/\/www.google.com\/maps\/contrib\/example-a"/);
+  const empty = { ...syntheticGoogleReviews, reviews: [] };
+  const emptyHtml = renderToStaticMarkup(createElement(HomeBlocksView,
+    { page, revisionId: "fixture", reviews: validateGoogleReviews(empty) }));
+  assert.ok(!emptyHtml.includes("ביקורות ב־Google Maps"));
 });
 
 test("static and CMS Revision 1 homepage produce identical HTML, metadata and JSON-LD", async () => {

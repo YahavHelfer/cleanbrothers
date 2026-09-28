@@ -29,10 +29,13 @@ const labels: Record<string,string> = {
 const serviceCatalog = Object.fromEntries(services.map(service => [service.landingPath.slice(1),
   { title: service.title, benefit: service.benefit, description: service.description }]));
 function label(key: string) { return labels[key] || serviceRegistry[key as ManagedServiceKey]?.crmName || key; }
-type AnyValue = string | AnyValue[] | { [key: string]: AnyValue };
+type AnyValue = string | boolean | AnyValue[] | { [key: string]: AnyValue };
 
 function ValueFields({ name, value, onChange, choices, section }: { name: string; value: AnyValue;
   onChange: (value: AnyValue) => void; choices: MediaChoice[]; section: HomeBlockType }) {
+  if (typeof value === "boolean") return <label className="flex items-center gap-2 font-bold">
+    <input type="checkbox" checked={value} onChange={event => onChange(event.target.checked)} />הצגת דירוג Google הכללי
+  </label>;
   if (typeof value === "string") {
     let options: { value: string; label: string }[] | null = null;
     if (name === "beforeVersionId" || name === "afterVersionId") options = choices.filter(choice =>

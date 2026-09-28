@@ -13,6 +13,8 @@ import { ServiceAreas, serviceAreasContent } from "@/sections/ServiceAreas";
 import { Services, servicesContent } from "@/sections/Services";
 import { TrustStrip } from "@/sections/TrustStrip";
 import { WhyChooseUs, whyUsContent } from "@/sections/WhyChooseUs";
+import { GoogleReviewsCarousel, type GoogleReviewsPresentation } from "@/cms/reviews/GoogleReviewsCarousel";
+import type { GoogleReviews } from "@/cms/reviews/model";
 import { validateHomeDraft, type HomeBlock, type HomeDraft } from "./model";
 
 export const staticHomeMedia: BlockMedia = Object.fromEntries(staticMediaInventory.map(item =>
@@ -27,8 +29,9 @@ export function homeFaqJsonLd(page: HomeDraft) {
       acceptedAnswer: { "@type": "Answer", text: item.answer } })) };
 }
 
-function HomeBlockView({ block, media, promotions, preview, revisionId }: {
+function HomeBlockView({ block, media, promotions, preview, revisionId, reviews }: {
   block: HomeBlock; media: BlockMedia; promotions: BlockPromotions; preview: boolean; revisionId: string;
+  reviews: GoogleReviews | null;
 }) {
   const p = block.payload;
   switch (block.type) {
@@ -49,6 +52,8 @@ function HomeBlockView({ block, media, promotions, preview, revisionId }: {
       return <BeforeAfter content={{ ...p, items } as unknown as typeof beforeAfterContent} preview={preview} />;
     }
     case "homeWhyUs": return <WhyChooseUs content={p as typeof whyUsContent} />;
+    case "homeGoogleReviews": return reviews?.reviews.length ?
+      <GoogleReviewsCarousel content={p as GoogleReviewsPresentation} source={reviews} preview={preview} /> : null;
     case "homePricing": return <PricingGuide content={p as typeof pricingGuideContent} preview={preview} />;
     case "homeEstimate": return <QuickPriceEstimate content={p as typeof quickEstimateContent} preview={preview} />;
     case "homeAreas": return <ServiceAreas content={p as typeof serviceAreasContent} />;
@@ -59,10 +64,11 @@ function HomeBlockView({ block, media, promotions, preview, revisionId }: {
   }
 }
 
-export function HomeBlocksView({ page, revisionId, media = staticHomeMedia, promotions = {}, preview = false }: {
+export function HomeBlocksView({ page, revisionId, media = staticHomeMedia, promotions = {}, preview = false, reviews = null }: {
   page: HomeDraft; revisionId: string; media?: BlockMedia; promotions?: BlockPromotions; preview?: boolean;
+  reviews?: GoogleReviews | null;
 }) {
   const draft = validateHomeDraft(page);
   return <>{draft.blocks.filter(block => !block.hidden).map(block => <HomeBlockView key={block.id}
-    block={block} media={media} promotions={promotions} preview={preview} revisionId={revisionId} />)}</>;
+    block={block} media={media} promotions={promotions} preview={preview} revisionId={revisionId} reviews={reviews} />)}</>;
 }

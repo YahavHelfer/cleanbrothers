@@ -107,6 +107,7 @@ export const homeBlockDefinitions = {
   homeProcess: { label: "תהליך העבודה", description: "שלבי התהליך", singleton: true },
   homeBeforeAfter: { label: "לפני ואחרי", description: "זוגות מדיה מאושרים", singleton: true },
   homeWhyUs: { label: "למה לבחור בנו", description: "יתרונות השירות", singleton: true },
+  homeGoogleReviews: { label: "ביקורות Google", description: "תצוגה בלבד; תוכן הביקורות מגיע ממקור חיצוני", singleton: true },
   homePricing: { label: "מדריך מחירים", description: "הסבר בלבד; נוסחאות בקוד", singleton: true },
   homeEstimate: { label: "מחשבון מחיר", description: "כותרות בלבד; חישוב בקוד", singleton: true },
   homeAreas: { label: "אזורי שירות", description: "מלל; ערים בקוד", singleton: true },

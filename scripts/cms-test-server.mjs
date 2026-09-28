@@ -35,7 +35,7 @@ const env = {
     CMS_MEDIA_LOCAL_SERVICE_KEY: serviceKey,
     TMPDIR: process.env.TMPDIR,
     CMS_SUPABASE_PUBLISHABLE_KEY: key,
-    ...(published ? { CMS_CONTENT_TEST_BUILD: "1", CMS_PILOT_CONTENT_SOURCE: "published",
+    ...(published ? { CMS_CONTENT_TEST_BUILD: "1", GOOGLE_REVIEWS_SOURCE: "fixture", CMS_PILOT_CONTENT_SOURCE: "published",
       CMS_HOME_SOURCE: "published", CMS_HOME_ALLOWLIST: "home",
       CMS_NEW_PAGE_SOURCE: "published",
       CMS_NEW_PAGE_ALLOWLIST: "cms-test-page,cms-test-renamed,cms-test-final,cms-test-copy",

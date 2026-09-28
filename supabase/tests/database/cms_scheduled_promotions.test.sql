@@ -328,6 +328,9 @@ select is((select count(*)::int from cms_active_promotion_placements where place
 -- Two typed placements activate and cancel as one schedule, without touching other documents.
 update cms_promotion_identity set status='active' where document_id=(select doc from schedule_fixture);
 insert into content_documents(content_type,content_key) values('service','sofa-cleaning');
+create temporary table schedule_content_counts as select
+ (select count(*)::int from content_publication_state) as publications,
+ (select count(*)::int from content_documents) as documents;
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"56000000-0000-4000-8000-000000000001","aal":"aal2","role":"authenticated"}',true);
 select is(cms_cancel_promotion_schedule((select endless_id from schedule_fixture),3),4::bigint,
@@ -370,9 +373,9 @@ select is((select outcome from cms_promotion_schedule_attempts where schedule_id
  'skipped_window','late retry records skipped window');
 select is((select count(*)::int from cms_active_promotion_placements where placement_kind='home'),0,
  'late retry never leaves active home placement');
-select is((select count(*)::int from content_publication_state),2,
+select is((select count(*)::int from content_publication_state),(select publications from schedule_content_counts),
  'scheduler leaves all content publication pointers unchanged');
-select is((select count(*)::int from content_documents),3,
+select is((select count(*)::int from content_documents),(select documents from schedule_content_counts),
  'scheduler leaves promotion and service document identities unchanged');
 
 -- A stale active row from a transient expiration failure must not permanently

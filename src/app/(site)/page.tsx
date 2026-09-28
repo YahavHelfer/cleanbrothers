@@ -6,6 +6,7 @@ import { getPublicHome } from "@/cms/home/public-source";
 import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
 import { getPublicActivePromotion } from "@/cms/schedules/public-source";
 import { buildMetadata } from "@/lib/seo";
+import { getGoogleReviews } from "@/cms/reviews/source";
 
 const staticMetadata = buildMetadata({
   title: "CleanBrothers | ניקיון מקצועי לבית, לעסק ולרכב",
@@ -23,13 +24,15 @@ export default async function Home() {
   const [{ settings }, source, homePromotion] = await Promise.all([getPublicSiteChrome(), getPublicHome(),
     getPublicActivePromotion("home", "home")]);
   const faq = homeFaqJsonLd(source.page);
+  const reviews = source.page.blocks.some(block => block.type === "homeGoogleReviews" && !block.hidden) ?
+    await getGoogleReviews("public") : null;
   return (
     <>
       {faq && <JsonLd id="cleanbrothers-faq-jsonld" data={faq} />}
       <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
       {homePromotion && <PublicScheduledPromotion active={homePromotion} />}
       <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}
-        media={source.media} promotions={source.promotions} />
+        media={source.media} promotions={source.promotions} reviews={reviews} />
     </>
   );
 }

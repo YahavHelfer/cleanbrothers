@@ -12,8 +12,9 @@ import { trustItems } from "@/sections/TrustStrip";
 import { whyUsContent } from "@/sections/WhyChooseUs";
 import { validateHomeDraft, type HomeBlock, type HomeBlockType } from "./model";
 
-function section(type: HomeBlockType, position: number, payload: Record<string, unknown>, mediaVersionId: string | null = null): HomeBlock {
-  return { id: `d4000000-0000-4000-8000-${String(position + 1).padStart(12, "0")}`, position,
+function section(type: HomeBlockType, position: number, payload: Record<string, unknown>,
+  mediaVersionId: string | null = null, stableOrdinal = position + 1): HomeBlock {
+  return { id: `d4000000-0000-4000-8000-${String(stableOrdinal).padStart(12, "0")}`, position,
     type, schemaVersion: 1, hidden: false, payload, mediaVersionId, promotionRevisionId: null };
 }
 
@@ -37,10 +38,12 @@ export const homeBaseline = validateHomeDraft({
       beforeAlt: item.beforeAlt, afterAlt: item.afterAlt,
     })) }),
     section("homeWhyUs", 5, whyUsContent),
-    section("homePricing", 6, pricingGuideContent),
-    section("homeEstimate", 7, quickEstimateContent),
-    section("homeAreas", 8, serviceAreasContent),
-    section("homeFaq", 9, faqContent),
-    section("homeFinalCta", 10, finalCtaContent),
+    { ...section("homeGoogleReviews", 6, { eyebrow: "מה אומרים עלינו", title: "ביקורות ב־Google Maps",
+      description: "חוות דעת על השירות שלנו", showRatingSummary: true }, null, 12), hidden: true },
+    section("homePricing", 7, pricingGuideContent, null, 7),
+    section("homeEstimate", 8, quickEstimateContent, null, 8),
+    section("homeAreas", 9, serviceAreasContent, null, 9),
+    section("homeFaq", 10, faqContent, null, 10),
+    section("homeFinalCta", 11, finalCtaContent, null, 11),
   ],
 });

@@ -30,7 +30,7 @@ test("homepage UI keeps draft private, publishes exact revision and rolls back w
   await page.goto("/admin/pages/home");
   await expect(page.getByRole("heading", { name: "עריכת דף הבית" })).toBeVisible();
   await expect(page.getByRole("button", { name: "שמירת טיוטה" })).toBeEnabled();
-  await expect(page.locator("[data-block-id]")).toHaveCount(11);
+  await expect(page.locator("[data-block-id]")).toHaveCount(12);
   await expect(page.locator("[data-block-id]").first()).toContainText("פתיח");
 
   // A temporary rich-text block, pinned promotion, service reordering, and a
@@ -38,15 +38,19 @@ test("homepage UI keeps draft private, publishes exact revision and rolls back w
   const type = page.getByRole("group", { name: "הוספת מקטע" }).getByRole("combobox");
   await type.selectOption("richText");
   await page.getByRole("group", { name: "הוספת מקטע" }).getByRole("button", { name: "הוספת מקטע" }).click();
-  await expect(page.locator("[data-block-id]")).toHaveCount(12);
+  await expect(page.locator("[data-block-id]")).toHaveCount(13);
   await type.selectOption("promotionBanner");
   await page.getByRole("group", { name: "הוספת מקטע" }).getByRole("button", { name: "הוספת מקטע" }).click();
-  await expect(page.locator("[data-block-id]")).toHaveCount(13);
+  await expect(page.locator("[data-block-id]")).toHaveCount(14);
   const trust = page.locator("[data-block-id]").nth(1);
   await trust.getByRole("button", { name: "הסתר" }).click();
   await page.locator("[data-block-id]").nth(2).getByRole("button", { name: "הזז למטה" }).click();
   const services = page.locator("[data-block-id]").filter({ hasText: "שירותים לפי סדר הופעה" });
   await services.getByRole("button", { name: "למטה" }).first().click();
+  const reviewsBlock = page.locator('[data-block-id="d4000000-0000-4000-8000-000000000012"]');
+  await expect(reviewsBlock).toContainText("מוסתר בגרסה זו");
+  await reviewsBlock.getByRole("button", { name: "הצג", exact: true }).click();
+  await reviewsBlock.getByRole("checkbox", { name: "הצגת דירוג Google הכללי" }).uncheck();
   await page.getByRole("button", { name: "שמירת טיוטה" }).click();
   await expect.poll(() => state().draft_revision_id).not.toBe(baseline.draft_revision_id);
   const changed = state();
@@ -57,12 +61,22 @@ test("homepage UI keeps draft private, publishes exact revision and rolls back w
   const cmsHomeBefore = await request.get(`${publishedOrigin}/`);
   expect(cmsHomeBefore.status()).toBe(200);
   expect(await cmsHomeBefore.text()).not.toContain("הצעת היכרות");
+  expect(await cmsHomeBefore.text()).not.toContain("Sample reviewer B");
 
   const preview = await page.goto(`/admin/preview/pages/home?revision=${changed.draft_revision_id}`);
   expect(preview?.status()).toBe(200);
   expect(preview?.headers()["cache-control"]).toContain("private, no-store");
   expect(preview?.headers()["x-robots-tag"]).toContain("noindex, nofollow");
   await expect(page.locator("main")).toContainText("הצעת היכרות");
+  await expect(page.getByRole("region", { name: "ביקורות Google" })).toBeVisible();
+  await expect(page.locator("[data-active-review]")).toHaveAttribute("data-active-review", "0");
+  await page.getByRole("button", { name: "ביקורת הבאה" }).click();
+  await expect(page.locator("[data-active-review]")).toHaveAttribute("data-active-review", "1");
+  for (const width of [390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const layout = await page.evaluate(() => ({ viewport: innerWidth, page: document.documentElement.scrollWidth }));
+    expect(layout.page).toBeLessThanOrEqual(layout.viewport);
+  }
   expect(await page.locator("main").innerHTML()).not.toMatch(/\/api\/whatsapp|GTM-|gtag\(|fbq\(/);
 
   await page.goto("/admin/pages/home");
@@ -72,6 +86,7 @@ test("homepage UI keeps draft private, publishes exact revision and rolls back w
   const live = await request.get(`${publishedOrigin}/`);
   expect(live.status()).toBe(200);
   expect(await live.text()).toContain("הצעת היכרות");
+  expect(await live.text()).toContain("Sample reviewer B");
   expect(otherState()).toBe(other);
 
   await page.goto("/admin/pages/home");
@@ -86,6 +101,7 @@ test("homepage UI keeps draft private, publishes exact revision and rolls back w
   const restored = await request.get(`${publishedOrigin}/`);
   expect(restored.status()).toBe(200);
   expect(await restored.text()).not.toContain("הצעת היכרות");
+  expect(await restored.text()).not.toContain("Sample reviewer B");
   expect(otherState()).toBe(other);
 });
 
@@ -125,4 +141,37 @@ test("stale homepage editor keeps its input; invalid Origin, AAL1 and nonmembers
   await session(outsider, context);
   await page.goto("/admin/pages/home");
   await expect(page).toHaveURL(/\/admin\/login\?error=forbidden/);
+});
+
+test("review block can be re-added; exact preview pauses for focus and reduced motion", async ({ page, context }) => {
+  await session(actor, context);
+  await page.goto("/admin/pages/home");
+  const original = page.locator('[data-block-id="d4000000-0000-4000-8000-000000000012"]');
+  await expect(original).toContainText("מוסתר בגרסה זו");
+  await original.getByRole("button", { name: "הסרה מהטיוטה" }).click();
+  await expect(page.locator("[data-block-id]")).toHaveCount(11);
+  const add = page.getByRole("group", { name: "הוספת מקטע" });
+  await add.getByRole("combobox").selectOption("homeGoogleReviews");
+  await add.getByRole("button", { name: "הוספת מקטע" }).click();
+  await expect(page.locator("[data-block-id]")).toHaveCount(12);
+  await page.getByRole("button", { name: "שמירת טיוטה" }).click();
+  await expect.poll(() => revisionCount()).toBe(2);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`/admin/preview/pages/home?revision=${state().draft_revision_id}`);
+  const section = page.locator("[data-active-review]");
+  await expect(section).toBeVisible();
+  await expect(section).toHaveAttribute("data-active-review", "0");
+  await page.waitForTimeout(5600);
+  await expect(section).toHaveAttribute("data-active-review", "0");
+  await page.getByRole("button", { name: "ביקורת הבאה" }).click();
+  await expect(section).toHaveAttribute("data-active-review", "1");
+  await page.getByRole("complementary", { name: "מצב תצוגה מקדימה" }).click();
+  await expect(section).not.toHaveAttribute("data-attention-paused", "true");
+  await page.getByRole("button", { name: "ביקורת הבאה" }).focus();
+  await expect(section).toHaveAttribute("data-attention-paused", "true");
+  await page.getByRole("complementary", { name: "מצב תצוגה מקדימה" }).click();
+  await expect(section).not.toHaveAttribute("data-attention-paused", "true");
+  await section.hover();
+  await expect(section).toHaveAttribute("data-attention-paused", "true");
+  await expect(section).toHaveAttribute("data-paused", "true");
 });

@@ -90,6 +90,11 @@ function content(type: HomeBlockType, value: unknown): Record<string, unknown> {
       const p = object(value, ["eyebrow", "title", "description", "items"]);
       return { ...copy(p, ["eyebrow", "title", "description"]), items: strings(p.items, 1, 8) };
     }
+    case "homeGoogleReviews": {
+      const p = object(value, ["eyebrow", "title", "description", "showRatingSummary"]);
+      if (typeof p.showRatingSummary !== "boolean") throw new PageValidationError("הגדרת דירוג הביקורות אינה תקינה.");
+      return { ...copy(p, ["eyebrow", "title", "description"]), showRatingSummary: p.showRatingSummary };
+    }
     case "homePricing": {
       const p = object(value, ["eyebrow", "title", "mobileDescription", "description", "factorsHeading", "factors", "cards", "ctaLabel", "ctaNote"]);
       const cards = rows(p.cards, 1, 8).map(item => {
