@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createSourceLoader, plain } from "./helpers/source-module.mjs";
@@ -169,6 +171,37 @@ test("live Google source accepts safe non-/maps attribution paths in a synthetic
   assert.equal(result.reviews.length, 5);
   assert.equal(result.reviews[0].googleMapsUri, response.reviews[0].googleMapsUri);
   assert.equal(result.reviews[0].author.uri, response.reviews[0].authorAttribution.uri);
+});
+
+test("temporary provider diagnostics report stages without secrets or review contents", async () => {
+  const providerFile = fileURLToPath(new URL("../src/cms/reviews/google-provider.ts", import.meta.url));
+  const instrumented = readFileSync(providerFile, "utf8").replace(
+    "console.info(DIAGNOSTIC, JSON.stringify(value));",
+    'require("diagnostic-test-capture").info(DIAGNOSTIC, JSON.stringify(value));');
+  const capture = async (env, payload, status = 200) => {
+    const lines = [];
+    const source = createSourceLoader({ env, sourceOverrides: { [providerFile]: instrumented },
+      mocks: { "diagnostic-test-capture": { info: (...parts) => lines.push(parts.join(" ")) } },
+      fetchImpl: async () => new Response(JSON.stringify(payload), { status }) })("src/cms/reviews/source.ts");
+    await source.getGoogleReviews("public");
+    const output = lines.join("\n");
+    assert.ok(lines.every(line => line.startsWith("[google-reviews-diagnostic] ")));
+    for (const forbidden of [googlePreview.GOOGLE_PLACES_API_KEY, googlePreview.GOOGLE_REVIEWS_PLACE_ID,
+      "שירות מעולה", "Reviewer 0", "https://www.google.com/maps/place/example",
+      "https://www.google.com/maps/reviews/example-0"])
+      assert.ok(!output.includes(forbidden));
+    return output;
+  };
+  assert.match(await capture({ ...googlePreview, GOOGLE_REVIEWS_SOURCE: "off" }, {}), /config_rejected/);
+  for (const status of [403, 429, 500])
+    assert.match(await capture(googlePreview, {}, status), new RegExp(`\\"status\\":${status}.*\\"ok\\":false`));
+  const empty = googlePayload(); empty.reviews = [];
+  assert.match(await capture(googlePreview, empty), /zero_reviews/);
+  const filtered = googlePayload(); filtered.reviews.forEach(review => { review.googleMapsUri = "https://evil.example/"; });
+  assert.match(await capture(googlePreview, filtered), /all_reviews_filtered/);
+  const accepted = await capture(googlePreview, googlePayload());
+  assert.match(accepted, /accepted/);
+  assert.match(accepted, /"finalSurvivingCount":5/);
 });
 
 test("live Google source fails closed for missing or mismatched Preview identities and secrets", async () => {
