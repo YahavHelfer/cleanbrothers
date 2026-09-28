@@ -4,6 +4,7 @@ import { homeBlockDefinitions, PageValidationError, pageUuid, validateBlock } fr
 export const HOME_PAGE_ID = "d4000000-0000-4000-8000-000000000000";
 export const HOME_PAGE_KEY = "home";
 export const HOME_SCHEMA_VERSION = 12;
+export const HOME_GOOGLE_REVIEWS_BLOCK_ID = "d4000000-0000-4000-8000-000000000012";
 export type HomeBlockType = keyof typeof homeBlockDefinitions;
 export type HomeBlock = {
   id: string; position: number; type: HomeBlockType | "richText" | "imageText" | "promotionBanner" | "spacer";

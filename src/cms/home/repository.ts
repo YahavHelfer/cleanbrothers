@@ -3,6 +3,7 @@ import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
 import { PageValidationError, pageGeneration, pageUuid } from "@/cms/pages/model";
 import { requireHomeEnvironment } from "./environment";
+import { addHiddenGoogleReviewsBlock } from "./google-reviews-bootstrap";
 import { validateHomeDraft, type HomeDraft } from "./model";
 
 export type HomeRevisionSummary = { id: string; number: number; createdAt: string;
@@ -43,4 +44,17 @@ export async function mutateHome(input: HomeMutation): Promise<string> {
     throw new PageValidationError("עורך אחר שינה את דף הבית. השינויים שלך נשארו בטופס ולא נשמרו. העתיקו אותם וטענו מחדש לפני ניסיון נוסף.");
   if (error) throw new Error("CMS homepage write unavailable");
   return pageUuid(data);
+}
+
+export async function bootstrapHomeGoogleReviews(expectedGeneration: number, expectedRevision: string):
+  Promise<{ created: boolean; revision: string }> {
+  const generation = pageGeneration(expectedGeneration), revision = pageUuid(expectedRevision);
+  const { snapshot } = await getHomeEditor();
+  if (!snapshot) throw new PageValidationError("דף הבית עדיין לא יובא ל־CMS.");
+  if (snapshot.generation !== generation || snapshot.draftRevisionId !== revision)
+    throw new PageValidationError("עורך אחר שינה את דף הבית. טענו מחדש לפני הוספת הביקורות.");
+  const payload = addHiddenGoogleReviewsBlock(snapshot.draft);
+  if (!payload) return { created: false, revision };
+  const saved = await mutateHome({ kind: "save", generation, revision, payload });
+  return { created: true, revision: saved };
 }

@@ -12,6 +12,7 @@ import { pageUuid } from "@/cms/pages/model";
 import { homeEnvironmentAllowed } from "@/cms/home/environment";
 import { getHomeEditor } from "@/cms/home/repository";
 import { homeBaseline } from "@/cms/home/baseline";
+import { HomeReviewsBootstrapControl } from "@/cms/home/HomeReviewsBootstrapControl";
 import { HomeEditor, RestoreHomeRevision } from "@/cms/home/HomeEditor";
 
 export default async function EditPage({ params }: { params: Promise<{ pageId: string }> }) {
@@ -27,6 +28,8 @@ export default async function EditPage({ params }: { params: Promise<{ pageId: s
       <h1 className="text-3xl font-black">עריכת דף הבית</h1>
       <p>פורסם: גרסה {snapshot.history.find(row=>row.id===snapshot.publishedRevisionId)?.number}
         {' '}· טיוטה: גרסה {snapshot.history.find(row=>row.id===snapshot.draftRevisionId)?.number}</p>
+      {!snapshot.draft.blocks.some(block => block.type === "homeGoogleReviews") &&
+        <HomeReviewsBootstrapControl generation={snapshot.generation} revision={snapshot.draftRevisionId} />}
       <HomeEditor key={snapshot.generation} snapshot={snapshot} templates={homeBaseline.blocks}
         mediaChoices={mediaChoices} promotionRevisions={promotion?.history.map(row=>({id:row.id,number:row.number}))||[]}/>
       <section aria-label="היסטוריית גרסאות" className="grid gap-4"><h2 className="text-2xl font-black">היסטוריית גרסאות</h2>

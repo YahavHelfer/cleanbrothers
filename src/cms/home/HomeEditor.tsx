@@ -9,7 +9,7 @@ import { serviceRegistry, type ManagedServiceKey } from "@/content/service-regis
 import { services } from "@/data/site";
 import { homeAction } from "./actions";
 import type { HomeSnapshot } from "./repository";
-import { validateHomeDraft, type HomeBlock, type HomeBlockType, type HomeDraft } from "./model";
+import { HOME_GOOGLE_REVIEWS_BLOCK_ID, validateHomeDraft, type HomeBlock, type HomeBlockType, type HomeDraft } from "./model";
 
 const initialAction = { ok: false, message: "" };
 const subscribe = () => () => {};
@@ -106,14 +106,17 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
   const updateMeta=(key:"h1"|"seoTitle"|"seoDescription",value:string)=>setDraft(current=>key==="h1"?
     { ...current,h1:value,blocks:current.blocks.map(block=>block.type==="homeHero"?
       { ...block,payload:{...block.payload,title:value} }:block) }:{ ...current,[key]:value });
-  const available=[...Object.keys(homeBlockDefinitions).filter(type=>!blocks.some(block=>block.type===type)),
+  const available=[...Object.keys(homeBlockDefinitions).filter(type=>
+    (type!=="homeGoogleReviews" || snapshot.draft.blocks.some(block=>block.type===type)) &&
+    !blocks.some(block=>block.type===type)),
     "richText","imageText","promotionBanner","spacer"] as HomeBlock["type"][];
   function addBlock() {
     if (blocks.length>=50) return;
     const type=available.includes(selectedType)?selectedType:available[0];
     if(!type)return;
     const template=templates.find(block=>block.type===type);
-    const block=template ? { ...structuredClone(template),id:crypto.randomUUID(),hidden:false } :
+    const block=template ? { ...structuredClone(template),
+      id:type==="homeGoogleReviews"?HOME_GOOGLE_REVIEWS_BLOCK_ID:crypto.randomUUID(),hidden:false } :
       defaultBlock(type as "richText"|"imageText"|"promotionBanner"|"spacer",blocks.length,
         promotionRevisions[0]?.id) as HomeBlock;
     reorder([...blocks,block]);

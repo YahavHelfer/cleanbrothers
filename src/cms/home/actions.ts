@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { PageValidationError, pageGeneration, pageUuid } from "@/cms/pages/model";
-import { mutateHome } from "./repository";
+import { bootstrapHomeGoogleReviews, mutateHome } from "./repository";
 
 export type HomeActionState = { ok: boolean; message: string; revision?: string };
 export async function homeAction(_previous: HomeActionState, form: FormData): Promise<HomeActionState> {
@@ -30,6 +30,25 @@ export async function homeAction(_previous: HomeActionState, form: FormData): Pr
     revalidatePath("/");
     return { ok: true, revision: result, message: intent === "publish" ?
       "גרסת דף הבית פורסמה בסביבת התוכן המאושרת." : "טיוטת דף הבית נשמרה. הפרסום לא השתנה." };
+  } catch (error) {
+    return { ok: false, message: error instanceof PageValidationError ? error.message :
+      "הפעולה לא הושלמה. בדקו את ההרשאה וטענו מחדש את דף הבית." };
+  }
+}
+
+export async function bootstrapGoogleReviewsAction(_previous: HomeActionState, form: FormData): Promise<HomeActionState> {
+  try {
+    await requireCmsAdmin();
+    const generation = pageGeneration(form.get("generation"));
+    const revision = pageUuid(form.get("revision"));
+    const result = await bootstrapHomeGoogleReviews(generation, revision);
+    if (result.created) {
+      revalidatePath("/admin/pages/home");
+      revalidatePath("/admin/preview/pages/home");
+    }
+    return { ok: true, revision: result.revision, message: result.created ?
+      "בלוק הביקורות נוסף כטיוטה מוסתרת. דף הבית הציבורי לא השתנה." :
+      "בלוק הביקורות כבר קיים בטיוטה. לא נוצרה גרסה נוספת." };
   } catch (error) {
     return { ok: false, message: error instanceof PageValidationError ? error.message :
       "הפעולה לא הושלמה. בדקו את ההרשאה וטענו מחדש את דף הבית." };
