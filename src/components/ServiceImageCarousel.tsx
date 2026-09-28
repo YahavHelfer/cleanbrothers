@@ -18,6 +18,7 @@ type ServiceImageCarouselProps = {
   images?: readonly string[];
   src?: string;
   alt: string;
+  imageAlts?: Record<string, string>;
   className: string;
   imageClassName?: string;
   imagePosition?: string;
@@ -33,6 +34,7 @@ export function ServiceImageCarousel({
   images,
   src,
   alt,
+  imageAlts,
   className,
   imageClassName = "object-cover",
   imagePosition = "object-center",
@@ -141,7 +143,7 @@ export function ServiceImageCarousel({
     return (
       <ImageWithFallback
         src={activeImage}
-        alt={alt}
+        alt={(activeImage && imageAlts?.[activeImage]) || alt}
         fallbackLabel={fallbackLabel}
         className={className}
         imageClassName={`${imageClassName} ${
@@ -178,7 +180,7 @@ export function ServiceImageCarousel({
       <ImageWithFallback
         key={activeImage}
         src={activeImage}
-        alt={`${alt}, תמונה ${safeIndex + 1} מתוך ${imageCount}`}
+        alt={imageAlts?.[activeImage] || `${alt}, תמונה ${safeIndex + 1} מתוך ${imageCount}`}
         fallbackLabel={fallbackLabel}
         className="absolute inset-0 h-full w-full"
         imageClassName={`${imageClassName} ${

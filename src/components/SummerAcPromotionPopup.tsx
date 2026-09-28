@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { trackGoogleAnalyticsEvent } from "@/lib/google-analytics";
+import { AcPromotionContent } from "./AcPromotionContent";
+import type { AirConditionerCleaningContent } from "@/cms/content/special-model";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const STORAGE_KEY = "cleanbrothers:summer-ac-promotion-shown";
@@ -12,7 +14,7 @@ const whatsappHref = getWhatsAppLink(
   "היי CleanBrothers, הגעתי ממבצע הקיץ לניקוי מזגנים ואשמח לקבל הצעת מחיר.",
 );
 
-export function SummerAcPromotionPopup() {
+export function SummerAcPromotionPopup({ promotion }: { promotion: AirConditionerCleaningContent["promotion"] }) {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -130,51 +132,7 @@ export function SummerAcPromotionPopup() {
           ×
         </button>
 
-        <div className="pr-0 text-center sm:px-3">
-          <p className="inline-flex rounded-full border border-turquoise/25 bg-turquoise/10 px-3 py-1.5 text-xs font-black text-turquoise-dark sm:text-sm">
-            מבצע קיץ ☀️
-          </p>
-          <h2
-            id="summer-ac-promotion-title"
-            className="mx-auto mt-3 max-w-md text-3xl font-black leading-tight sm:text-4xl"
-          >
-            ניקוי מזגן החל מ־<span className="text-turquoise-dark">199 ₪</span>
-          </h2>
-          <p className="mt-1.5 text-sm font-bold theme-muted">
-            במקום <span className="line-through decoration-2">250 ₪</span>
-          </p>
-
-          <div className="mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/[0.08] px-4 py-3 sm:mt-5">
-            <p className="text-lg font-black sm:text-xl">
-              מנקים 5 מזגנים — המזגן ה־6 עלינו!
-            </p>
-          </div>
-
-          <p
-            id="summer-ac-promotion-description"
-            className="mx-auto mt-4 max-w-md text-sm leading-6 theme-muted sm:text-base sm:leading-7"
-          >
-            שלחו לנו תמונות של המזגנים בוואטסאפ וקבלו הצעת מחיר מדויקת.
-          </p>
-
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() =>
-              trackGoogleAnalyticsEvent("promotion_whatsapp_click")
-            }
-            className="btn-primary mt-4 inline-flex min-h-12 w-full px-5 text-base sm:mt-5"
-          >
-            שלחו תמונות וקבלו מחיר
-          </a>
-
-          <p className="mt-4 text-right text-[0.7rem] leading-5 theme-muted sm:text-xs">
-            המחיר הסופי נקבע לפי סוג המזגן, מצבו, הנגישות ומיקום השירות. מבצע
-            המזגן השישי מתייחס לניקוי במסגרת אותו ביקור ובאותה כתובת, בכפוף
-            להתאמת המזגנים לשירות.
-          </p>
-        </div>
+        <AcPromotionContent promotion={promotion} whatsappHref={whatsappHref} onContact={() => trackGoogleAnalyticsEvent("promotion_whatsapp_click")} />
       </div>
     </div>,
     document.body,

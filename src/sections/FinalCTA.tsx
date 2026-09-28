@@ -9,7 +9,18 @@ const trustNotes = [
   "ללא התחייבות",
 ];
 
-export function FinalCTA() {
+export const finalCtaContent = {
+  eyebrow: "הצעת מחיר בוואטסאפ תוך דקות",
+  title: "צריכים שירות ניקיון לבית, לעסק או לרכב?",
+  description: "שלחו תמונה של מה שתרצו לנקות בוואטסאפ ונחזור עם הערכת מחיר ברורה.",
+  whatsappLabel: "שלחו תמונה וקבלו מחיר",
+  phoneLabel: "התקשרו עכשיו:",
+  trustNotes,
+};
+
+export function FinalCTA({ content = finalCtaContent, preview = false }: {
+  content?: typeof finalCtaContent; preview?: boolean;
+} = {}) {
   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
 
@@ -48,36 +59,36 @@ export function FinalCTA() {
               />
             </div>
             <p className="text-xs font-black text-turquoise sm:text-sm">
-              הצעת מחיר בוואטסאפ תוך דקות
+              {content.eyebrow}
             </p>
             <h2 className="mt-2 text-[1.45rem] font-black leading-tight sm:mt-3 sm:text-5xl">
-              צריכים שירות ניקיון לבית, לעסק או לרכב?
+              {content.title}
             </h2>
             <p className="mx-auto mt-2.5 max-w-2xl text-sm leading-6 text-white/78 sm:mt-5 sm:text-lg sm:leading-8">
-              שלחו תמונה של מה שתרצו לנקות בוואטסאפ ונחזור עם הערכת מחיר ברורה.
+              {content.description}
             </p>
 
             <div className="mt-4 grid justify-center gap-2 sm:mt-8 sm:flex sm:flex-row sm:items-center sm:gap-3">
-              <a
+              {preview ? <span className="btn-primary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base" aria-disabled="true">{content.whatsappLabel}</span> : <a
                 href={getWhatsAppLink(
                   "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי מזגן או ריפודים.",
                 )}
                 aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת הערכת מחיר"
                 className="btn-primary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
-                שלחו תמונה וקבלו מחיר
-              </a>
-              <a
+                {content.whatsappLabel}
+              </a>}
+              {preview ? <span className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base" aria-disabled="true">{content.phoneLabel} {businessConfig.phoneDisplay}</span> : <a
                 href={phoneHref}
                 aria-label="חיוג ל-CleanBrothers"
                 className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
-                התקשרו עכשיו: <GoogleCallTrackingNumber />
-              </a>
+                {content.phoneLabel} <GoogleCallTrackingNumber />
+              </a>}
             </div>
 
             <div className="mx-auto mt-4 flex max-w-3xl flex-wrap justify-center gap-1.5 text-[0.7rem] font-bold text-white/70 sm:mt-6 sm:gap-2 sm:text-xs">
-              {trustNotes.map((note) => (
+              {content.trustNotes.map((note) => (
                 <span
                   key={note}
                   className="rounded-full border border-white/12 bg-white/[0.075] px-2.5 py-1 sm:px-3 sm:py-1.5"

@@ -42,6 +42,7 @@ export function ImageWithFallback({
       {shouldShowImage ? (
         <Image
           src={src as string}
+          unoptimized={src?.startsWith("/admin/media/file/") || src?.startsWith("/cms-media/")}
           alt={alt}
           fill
           preload={preload || priority}

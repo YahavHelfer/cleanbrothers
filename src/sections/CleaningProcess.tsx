@@ -38,6 +38,14 @@ const processSteps: ProcessStep[] = [
   },
 ];
 
+export const processContent = {
+  eyebrow: "תהליך העבודה",
+  title: "ארבעה צעדים פשוטים לשירות ניקיון",
+  mobileDescription: "תמונה, מחיר, תיאום וניקוי עד הבית.",
+  description: "בלי טפסים מיותרים ובלי ניחושים. שולחים תמונה, מקבלים מחיר ברור, קובעים מועד ואנחנו מגיעים עם כל הציוד.",
+  steps: processSteps,
+};
+
 function StepIcon({ type }: { type: ProcessStep["icon"] }) {
   const sharedProps = {
     className: "h-6 w-6",
@@ -84,7 +92,9 @@ function StepIcon({ type }: { type: ProcessStep["icon"] }) {
   );
 }
 
-export function CleaningProcess() {
+export function CleaningProcess({ content = processContent, preview = false }: {
+  content?: typeof processContent; preview?: boolean;
+} = {}) {
   return (
     <section className="reveal theme-section-soft relative overflow-hidden py-9 sm:py-16 lg:py-18">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-l from-transparent via-turquoise/45 to-transparent" />
@@ -92,10 +102,10 @@ export function CleaningProcess() {
 
       <div className="section-container">
         <SectionHeading
-          eyebrow="תהליך העבודה"
-          title="ארבעה צעדים פשוטים לשירות ניקיון"
-          mobileDescription="תמונה, מחיר, תיאום וניקוי עד הבית."
-          description="בלי טפסים מיותרים ובלי ניחושים. שולחים תמונה, מקבלים מחיר ברור, קובעים מועד ואנחנו מגיעים עם כל הציוד."
+          eyebrow={content.eyebrow}
+          title={content.title}
+          mobileDescription={content.mobileDescription}
+          description={content.description}
           tone="light"
         />
 
@@ -104,7 +114,7 @@ export function CleaningProcess() {
           <div className="absolute right-[12.5%] top-10 hidden h-px w-[75%] bg-gradient-to-l from-turquoise/5 via-turquoise/55 to-turquoise/5 md:block" />
 
           <div className="grid gap-3 md:grid-cols-4 md:gap-5">
-            {processSteps.map((step, index) => (
+            {content.steps.map((step, index) => (
               <article
                 key={step.title}
                 className={`card-lift reveal relative rounded-[1.25rem] border theme-card p-3.5 hover:border-turquoise/45 hover:shadow-turquoise/10 sm:rounded-[2rem] sm:p-6 stagger-${index + 1}`}
@@ -135,7 +145,7 @@ export function CleaningProcess() {
         </div>
 
         <div className="mt-5 text-center sm:mt-9">
-          <a
+          {preview ? <span className="btn-primary inline-flex" aria-disabled="true">התחילו עכשיו בוואטסאפ</span> : <a
             href={getWhatsAppLink(
               "היי, אשמח לקבל הצעת מחיר לניקוי ריפודים.",
             )}
@@ -143,7 +153,7 @@ export function CleaningProcess() {
             className="btn-primary inline-flex"
           >
             התחילו עכשיו בוואטסאפ
-          </a>
+          </a>}
         </div>
       </div>
     </section>

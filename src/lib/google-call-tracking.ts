@@ -1,7 +1,6 @@
 import { hasAdStorageConsent } from "@/lib/consent";
-
-export const GOOGLE_CALL_CONVERSION_NUMBER_CLASS =
-  "google-call-conversion-number";
+import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking-constant";
+export { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking-constant";
 
 type GoogleCallTrackingState = {
   formattedNumber: string;

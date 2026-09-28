@@ -39,6 +39,8 @@ export function PageHero({
             >
               {ctaLabel}
             </a>
+          ) : ctaLabel ? (
+            <span aria-disabled="true" className="btn-primary reveal stagger-4 mt-6 inline-flex sm:mt-8">{ctaLabel}</span>
           ) : null}
         </div>
       </div>

@@ -11,12 +11,24 @@ const trustChips = [
 
 const mascotAlt = "איור של צוות CleanBrothers";
 
-export function Hero() {
+export const heroContent = {
+  eyebrow: "CleanBrothers • שירותי ניקיון מקצועיים",
+  title: "ניקיון מקצועי לבית, לעסק ולרכב",
+  description: "ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות — עם שירות מקצועי עד אליכם.",
+  primaryLabel: "שלחו תמונה וקבלו הערכת מחיר",
+  secondaryLabel: "צפו בכל השירותים",
+  trustChips,
+  backgroundAlt: "ניקוי ספה מקצועי בבית הלקוח",
+};
+
+export function Hero({ content = heroContent, backgroundSrc = "/images/hero/hero-sofa-cleaning.jpg", preview = false }: {
+  content?: typeof heroContent; backgroundSrc?: string; preview?: boolean;
+} = {}) {
   return (
     <section className="relative overflow-hidden bg-page-hero">
       <ImageWithFallback
-        src="/images/hero/hero-sofa-cleaning.jpg"
-        alt="ניקוי ספה מקצועי בבית הלקוח"
+        src={backgroundSrc}
+        alt={content.backgroundAlt}
         className="image-reveal absolute inset-0 h-full w-full"
         imageClassName="object-cover object-[58%_48%] sm:object-[55%_45%] lg:object-[50%_45%]"
         fallbackLabel=""
@@ -56,34 +68,32 @@ export function Hero() {
           />
 
           <p className="reveal stagger-2 mb-3 inline-flex rounded-full border border-turquoise/35 bg-navy/35 px-3 py-1.5 text-xs font-bold text-turquoise backdrop-blur sm:mb-5 sm:px-4 sm:py-2 sm:text-sm lg:mb-4">
-            CleanBrothers • שירותי ניקיון מקצועיים
+            {content.eyebrow}
           </p>
 
           <h1 className="reveal stagger-3 mx-auto max-w-4xl text-[2rem] font-black leading-[1.13] text-white min-[380px]:text-[2.18rem] sm:text-5xl lg:mx-0 lg:text-[4.05rem]">
-            ניקיון מקצועי לבית, לעסק ולרכב
+            {content.title}
           </h1>
 
           <p className="reveal stagger-4 mx-auto mt-4 max-w-2xl text-base leading-7 text-white/86 sm:mt-6 sm:text-xl sm:leading-9 lg:mx-0">
-            ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות — עם
-            שירות מקצועי עד אליכם.
+            {content.description}
           </p>
 
           <div className="reveal stagger-5 mx-auto mt-6 flex max-w-2xl flex-col justify-center gap-3 sm:flex-row sm:flex-wrap lg:mx-0 lg:justify-start">
-            <a
+            {preview ? <span className="btn-primary inline-flex" aria-disabled="true">{content.primaryLabel}</span> : <a
               href={getWhatsAppLink(
                 "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לשירות ניקיון.",
               )}
               className="btn-primary inline-flex"
             >
-              שלחו תמונה וקבלו הערכת מחיר
-            </a>
-            <Link href="/services" className="btn-secondary inline-flex text-white">
-              צפו בכל השירותים
-            </Link>
+              {content.primaryLabel}
+            </a>}
+            {preview ? <span className="btn-secondary inline-flex text-white" aria-disabled="true">{content.secondaryLabel}</span>
+              : <Link href="/services" className="btn-secondary inline-flex text-white">{content.secondaryLabel}</Link>}
           </div>
 
           <div className="reveal stagger-6 mx-auto mt-5 flex max-w-2xl flex-wrap justify-center gap-1.5 sm:mt-6 sm:gap-2 lg:mx-0 lg:justify-start">
-            {trustChips.map((item) => (
+            {content.trustChips.map((item) => (
               <div
                 key={item}
                 className="rounded-full border border-white/12 bg-navy/26 px-2.5 py-1 text-[0.7rem] font-black text-white/84 backdrop-blur-md transition duration-300 hover:border-turquoise/35 hover:text-turquoise sm:px-3 sm:py-1.5 sm:text-sm"

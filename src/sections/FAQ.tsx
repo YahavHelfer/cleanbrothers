@@ -1,7 +1,15 @@
 import { SectionHeading } from "@/components/SectionHeading";
 import { faqs } from "@/data/site";
 
-export function FAQ() {
+export const faqContent = {
+  eyebrow: "שאלות נפוצות",
+  title: "כל מה שכדאי לדעת לפני שמזמינים ניקוי",
+  mobileDescription: "תשובות קצרות לפני שמזמינים.",
+  description: "תשובות קצרות וברורות על ייבוש, ריחות, כתמים, בעלי חיים, מחיר ושירות עד הבית.",
+  items: faqs,
+};
+
+export function FAQ({ content = faqContent }: { content?: typeof faqContent } = {}) {
   return (
     <section
       id="faq"
@@ -11,15 +19,15 @@ export function FAQ() {
 
       <div className="section-container">
         <SectionHeading
-          eyebrow="שאלות נפוצות"
-          title="כל מה שכדאי לדעת לפני שמזמינים ניקוי"
-          mobileDescription="תשובות קצרות לפני שמזמינים."
-          description="תשובות קצרות וברורות על ייבוש, ריחות, כתמים, בעלי חיים, מחיר ושירות עד הבית."
+          eyebrow={content.eyebrow}
+          title={content.title}
+          mobileDescription={content.mobileDescription}
+          description={content.description}
           tone="light"
         />
 
         <div className="mx-auto mt-4 max-w-4xl space-y-1.5 sm:mt-10 sm:space-y-3">
-          {faqs.map((faq, index) => (
+          {content.items.map((faq, index) => (
             <details
               key={faq.question}
               className={`card-lift reveal group rounded-[1.05rem] border theme-card p-3 hover:border-turquoise/35 sm:rounded-[1.75rem] sm:p-5 stagger-${(index % 6) + 1}`}

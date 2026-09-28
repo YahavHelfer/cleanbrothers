@@ -1,0 +1,216 @@
+# CMS authentication — local foundation
+
+This guide covers the isolated local foundation on Next.js 16.3.5.
+The local MFA/AAL2 implementation and the B2B2 rollout/recovery procedure are in
+[the MFA foundation guide](cms-mfa-foundation.md). The local CLI directory stays
+unlinked. The separate Free cloud project and Preview setup are
+documented in [the cloud foundation report](cms-cloud-foundation.md).
+The public site still uses `staticContentSource`; its business APIs are unchanged.
+
+## Trust boundaries
+
+- `/admin/login` uses a Next.js Server Action for email/password login. There is
+  no browser Supabase client, signup action, OAuth callback, or user-supplied redirect.
+- `src/proxy.ts` runs only on `/admin/:path*`. It verifies/refreshes the session
+  with `getUser()`, forwards refreshed request cookies, returns response cookies,
+  and marks every admin response private/no-store/noindex.
+- The protected route-group layout calls `requireCmsAdminPage()`. Dashboard data
+  calls it independently. Future reads and mutations must call `requireCmsAdmin()`
+  directly, including Server Actions and route handlers; a layout or Proxy check
+  never substitutes for authorization at the data boundary.
+- `requireCmsAdmin()` creates a request-local ordinary SSR client, verifies the
+  identity with an Auth-server `getUser()` call and signature-verified `getClaims()`,
+  checks active membership, requires a verified TOTP factor and `aal2`, and then
+  selects that UUID's active `admin` membership through AAL2-protected RLS. It
+  returns only UUID, verified email and role. Neither cookie user data, editable
+  user metadata, email matching nor an unverified `getSession()` result authorizes
+  access. There is no persistent authorization cache.
+- Normal application access uses only the publishable key and the user's JWT.
+  No service-role client/key exists in application source or browser bundles.
+- Membership RLS allows an authenticated active AAL2 admin to SELECT only their
+  own active row. An invited account must first set its initial password.
+  Anonymous has no table privilege. No API role has membership-write table
+  privileges/policies. The owner-only bootstrap process changes membership.
+- `is_cms_admin_aal2()` is the mandatory helper for future content RLS. The legacy
+  `is_cms_admin()` name now delegates to it. Both are SECURITY INVOKER with empty
+  search paths. Two no-argument SECURITY DEFINER functions expose only own-user
+  membership/initial-password eligibility booleans to authenticated users; they
+  expose neither Auth rows nor CMS content. A third no-argument function can mark
+  only the caller's initial-password completion after signed password authentication;
+  it cannot create or activate memberships. No content tables are included.
+- The historical Phase 1B-A migration created two fixed administrator seats.
+  The forward migration `20260921150000_cms_flexible_membership.sql` removes
+  `admin_slot` and its constraints without changing identities, role, active
+  status, timestamps, RLS, grants or the authorization helper. Only the `admin`
+  role remains. Exactly two real administrators is a controlled bootstrap policy,
+  not a permanent database capacity limit. Synthetic SQL tests verify a third
+  membership can exist without allowing API users to create memberships.
+- Cookies use a dedicated `cb-cms-auth` namespace, HttpOnly, SameSite=Lax, and
+  Path=/admin. No public consent/attribution cookie is read or changed. They use
+  Secure=false solely for the hard-allowed loopback HTTP endpoint outside Vercel.
+  Hosted, missing and invalid configuration retain Secure=true, including cookie
+  deletion during logout. Only the verified CMS cloud project is allowed on
+  Vercel Preview. Other hosted URLs, Production, missing settings and
+  secret/service/legacy keys are rejected before any connection.
+- Login creates a new Supabase session. Unauthorized login revokes that session
+  and clears its cookies. Logout revokes the current session's refresh token and
+  clears only CMS cookies. Supabase-issued access JWTs can remain valid until
+  expiry (300 seconds locally); this is not a custom token revocation system.
+  Membership deactivation is checked afresh and takes effect immediately.
+
+## Local setup and validation
+
+Prerequisites: Node >=22, Docker, npm. The CLI and Playwright are pinned in the
+lockfile. Never use `supabase link`, `db push`, remote URLs or production keys here.
+
+```sh
+npm ci
+npx playwright install chromium
+# Create once; reuse only this project's dedicated network.
+docker network create --driver bridge \
+  --opt com.docker.network.bridge.host_binding_ipv4=127.0.0.1 \
+  cleanbrothers-cms-local
+npm run cms:start
+npm run test:cms:db
+npm test
+npm run test:cms
+npm run build
+npm run test:e2e
+npx tsc --noEmit --incremental false
+npm run lint
+git diff --check
+npm run cms:stop
+```
+
+The Supabase CLI currently publishes its API/database/mail-test ports on all
+host interfaces even with the network's loopback binding option. This stack is
+for a private local test machine, contains synthetic identities only, and should
+be stopped when tests finish. Next's test server itself binds only to loopback.
+No external SMTP, production project, real account or customer data is needed.
+
+Docker Desktop's credential helper stalled public image downloads on the test
+machine. An isolated temporary `DOCKER_CONFIG` containing only `{"auths":{}}`,
+with `DOCKER_HOST` pointing to the local Docker socket, allowed anonymous public
+image downloads. No user Docker configuration or stored credential was changed.
+
+The web test harness reads `supabase status --output json` in memory, requires
+project `cleanbrothers-cms-local`, refuses a linked project, and verifies the exact
+API origin `http://127.0.0.1:56321`. It gives the Next.js child process ONLY the
+CMS publishable configuration, PATH and Node/telemetry settings; no CRM variables
+or bootstrap key are inherited. Next runs at `http://127.0.0.1:56300` with
+`reuseExistingServer: false`. Browser requests to other origins are rejected.
+
+For an interactive local session, copy only the local API URL and publishable
+key into ignored `.env.local` under `CMS_SUPABASE_URL` and
+`CMS_SUPABASE_PUBLISHABLE_KEY`. `.env.example` contains names and comments only
+for these new settings. Never place a service key there. Without valid local
+configuration the public site builds normally and admin login fails safely.
+
+## Fixtures and controlled bootstrap
+
+Before each test, Playwright creates three randomized `example.invalid` Auth
+identities using the local Auth Admin API: an active admin, an inactive admin and
+a non-member. Their password is generated per worker and never committed. Only
+the first two get membership rows. Invitation tests additionally generate local
+invite links without sending email.
+Cleanup after each test deletes only that test's identities, with membership
+cascade deletion, then asserts zero Auth users and zero memberships. The suite
+refuses to seed a non-empty membership table. No Auth state, screenshots, traces
+or video are persisted by default.
+SQL tests run in a transaction and roll back all fixtures and changes.
+
+The privileged test helper lives in `scripts/cms-local.mjs` and `tests/e2e`, not
+in the application. It obtains the **local** service key only in memory for Auth
+fixture creation/deletion. Membership setup uses `docker exec`/`psql` on the exact
+local CMS database container as its database owner. Runtime clients never use it.
+
+Future real bootstrap (Phase 1B-B2, not performed): an authorized operator creates
+exactly two Auth identities through the dedicated CMS project's administrative
+API/console and confirms them through a controlled flow. The bootstrap procedure
+must verify the dedicated project reference and both UUIDs, acquire a transaction
+advisory lock shared by all membership bootstrap operations, check that no real
+memberships already exist, and insert the two memberships atomically using a
+database-owner connection. Abort on a non-empty initial membership table rather
+than silently adding more administrators. The process must check that exactly
+two intended active memberships remain before committing. Replacements require
+an explicit revoke-and-replace operation under the same lock. Do not hardcode
+email allowlists or expose bootstrap as a browser API. Individual insertion shape:
+
+```sql
+-- Only within the controlled two-identity bootstrap transaction above.
+insert into public.cms_admin_members (user_id, role, is_active)
+values (:'user_id'::uuid, 'admin', true);
+```
+
+Keep bootstrap credentials outside the web process. Disable a member with an
+owner-side `is_active=false` update; replace identities deliberately. No
+browser membership-management endpoint, service-key client, or open signup exists.
+The local CLI maps `auth.email.enable_signup` to the email provider enable flag;
+it must be true for password login. Global `auth.enable_signup=false` blocks
+public signup, verified against the live local API (`signup_disabled`).
+
+## Test changes from Phase 1A
+
+The exact route inventory now includes `/admin/login`; admin is no longer an
+unauthenticated placeholder. The old placeholder assertion was replaced with a
+shell-only isolation assertion plus authenticated browser coverage. Import-graph
+checks now cover every admin module and Proxy. Dedicated Auth fetches are allowed,
+while CRM endpoints, public tracking imports and marketing calls remain forbidden.
+All public URL, metadata, consent, CRM, WhatsApp and static-adapter tests remain.
+The in-memory unit loader supports explicit mocks for server-only auth tests;
+real Auth/database behavior is independently tested by pgTAP and Playwright.
+
+## Security review and next phase
+
+The checks cover unauthenticated/forged access, non-members, inactive members,
+revocation after login, direct SQL privileges, fixed redirects, session refresh,
+logout, cache headers, noindex, mobile RTL and public-cookie/marketing isolation.
+Admin/preview remain outside the sitemap. Auth sessions and membership are never
+cached across requests. Next Server Actions enforce their standard Origin/Host
+CSRF checks; no cross-origin allowlist is added.
+
+The original Phase 1B-A audit found 9 inherited vulnerable packages (1 low,
+1 moderate, 6 high, 1 critical). The subsequent local security gate updated Next.js
+and eslint-config-next to 16.3.5 and resolved the remaining vulnerable transitive
+dependencies. The final audit on 2026-09-21 reports zero vulnerabilities, including
+development dependencies. All regression suites pass; four additional tests call
+the dashboard data boundary directly without running Proxy or a layout.
+See [the security gate report](phase-1b-security-gate.md) for all advisories,
+exact version changes, exposure analysis and validation evidence.
+
+Cookie Path=/admin remains unchanged. Server Actions invoked from admin pages
+receive this cookie; a future /preview/* URL would not. Prefer an authenticated
+/admin/preview/* URL, with its own isolated layout and independent data-boundary
+authorization. Any alternative preview session architecture needs a separate
+review; no preview authentication or broader cookie scope is implemented here.
+The security report records the earlier recommendation for flexible membership.
+Phase 1B-B1 implements that recommendation through a new forward migration and
+26 SQL authorization/schema tests. The original migration remains unchanged.
+See [the cloud foundation status](cms-cloud-foundation.md) for external setup
+prerequisites and which cloud steps have actually been completed.
+
+Phase 1B-B1 created the dedicated Free cloud project and applied the first two
+membership migrations. B2A subsequently deployed the approved feature SHA to a
+protected Preview and narrowed the two CMS variables to that branch. Production
+remains on main. The B1 report is a historical snapshot, not current MFA status.
+
+B2B1 adds local-only TOTP enrollment/challenge, invitation/first-password routes
+and `20260922000000_cms_mfa_aal2.sql`. Start the isolated stack with TOTP enabled;
+for a previously initialized local database, apply pending migrations explicitly:
+
+```sh
+SUPABASE_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 \
+  npx supabase migration up --local --network-id cleanbrothers-cms-local
+```
+
+Do not use `--linked` for these tests. Cloud still has only the two B1 migrations,
+zero users and zero memberships. The new code/migration is not deployed. Review
+and separate B2B2 authorization are required before cloud rollout or real users;
+follow [the MFA guide](cms-mfa-foundation.md) for the exact order and URL settings.
+
+References:
+- https://supabase.com/docs/guides/auth/server-side/creating-a-client
+- https://supabase.com/docs/guides/auth/server-side/advanced-guide
+- https://supabase.com/docs/guides/database/postgres/row-level-security
+- https://supabase.com/docs/guides/local-development/cli/config
+- Installed Next.js docs: `node_modules/next/dist/docs/01-app/02-guides/authentication.md`
