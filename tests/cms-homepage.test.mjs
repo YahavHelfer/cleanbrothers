@@ -54,6 +54,46 @@ test("review source validation keeps attribution, drops missing links and reject
   assert.equal(validateGoogleReviews(fixture).reviews.length, 0);
 });
 
+test("Maps attribution accepts exact Google hosts without requiring a /maps path", () => {
+  const validLinks = [
+    "https://maps.google.com/",
+    "https://maps.google.com/?q=CleanBrothers",
+    "https://www.google.com/maps/place/example",
+    "https://google.com/maps/place/example",
+    "https://maps.app.goo.gl/example",
+  ];
+  for (const link of validLinks) {
+    const fixture = structuredClone(syntheticGoogleReviews);
+    fixture.googleMapsUri = link;
+    fixture.reviews[0].googleMapsUri = link;
+    fixture.reviews[0].author.uri = link;
+    const checked = validateGoogleReviews(fixture);
+    assert.equal(checked.googleMapsUri, link);
+    assert.equal(checked.reviews[0].googleMapsUri, link);
+    assert.equal(checked.reviews[0].author.uri, link);
+  }
+  const unsafeLinks = [
+    "http://maps.google.com/",
+    "https://evil.example/maps/place/example",
+    "https://google.com.evil.example/maps/place/example",
+    "https://user:pass@google.com/maps/place/example",
+    "https://google.com:444/maps/place/example",
+    "javascript:alert(1)",
+    "data:text/html,hello",
+  ];
+  for (const link of unsafeLinks) {
+    const fixture = structuredClone(syntheticGoogleReviews);
+    fixture.googleMapsUri = link;
+    assert.equal(validateGoogleReviews(fixture), null, link);
+    fixture.googleMapsUri = "https://maps.google.com/";
+    fixture.reviews[0].googleMapsUri = link;
+    assert.equal(validateGoogleReviews(fixture).reviews.length, 3, link);
+    fixture.reviews[0].googleMapsUri = "https://maps.google.com/";
+    fixture.reviews[0].author.uri = link;
+    assert.equal(validateGoogleReviews(fixture).reviews.length, 3, link);
+  }
+});
+
 test("server review source fails closed on public pages and permits only explicit local fixtures", async () => {
   const source = env => createSourceLoader({ env })("src/cms/reviews/source.ts").getGoogleReviews;
   assert.equal(await source({})("public"), null);
@@ -115,6 +155,20 @@ test("live Google source uses exact Place Details fields, validates five reviews
   assert.equal(result.reviews[0].googleMapsUri, response.reviews[0].googleMapsUri);
   assert.ok(!JSON.stringify(result).includes(googlePreview.GOOGLE_PLACES_API_KEY));
   assert.ok(!JSON.stringify(result).includes("authorAttribution"));
+});
+
+test("live Google source accepts safe non-/maps attribution paths in a synthetic response", async () => {
+  const response = googlePayload();
+  response.googleMapsUri = "https://maps.google.com/";
+  response.reviews[0].googleMapsUri = "https://maps.google.com/?q=review";
+  response.reviews[0].authorAttribution.uri = "https://maps.google.com/?q=contributor";
+  const source = createSourceLoader({ env: googlePreview,
+    fetchImpl: async () => new Response(JSON.stringify(response), { status: 200 }) })("src/cms/reviews/source.ts");
+  const result = plain(await source.getGoogleReviews("public"));
+  assert.equal(result.googleMapsUri, response.googleMapsUri);
+  assert.equal(result.reviews.length, 5);
+  assert.equal(result.reviews[0].googleMapsUri, response.reviews[0].googleMapsUri);
+  assert.equal(result.reviews[0].author.uri, response.reviews[0].authorAttribution.uri);
 });
 
 test("live Google source fails closed for missing or mismatched Preview identities and secrets", async () => {

@@ -27,8 +27,8 @@ function safeUrl(value: unknown, kind: "maps" | "avatar"): string | null {
   try {
     const url = new URL(value);
     if (url.protocol !== "https:" || url.username || url.password || url.port) return null;
-    if (kind === "maps" && ((["www.google.com", "google.com", "maps.google.com"].includes(url.hostname) &&
-      url.pathname.startsWith("/maps")) || url.hostname === "maps.app.goo.gl")) return url.href;
+    if (kind === "maps" && ["www.google.com", "google.com", "maps.google.com", "maps.app.goo.gl"]
+      .includes(url.hostname)) return url.href;
     if (kind === "avatar" && (url.hostname === "googleusercontent.com" ||
       url.hostname.endsWith(".googleusercontent.com"))) return url.href;
   } catch { /* Invalid external URL; omit it. */ }
