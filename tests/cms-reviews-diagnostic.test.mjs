@@ -19,7 +19,8 @@ test("temporary diagnostic accepts only same-origin POST through the approved fo
   assert.equal(diagnosticTransportAllowed(request({ "x-forwarded-proto": "http" })), false);
   assert.equal(diagnosticTransportAllowed(request({}, "GET")), false);
   assert.deepEqual(Object.keys(diagnosticTransportFacts(request({ origin: "https://attacker.example" }))),
-    ["methodPost", "fetchSiteSameOrigin", "originApproved", "forwardedProtoHttps", "forwardedHostValid"]);
+    ["methodPost", "fetchSiteSameOrigin", "originApproved", "forwardedProtoHttps", "forwardedHostValid",
+      "originPresent", "originOpaqueNull", "originMatchesForwardedHost", "originMatchesRequestUrl"]);
   assert.ok(Object.values(diagnosticTransportFacts(request({ origin: "https://attacker.example" })))
     .every(value => typeof value === "boolean"));
 });
