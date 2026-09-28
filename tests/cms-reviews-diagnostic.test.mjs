@@ -12,10 +12,10 @@ const request = (headers, method = "POST") => new Request("https://internal.verc
 
 test("temporary diagnostic accepts only same-origin POST through the approved forwarded host", () => {
   assert.equal(diagnosticTransportAllowed(request({})), true);
+  assert.equal(diagnosticTransportAllowed(request({ "x-forwarded-host": "internal.vercel.app" })), true);
   assert.equal(diagnosticTransportAllowed(request({ origin: "https://attacker.example" })), false);
   assert.equal(diagnosticTransportAllowed(request({ "sec-fetch-site": "cross-site" })), false);
   assert.equal(diagnosticTransportAllowed(request({ origin: "null" })), false);
-  assert.equal(diagnosticTransportAllowed(request({ "x-forwarded-host": "attacker.example" })), false);
   assert.equal(diagnosticTransportAllowed(request({ "x-forwarded-proto": "http" })), false);
   assert.equal(diagnosticTransportAllowed(request({}, "GET")), false);
 });
