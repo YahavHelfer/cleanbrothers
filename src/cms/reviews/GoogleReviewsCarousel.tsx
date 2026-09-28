@@ -44,7 +44,12 @@ export function GoogleReviewsCarousel({ content, source, preview = false }: {
         <strong>{source.rating} / 5</strong><span aria-hidden="true">★</span>
         <span>מתוך {source.userRatingCount} דירוגים ב־Google Maps</span>
       </div>}
-      <p className="mt-2 text-sm">מקור: Google Maps · הביקורות מוצגות לפי סדר הרלוונטיות שמוחזר מ־Google Maps</p>
+      <div className="mt-3 inline-flex flex-wrap items-center gap-3 text-sm">
+        <span className="inline-block rounded bg-white px-[10px] pb-[5px] pt-[10px]">
+          <Image src="/images/google/GoogleMaps_Logo_DarkGray.svg" alt="Google Maps" width={98} height={18} unoptimized />
+        </span>
+        <span>הביקורות מוצגות לפי סדר הרלוונטיות שמוחזר מ־Google Maps</span>
+      </div>
       {preview ? <p className="mt-2 text-sm">צפייה בעסק ב־Google Maps</p> :
         <a href={source.googleMapsUri} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm underline">צפייה בעסק ב־Google Maps</a>}
       <div className="mt-6 flex items-center justify-end gap-2">

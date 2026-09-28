@@ -63,6 +63,98 @@ test("server review source fails closed on public pages and permits only explici
   assert.equal((await source({})("preview")).reviews.length, 4);
 });
 
+const googlePreview = {
+  VERCEL: "1", VERCEL_ENV: "preview", VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+  VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
+  CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co",
+  GOOGLE_REVIEWS_SOURCE: "google", GOOGLE_REVIEWS_PLACE_ID: "ChIJM6V_e13OrmgRCjbDT5abAqA",
+  GOOGLE_PLACES_API_KEY: "synthetic-test-key-never-real",
+};
+const googlePayload = () => ({
+  displayName: { text: "CleanBrothers" }, rating: 4.8, userRatingCount: 317,
+  googleMapsUri: "https://www.google.com/maps/place/example",
+  reviews: Array.from({ length: 5 }, (_, index) => ({
+    rating: index === 1 ? 4 : 5,
+    text: { text: index === 0 ? "שירות מעולה" : `Excellent service ${index}` },
+    ...(index === 1 ? {} : { relativePublishTimeDescription: "1 month ago" }),
+    authorAttribution: {
+      displayName: `Reviewer ${index}`,
+      uri: `https://www.google.com/maps/contrib/example-${index}`,
+      ...(index === 0 ? {} : { photoUri: "https://lh3.googleusercontent.com/example-avatar" }),
+    },
+    googleMapsUri: `https://www.google.com/maps/reviews/example-${index}`,
+  })),
+});
+
+test("live Google source uses exact Place Details fields, validates five reviews and never returns the key", async () => {
+  let calls = 0;
+  const response = googlePayload();
+  const source = createSourceLoader({ env: googlePreview, fetchImpl: async (url, options) => {
+    calls++;
+    assert.equal(url, `https://places.googleapis.com/v1/places/${googlePreview.GOOGLE_REVIEWS_PLACE_ID}`);
+    assert.equal(options.cache, "no-store");
+    assert.equal(options.headers["X-Goog-Api-Key"], googlePreview.GOOGLE_PLACES_API_KEY);
+    assert.equal(options.headers["X-Goog-FieldMask"], [
+      "displayName.text", "rating", "userRatingCount", "googleMapsUri", "reviews.rating", "reviews.text.text",
+      "reviews.relativePublishTimeDescription", "reviews.authorAttribution.displayName",
+      "reviews.authorAttribution.uri", "reviews.authorAttribution.photoUri", "reviews.googleMapsUri",
+    ].join(","));
+    assert.ok(options.signal);
+    return new Response(JSON.stringify(response), { status: 200 });
+  } })("src/cms/reviews/source.ts").getGoogleReviews;
+  const result = plain(await source("public"));
+  assert.equal(calls, 1);
+  assert.equal(result.placeName, "CleanBrothers");
+  assert.equal(result.rating, 4.8);
+  assert.equal(result.userRatingCount, 317);
+  assert.equal(result.reviews.length, 5);
+  assert.equal(result.reviews[0].text, "שירות מעולה");
+  assert.match(result.reviews[1].text, /Excellent/);
+  assert.equal(result.reviews[0].author.photoUri, null);
+  assert.equal(result.reviews[1].relativePublishTimeDescription, null);
+  assert.equal(result.reviews[0].googleMapsUri, response.reviews[0].googleMapsUri);
+  assert.ok(!JSON.stringify(result).includes(googlePreview.GOOGLE_PLACES_API_KEY));
+  assert.ok(!JSON.stringify(result).includes("authorAttribution"));
+});
+
+test("live Google source fails closed for missing or mismatched Preview identities and secrets", async () => {
+  for (const change of [
+    { GOOGLE_REVIEWS_SOURCE: "fixture" }, { VERCEL: "" }, { VERCEL_ENV: "production" },
+    { VERCEL_PROJECT_ID: "wrong" }, { VERCEL_GIT_COMMIT_REF: "main" },
+    { CMS_SUPABASE_URL: "https://other.supabase.co" }, { GOOGLE_REVIEWS_PLACE_ID: "" },
+    { GOOGLE_REVIEWS_PLACE_ID: "ChIJnotTheApprovedPlaceId123" }, { GOOGLE_PLACES_API_KEY: "" },
+  ]) {
+    let calls = 0;
+    const source = createSourceLoader({ env: { ...googlePreview, ...change },
+      fetchImpl: async () => { calls++; throw Error("Google must not be called"); } })("src/cms/reviews/source.ts");
+    assert.equal(await source.getGoogleReviews("public"), null);
+    assert.equal(calls, 0);
+  }
+});
+
+test("live Google source omits empty, malformed, unsafe and unavailable reviews without breaking the page", async () => {
+  const run = async (payload, status = 200) => {
+    const source = createSourceLoader({ env: googlePreview,
+      fetchImpl: async () => new Response(JSON.stringify(payload), { status }) })("src/cms/reviews/source.ts");
+    return source.getGoogleReviews("public");
+  };
+  const empty = googlePayload(); empty.reviews = [];
+  assert.equal(await run(empty), null);
+  const malformed = googlePayload(); malformed.reviews[0].rating = 9;
+  assert.equal((await run(malformed)).reviews.length, 4);
+  const unsafe = googlePayload(); unsafe.reviews[0].googleMapsUri = "https://evil.example/maps/review";
+  assert.equal((await run(unsafe)).reviews.length, 4);
+  const unsafePlace = googlePayload(); unsafePlace.googleMapsUri = "https://evil.example/maps/place";
+  assert.equal(await run(unsafePlace), null);
+  const tooMany = googlePayload(); tooMany.reviews.push(tooMany.reviews[0]);
+  assert.equal(await run(tooMany), null);
+  for (const status of [403, 429, 500]) assert.equal(await run({}, status), null);
+  const timeout = createSourceLoader({ env: googlePreview, fetchImpl: async () => {
+    throw Object.assign(Error("timeout"), { name: "TimeoutError" });
+  } })("src/cms/reviews/source.ts");
+  assert.equal(await timeout.getGoogleReviews("public"), null);
+});
+
 test("review config is closed, singleton and contains no external review or API fields", () => {
   const page = draft(), block = page.blocks[6];
   block.hidden = false;
@@ -90,6 +182,7 @@ test("reviews render only when visible with separate valid runtime data", () => 
   const html = renderToStaticMarkup(createElement(HomeBlocksView,
     { page, revisionId: "fixture", reviews: validateGoogleReviews(syntheticGoogleReviews), preview: true }));
   assert.match(html, /Google Maps/);
+  assert.match(html, /GoogleMaps_Logo_DarkGray\.svg/);
   assert.match(html, /לקוח לדוגמה/);
   assert.ok(!html.includes("href=\"https://www.google.com/maps/reviews/"));
   assert.ok(!JSON.stringify(page).includes("Sample reviewer"));
