@@ -73,7 +73,7 @@ test("AC Preview stays request-rendered before allowlisting and reads the newly 
  assert.equal(result.content.copy.heroDescription,published.copy.heroDescription);
  assert.equal((await before.getPublicSpecialService("air-conditioner-cleaning")).content.copy.heroDescription,acBaseline.copy.heroDescription);
 });
-test("special Preview rollout preserves six shared services and enables only each explicitly selected service",()=>{
+test("special Preview rollout preserves seven shared services and enables only each explicitly selected service",()=>{
  const {sharedServiceKeys,specialServiceKeys}=load("src/content/service-registry.ts");
  const all=[...sharedServiceKeys,...specialServiceKeys];
  for(const allowlist of [[...sharedServiceKeys],[...sharedServiceKeys,"air-conditioner-cleaning"],all,["air-conditioner-cleaning"],["window-cleaning"]]){

@@ -17,7 +17,7 @@ select ok(not cms_new_page_slug('page#fragment'),'fragment injection denied');
 select ok(not cms_new_page_slug('page--name'),'repeated separator denied');
 select ok(not cms_new_page_slug('-page'),'leading separator denied');
 select ok(not cms_new_page_slug('page-'),'trailing separator denied');
-select is((select count(*)::int from cms_page_routes where kind in ('static','service','system')),27,
+select is((select count(*)::int from cms_page_routes where kind in ('static','service','system')),28,
   'all existing top-level routes have one reserved owner');
 select is((select count(*)::int from pg_class where relname in
   ('cms_new_page_identity','cms_page_routes','cms_page_route_events') and relforcerowsecurity),3,

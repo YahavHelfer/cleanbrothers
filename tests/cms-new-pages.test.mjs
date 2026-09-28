@@ -6,7 +6,7 @@ const routes = createSourceLoader()("src/cms/pages/routes.ts");
 const model = createSourceLoader()("src/cms/pages/model.ts");
 
 test("new page slugs cannot shadow existing or system routes", () => {
-  for (const slug of ["about", "admin", "api", "services", "sofa-cleaning", "window-cleaning",
+  for (const slug of ["about", "admin", "api", "services", "sofa-cleaning", "window-cleaning", "post-renovation-cleaning",
     "robots", "sitemap", "cms-media", "_next", "UPPER", "two--hyphens", "../admin",
     "a", "a".repeat(65), "x?revision=1", "x%2fadmin", "x.html", "x_foo", " x-page"])
     assert.throws(() => routes.validateNewPageSlug(slug));

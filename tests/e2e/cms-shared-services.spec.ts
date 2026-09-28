@@ -29,6 +29,18 @@ test.beforeEach(async({context})=>{
 });
 test.afterEach(async()=>{await cleanupActors();});
 
+test("post-renovation service remains readable at phone, tablet and desktop widths",async({page})=>{
+ for(const width of [390,768,1440]){
+  await page.setViewportSize({width,height:900});
+  const response=await page.goto('/post-renovation-cleaning');
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('main h1')).toContainText('ניקיון אחרי שיפוץ ולפני אכלוס');
+  await expect(page.locator('script[id="post-renovation-cleaning-faq-jsonld"]')).toHaveCount(1);
+  const layout=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));
+  expect(layout.document).toBeLessThanOrEqual(layout.viewport);
+ }
+});
+
 test("generic editor waits for JavaScript before editing or submitting under no-referrer",async({page,context})=>{
  await session(actor,context);
  const key="carpet-cleaning",initial=state(key),before=immutableSnapshot();
@@ -74,10 +86,10 @@ test("generic editor waits for JavaScript before editing or submitting under no-
  } finally {release();}
 });
 
-test("all six imported database baselines render exactly like static public pages; bootstrap preserves all history",async({page,context})=>{
+test("all seven imported database baselines render exactly like static public pages; bootstrap preserves all history",async({page,context})=>{
  const before=immutableSnapshot();bootstrap();expect(immutableSnapshot()).toBe(before);
- expect(localSql("select count(*) from content_documents")).toBe("6");
- expect(localSql("select count(*) from media_versions")).toBe("20");
+ expect(localSql("select count(*) from content_documents")).toBe("7");
+ expect(localSql("select count(*) from media_versions")).toBe("24");
  for(const key of sharedServiceKeys){const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);expect(original.service).toBe(serviceRegistry[key].crmName);}
  const client=await session(actor,context);
  for(const key of sharedServiceKeys.filter(k=>k!=="sofa-cleaning"&&k!=="mattress-cleaning")){

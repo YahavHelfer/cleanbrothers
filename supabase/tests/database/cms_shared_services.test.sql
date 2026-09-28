@@ -14,10 +14,10 @@ select ok(cms_valid_service_payload(k,p),k||' schema 3 accepted') from shared_fi
 update shared_fixture set baseline=cms_import_shared_baseline(k,p);
 select is(cms_import_shared_baseline(k,p),baseline,k||' baseline idempotent') from shared_fixture;
 select is((select count(*)::int from content_documents),6,'exactly six shared documents');
-select is((select count(*)::int from media_versions),20,'exactly twenty logical static versions; no copies');
-select is(cms_import_shared_media(),20,'media import idempotent');
-select is((select count(*)::int from media_versions),20,'media count unchanged');
-select is((select count(*)::int from media_audit_events),20,'system baseline authorship only');
+select is((select count(*)::int from media_versions),24,'exactly twenty-four logical static versions; no copies');
+select is(cms_import_shared_media(),24,'media import idempotent');
+select is((select count(*)::int from media_versions),24,'media count unchanged');
+select is((select count(*)::int from media_audit_events),24,'system baseline authorship only');
 select is((select count(*)::int from content_revisions where created_by is not null),0,'baseline is not attributed to invented admin');
 select is((select count(*)::int from revision_media_refs where revision_id=f.baseline),5,f.k||' exact roles including before/after') from shared_fixture f;
 select throws_ok($$insert into content_documents(content_type,content_key) values('page','sofa-cleaning')$$,'23514',null,'AAL2 does not broaden document types');

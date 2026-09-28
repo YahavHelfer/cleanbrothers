@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/car-upholstery-cleaning",
     "/armchair-chair-cleaning",
     "/delicate-upholstery-cleaning",
+    "/post-renovation-cleaning",
     "/gallery",
     "/about",
     "/contact",

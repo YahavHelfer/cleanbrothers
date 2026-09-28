@@ -1,4 +1,5 @@
 // Code-owned integration identity, never accepted from editor payloads.
+import { postRenovationIdentity } from "./post-renovation-identity";
 export const serviceRegistry = {
   "sofa-cleaning": {
     "crmName": "ניקוי ספות",
@@ -31,7 +32,8 @@ export const serviceRegistry = {
     "path": "/delicate-upholstery-cleaning"
   },
   "air-conditioner-cleaning": { crmName: "ניקוי מזגנים", documentId: "2185a776-4440-4728-af2c-909d17994241", path: "/air-conditioner-cleaning" },
-  "window-cleaning": { crmName: "ניקוי חלונות", documentId: "f05f10a0-b576-4625-8eb2-8abc5a0a1ae6", path: "/window-cleaning" }
+  "window-cleaning": { crmName: "ניקוי חלונות", documentId: "f05f10a0-b576-4625-8eb2-8abc5a0a1ae6", path: "/window-cleaning" },
+  "post-renovation-cleaning": { crmName: postRenovationIdentity.crmName, documentId: postRenovationIdentity.documentId, path: postRenovationIdentity.path }
 } as const;
 export type ManagedServiceKey = keyof typeof serviceRegistry;
 export const managedServiceKeys = Object.keys(serviceRegistry) as ManagedServiceKey[];

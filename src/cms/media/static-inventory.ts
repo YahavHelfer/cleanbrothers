@@ -222,6 +222,50 @@ export const staticMediaInventory = [
     "alt": "ניקוי מבוקר של ריפוד עדין על ידי CleanBrothers"
   },
   {
+    "path": "/images/services/post-renovation-cleaning-1.png",
+    "assetId": "92f17336-cf2c-4185-bd29-a41d486cb8c9",
+    "versionId": "e69df7e0-b215-4a91-981f-5383bb821adc",
+    "byteSize": 3776767,
+    "width": 1086,
+    "height": 1448,
+    "hash": "111ff909dd760275a74da1f3f15f2fe38edaad269bad6b3111b6448e69ac095a",
+    "mime": "image/png",
+    "alt": "עובד CleanBrothers מפעיל מכונת ניקוי רצפה במטבח דירה במהלך שיפוץ"
+  },
+  {
+    "path": "/images/services/post-renovation-cleaning-2.png",
+    "assetId": "323c6cce-19c2-4f71-a31c-2d2a8f6f928f",
+    "versionId": "5ddf16ba-4089-4454-9ab1-5161bf191ec3",
+    "byteSize": 3543475,
+    "width": 1086,
+    "height": 1448,
+    "hash": "d7b4804988e6f2fc4b2b4f61bc56fe0f88bbcc23e00ab3a6ad05d736be4cf94f",
+    "mime": "image/png",
+    "alt": "עובד CleanBrothers מנקה רצפה ליד ריהוט מוגן בדירה במהלך שיפוץ"
+  },
+  {
+    "path": "/images/services/post-renovation-cleaning-3.png",
+    "assetId": "ca6f49b2-06ad-4bcf-b9aa-0382bab86a10",
+    "versionId": "67ae7454-b978-48ea-86db-632bbcd32bff",
+    "byteSize": 3481627,
+    "width": 1086,
+    "height": 1448,
+    "hash": "b7ff910f3b40099732f367444f5090957fa0e3ec8da1859a2ea5e31bee4bac20",
+    "mime": "image/png",
+    "alt": "עובד CleanBrothers מפעיל מכונת ניקוי רצפה בחלל דירה במהלך שיפוץ"
+  },
+  {
+    "path": "/images/services/post-renovation-cleaning-4.png",
+    "assetId": "ff57ce67-f1b9-49dc-904f-6ea8888d84b1",
+    "versionId": "ca9fda4c-f970-46f6-91cb-6a0347a76002",
+    "byteSize": 3558064,
+    "width": 1086,
+    "height": 1448,
+    "hash": "f4dd902d24f540c3298b02c53d43e242c143e656509a7f767ae6e67506b886b3",
+    "mime": "image/png",
+    "alt": "עובד CleanBrothers מנקה רצפה במכונה ליד חלון בדירה במהלך שיפוץ"
+  },
+  {
     "path": "/images/hero/hero-sofa-cleaning.jpg",
     "assetId": "d3000000-0000-4000-8000-000000000001",
     "versionId": "d3000000-0000-4000-8000-000000000002",

@@ -370,9 +370,9 @@ select is((select outcome from cms_promotion_schedule_attempts where schedule_id
  'skipped_window','late retry records skipped window');
 select is((select count(*)::int from cms_active_promotion_placements where placement_kind='home'),0,
  'late retry never leaves active home placement');
-select is((select count(*)::int from content_publication_state),1,
+select is((select count(*)::int from content_publication_state),2,
  'scheduler leaves all content publication pointers unchanged');
-select is((select count(*)::int from content_documents),2,
+select is((select count(*)::int from content_documents),3,
  'scheduler leaves promotion and service document identities unchanged');
 
 -- A stale active row from a transient expiration failure must not permanently

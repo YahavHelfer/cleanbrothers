@@ -19,7 +19,7 @@ test.beforeEach(async({context})=>{resetContent();bootstrap();actor=await create
 test.afterEach(async()=>{await cleanupActors();});
 for(const key of specialServiceKeys)test(`${key}: actual UI lifecycle, exact revision, SEO, media history, fresh publish and rollback`,async({page,context})=>{
  const initial=state(key),others=otherState(key),before=allState();bootstrap();expect(allState()).toBe(before);
- expect(localSql('select count(*) from content_documents')).toBe('8');expect(localSql('select count(*) from media_versions')).toBe('23');
+ expect(localSql('select count(*) from content_documents')).toBe('9');expect(localSql('select count(*) from media_versions')).toBe('27');
  const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);
  await session(actor,context);await page.goto(`/admin/services/${key}`);
  const heading=page.getByRole('textbox',{name:'כותרת ראשית',exact:true});await expect(heading).toBeEnabled();await heading.fill(`טיוטה מיוחדת ${key}`);
@@ -57,8 +57,8 @@ for(const key of specialServiceKeys)test(`${key}: stale editors retain Hebrew co
  const saved=allState();for(const origin of ['null','https://untrusted.invalid']){const result=await context.request.post(`${appOrigin}/admin/services/${key}`,{headers:{origin,'next-action':(await mutation.headerValue('next-action'))!,'content-type':(await mutation.headerValue('content-type'))!},data:mutation.postDataBuffer()!,maxRedirects:0});expect(result.status()).toBe(500);expect(allState()).toBe(saved);}
  await second.close();
 });
-test('special private previews deny AAL1/nonmember and all eight services share the admin list',async({page,context})=>{
- await session(actor,context);await page.goto('/admin/services');await expect(page.locator('main article')).toHaveCount(8);
+test('special private previews deny AAL1/nonmember and all nine services share the admin list',async({page,context})=>{
+ await session(actor,context);await page.goto('/admin/services');await expect(page.locator('main article')).toHaveCount(9);
  await context.clearCookies();await session(actor,context,false);for(const key of specialServiceKeys){await page.goto(`/admin/preview/services/${key}?revision=${state(key).draft_revision_id}`);await expect(page).toHaveURL(/\/admin\/mfa\/challenge/);}
  const outsider=await createActor(false);await context.clearCookies();await session(outsider,context);for(const key of specialServiceKeys){await page.goto(`/admin/services/${key}`);await expect(page).toHaveURL(/\/admin\/login\?error=forbidden/);}
 });

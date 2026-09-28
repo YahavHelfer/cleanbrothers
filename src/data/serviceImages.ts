@@ -24,6 +24,12 @@ export const serviceImages = {
   delicateUpholstery: [
     "/images/services/delicate-upholstery-cleaning.jpeg",
   ],
+  postRenovation: [
+    "/images/services/post-renovation-cleaning-4.png",
+    "/images/services/post-renovation-cleaning-1.png",
+    "/images/services/post-renovation-cleaning-3.png",
+    "/images/services/post-renovation-cleaning-2.png",
+  ],
 } satisfies Record<string, string[]>;
 
 export const sofaImagePositions = {

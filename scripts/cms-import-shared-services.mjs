@@ -20,5 +20,5 @@ export function importSharedServices() {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   importSharedServices();
-  console.log("Six local shared-service baselines present; existing history preserved; no media bytes copied.");
+  console.log("Seven local shared-service baselines present; existing history preserved; no media bytes copied.");
 }

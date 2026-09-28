@@ -10,7 +10,7 @@ import { getWhatsAppLink } from "@/lib/whatsapp";
 export const metadata = buildMetadata({
   title: "שירותי ניקיון לבית, לעסק ולרכב | CleanBrothers",
   description:
-    "שירותי ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז מבית CleanBrothers.",
+    "שירותי ניקיון אחרי שיפוץ ולפני אכלוס, ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות באזור המרכז מבית CleanBrothers.",
   path: "/services",
 });
 

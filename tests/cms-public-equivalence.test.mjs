@@ -25,7 +25,15 @@ function canonicalReactIds(html) {
 for(const file of pages)test(`approved public baseline unchanged: ${file}`,async()=>{
  const a=before(file),b=after(file);
  const actual=renderToStaticMarkup(await b.default()),expected=renderToStaticMarkup(await a.default());
- assert.equal(file==="src/app/(site)/page.tsx"?canonicalReactIds(actual):actual,
+ if (file==="src/app/(site)/services/page.tsx") {
+  const cards=(html)=>html.match(/<article\b[\s\S]*?<\/article>/g)??[];
+  assert.deepEqual(cards(actual).slice(0,8),cards(expected));
+  assert.equal(cards(actual).length,9);
+  assert.match(cards(actual)[8],/post-renovation-cleaning/);
+  return;
+ }
+ const existingOutput=actual.replace('<option>ניקיון אחרי שיפוץ ולפני אכלוס</option>','');
+ assert.equal(file==="src/app/(site)/page.tsx"?canonicalReactIds(existingOutput):existingOutput,
   file==="src/app/(site)/page.tsx"?canonicalReactIds(expected):expected);
  assert.deepEqual(JSON.parse(JSON.stringify(b.metadata??await b.generateMetadata())),JSON.parse(JSON.stringify(a.metadata??await a.generateMetadata())));
 });

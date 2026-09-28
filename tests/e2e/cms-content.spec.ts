@@ -99,7 +99,7 @@ test("editor draft, exact preview, explicit publish and historical restore prese
   test.setTimeout(60_000);
   await session(admin, context);
   await page.goto("/admin/services");
-  await expect(page.locator("main article")).toHaveCount(8);
+  await expect(page.locator("main article")).toHaveCount(9);
   await expect(page.getByText("עמוד שירות ייחודי", { exact: true })).toHaveCount(2);
   await page.getByRole("link", { name: "עריכת השירות" }).click();
   const publicContext = await browser.newContext();

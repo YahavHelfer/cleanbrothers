@@ -44,7 +44,7 @@ function list(value: unknown, max: number, min = 1): unknown[] {
 
 export const internalRoutes = ["/", "/about", "/services", "/contact", "/gallery",
   "/sofa-cleaning", "/mattress-cleaning", "/carpet-cleaning", "/delicate-upholstery-cleaning",
-  "/car-upholstery-cleaning", "/armchair-chair-cleaning", "/air-conditioner-cleaning", "/window-cleaning"] as const;
+  "/car-upholstery-cleaning", "/armchair-chair-cleaning", "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning"] as const;
 export type SafeTarget = { kind: "internal"; path: (typeof internalRoutes)[number] }
   | { kind: "phone" }
   | { kind: "whatsapp"; message: string };
