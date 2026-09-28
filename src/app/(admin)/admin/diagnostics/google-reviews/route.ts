@@ -1,0 +1,136 @@
+import "server-only";
+import { requireCmsAdmin } from "@/cms/authorization";
+import { approvedHomePreview } from "@/cms/home/environment";
+import { liveGoogleReviewsConfig } from "@/cms/reviews/environment";
+import { GOOGLE_PLACE_FIELD_MASK } from "@/cms/reviews/google-provider";
+import { validateGoogleReviews } from "@/cms/reviews/model";
+
+export const runtime = "nodejs";
+
+const privateHeaders = {
+  "Cache-Control": "private, no-store, max-age=0",
+  "X-Robots-Tag": "noindex, nofollow",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "no-referrer",
+  "Content-Security-Policy": "default-src 'none'; form-action 'self'; base-uri 'none'",
+};
+type ObjectValue = Record<string, unknown>;
+const object = (value: unknown): ObjectValue | null =>
+  value && typeof value === "object" && !Array.isArray(value) ? value as ObjectValue : null;
+
+// Ask the current validator itself; do not introduce a second URL policy.
+function mapsAccepted(value: unknown) {
+  return validateGoogleReviews({ placeName: "probe", rating: 1, userRatingCount: 0,
+    googleMapsUri: value, reviews: [] }) !== null;
+}
+function parsedUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+  try { return new URL(value); } catch { return null; }
+}
+function pathShape(pathname: string) {
+  const known = new Set(["maps", "place", "reviews", "review", "contrib", "local", "profile"]);
+  const parts = pathname.split("/").filter(Boolean);
+  return parts.length ? `/${parts.slice(0, 3).map((part) => known.has(part) ? part : "{segment}").join("/")}` +
+    (parts.length > 3 ? "/{…}" : "") : "/";
+}
+function urlSummary(values: unknown[]) {
+  const categories = new Map<string, { hostname: string | null; pathShape: string | null;
+    accepted: boolean; count: number }>();
+  let present = 0, accepted = 0;
+  for (const value of values) {
+    if (typeof value !== "string" || !value) continue;
+    present++;
+    const url = parsedUrl(value), valid = mapsAccepted(value);
+    if (valid) accepted++;
+    const item = { hostname: url?.hostname ?? null,
+      pathShape: url ? pathShape(url.pathname) : null, accepted: valid };
+    const key = JSON.stringify(item), old = categories.get(key);
+    if (old) old.count++;
+    else categories.set(key, { ...item, count: 1 });
+  }
+  return { present, accepted, rejected: present - accepted, categories: [...categories.values()] };
+}
+function textValid(value: unknown, max: number) {
+  return typeof value === "string" && !!value.trim() && [...value].length <= max &&
+    !/[<>\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(value);
+}
+function ratingValid(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 1 && value <= 5;
+}
+
+async function authorized() {
+  await requireCmsAdmin(); // Fresh AAL2 and active membership check, independent of Proxy.
+  if (!approvedHomePreview()) return null;
+  const config = liveGoogleReviewsConfig();
+  return config?.placeId === "ChIJM6V_e13OrmgRCjbDT5abAqA" ? config : null;
+}
+
+export async function GET() {
+  try {
+    if (!await authorized()) return new Response(null, { status: 404, headers: privateHeaders });
+    return new Response('<!doctype html><html><meta name="robots" content="noindex,nofollow"><title>One-time Google diagnostic</title><form method="post"><button type="submit">Run one diagnostic</button></form></html>',
+      { headers: { ...privateHeaders, "Content-Type": "text/html; charset=utf-8" } });
+  } catch { return new Response(null, { status: 403, headers: privateHeaders }); }
+}
+
+export async function POST(request: Request) {
+  try {
+    const config = await authorized();
+    if (!config) return new Response(null, { status: 404, headers: privateHeaders });
+    const target = new URL(request.url);
+    if (request.headers.get("origin") !== target.origin || request.headers.get("host") !== target.host)
+      return new Response(null, { status: 403, headers: privateHeaders });
+
+    const response = await fetch(`https://places.googleapis.com/v1/places/${config.placeId}`, {
+      headers: { "X-Goog-Api-Key": config.apiKey, "X-Goog-FieldMask": GOOGLE_PLACE_FIELD_MASK },
+      cache: "no-store", signal: AbortSignal.timeout(3000),
+    });
+    if (!response.ok) return Response.json({ providerStatus: response.status, stage: "http_error" },
+      { headers: privateHeaders });
+    const place = object(await response.json());
+    const rawReviews = Array.isArray(place?.reviews) ? place.reviews : null;
+    const reviews = rawReviews?.map(object) ?? [];
+    const mapped = { placeName: object(place?.displayName)?.text, rating: place?.rating,
+      userRatingCount: place?.userRatingCount, googleMapsUri: place?.googleMapsUri,
+      reviews: reviews.map((review) => ({ rating: review?.rating, text: object(review?.text)?.text,
+        relativePublishTimeDescription: review?.relativePublishTimeDescription,
+        author: review?.authorAttribution, googleMapsUri: review?.googleMapsUri })) };
+    const validated = validateGoogleReviews(mapped);
+    const placeNameValid = textValid(mapped.placeName, 180);
+    const aggregateRatingValid = ratingValid(mapped.rating);
+    const userRatingCountValid = Number.isInteger(mapped.userRatingCount) &&
+      (mapped.userRatingCount as number) >= 0;
+    const placeUriValid = mapsAccepted(place?.googleMapsUri);
+    const reviewUris = urlSummary(reviews.map((review) => review?.googleMapsUri));
+    const authorUris = urlSummary(reviews.map((review) => object(review?.authorAttribution)?.uri));
+    const otherRejected = reviews.filter((review) => {
+      const author = object(review?.authorAttribution);
+      return !ratingValid(review?.rating) || !textValid(object(review?.text)?.text, 5000) ||
+        !textValid(author?.displayName, 180) ||
+        (review?.relativePublishTimeDescription != null &&
+          !textValid(review.relativePublishTimeDescription, 120));
+    }).length;
+    const stage = !place || !rawReviews || reviews.length === 0 || reviews.length > 5
+      ? "response_or_review_count"
+      : !placeNameValid ? "place_name"
+      : !aggregateRatingValid ? "aggregate_rating"
+      : !userRatingCountValid ? "user_rating_count"
+      : !placeUriValid ? "place_maps_uri"
+      : !validated?.reviews.length ? "all_reviews_filtered"
+      : "accepted";
+    const placeUrl = parsedUrl(place?.googleMapsUri);
+    return Response.json({ providerStatus: response.status,
+      place: { hostname: placeUrl?.hostname ?? null, pathname: placeUrl?.pathname ?? null,
+        mapsUriAccepted: placeUriValid },
+      reviews: { count: reviews.length, mapsUris: reviewUris, survivingValidation: validated?.reviews.length ?? 0,
+        otherRejectedCount: otherRejected },
+      authors: { uris: authorUris },
+      validation: { placeNameValid, aggregateRatingValid, userRatingCountValid,
+        mappedReviewCount: reviews.length, validatedReviewCount: validated?.reviews.length ?? 0,
+        validateGoogleReviewsNonNull: validated !== null,
+        providerResultNonNull: !!rawReviews && reviews.length > 0 && reviews.length <= 5 &&
+          !!validated?.reviews.length, stage },
+    }, { headers: privateHeaders });
+  } catch { return Response.json({ stage: "request_or_parse_error" },
+    { status: 502, headers: privateHeaders }); }
+}
