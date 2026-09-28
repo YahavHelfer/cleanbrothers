@@ -4,7 +4,7 @@ import { approvedHomePreview } from "@/cms/home/environment";
 import { liveGoogleReviewsConfig } from "@/cms/reviews/environment";
 import { GOOGLE_PLACE_FIELD_MASK } from "@/cms/reviews/google-provider";
 import { validateGoogleReviews } from "@/cms/reviews/model";
-import { diagnosticTransportAllowed } from "@/cms/reviews/diagnostic-transport";
+import { diagnosticTransportAllowed, diagnosticTransportFacts } from "@/cms/reviews/diagnostic-transport";
 
 export const runtime = "nodejs";
 
@@ -78,7 +78,11 @@ export async function POST(request: Request) {
   try {
     const config = await authorized();
     if (!config) return new Response(null, { status: 404, headers: privateHeaders });
-    if (!diagnosticTransportAllowed(request)) return new Response(null, { status: 403, headers: privateHeaders });
+    if (!diagnosticTransportAllowed(request)) {
+      // Boolean-only transport evidence; never log header values or Google data.
+      console.info("temporary Google diagnostic transport denied", diagnosticTransportFacts(request));
+      return new Response(null, { status: 403, headers: privateHeaders });
+    }
 
     const response = await fetch(`https://places.googleapis.com/v1/places/${config.placeId}`, {
       headers: { "X-Goog-Api-Key": config.apiKey, "X-Goog-FieldMask": GOOGLE_PLACE_FIELD_MASK },

@@ -3,7 +3,7 @@ import test from "node:test";
 import { createSourceLoader } from "./helpers/source-module.mjs";
 
 const load = createSourceLoader();
-const { diagnosticTransportAllowed } = load("src/cms/reviews/diagnostic-transport.ts");
+const { diagnosticTransportAllowed, diagnosticTransportFacts } = load("src/cms/reviews/diagnostic-transport.ts");
 const alias = "cleanbrothers-git-feature-cms-c-061c94-yahavs-projects-6b5e850f.vercel.app";
 const request = (headers, method = "POST") => new Request("https://internal.vercel.app/admin/diagnostics/google-reviews", {
   method, headers: { origin: `https://${alias}`, "sec-fetch-site": "same-origin",
@@ -18,6 +18,10 @@ test("temporary diagnostic accepts only same-origin POST through the approved fo
   assert.equal(diagnosticTransportAllowed(request({ origin: "null" })), false);
   assert.equal(diagnosticTransportAllowed(request({ "x-forwarded-proto": "http" })), false);
   assert.equal(diagnosticTransportAllowed(request({}, "GET")), false);
+  assert.deepEqual(Object.keys(diagnosticTransportFacts(request({ origin: "https://attacker.example" }))),
+    ["methodPost", "fetchSiteSameOrigin", "originApproved", "forwardedProtoHttps", "forwardedHostValid"]);
+  assert.ok(Object.values(diagnosticTransportFacts(request({ origin: "https://attacker.example" })))
+    .every(value => typeof value === "boolean"));
 });
 
 const preview = {
