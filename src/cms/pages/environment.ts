@@ -1,5 +1,6 @@
 import "server-only";
 import { getCmsConfig } from "@/cms/config";
+import { configuredCmsProduction } from "@/cms/production-environment";
 
 const LOCAL_CMS_URL = "http://127.0.0.1:56321";
 const CLOUD_CMS_URL = "https://plbwefnwussxlglscfpn.supabase.co";
@@ -16,7 +17,7 @@ export function approvedPagePreview(): boolean {
 export function pagesEnvironmentAllowed(): boolean {
   const local = !process.env.VERCEL && !process.env.VERCEL_ENV &&
     process.env.CMS_SUPABASE_URL === LOCAL_CMS_URL;
-  return local || approvedPagePreview();
+  return local || approvedPagePreview() || configuredCmsProduction();
 }
 
 export function requirePagesEnvironment(): void {

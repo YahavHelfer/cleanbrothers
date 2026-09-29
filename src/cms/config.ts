@@ -1,4 +1,5 @@
 import "server-only";
+import { CMS_PRODUCTION_ORIGIN, configuredCmsProduction } from "./production-environment";
 
 export const CMS_COOKIE_NAME = "cb-cms-auth";
 const LOCAL_CMS_URL = "http://127.0.0.1:56321";
@@ -20,9 +21,10 @@ export function getCmsConfig() {
   const key = process.env.CMS_SUPABASE_PUBLISHABLE_KEY;
   const isCmsPreview = process.env.VERCEL === "1" &&
     process.env.VERCEL_ENV === "preview" && url === CLOUD_CMS_URL;
-  // Cloud is enabled only for this verified project on Vercel Preview.
-  // Production, arbitrary hosted URLs and hosted loopback settings fail closed.
-  if ((!isLocalCms() && !isCmsPreview) || !url || !key || !/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)) {
+  // Production requires its own exact identity and publishable key. Public
+  // source flags remain independent; a configured Admin never enables them.
+  if ((!isLocalCms() && !isCmsPreview && !configuredCmsProduction()) ||
+      !url || !key || !/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)) {
     throw new Error("CMS configuration unavailable");
   }
   return { url, key };
@@ -30,7 +32,8 @@ export function getCmsConfig() {
 
 export function getCmsAppOrigin(): string {
   getCmsConfig();
-  return isLocalCms() ? "http://127.0.0.1:56300" : CMS_PREVIEW_ORIGIN;
+  return isLocalCms() ? "http://127.0.0.1:56300" :
+    configuredCmsProduction() ? CMS_PRODUCTION_ORIGIN : CMS_PREVIEW_ORIGIN;
 }
 
 export const cmsCookieOptions = {

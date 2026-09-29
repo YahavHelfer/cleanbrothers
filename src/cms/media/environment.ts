@@ -2,6 +2,7 @@ import "server-only";
 import { managedServiceKeys } from "@/content/service-registry";
 import { usesCmsSource } from "@/cms/content/environment";
 import { getCmsConfig } from "@/cms/config";
+import { configuredCmsProduction, CMS_PRODUCTION_ORIGIN } from "@/cms/production-environment";
 import { MAX_IMAGE_BYTES, MAX_PREVIEW_IMAGE_BYTES } from "./model";
 
 export const PREVIEW_MEDIA_BUCKET = "cms-media-preview";
@@ -17,7 +18,7 @@ export function mediaLocalEnabled() {
   );
 }
 export function mediaCloudEnabled() {
-  return (
+  const preview = (
     process.env.CMS_MEDIA_PREVIEW_ENABLED === "1" &&
     process.env.VERCEL === "1" &&
     process.env.VERCEL_ENV === "preview" &&
@@ -26,6 +27,11 @@ export function mediaCloudEnabled() {
     process.env.CMS_PILOT_CONTENT_SOURCE === "published" &&
     managedServiceKeys.some(usesCmsSource)
   );
+  const production = process.env.CMS_MEDIA_PRODUCTION_ENABLED === "1" &&
+    !!process.env.CMS_MEDIA_SERVER_KEY?.trim() &&
+    configuredCmsProduction() && process.env.CMS_CONTENT_SOURCE === "published" &&
+    managedServiceKeys.some(usesCmsSource);
+  return preview || production;
 }
 export function mediaEnabled() {
   return mediaLocalEnabled() || mediaCloudEnabled();
@@ -42,13 +48,13 @@ export function requireLocalMediaEnvironment() {
   getCmsConfig();
 }
 export function requireCloudMediaEnvironment() {
-  if (!mediaCloudEnabled()) throw new Error("Preview CMS media unavailable");
+  if (!mediaCloudEnabled()) throw new Error("Cloud CMS media unavailable");
   getCmsConfig();
 }
 export function mediaUploadOriginAllowed(request: Request) {
   const origin = request.headers.get("origin");
   const allowed = mediaCloudEnabled()
-    ? [PREVIEW_MEDIA_ORIGIN]
+    ? [configuredCmsProduction() ? CMS_PRODUCTION_ORIGIN : PREVIEW_MEDIA_ORIGIN]
     : mediaLocalEnabled()
       ? ["http://127.0.0.1:56300", "http://127.0.0.1:56301"]
       : [];

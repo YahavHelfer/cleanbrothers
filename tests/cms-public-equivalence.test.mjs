@@ -9,7 +9,10 @@ const baseline="02af571d8d1c15b38e1e203711921b0b512a87e7";
 // All tracked source overrides ensure this remains valid before AND after commit.
 const files=execFileSync("git",["ls-tree","-r","--name-only",baseline,"src"],{encoding:"utf8"}).trim().split("\n").filter(f=>/\.tsx?$/.test(f));
 const overrides=Object.fromEntries(files.map(f=>[resolve(projectRoot,f),repairHistoricalAcMedia(f,execFileSync("git",["show",`${baseline}:${f}`],{encoding:"utf8"}))]));
-const before=createSourceLoader({sourceOverrides:overrides}),after=createSourceLoader();
+const before=createSourceLoader({sourceOverrides:overrides}),after=createSourceLoader({ env: {
+ VERCEL:"1",VERCEL_ENV:"production",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+ VERCEL_GIT_COMMIT_REF:"main",
+} });
 const pages=files.filter(f=>f.startsWith("src/app/(site)/")&&f.endsWith("/page.tsx"));
 assert.equal(pages.length,16);
 // Reorderable homepage blocks add React component boundaries, which changes

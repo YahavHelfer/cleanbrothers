@@ -29,15 +29,21 @@ test.beforeEach(async({context})=>{
 });
 test.afterEach(async()=>{await cleanupActors();});
 
-test("post-renovation service remains readable at phone, tablet and desktop widths",async({page})=>{
+test("post-renovation service remains readable at phone, tablet and desktop widths",async({context})=>{
  for(const width of [390,768,1440]){
-  await page.setViewportSize({width,height:900});
-  const response=await page.goto('/post-renovation-cleaning');
-  expect(response?.status()).toBe(200);
-  await expect(page.locator('main h1')).toContainText('ניקיון אחרי שיפוץ ולפני אכלוס');
-  await expect(page.locator('script[id="post-renovation-cleaning-faq-jsonld"]')).toHaveCount(1);
-  const layout=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));
-  expect(layout.document).toBeLessThanOrEqual(layout.viewport);
+  // Fresh pages prevent Next/Image preload/srcset requests from a previous viewport leaking into the next navigation.
+  const page=await context.newPage();
+  try {
+   await page.setViewportSize({width,height:900});
+   const response=await page.goto('/post-renovation-cleaning');
+   expect(response?.status()).toBe(200);
+   await expect(page.locator('main h1')).toContainText('ניקיון אחרי שיפוץ ולפני אכלוס');
+   await expect(page.locator('script[id="post-renovation-cleaning-faq-jsonld"]')).toHaveCount(1);
+   const layout=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));
+   expect(layout.document).toBeLessThanOrEqual(layout.viewport);
+  } finally {
+   await page.close();
+  }
  }
 });
 

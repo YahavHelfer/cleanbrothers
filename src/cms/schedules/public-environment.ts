@@ -1,5 +1,6 @@
 import "server-only";
 import { isManagedServiceKey } from "@/content/service-registry";
+import { configuredCmsProduction } from "@/cms/production-environment";
 
 export type PublicPlacement = { kind: "global"; target: "site" } |
   { kind: "home"; target: "home" } | { kind: "service"; target: string };
@@ -17,7 +18,7 @@ export function scheduledPublicEnvironmentAllowed(): boolean {
     process.env.VERCEL_PROJECT_ID === "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A" &&
     process.env.VERCEL_GIT_COMMIT_REF === "feature/cms-cloud-foundation" &&
     process.env.CMS_SUPABASE_URL === "https://plbwefnwussxlglscfpn.supabase.co";
-  return local || preview;
+  return local || preview || configuredCmsProduction();
 }
 
 export function usesScheduledPublicPlacement(kind: unknown, target: unknown): boolean {

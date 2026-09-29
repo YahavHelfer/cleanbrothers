@@ -155,7 +155,12 @@ for (const [name, env] of Object.entries({
       "@/cms/server": { createCmsServerClient: async () => { calls++; throw Error("unexpected"); } },
       "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },
     } });
-    await assert.rejects(() => guarded("src/cms/content/public-source.ts").getPublicPilot(), /unavailable/);
+    if (name === "Production with both flags") {
+      // Preview's legacy source flag cannot select a Production public source.
+      assert.equal((await guarded("src/cms/content/public-source.ts").getPublicPilot()).revisionId, null);
+    } else {
+      await assert.rejects(() => guarded("src/cms/content/public-source.ts").getPublicPilot(), /unavailable/);
+    }
     await assert.rejects(() => guarded("src/cms/content/repository.ts").getPilotEditor(), /unavailable/);
     assert.equal(calls, 0);
   });
