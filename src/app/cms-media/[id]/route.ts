@@ -2,7 +2,7 @@ import { managedServiceKeys } from "@/content/service-registry";
 import { usesCmsSource } from "@/cms/content/environment";
 import { createClient } from "@supabase/supabase-js";
 import { getCmsConfig } from "@/cms/config";
-import { requireMediaEnvironment } from "@/cms/media/environment";
+import { requireTrustedMediaEnvironment } from "@/cms/media/environment";
 import { mediaId } from "@/cms/media/model";
 import { mediaBytes } from "@/cms/media/repository";
 import { privateMediaHeaders } from "@/cms/media/http";
@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    requireMediaEnvironment();
+    requireTrustedMediaEnvironment();
     if (!managedServiceKeys.some(usesCmsSource)) throw new Error("Not enabled");
     const { url, key } = getCmsConfig();
     const client = createClient(url, key, {

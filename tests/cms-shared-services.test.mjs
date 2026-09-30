@@ -62,7 +62,7 @@ test("generic public source fetches only its selected published projection once 
  for(const key of keys.filter(k=>k!=="delicate-upholstery-cleaning")){
   const draft=serviceBaseline(key);const calls=[];
   const media=baselineMedia(draft).map(row=>({...row,provider:"static"}));
-  const source=createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key},mocks:{"next/server":{connection:async()=>{}},"@/cms/media/environment":{requireMediaEnvironment:()=>{}},"@supabase/supabase-js":{createClient:()=>({rpc:async(name,args)=>{calls.push([name,args]);return {data:{revisionId:"a0000000-0000-4000-8000-000000000001",payload:draft,media},error:null};}})}}})("src/cms/content/public-source.ts");
+  const source=createSourceLoader({env:{...local,CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:key},mocks:{"next/server":{connection:async()=>{}},"@/cms/media/environment":{requireMediaReadEnvironment:()=>{}},"@supabase/supabase-js":{createClient:()=>({rpc:async(name,args)=>{calls.push([name,args]);return {data:{revisionId:"a0000000-0000-4000-8000-000000000001",payload:draft,media},error:null};}})}}})("src/cms/content/public-source.ts");
   const result=await source.getPublicService(key);assert.equal(result.page.serviceId,key);assert.deepEqual(plain(calls),[["cms_read_published_service",{target_key:key}]]);
  }
 });
@@ -71,7 +71,7 @@ test("public media requires an actual published owner in the explicit service al
  const id="a3000000-0000-4000-8000-000000000001";
  for(const [owners,status] of [[["sofa-cleaning"],200],[["mattress-cleaning"],404],[["window-cleaning"],404],[[],404],[undefined,404]]){
   let reads=0;
-  const route=createSourceLoader({env:{...local,CMS_MEDIA_LOCAL_ENABLED:"1",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:"sofa-cleaning"},mocks:{
+  const route=createSourceLoader({env:{...local,CMS_MEDIA_LOCAL_ENABLED:"1",CMS_MEDIA_LOCAL_SERVICE_KEY:"synthetic-local-key",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:"sofa-cleaning"},mocks:{
    "@supabase/supabase-js":{createClient:()=>({rpc:async()=>({data:{id,storage_provider:"local",serviceKeys:owners},error:null})})},
    "@/cms/media/repository":{mediaBytes:async()=>{reads++;return {bytes:Buffer.from("fixture")};}},
   }})("src/app/cms-media/[id]/route.ts");

@@ -4,7 +4,7 @@ import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaEnvironment } from "./environment";
+import { mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, requireTrustedMediaEnvironment, trustedMediaEnvironmentEnabled } from "./environment";
 import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { validateImage } from "./validate-image";
@@ -29,6 +29,7 @@ export type LibraryItem = MediaAsset & {
   version: MediaVersion;
   usageCount: number;
   publishedUsageCount: number;
+  previewSrc: string | null;
 };
 export type MediaDetail = {
   asset: MediaAsset;
@@ -51,15 +52,20 @@ function check(error: { code?: string } | null) {
 }
 export async function listMedia(): Promise<LibraryItem[]> {
   await requireCmsAdmin();
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   const client = await createCmsServerClient();
   const { data, error } = await client.rpc("cms_media_library");
   check(error);
-  return data;
+  return (data as Omit<LibraryItem, "previewSrc">[]).map((item) => ({
+    ...item,
+    previewSrc: item.version.storage_provider === "static"
+      ? staticMediaPath(item.version.id)
+      : trustedMediaEnvironmentEnabled() ? privateMediaUrl(item.version.id) : null,
+  }));
 }
 export async function getMediaDetail(id: string): Promise<MediaDetail | null> {
   await requireCmsAdmin();
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   const client = await createCmsServerClient();
   const { data, error } = await client.rpc("cms_media_detail", {
     target_asset: mediaId(id),
@@ -71,7 +77,7 @@ export async function getMediaDetail(id: string): Promise<MediaDetail | null> {
 }
 export async function getMediaChoices(): Promise<MediaChoice[]> {
   await requireCmsAdmin();
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   const items = await listMedia();
   const client = await createCmsServerClient();
   const { data: versions, error } = await client
@@ -102,7 +108,7 @@ export async function updateMedia(
   metadata: unknown,
 ) {
   await requireCmsAdmin();
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   if (!["metadata", "archive", "restore"].includes(String(operation)))
     throw new MediaError();
   const client = await createCmsServerClient();
@@ -123,7 +129,7 @@ export async function uploadMedia(
   generation?: unknown,
 ) {
   const admin = await requireCmsAdmin();
-  requireMediaEnvironment();
+  requireTrustedMediaEnvironment();
   const meta = mediaMetadata(metadata);
   const target = asset ? mediaId(asset) : null;
   const expected = asset ? mediaGeneration(generation) : null;
@@ -159,7 +165,7 @@ export async function uploadMedia(
 }
 export async function readPrivateMedia(id: string) {
   await requireCmsAdmin();
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   const client = await createCmsServerClient();
   const { data, error } = await client
     .from("media_versions")
@@ -173,13 +179,13 @@ export async function readPrivateMedia(id: string) {
 export async function mediaBytes(
   version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash">,
 ) {
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   if (
     version.storage_provider === "static"
   )
     return { staticPath: staticMediaPath(version.id) };
   const id = mediaId(version.id);
-  if (version.storage_provider === "supabase" && mediaCloudEnabled())
+  if (version.storage_provider === "supabase" && mediaCloudEnabled() && trustedMediaEnvironmentEnabled())
     return { bytes: await readCloudImage(id, version.content_hash) };
   if (version.storage_provider === "local" && mediaLocalEnabled())
     return { bytes: await readLocalImage(id, version.content_hash) };

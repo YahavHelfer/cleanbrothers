@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { LibraryItem } from "./repository";
-import { privateMediaUrl, STATIC_MEDIA_PATH } from "./model";
 export function Library({ items }: { items: LibraryItem[] }) {
   const [query, setQuery] = useState(""),
     [archived, setArchived] = useState(false);
@@ -43,18 +42,14 @@ export function Library({ items }: { items: LibraryItem[] }) {
             key={a.id}
             className="grid gap-3 rounded-2xl border theme-card p-4"
           >
-            <Image
-              src={
-                a.version.storage_provider === "static"
-                  ? STATIC_MEDIA_PATH
-                  : privateMediaUrl(a.version.id)
-              }
+            {a.previewSrc ? <Image
+              src={a.previewSrc}
               alt={a.alt_text}
               width={320}
               height={240}
               unoptimized
               className="h-48 w-full rounded-xl object-contain"
-            />
+            /> : <p className="flex h-48 items-center justify-center rounded-xl border theme-muted">קובץ פרטי אינו זמין לצפייה בסביבה זו.</p>}
             <h2 className="break-all font-bold" dir="auto">
               {a.version.original_filename}
             </h2>

@@ -1,5 +1,5 @@
 import "server-only";
-import { requireMediaEnvironment } from "@/cms/media/environment";
+import { requireMediaReadEnvironment } from "@/cms/media/environment";
 import { resolveMediaProjection } from "@/cms/media/resolve";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
@@ -38,7 +38,7 @@ export async function getServiceRevision(key: ManagedServiceKey, id: string) {
   if (!data) return null;
   let media;
   if (data.schema_version >= 2) {
-    requireMediaEnvironment();
+    requireMediaReadEnvironment();
     const refs = await client.rpc("cms_read_revision_media", { target_revision: revisionId });
     if (refs.error) throw new Error("CMS media unavailable");
     media = resolveMediaProjection(refs.data, "admin");
@@ -59,7 +59,7 @@ export async function mutateService(key: ManagedServiceKey, input: ContentMutati
   requireServiceKey(key);
   if (!Number.isSafeInteger(input.generation) || input.generation < 1) throw new ContentValidationError();
   const revision = parseRevisionId(input.revision);
-  if (input.kind === "save" && validateManagedDraft(key, input.payload).schemaVersion >= 2) requireMediaEnvironment();
+  if (input.kind === "save" && validateManagedDraft(key, input.payload).schemaVersion >= 2) requireMediaReadEnvironment();
   const client = await createCmsServerClient();
   const result = input.kind === "publish"
     ? await client.rpc("cms_publish_managed_revision", { target_key: key, expected_generation: input.generation, revision })

@@ -1,4 +1,5 @@
 import { staticMediaPath } from "./static-inventory";
+import { mediaCloudEnabled, mediaLocalEnabled, trustedMediaEnvironmentEnabled } from "./environment";
 import type { ResolvedMedia } from "./model";
 import {
   mediaId,
@@ -24,8 +25,13 @@ export function resolveMediaProjection(
     let src: string;
     if (row.provider === "static")
       src = staticMediaPath(id);
-    else if (row.provider === "local" || row.provider === "supabase")
+    else if (row.provider === "local" || row.provider === "supabase") {
+      if (audience === "public" && row.provider === "supabase" && !(mediaCloudEnabled() && trustedMediaEnvironmentEnabled()))
+        throw new Error("Private CMS media unavailable");
+      if (audience === "public" && row.provider === "local" && !mediaLocalEnabled())
+        throw new Error("Local CMS media unavailable");
       src = audience === "admin" ? privateMediaUrl(id) : `/cms-media/${id}`;
+    }
     else throw new Error("Unsupported media provider");
     return { ...row, src };
   });

@@ -1,5 +1,5 @@
 import "server-only";
-import { requireMediaEnvironment } from "@/cms/media/environment";
+import { requireMediaReadEnvironment } from "@/cms/media/environment";
 import { resolveMediaProjection } from "@/cms/media/resolve";
 import { cache } from "react";
 import { connection } from "next/server";
@@ -29,7 +29,7 @@ export const getPublicService = cache(async (key: SharedServiceKey) => {
   const { data, error } = await (key === PILOT_KEY ? client.rpc("cms_read_published_pilot") : client.rpc("cms_read_published_service", { target_key: key }));
   if (error || !data) throw new Error("Published CMS service unavailable");
   const media = data.payload.schemaVersion >= 2 ? (() => {
-    requireMediaEnvironment();
+    requireMediaReadEnvironment();
     return resolveMediaProjection(data.media, "public");
   })() : undefined;
   return { revisionId: parseRevisionId(data.revisionId), page: toServiceLanding(key, data.payload, media) };
@@ -53,7 +53,7 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   if (acPreview) await connection();
   if (!usesCmsSource(key)) return { revisionId: null, content: key === "air-conditioner-cleaning" ? acBaseline : windowBaseline, media: undefined };
   requireContentEnvironment();
-  requireMediaEnvironment();
+  requireMediaReadEnvironment();
   if (!acPreview) await connection();
   const { url, key: publishableKey } = getCmsConfig();
   const client = createClient(url, publishableKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },

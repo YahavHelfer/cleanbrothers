@@ -33,15 +33,33 @@ export function mediaCloudEnabled() {
     managedServiceKeys.some(usesCmsSource);
   return preview || production;
 }
+// Metadata and code-owned static files need the ordinary CMS identity only.
+// Preview keeps its existing rollout gate; Production Admin reads do not
+// activate public service content or private Storage.
+export function mediaReadEnvironmentEnabled() {
+  return mediaLocalEnabled() || mediaCloudEnabled() || configuredCmsProduction();
+}
+export function requireMediaReadEnvironment() {
+  if (!mediaReadEnvironmentEnabled()) throw new Error("CMS media unavailable");
+  getCmsConfig();
+}
+export function trustedMediaEnvironmentEnabled() {
+  return mediaLocalEnabled()
+    ? !!process.env.CMS_MEDIA_LOCAL_SERVICE_KEY?.trim()
+    : mediaCloudEnabled() && !!process.env.CMS_MEDIA_SERVER_KEY?.trim();
+}
+export function requireTrustedMediaEnvironment() {
+  if (!trustedMediaEnvironmentEnabled()) throw new Error("Trusted CMS media unavailable");
+  getCmsConfig();
+}
 export function mediaEnabled() {
-  return mediaLocalEnabled() || mediaCloudEnabled();
+  return mediaReadEnvironmentEnabled();
 }
 export function mediaByteLimit() {
   return mediaCloudEnabled() ? MAX_PREVIEW_IMAGE_BYTES : MAX_IMAGE_BYTES;
 }
 export function requireMediaEnvironment() {
-  if (!mediaEnabled()) throw new Error("CMS media unavailable");
-  getCmsConfig();
+  requireMediaReadEnvironment();
 }
 export function requireLocalMediaEnvironment() {
   if (!mediaLocalEnabled()) throw new Error("Local CMS media unavailable");
@@ -49,7 +67,7 @@ export function requireLocalMediaEnvironment() {
 }
 export function requireCloudMediaEnvironment() {
   if (!mediaCloudEnabled()) throw new Error("Cloud CMS media unavailable");
-  getCmsConfig();
+  requireTrustedMediaEnvironment();
 }
 export function mediaUploadOriginAllowed(request: Request) {
   const origin = request.headers.get("origin");

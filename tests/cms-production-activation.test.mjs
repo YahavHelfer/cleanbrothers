@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
+import { renderToStaticMarkup } from "react-dom/server";
 import { createSourceLoader } from "./helpers/source-module.mjs";
 
 const url = "https://plbwefnwussxlglscfpn.supabase.co";
@@ -163,4 +164,119 @@ test("Production media gate is independent and unavailable without explicit medi
     CMS_MEDIA_SERVER_KEY: "synthetic-server-only-key" };
   assert.equal(get(enabled, file).mediaCloudEnabled(), true);
   assert.equal(get({ ...enabled, VERCEL_PROJECT_ID: "other" }, file).mediaCloudEnabled(), false);
+});
+
+test("Production Admin can read static media metadata without a trusted key or public service flags", async () => {
+  const gates = get(production, "src/cms/media/environment.ts");
+  assert.equal(gates.mediaReadEnvironmentEnabled(), true);
+  assert.equal(gates.trustedMediaEnvironmentEnabled(), false);
+  assert.equal(gates.mediaCloudEnabled(), false);
+  assert.doesNotThrow(() => gates.requireMediaReadEnvironment());
+  assert.throws(() => gates.requireTrustedMediaEnvironment());
+  const versionId = "d1000000-0000-4000-8000-000000000001";
+  const item = { id: "d0000000-0000-4000-8000-000000000001",
+    version: { id: versionId, storage_provider: "static" }, usageCount: 1, publishedUsageCount: 1 };
+  const repo = createSourceLoader({ env: production, mocks: {
+    "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "admin" }) },
+    "@/cms/server": { createCmsServerClient: async () => ({
+      rpc: async (name) => name === "cms_media_library"
+        ? { data: [item], error: null }
+        : { data: { asset: item, versions: [item.version], usages: [], audit: [] }, error: null },
+      from: () => ({ select() { return this; }, order: async () => ({
+        data: [{ ...item.version, asset_id: item.id, version_number: 1, original_filename: "static.jpeg" }], error: null,
+      }) }),
+    }) },
+    "./trusted-client": { createTrustedMediaClient: () => { throw Error("privileged client must not be created"); } },
+  } })("src/cms/media/repository.ts");
+  assert.equal((await repo.listMedia())[0].previewSrc, "/images/services/delicate-upholstery-cleaning.jpeg");
+  assert.ok(await repo.getMediaDetail(item.id));
+  assert.equal((await repo.getMediaChoices())[0].src, "/images/services/delicate-upholstery-cleaning.jpeg");
+  await repo.updateMedia(item.id, 1, "metadata", { altText: "תמונה", caption: "", folder: "" });
+});
+
+test("Production upload and private delivery remain closed without a media credential", async () => {
+  const service = { ...production, CMS_CONTENT_SOURCE: "published",
+    CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning" };
+  let writes = 0;
+  const repo = createSourceLoader({ env: service, mocks: {
+    "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "admin" }) },
+    "./validate-image": { validateImage: async () => { writes++; throw Error("unexpected"); } },
+  } })("src/cms/media/repository.ts");
+  await assert.rejects(() => repo.uploadMedia(new Uint8Array(), "x.jpg", "image/jpeg", {}), /Trusted CMS media unavailable/);
+  assert.equal(writes, 0);
+  const uploadRoute = createSourceLoader({ env: service, mocks: {
+    "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "admin" }) },
+    "@/cms/media/repository": { uploadMedia: async () => { writes++; throw Error("unexpected"); } },
+  } })("src/app/(admin)/admin/media/upload/route.ts");
+  const uploadResponse = await uploadRoute.POST(new Request("https://www.cleanbrothers.co.il/admin/media/upload", { method: "POST" }));
+  assert.equal(uploadResponse.status, 503);
+  assert.match(uploadResponse.headers.get("cache-control"), /private.*no-store/);
+  assert.equal(writes, 0);
+  const route = createSourceLoader({ env: service, mocks: {
+    "@/cms/media/repository": { mediaBytes: async () => { writes++; throw Error("unexpected"); } },
+  } })("src/app/cms-media/[id]/route.ts");
+  const response = await route.GET(new Request("https://www.cleanbrothers.co.il/cms-media/d1000000-0000-4000-8000-000000000001"),
+    { params: Promise.resolve({ id: "d1000000-0000-4000-8000-000000000001" }) });
+  assert.equal(response.status, 404);
+  assert.equal(writes, 0);
+  const storage = createSourceLoader({ env: service, mocks: {
+    "./trusted-client": { createTrustedMediaClient: () => { writes++; throw Error("unexpected"); } },
+  } })("src/cms/media/cloud-storage.ts");
+  await assert.rejects(() => storage.readCloudImage("d1000000-0000-4000-8000-000000000001", "a".repeat(64)), /Cloud CMS media unavailable/);
+  assert.equal(writes, 0);
+});
+
+test("Production Media Admin shows read-only library and hides upload controls", async () => {
+  const page = createSourceLoader({ env: production, mocks: {
+    "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "admin" }) },
+    "@/cms/media/repository": { listMedia: async () => [] },
+    "@/cms/media/Library": { Library: () => null },
+    "@/cms/media/UploadForm": { UploadForm: () => { throw Error("upload control rendered"); } },
+  } })("src/app/(admin)/admin/(protected)/media/page.tsx");
+  const html = renderToStaticMarkup(await page.default());
+  assert.match(html, /ספריית מדיה/);
+  assert.match(html, /העלאה והחלפה של תמונות אינן זמינות/);
+  assert.doesNotMatch(html, /העלאת תמונה חדשה/);
+});
+
+test("Production public media projection permits static versions but rejects private and local versions", () => {
+  const service = { ...production, CMS_CONTENT_SOURCE: "published",
+    CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning" };
+  const resolve = get(service, "src/cms/media/resolve.ts").resolveMediaProjection;
+  const row = { media_version_id: "d1000000-0000-4000-8000-000000000001",
+    usage_role: "hero", position: 0, alt_text: "תמונה", provider: "static" };
+  assert.equal(resolve([row], "public")[0].src, "/images/services/delicate-upholstery-cleaning.jpeg");
+  assert.throws(() => resolve([{ ...row, provider: "supabase" }], "public"), /Private CMS media unavailable/);
+  assert.throws(() => resolve([{ ...row, provider: "local" }], "public"), /Local CMS media unavailable/);
+});
+
+test("Production published service reads static media without creating a trusted client", async () => {
+  const service = { ...production, CMS_CONTENT_SOURCE: "published",
+    CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning" };
+  const baseline = get(service, "src/cms/content/baseline.ts").pilotBaseline();
+  const payload = { ...baseline, schemaVersion: 2,
+    images: ["d1000000-0000-4000-8000-000000000001"] };
+  const row = { media_version_id: payload.images[0], provider: "static", usage_role: "hero",
+    position: 0, alt_text: "ניקוי ריפודים", width: 1600, height: 1200 };
+  const makeSource = (provider) => createSourceLoader({ env: service, mocks: {
+    "next/server": { connection: async () => {} },
+    "@supabase/supabase-js": { createClient: (_url, key) => {
+      assert.equal(key, production.CMS_SUPABASE_PUBLISHABLE_KEY);
+      return { rpc: async () => ({ data: { revisionId: "a0000000-0000-4000-8000-000000000001",
+        payload, media: [{ ...row, provider }, { ...row, provider, usage_role: "result" }] }, error: null }) };
+    } },
+    "@/cms/media/trusted-client": { createTrustedMediaClient: () => { throw Error("privileged client used"); } },
+  } })("src/cms/content/public-source.ts");
+  const publicPage = await makeSource("static").getPublicPilot();
+  assert.equal(publicPage.page.content.images[0], "/images/services/delicate-upholstery-cleaning.jpeg");
+  await assert.rejects(() => makeSource("supabase").getPublicPilot(), /Private CMS media unavailable/);
+});
+
+test("Production read gate fails closed for other project, branch and CMS identity", () => {
+  for (const change of [{ VERCEL_PROJECT_ID: "other" }, { VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation" },
+    { CMS_SUPABASE_URL: "https://other.supabase.co" }, { CMS_SUPABASE_PUBLISHABLE_KEY: undefined }]) {
+    const gates = get({ ...production, ...change }, "src/cms/media/environment.ts");
+    assert.equal(gates.mediaReadEnvironmentEnabled(), false);
+    assert.throws(() => gates.requireMediaReadEnvironment());
+  }
 });

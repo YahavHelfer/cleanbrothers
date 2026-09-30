@@ -1,12 +1,12 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { getCmsConfig } from "@/cms/config";
-import { mediaCloudEnabled, requireMediaEnvironment } from "./environment";
+import { mediaCloudEnabled, requireTrustedMediaEnvironment } from "./environment";
 
 // Server attestation of decoded bytes and private Storage access. Never exported
 // through an action, client component, browser credential or signed URL.
 export function createTrustedMediaClient() {
-  requireMediaEnvironment();
+  requireTrustedMediaEnvironment();
   const { url } = getCmsConfig();
   const key = mediaCloudEnabled()
     ? process.env.CMS_MEDIA_SERVER_KEY

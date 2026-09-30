@@ -111,9 +111,10 @@ test("SQL closed contracts and TS contracts agree exactly; no arbitrary field es
 });
 test("private and published special media use the authorized byte route directly, never the public image optimizer",()=>{
  const {AirConditionerCleaningView}=load('src/components/AirConditionerCleaningView.tsx'),{WindowCleaningView}=load('src/components/WindowCleaningView.tsx');
+ const localResolve=createSourceLoader({env:local})("src/cms/media/resolve.ts").resolveMediaProjection;
  const ac=clone(acBaseline),window=clone(windowBaseline);window.media.hero=[ac.media.gallery[0]];
  for(const [component,content] of [[AirConditionerCleaningView,ac],[WindowCleaningView,window]])for(const audience of ['admin','public']){
-  const refs=resolveMediaProjection(media(content).map(m=>({...m,provider:'local'})),audience);
+  const refs=localResolve(media(content).map(m=>({...m,provider:'local'})),audience);
   const html=renderToStaticMarkup(component({content,media:refs,preview:audience==='admin'}));
   assert.doesNotMatch(html,/\/_next\/image\?url=%2F(?:admin|cms-media)/);
   assert.ok(html.includes(audience==='admin'?'/admin/media/file/':'/cms-media/'));

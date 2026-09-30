@@ -4,10 +4,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { getMediaDetail } from "@/cms/media/repository";
-import { privateMediaUrl, STATIC_MEDIA_PATH, mediaId } from "@/cms/media/model";
+import { privateMediaUrl, mediaId } from "@/cms/media/model";
+import { staticMediaPath } from "@/cms/media/static-inventory";
 import { MetadataEditor } from "@/cms/media/MetadataEditor";
 import { UploadForm } from "@/cms/media/UploadForm";
-import { mediaByteLimit } from "@/cms/media/environment";
+import { mediaByteLimit, trustedMediaEnvironmentEnabled } from "@/cms/media/environment";
 export default async function MediaDetailPage({
   params,
 }: {
@@ -48,9 +49,10 @@ export default async function MediaDetailPage({
         {asset.generation}
       </p>
       <MetadataEditor key={asset.id} asset={asset} />
-      {asset.status === "available" && (
+      {asset.status === "available" && trustedMediaEnvironmentEnabled() && (
         <UploadForm key={`upload-${asset.generation}`} asset={asset} maxBytes={mediaByteLimit()} />
       )}
+      {!trustedMediaEnvironmentEnabled() && <p>העלאה והחלפה אינן זמינות ללא גישת מדיה פרטית.</p>}
       <section aria-label="גרסאות תמונה" className="grid gap-4">
         <h2 className="text-2xl font-black">גרסאות תמונה</h2>
         {versions.map((v) => (
@@ -62,18 +64,16 @@ export default async function MediaDetailPage({
               גרסת תמונה {v.version_number}
               {v.id === asset.current_version_id ? " · נוכחית" : ""}
             </h3>
-            <Image
-              src={
-                v.storage_provider === "static"
-                  ? STATIC_MEDIA_PATH
-                  : privateMediaUrl(v.id)
-              }
-              width={320}
-              height={240}
-              alt={asset.alt_text}
-              unoptimized
-              className="max-h-60 w-full object-contain"
-            />
+            {v.storage_provider === "static" || trustedMediaEnvironmentEnabled() ? (
+              <Image
+                src={v.storage_provider === "static" ? staticMediaPath(v.id) : privateMediaUrl(v.id)}
+                width={320}
+                height={240}
+                alt={asset.alt_text}
+                unoptimized
+                className="max-h-60 w-full object-contain"
+              />
+            ) : <p>קובץ פרטי אינו זמין לצפייה בסביבה זו.</p>}
             <p className="break-all" dir="auto">
               {v.original_filename}
             </p>

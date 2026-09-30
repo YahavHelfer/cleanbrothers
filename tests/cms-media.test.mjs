@@ -8,6 +8,7 @@ const env = {
   CMS_SUPABASE_URL: "http://127.0.0.1:56321",
   CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_local_test",
   CMS_MEDIA_LOCAL_ENABLED: "1",
+  CMS_MEDIA_LOCAL_SERVICE_KEY: "synthetic-local-key",
 };
 const load = createSourceLoader({ env });
 const { validateImage, safeOriginalFilename } = load(
@@ -563,6 +564,7 @@ const cloudEnv = {
   CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co",
   CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_synthetic_test_only",
   CMS_MEDIA_PREVIEW_ENABLED: "1",
+  CMS_MEDIA_SERVER_KEY: "synthetic-server-key",
   VERCEL: "1", VERCEL_ENV: "preview",
   VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
   CMS_PILOT_CONTENT_SOURCE: "published",
@@ -574,7 +576,7 @@ test("cloud media requires every Preview, project, branch and allowlist conditio
   assert.equal(enabled.mediaEnabled(),true);
   assert.doesNotThrow(()=>enabled.requireMediaEnvironment());
   assert.throws(()=>enabled.requireLocalMediaEnvironment());
-  for(const key of Object.keys(cloudEnv).filter(k=>k!=="CMS_SUPABASE_PUBLISHABLE_KEY")) {
+  for(const key of Object.keys(cloudEnv).filter(k=>!["CMS_SUPABASE_PUBLISHABLE_KEY","CMS_MEDIA_SERVER_KEY"].includes(k))) {
     const loaded = createSourceLoader({env:{...cloudEnv,[key]:"wrong"}})("src/cms/media/environment.ts");
     assert.equal(loaded.mediaEnabled(),false,key);
     assert.throws(()=>loaded.requireCloudMediaEnvironment());
@@ -605,7 +607,7 @@ test("trusted media credentials are selected server-side only after the environm
   const loaded=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:"synthetic-server-key"},mocks,fetchImpl:async(input,init)=>{request={input,init};return new Response();}})("src/cms/media/trusted-client.ts");
   loaded.createTrustedMediaClient();await calls[1].options.global.fetch("https://example.invalid");
   assert.equal(request.init.cache,"no-store");assert.equal(request.init.redirect,"error");
-  for(const e of [{...cloudEnv}, {...cloudEnv,VERCEL_ENV:"production",CMS_MEDIA_SERVER_KEY:"synthetic"}])
+  for(const e of [{...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined}, {...cloudEnv,VERCEL_ENV:"production",CMS_MEDIA_SERVER_KEY:"synthetic"}])
     assert.throws(()=>createSourceLoader({env:e,mocks})("src/cms/media/trusted-client.ts").createTrustedMediaClient());
   assert.equal(calls.length,2);
 });
@@ -647,7 +649,7 @@ test("cloud upload authorizes, validates, writes and registers with actor attrib
   }
 });
 test("cloud media versions resolve to same-origin routes without signed URLs or raw Storage paths",()=>{
-  const resolve=load("src/cms/media/resolve.ts").resolveMediaProjection;
+  const resolve=createSourceLoader({env:cloudEnv})("src/cms/media/resolve.ts").resolveMediaProjection;
   const row={media_version_id:"a3000000-0000-4000-8000-000000000001",usage_role:"hero",position:0,alt_text:"Alt",provider:"supabase"};
   assert.equal(resolve([row],"admin")[0].src,"/admin/media/file/"+row.media_version_id);
   assert.equal(resolve([row],"public")[0].src,"/cms-media/"+row.media_version_id);
@@ -698,7 +700,7 @@ test("Preview media stays enabled through each explicit one-service rollout step
 
 test("multi-service Preview media retains every environment and strict allowlist guard", () => {
  const base={...cloudEnv,CMS_CONTENT_SERVICE_ALLOWLIST:"delicate-upholstery-cleaning,sofa-cleaning"};
- const invalid=[...Object.keys(base).filter(key=>key!=="CMS_SUPABASE_PUBLISHABLE_KEY").map(key=>({[key]:"wrong"})),
+ const invalid=[...Object.keys(base).filter(key=>!["CMS_SUPABASE_PUBLISHABLE_KEY","CMS_MEDIA_SERVER_KEY"].includes(key)).map(key=>({[key]:"wrong"})),
   {VERCEL_ENV:"production"},{VERCEL_GIT_COMMIT_REF:"main"},{CMS_MEDIA_LOCAL_ENABLED:"1",CMS_SUPABASE_URL:env.CMS_SUPABASE_URL},
   ...["*","sofa-cleaning,*","sofa-cleaning,sofa-cleaning","sofa-cleaning,unknown-service","sofa-cleaning,",""].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
  for(const invalidEnv of invalid) {
