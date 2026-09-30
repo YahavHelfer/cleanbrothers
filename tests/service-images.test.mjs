@@ -5,6 +5,23 @@ import test from "node:test";
 import { serviceImages } from "../src/data/serviceImages.ts";
 import { getServiceImages, getPrimaryServiceImage } from "../src/lib/service-images.ts";
 
+test("air conditioner carousel and poster use only existing approved images", () => {
+  const images = serviceImages.airConditioner;
+  assert.deepEqual(images, [
+    "/images/services/Air-conditioner-cleaning4.JPG",
+    "/images/services/Air-conditioner-cleaning.PNG",
+    "/images/services/Air-conditioner-cleaning2.PNG",
+  ]);
+  assert.equal(new Set(images).size, images.length);
+  for (const path of images) {
+    assert.ok(readFileSync(new URL(`../public${path}`, import.meta.url)).length > 0, path);
+  }
+
+  const landing = readFileSync(new URL("../src/data/serviceLandingPages.ts", import.meta.url), "utf8");
+  const poster = landing.match(/poster:\s*"([^"]+)"/)?.[1];
+  assert.equal(poster, images[0]);
+});
+
 test("car upholstery uses every replacement asset with exact casing and no duplicates", () => {
   const directory = new URL("../public/images/services/", import.meta.url);
   const files = readdirSync(directory).filter((name) => /^car-upholstery-cleaning\d*\./i.test(name));

@@ -30,7 +30,7 @@ export const airConditionerLanding = {
   video: {
     youtubeId: "cCQpujXNpSQ",
     watchUrl: "https://www.youtube.com/shorts/cCQpujXNpSQ",
-    poster: "/images/services/air-conditioner-cleaning-web.jpg",
+    poster: "/images/services/Air-conditioner-cleaning4.JPG",
     title: "כך נראה ניקוי מזגן מקצועי",
     description:
       "צפו בתהליך העבודה של CleanBrothers – ניקוי יסודי ומסודר בבית הלקוח.",

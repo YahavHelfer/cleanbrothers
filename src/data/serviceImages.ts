@@ -14,11 +14,9 @@ export const serviceImages = {
     "/images/services/car-upholstery-cleaning4.jpg",
   ],
   airConditioner: [
-    "/images/services/air-conditioner-cleaning-web.jpg",
+    "/images/services/Air-conditioner-cleaning4.JPG",
     "/images/services/Air-conditioner-cleaning.PNG",
     "/images/services/Air-conditioner-cleaning2.PNG",
-    "/images/services/Air-conditioner-cleaning4.JPG",
-    "/images/services/Air-conditioner-cleaning5.JPG",
   ],
   armchairChair: ["/images/services/armchair-chair-cleaning.jpeg"],
   delicateUpholstery: [

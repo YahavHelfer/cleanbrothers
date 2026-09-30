@@ -7,6 +7,11 @@ export const approvedAcImages = [
 ];
 export const approvedAcGallery = [approvedAcImages[1], approvedAcImages[2], approvedAcImages[0]];
 export function repairHistoricalAcMedia(file, source) {
+  if (file.endsWith("src/data/serviceImages.ts"))
+    return source.replace(/airConditioner:\s*\[[\s\S]*?\],/, `airConditioner: ${JSON.stringify(approvedAcImages)},`);
+  if (file.endsWith("src/data/serviceLandingPages.ts"))
+    return source.replace('poster: "/images/services/air-conditioner-cleaning-web.jpg"',
+      `poster: ${JSON.stringify(approvedAcImages[0])}`);
   if (file.endsWith("src/components/AirConditionerCleaningLandingPage.tsx"))
     return source.replace("serviceImages.airConditioner.slice(1, 5)", `(${JSON.stringify(approvedAcGallery)})`)
       .replace("images={serviceImages.airConditioner}", `images={${JSON.stringify(approvedAcImages)}}`);
