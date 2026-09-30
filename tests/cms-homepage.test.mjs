@@ -131,7 +131,8 @@ test("live Google source uses exact Place Details fields, validates five reviews
   const response = googlePayload();
   const source = createSourceLoader({ env: googlePreview, fetchImpl: async (url, options) => {
     calls++;
-    assert.equal(url, `https://places.googleapis.com/v1/places/${googlePreview.GOOGLE_REVIEWS_PLACE_ID}`);
+    assert.equal(url, `https://places.googleapis.com/v1/places/${googlePreview.GOOGLE_REVIEWS_PLACE_ID}?languageCode=he`);
+    assert.ok(!url.includes(googlePreview.GOOGLE_PLACES_API_KEY));
     assert.equal(options.cache, "no-store");
     assert.equal(options.headers["X-Goog-Api-Key"], googlePreview.GOOGLE_PLACES_API_KEY);
     assert.equal(options.headers["X-Goog-FieldMask"], [

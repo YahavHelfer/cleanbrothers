@@ -17,6 +17,27 @@ test.beforeEach(async () => {
 });
 test.afterEach(async () => { await cleanupActors(); });
 
+test("service areas can be edited, added and removed without dropping blank rows", async ({ page, context }) => {
+  await session(actor, context);
+  await page.goto("/admin/site/settings");
+  const area = (index: number) => page.getByRole("textbox", { name: `אזור שירות ${index}`, exact: true });
+  await expect(area(1)).toHaveValue("ראש העין");
+  await area(1).fill("ראש העין החדשה");
+  await page.getByRole("button", { name: "הוספת אזור שירות" }).click();
+  await expect(area(10)).toHaveValue("");
+  await area(10).fill("אזור בדיקה");
+  await expect(area(10)).toHaveValue("אזור בדיקה");
+  await page.getByRole("button", { name: /הסרת אזור שירות 2/ }).click();
+  await expect(area(2)).toHaveValue("הוד השרון");
+  await expect(area(9)).toHaveValue("אזור בדיקה");
+  for (let i = 10; i <= 20; i++) await page.getByRole("button", { name: "הוספת אזור שירות" }).click();
+  await expect(area(20)).toHaveValue("");
+  await expect(page.getByRole("button", { name: "הוספת אזור שירות" })).toBeDisabled();
+  for (let i = 20; i > 1; i--) await page.getByRole("button", { name: `הסרת אזור שירות ${i}`, exact: i === 20 }).click();
+  await expect(area(1)).toHaveValue("ראש העין החדשה");
+  await expect(page.getByRole("button", { name: /הסרת אזור שירות 1/ })).toBeDisabled();
+});
+
 test("global settings UI keeps draft private, previews exact revision, publishes and restores without changing default public site", async ({page,context,request}) => {
   await session(actor,context);
   const baseline=state();

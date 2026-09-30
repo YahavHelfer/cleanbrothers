@@ -27,8 +27,21 @@ function SettingsFields({ value, change }: { value: SiteSettings; change: (next:
       onChange={phoneDisplay => change({ ...value, phoneDisplay })} />
     <p className="text-sm text-[var(--muted)]">קישור החיוג ומעקב השיחות אינם משתנים בשדה זה.</p>
     <Text label="אימייל ציבורי" value={value.email} max={254} onChange={email => change({ ...value, email })} />
-    <Text label="אזורי שירות — שורה לכל אזור" value={value.serviceAreas.join("\n")} multi max={1600}
-      onChange={text => change({ ...value, serviceAreas: text.split("\n").map(area => area.trim()).filter(Boolean) })} />
+    <fieldset className="grid gap-3 rounded-2xl border p-4">
+      <legend className="font-black">אזורי שירות</legend>
+      {value.serviceAreas.map((area, index) => <div key={index} className="flex flex-wrap items-end gap-2">
+        <label className="grid min-w-48 flex-1 gap-2 font-bold">אזור שירות {index + 1}
+          <input className={field} value={area} maxLength={80} required
+            onChange={event => change({ ...value, serviceAreas: value.serviceAreas.map((item, i) =>
+              i === index ? event.target.value : item) })} />
+        </label>
+        <button type="button" className={button} disabled={value.serviceAreas.length <= 1}
+          aria-label={`הסרת אזור שירות ${index + 1}${area ? `: ${area}` : ""}`}
+          onClick={() => change({ ...value, serviceAreas: value.serviceAreas.filter((_, i) => i !== index) })}>הסרה</button>
+      </div>)}
+      <button type="button" className={button} disabled={value.serviceAreas.length >= 20}
+        onClick={() => change({ ...value, serviceAreas: [...value.serviceAreas, ""] })}>הוספת אזור שירות</button>
+    </fieldset>
     <Text label="תיאור עסק לנתונים מובנים" value={value.structuredDescription} multi max={500}
       onChange={structuredDescription => change({ ...value, structuredDescription })} />
   </div>;

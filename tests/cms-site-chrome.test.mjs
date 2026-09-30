@@ -20,6 +20,9 @@ test("closed global schemas reject executable content, unknown fields and integr
   assert.throws(() => model.validateSiteSettings({ ...settings, phoneDisplay: "0500000000" }));
   assert.throws(() => model.validateSiteSettings({ ...settings, email: "x@example.com?subject=leak" }));
   assert.throws(() => model.validateSiteSettings({ ...settings, serviceAreas: ["תל אביב","תל אביב"] }));
+  assert.throws(() => model.validateSiteSettings({ ...settings, serviceAreas: [] }));
+  assert.throws(() => model.validateSiteSettings({ ...settings, serviceAreas: [...settings.serviceAreas, ...Array(12).fill("אזור נוסף")] }));
+  assert.throws(() => model.validateSiteSettings({ ...settings, serviceAreas: [...settings.serviceAreas, ""] }));
   assert.equal(model.validateSiteSettings({ ...settings, phoneDisplay: "055-957-7731" }).phoneDisplay,"055-957-7731");
 });
 

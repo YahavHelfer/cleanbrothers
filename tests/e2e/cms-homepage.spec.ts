@@ -21,6 +21,31 @@ test.beforeEach(async () => {
 });
 test.afterEach(async () => { await cleanupActors(); });
 
+test("Google reviews autoplay and manual navigation scroll only the RTL track", async ({ page, context }) => {
+  await session(actor, context);
+  await page.goto("/admin/pages/home");
+  await page.locator('[data-block-id="d4000000-0000-4000-8000-000000000012"]')
+    .getByRole("button", { name: "הצג", exact: true }).click();
+  await page.getByRole("button", { name: "שמירת טיוטה" }).click();
+  await expect.poll(() => state().draft_revision_id).not.toBe(state().published_revision_id);
+  await page.goto(`/admin/preview/pages/home?revision=${state().draft_revision_id}`);
+  const carousel = page.locator("[data-active-review]");
+  await expect(carousel).toHaveAttribute("data-active-review", "0");
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const beforeAutoplay = await page.evaluate(() => window.scrollY);
+  await expect(carousel).toHaveAttribute("data-active-review", "1", { timeout: 9000 });
+  expect(await page.evaluate(() => window.scrollY)).toBe(beforeAutoplay);
+  const next = page.getByRole("button", { name: "ביקורת הבאה" });
+  await next.scrollIntoViewIfNeeded();
+  const beforeManual = await page.evaluate(() => window.scrollY);
+  await next.click();
+  await expect(carousel).toHaveAttribute("data-active-review", "2");
+  expect(await page.evaluate(() => window.scrollY)).toBe(beforeManual);
+  await page.getByRole("button", { name: "ביקורת קודמת" }).click();
+  await expect(carousel).toHaveAttribute("data-active-review", "1");
+  expect(await page.evaluate(() => window.scrollY)).toBe(beforeManual);
+});
+
 test("homepage UI keeps draft private, publishes exact revision and rolls back with AAL2", async ({ page, context, request }) => {
   await session(actor, context);
   const baseline = state(), other = otherState();

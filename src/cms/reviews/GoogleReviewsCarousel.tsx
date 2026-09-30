@@ -19,7 +19,14 @@ export function GoogleReviewsCarousel({ content, source, preview = false }: {
   const go = useCallback((next: number) => {
     const target = (next + count) % count;
     setIndex(target);
-    track.current?.children[target]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+    const container = track.current;
+    const card = container?.children[target];
+    if (!container || !card) return;
+    const containerRect = container.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const rtl = getComputedStyle(container).direction === "rtl";
+    container.scrollBy({ left: rtl ? cardRect.right - containerRect.right : cardRect.left - containerRect.left,
+      behavior: "smooth" });
   }, [count]);
 
   useEffect(() => {

@@ -40,7 +40,7 @@ export const getLiveGoogleReviews = cache(async (): Promise<GoogleReviews | null
   const config = liveGoogleReviewsConfig();
   if (!config) return null;
   try {
-    const response = await fetch(`https://places.googleapis.com/v1/places/${config.placeId}`, {
+    const response = await fetch(`https://places.googleapis.com/v1/places/${config.placeId}?languageCode=he`, {
       headers: { "X-Goog-Api-Key": config.apiKey, "X-Goog-FieldMask": GOOGLE_PLACE_FIELD_MASK },
       cache: "no-store",
       signal: AbortSignal.timeout(3000),
