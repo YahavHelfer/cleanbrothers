@@ -50,7 +50,7 @@ test("public projection contains presentation only", () => {
     assert.throws(() => validatePublicCampaign({ ...publicData, [privateKey]: "secret" }));
 });
 
-test("manual campaign remains separate from scheduled runtime and Production fails closed", () => {
+test("manual campaign remains separate from scheduled runtime and unconfigured Production fails closed", () => {
   const env = { VERCEL: "1", VERCEL_ENV: "preview", VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
     VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
     CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co", CMS_MANUAL_PROMOTIONS_SOURCE: "active" };
@@ -64,6 +64,44 @@ test("manual campaign remains separate from scheduled runtime and Production fai
   assert.match(sql, /placement text primary key/i);
   assert.match(sql, /pg_advisory_xact_lock\(20260930,1\)/);
   assert.doesNotMatch(sql, /create.*cron|alter.*cms_promotion_schedules|alter.*cms_active_promotion_placements/i);
+});
+
+test("manual campaigns use exact Production identity and independent public activation", () => {
+  const production = { VERCEL: "1", VERCEL_ENV: "production",
+    VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
+    VERCEL_GIT_COMMIT_REF: "main",
+    CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co",
+    CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_synthetic_test_only" };
+  const gates = env => createSourceLoader({ env })("src/cms/promotions/environment.ts");
+  assert.equal(gates(production).manualCampaignAdminAllowed(), true);
+  assert.equal(gates(production).manualCampaignPublicAllowed(), false);
+  assert.equal(gates({ ...production, CMS_MANUAL_PROMOTIONS_SOURCE: "active" }).manualCampaignPublicAllowed(), true);
+
+  for (const patch of [
+    { VERCEL: "" },
+    { VERCEL_ENV: "preview" },
+    { VERCEL_GIT_COMMIT_REF: "feature/cms-manual-promotions" },
+    { VERCEL_PROJECT_ID: "wrong-project" },
+    { CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co.evil.example" },
+    { CMS_SUPABASE_URL: "not-a-url" },
+    { CMS_SUPABASE_PUBLISHABLE_KEY: "" },
+  ]) {
+    const denied = gates({ ...production, CMS_MANUAL_PROMOTIONS_SOURCE: "active", ...patch });
+    assert.equal(denied.manualCampaignAdminAllowed(), false, JSON.stringify(patch));
+    assert.equal(denied.manualCampaignPublicAllowed(), false, JSON.stringify(patch));
+  }
+  for (const source of ["", "all", "*", "published", "ACTIVE", "active,*", "active "]) {
+    assert.equal(gates({ ...production, CMS_MANUAL_PROMOTIONS_SOURCE: source }).manualCampaignPublicAllowed(), false, source);
+  }
+
+  const adminPage = readFileSync("src/app/(admin)/admin/(protected)/promotions/page.tsx", "utf8");
+  const adminLayout = readFileSync("src/app/(admin)/admin/(protected)/layout.tsx", "utf8");
+  const publicRoute = readFileSync("src/app/api/cms/public-promotion/route.ts", "utf8");
+  const repository = readFileSync("src/cms/promotions/repository.ts", "utf8");
+  assert.match(adminPage, /manualCampaignAdminAllowed\(\)/);
+  assert.match(adminLayout, /requireCmsAdminPage\(\)/);
+  assert.match(publicRoute, /readPublicCampaign\(path\)/);
+  assert.match(repository, /if \(!paths\.has\(path\) \|\| !manualCampaignPublicAllowed\(\)\) return null/);
 });
 
 test("CMS Preview identity accepts only the two exact pilot branches", () => {
