@@ -2,6 +2,7 @@ import { mediaEnabled } from "@/cms/media/environment";
 import { pagesEnvironmentAllowed } from "@/cms/pages/environment";
 import { siteEnvironmentAllowed } from "@/cms/site/environment";
 import { schedulesEnvironmentAllowed } from "@/cms/schedules/environment";
+import { manualCampaignAdminAllowed } from "@/cms/promotions/environment";
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import Link from "next/link";
@@ -32,11 +33,12 @@ export default function AdminLayout({
         <header className="border-b theme-card">
           <div className="section-container flex flex-wrap items-center justify-between gap-4 py-5">
             <p className="text-lg font-black">CleanBrothers CMS</p>
-            <nav aria-label="ניווט ניהול" className="flex items-center gap-5 text-sm font-bold">
+            <nav aria-label="ניווט ניהול" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-bold">
               <Link href="/admin/services" prefetch={false}>שירותים</Link>
               {pagesEnvironmentAllowed() && <Link href="/admin/pages" prefetch={false}>עמודים</Link>}
               {siteEnvironmentAllowed() && <Link href="/admin/site" prefetch={false}>האתר</Link>}
-              {schedulesEnvironmentAllowed() && <Link href="/admin/promotions/schedules" prefetch={false}>מבצעים מתוזמנים</Link>}
+              {manualCampaignAdminAllowed() && <Link href="/admin/promotions" prefetch={false}>מבצעים</Link>}
+              {schedulesEnvironmentAllowed() && <Link href="/admin/promotions/schedules" prefetch={false}>תזמון מתקדם</Link>}
               {mediaEnabled() && <Link href="/admin/media" prefetch={false}>מדיה</Link>}
               <Link href="/admin" prefetch={false} className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquoise">
                 לוח בקרה

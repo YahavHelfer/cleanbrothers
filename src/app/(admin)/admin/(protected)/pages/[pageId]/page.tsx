@@ -14,6 +14,7 @@ import { getHomeEditor } from "@/cms/home/repository";
 import { homeBaseline } from "@/cms/home/baseline";
 import { HomeReviewsBootstrapControl } from "@/cms/home/HomeReviewsBootstrapControl";
 import { HomeEditor, RestoreHomeRevision } from "@/cms/home/HomeEditor";
+import { CampaignPlacementSection } from "@/cms/promotions/CampaignPlacementSection";
 
 export default async function EditPage({ params }: { params: Promise<{ pageId: string }> }) {
   if (!pagesEnvironmentAllowed()) notFound();
@@ -32,6 +33,7 @@ export default async function EditPage({ params }: { params: Promise<{ pageId: s
         <HomeReviewsBootstrapControl generation={snapshot.generation} revision={snapshot.draftRevisionId} />}
       <HomeEditor key={snapshot.generation} snapshot={snapshot} templates={homeBaseline.blocks}
         mediaChoices={mediaChoices} promotionRevisions={promotion?.history.map(row=>({id:row.id,number:row.number}))||[]}/>
+      <CampaignPlacementSection placement="home:home" />
       <section aria-label="היסטוריית גרסאות" className="grid gap-4"><h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
         {snapshot.history.map(revision=><article key={revision.id} className="grid gap-3 rounded-2xl border theme-card p-5">
           <h3>גרסה {revision.number} — {revision.createdBy===null?"ייבוא":revision.createdBy===userId?"את/ה":"מנהל/ת נוסף/ת"}</h3>
@@ -83,6 +85,7 @@ export default async function EditPage({ params }: { params: Promise<{ pageId: s
     </div>
     <PageEditor key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices}
       promotionRevisions={promotion?.history.map(revision => ({ id: revision.id, number: revision.number })) || []} />
+    <CampaignPlacementSection placement="page:about" />
     <section aria-label="היסטוריית גרסאות" className="grid gap-4"><h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
       <p>שחזור יוצר טיוטה חדשה ואינו משנה גרסאות היסטוריות.</p>
       {snapshot.history.map(revision => <article key={revision.id} data-revision={revision.id} className="grid gap-3 rounded-2xl border theme-card p-5">

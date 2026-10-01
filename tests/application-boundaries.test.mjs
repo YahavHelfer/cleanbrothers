@@ -52,12 +52,12 @@ test("all existing public page URLs and the new service are in the public route 
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]", "/admin/promotions/schedules", "/admin/preview/promotions/schedules/[id]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]", "/admin/promotions", "/admin/promotions/[id]", "/admin/preview/promotions/[id]", "/admin/promotions/schedules", "/admin/preview/promotions/schedules/[id]"].sort());
 });
 
-test("business API URLs stay outside the UI route groups; preview has no endpoint", () => {
+test("business and public campaign API URLs stay outside the UI route groups; preview has no endpoint", () => {
   const handlers = filesIn(appDirectory).filter((file) => file.endsWith("/route.ts"));
-  assert.deepEqual(handlers.map(routeFor).sort(), ["/admin/auth/confirm", "/admin/media/file/[id]", "/admin/media/upload", "/api/contact-lead", "/api/whatsapp", "/cms-media/[id]"]);
+  assert.deepEqual(handlers.map(routeFor).sort(), ["/admin/auth/confirm", "/admin/media/file/[id]", "/admin/media/upload", "/api/cms/public-promotion", "/api/contact-lead", "/api/whatsapp", "/cms-media/[id]"]);
   assert.equal(existsSync(resolve(appDirectory, "layout.tsx")), false);
   assert.deepEqual(
     filesIn(resolve(appDirectory, "(preview)")).map((file) => relative(appDirectory, file)),

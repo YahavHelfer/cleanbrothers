@@ -7,6 +7,7 @@ import { isManagedServiceKey, isSpecialServiceKey, serviceRegistry } from "@/con
 import { notFound } from "next/navigation";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { ServiceEditor, RestoreRevision } from "@/cms/content/ServiceEditor";
+import { CampaignPlacementSection } from "@/cms/promotions/CampaignPlacementSection";
 
 export default async function ServiceEditorPage({ params }: { params: Promise<{ serviceKey: string }> }) {
   await requireCmsAdmin();
@@ -24,6 +25,7 @@ export default async function ServiceEditorPage({ params }: { params: Promise<{ 
       <p>נשמר לאחרונה: <time dateTime={snapshot.updatedAt}>{new Date(snapshot.updatedAt).toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}</time></p>
     </div>
     {isSpecialServiceKey(serviceKey) ? <SpecialServiceEditor serviceKey={serviceKey} key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices} /> : <ServiceEditor serviceKey={serviceKey} key={snapshot.generation} snapshot={snapshot} mediaChoices={mediaChoices} />}
+    <CampaignPlacementSection placement={`service:${serviceKey}`} />
     <section aria-label="היסטוריית גרסאות" className="grid gap-4">
       <h2 className="text-2xl font-black">היסטוריית גרסאות</h2>
       <p>שחזור יוצר טיוטה חדשה ואינו משנה את הפרסום. הגרסאות הקודמות נשמרות.</p>

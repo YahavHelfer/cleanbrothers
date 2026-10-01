@@ -14,6 +14,7 @@ import { businessConfig } from "@/config/business";
 import { getPublicSiteChrome } from "@/cms/site/public-source";
 import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
 import { getPublicActivePromotion } from "@/cms/schedules/public-source";
+import { PublicCampaigns } from "@/cms/promotions/PublicCampaigns";
 import { getGoogleConsentBootstrapScript } from "@/lib/consent";
 import { GOOGLE_CALL_CONVERSION_NUMBER_CLASS } from "@/lib/google-call-tracking";
 import { buildMetadata } from "@/lib/seo";
@@ -79,6 +80,7 @@ export default async function RootLayout({
         <ScrollProgress />
         <Navbar links={chrome.navLinks} />
         {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
+        <PublicCampaigns />
         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
           {children}
         </main>

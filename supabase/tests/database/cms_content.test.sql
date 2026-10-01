@@ -3,7 +3,8 @@ create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 select no_plan();
 -- Rollback restores the imported local baseline after every SQL run.
-truncate public.cms_promotion_schedule_audit, public.cms_promotion_schedule_attempts, public.cms_active_promotion_placements,
+truncate public.cms_manual_campaign_events, public.cms_manual_campaign_placements, public.cms_manual_campaign_revisions,
+ public.cms_promotion_schedule_audit, public.cms_promotion_schedule_attempts, public.cms_active_promotion_placements,
  public.cms_promotion_schedule_placements, public.cms_promotion_schedules, public.cms_page_route_events, public.cms_page_routes,
  public.cms_new_page_identity, public.page_revision_blocks, public.promotion_revision_media, public.cms_promotion_identity,
  public.revision_media_refs, public.content_publication_events, public.content_publication_state, public.content_revisions, public.content_documents;
