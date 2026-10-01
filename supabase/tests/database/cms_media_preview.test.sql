@@ -18,7 +18,9 @@ insert into cms_admin_members(user_id,is_active) values
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
  values('cms-media-preview','cms-media-preview',false,8388608,array['image/webp']);
 select ok((select relrowsecurity from pg_class where oid='storage.objects'::regclass),'Storage RLS enabled');
-select is((select count(*)::int from pg_policies where schemaname='storage' and tablename='objects'),0,'no direct browser Storage policies');
+select is((select count(*)::int from pg_policies where schemaname='storage' and tablename='objects'
+  and (qual like '%cms-media-preview%' or with_check like '%cms-media-preview%')),0,
+  'no direct browser policies on the legacy Preview bucket');
 set local role service_role;
 select set_config('request.jwt.claims','{"role":"service_role"}',true);
 select throws_ok($$select cms_register_preview_media_version(null,null,'e1000000-0000-4000-8000-000000000001','{"byteSize":200,"width":12,"height":8,"contentHash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","originalFilename":"test.png"}','{"altText":"Alt","caption":"","folder":""}','50000000-0000-4000-8000-000000000001')$$,'22023',null,'registration requires an existing object in the exact private bucket');

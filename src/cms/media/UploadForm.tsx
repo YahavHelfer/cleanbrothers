@@ -33,6 +33,7 @@ export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: Medi
   }
   return (
     <form
+      id={asset ? "upload-media-version" : "upload-media"}
       aria-label={asset ? "החלפת תמונה" : "העלאת תמונה"}
       className="grid gap-4 rounded-2xl border theme-card p-5"
       onSubmit={async (e) => {
@@ -69,7 +70,7 @@ export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: Medi
       }}
     >
       <h2 className="text-xl font-black">
-        {asset ? "החלפה בגרסה חדשה" : "העלאת תמונה חדשה"}
+        {asset ? "העלאת גרסה חדשה" : "העלאת תמונה חדשה"}
       </h2>
       <p className="text-sm theme-muted">
         JPEG, PNG או WebP בלבד · עד {maxBytes / 1024 / 1024} MiB · עד 6,000 פיקסלים לצלע ו־16 מיליון

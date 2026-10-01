@@ -1,5 +1,5 @@
 import { requireCmsAdmin } from "@/cms/authorization";
-import { mediaUploadOriginAllowed, trustedMediaEnvironmentEnabled } from "@/cms/media/environment";
+import { mediaUploadOriginAllowed, mediaUploadEnabled } from "@/cms/media/environment";
 import { boundedUploadForm, privateMediaHeaders } from "@/cms/media/http";
 import { uploadMedia } from "@/cms/media/repository";
 import { MediaError } from "@/cms/media/model";
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     await requireCmsAdmin();
-    if (!trustedMediaEnvironmentEnabled())
+    if (!mediaUploadEnabled())
       throw new MediaError("העלאת מדיה אינה זמינה בסביבה זו.", 503);
     // Exact approved origin and received Host; never trust forwarded headers.
     if (!mediaUploadOriginAllowed(request))

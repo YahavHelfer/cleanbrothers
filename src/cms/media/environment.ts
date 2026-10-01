@@ -26,9 +26,7 @@ export function mediaCloudEnabled() {
     managedServiceKeys.some(usesCmsSource)
   );
   const production = process.env.CMS_MEDIA_PRODUCTION_ENABLED === "1" &&
-    !!process.env.CMS_MEDIA_SERVER_KEY?.trim() &&
-    configuredCmsProduction() && process.env.CMS_CONTENT_SOURCE === "published" &&
-    managedServiceKeys.some(usesCmsSource);
+    configuredCmsProduction();
   return preview || production;
 }
 // Metadata and code-owned static files need the ordinary CMS identity only.
@@ -44,7 +42,14 @@ export function requireMediaReadEnvironment() {
 export function trustedMediaEnvironmentEnabled() {
   return mediaLocalEnabled()
     ? !!process.env.CMS_MEDIA_LOCAL_SERVICE_KEY?.trim()
-    : mediaCloudEnabled() && !!process.env.CMS_MEDIA_SERVER_KEY?.trim();
+    : approvedCmsPreviewIdentity() && mediaCloudEnabled() && !!process.env.CMS_MEDIA_SERVER_KEY?.trim();
+}
+// Production Storage uses the AAL2 user's JWT and RLS, never a privileged key.
+export function authenticatedMediaEnvironmentEnabled() {
+  return configuredCmsProduction() && mediaCloudEnabled();
+}
+export function mediaUploadEnabled() {
+  return trustedMediaEnvironmentEnabled() || authenticatedMediaEnvironmentEnabled();
 }
 export function requireTrustedMediaEnvironment() {
   if (!trustedMediaEnvironmentEnabled()) throw new Error("Trusted CMS media unavailable");
@@ -65,7 +70,8 @@ export function requireLocalMediaEnvironment() {
 }
 export function requireCloudMediaEnvironment() {
   if (!mediaCloudEnabled()) throw new Error("Cloud CMS media unavailable");
-  requireTrustedMediaEnvironment();
+  if (!trustedMediaEnvironmentEnabled() && !authenticatedMediaEnvironmentEnabled())
+    throw new Error("Cloud CMS media unavailable");
 }
 export function mediaUploadOriginAllowed(request: Request) {
   const origin = request.headers.get("origin");

@@ -1,5 +1,5 @@
 import { staticMediaPath } from "./static-inventory";
-import { mediaCloudEnabled, mediaLocalEnabled, trustedMediaEnvironmentEnabled } from "./environment";
+import { mediaCloudEnabled, mediaLocalEnabled, mediaUploadEnabled } from "./environment";
 import type { ResolvedMedia } from "./model";
 import {
   mediaId,
@@ -26,7 +26,7 @@ export function resolveMediaProjection(
     if (row.provider === "static")
       src = staticMediaPath(id);
     else if (row.provider === "local" || row.provider === "supabase") {
-      if (audience === "public" && row.provider === "supabase" && !(mediaCloudEnabled() && trustedMediaEnvironmentEnabled()))
+      if (audience === "public" && row.provider === "supabase" && !(mediaCloudEnabled() && mediaUploadEnabled()))
         throw new Error("Private CMS media unavailable");
       if (audience === "public" && row.provider === "local" && !mediaLocalEnabled())
         throw new Error("Local CMS media unavailable");

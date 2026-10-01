@@ -56,7 +56,7 @@ export function Library({ items }: { items: LibraryItem[] }) {
             <p>{a.alt_text}</p>
             <p>
               {a.version.width} × {a.version.height} · {a.version.mime_type} ·
-              גרסה {a.version.version_number}
+              גרסה {a.version.version_number} · {a.versionCount ?? a.version.version_number} גרסאות · {a.version.byte_size} bytes
             </p>
             <p>
               {a.usageCount} הפניות שמורות · {a.publishedUsageCount} בתוכן

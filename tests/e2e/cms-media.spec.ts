@@ -462,3 +462,14 @@ test("Preview Storage adapter uses real isolated Storage/RPCs with AAL2, private
   });
   expect(result.trim()).toBe("Local Preview Storage adapter integration passed; bucket and objects removed.");
 });
+
+test("authenticated Storage adapter keeps published image A immutable through version B and rollback", async () => {
+  const client = await session(admin);
+  const { data } = await client.auth.getSession();
+  if (!data.session) throw Error("Local Storage fixture session missing");
+  const result = execFileSync(process.execPath, ["tests/helpers/cms-authenticated-storage-integration.mjs"], {
+    input: JSON.stringify({ actor: admin.id, baseline, session: data.session }),
+    encoding: "utf8", stdio: ["pipe", "pipe", "pipe"],
+  });
+  expect(result.trim()).toBe("Local AAL2 Storage upload and A/B/rollback integration passed; synthetic objects removed.");
+});

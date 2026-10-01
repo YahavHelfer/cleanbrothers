@@ -159,11 +159,66 @@ test("Production media gate is independent and unavailable without explicit medi
   const service = { ...production, CMS_CONTENT_SOURCE: "published",
     CMS_CONTENT_SERVICE_ALLOWLIST: "sofa-cleaning" };
   assert.equal(get(service, file).mediaCloudEnabled(), false);
-  assert.equal(get({ ...service, CMS_MEDIA_PRODUCTION_ENABLED: "1" }, file).mediaCloudEnabled(), false);
-  const enabled = { ...service, CMS_MEDIA_PRODUCTION_ENABLED: "1",
-    CMS_MEDIA_SERVER_KEY: "synthetic-server-only-key" };
+  const enabled = { ...service, CMS_MEDIA_PRODUCTION_ENABLED: "1" };
   assert.equal(get(enabled, file).mediaCloudEnabled(), true);
+  assert.equal(get({ ...production, CMS_MEDIA_PRODUCTION_ENABLED: "1" }, file).mediaCloudEnabled(), true);
+  assert.equal(get(enabled, file).authenticatedMediaEnvironmentEnabled(), true);
+  assert.equal(get(enabled, file).trustedMediaEnvironmentEnabled(), false);
+  assert.equal(get({ ...enabled, CMS_MEDIA_SERVER_KEY: "synthetic-unused-key" }, file).trustedMediaEnvironmentEnabled(), false);
   assert.equal(get({ ...enabled, VERCEL_PROJECT_ID: "other" }, file).mediaCloudEnabled(), false);
+  assert.equal(get({ ...enabled, VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation" }, file).mediaCloudEnabled(), false);
+});
+
+test("Production media upload uses the AAL2 session for Storage and registration, never a privileged client", async () => {
+  const service = { ...production, CMS_CONTENT_SOURCE: "published",
+    CMS_CONTENT_SERVICE_ALLOWLIST: "sofa-cleaning", CMS_MEDIA_PRODUCTION_ENABLED: "1" };
+  const calls = [];
+  const actor = "a3000000-0000-4000-8000-000000000001";
+  const repo = createSourceLoader({ env: service, mocks: {
+    "@/cms/authorization": { requireCmsAdmin: async () => { calls.push("aal2"); return { userId: actor }; } },
+    "@/cms/server": { createCmsServerClient: async () => ({ rpc: async (name, args) => {
+      calls.push("register");
+      assert.equal(name, "cms_register_authenticated_media_version");
+      assert.equal(args.actor, actor);
+      return { data: actor, error: null };
+    } }) },
+    "./validate-image": { validateImage: async () => { calls.push("decode"); return {
+      bytes: Buffer.from("normalized"), mimeType: "image/webp", byteSize: 10,
+      width: 12, height: 8, contentHash: "a".repeat(64), originalFilename: "image.png",
+    }; } },
+    "./authenticated-storage": { writeAuthenticatedImage: async () => { calls.push("write"); } },
+    "./trusted-client": { createTrustedMediaClient: () => { throw Error("privileged client used"); } },
+  } })("src/cms/media/repository.ts");
+  assert.equal(await repo.uploadMedia(Buffer.from("input"), "image.png", "image/png",
+    { altText: "Alt", caption: "", folder: "" }), actor);
+  assert.deepEqual(calls, ["aal2", "decode", "write", "register"]);
+});
+
+test("Production media delivery honors independent Page, Homepage and new-page public gates", async () => {
+  const media = { ...production, CMS_MEDIA_PRODUCTION_ENABLED: "1" };
+  const id = "a3000000-0000-4000-8000-000000000001";
+  for (const [flags, projection] of [
+    [{ CMS_PAGE_SOURCE: "published", CMS_PAGE_ALLOWLIST: "about" },
+      { pageKeys: ["about"] }],
+    [{ CMS_HOME_SOURCE: "published", CMS_HOME_ALLOWLIST: "home" },
+      { home: true }],
+    [{ CMS_NEW_PAGE_SOURCE: "published", CMS_NEW_PAGE_ALLOWLIST: "cms-test-page" },
+      { pageSlugs: ["cms-test-page"] }],
+  ]) {
+    const run = async (env) => {
+      const route = createSourceLoader({ env, mocks: {
+        "@supabase/supabase-js": { createClient: () => ({ rpc: async () => ({
+          data: { id, serviceKeys: [], pageKeys: [], pageSlugs: [], home: false,
+            promotion: false, ...projection }, error: null,
+        }) }) },
+        "@/cms/media/repository": { mediaBytes: async () => ({ bytes: Buffer.from("fixture") }) },
+      } })("src/app/cms-media/[id]/route.ts");
+      return route.GET(new Request(`https://www.cleanbrothers.co.il/cms-media/${id}`),
+        { params: Promise.resolve({ id }) });
+    };
+    assert.equal((await run(media)).status, 404);
+    assert.equal((await run({ ...media, ...flags })).status, 200);
+  }
 });
 
 test("Production Admin can read static media metadata without a trusted key or public service flags", async () => {
@@ -202,7 +257,7 @@ test("Production upload and private delivery remain closed without a media crede
     "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "admin" }) },
     "./validate-image": { validateImage: async () => { writes++; throw Error("unexpected"); } },
   } })("src/cms/media/repository.ts");
-  await assert.rejects(() => repo.uploadMedia(new Uint8Array(), "x.jpg", "image/jpeg", {}), /Trusted CMS media unavailable/);
+  await assert.rejects(() => repo.uploadMedia(new Uint8Array(), "x.jpg", "image/jpeg", {}), /העלאת מדיה אינה זמינה/);
   assert.equal(writes, 0);
   const uploadRoute = createSourceLoader({ env: service, mocks: {
     "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "admin" }) },

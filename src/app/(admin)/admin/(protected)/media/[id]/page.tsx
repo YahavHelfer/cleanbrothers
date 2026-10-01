@@ -3,12 +3,29 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCmsAdmin } from "@/cms/authorization";
-import { getMediaDetail } from "@/cms/media/repository";
+import { getMediaDetail, mediaVersionReadable } from "@/cms/media/repository";
 import { privateMediaUrl, mediaId } from "@/cms/media/model";
 import { staticMediaPath } from "@/cms/media/static-inventory";
 import { MetadataEditor } from "@/cms/media/MetadataEditor";
 import { UploadForm } from "@/cms/media/UploadForm";
-import { mediaByteLimit, trustedMediaEnvironmentEnabled } from "@/cms/media/environment";
+import { mediaByteLimit, mediaUploadEnabled } from "@/cms/media/environment";
+function usageLink(key: string, revision: string) {
+  if (isManagedServiceKey(key)) return `/admin/preview/services/${key}?revision=${revision}`;
+  if (key === "about" || key === "home") return `/admin/preview/pages/${key}?revision=${revision}`;
+  if (key.startsWith("new:")) return `/admin/preview/pages/${key.slice(4)}?revision=${revision}`;
+  if (key.startsWith("campaign-")) {
+    const id = key.slice(9).replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5");
+    return `/admin/preview/promotions/${id}?revision=${revision}`;
+  }
+  return "/admin/pages/about/promotion";
+}
+function usageLabel(key: string) {
+  if (isManagedServiceKey(key)) return serviceRegistry[key].crmName;
+  if (key === "about") return "עמוד אודות";
+  if (key === "home") return "דף הבית";
+  if (key.startsWith("new:")) return "עמוד CMS";
+  return key === "about-intro" ? "מבצע אודות" : "מבצע";
+}
 export default async function MediaDetailPage({
   params,
 }: {
@@ -48,11 +65,14 @@ export default async function MediaDetailPage({
         {asset.status === "archived" ? "בארכיון" : "זמין לבחירה"} · מצב עריכה{" "}
         {asset.generation}
       </p>
-      <MetadataEditor key={asset.id} asset={asset} />
-      {asset.status === "available" && trustedMediaEnvironmentEnabled() && (
-        <UploadForm key={`upload-${asset.generation}`} asset={asset} maxBytes={mediaByteLimit()} />
+      <MetadataEditor key={asset.id} asset={asset} publishedUsageCount={usages.filter((usage) => usage.published).length} />
+      {asset.status === "available" && mediaUploadEnabled() && (
+        <>
+          <a className="btn-primary justify-self-start" href="#upload-media-version">העלאת גרסה חדשה</a>
+          <UploadForm key={`upload-${asset.generation}`} asset={asset} maxBytes={mediaByteLimit()} />
+        </>
       )}
-      {!trustedMediaEnvironmentEnabled() && <p>העלאה והחלפה אינן זמינות ללא גישת מדיה פרטית.</p>}
+      {!mediaUploadEnabled() && <p>העלאה והחלפה אינן זמינות ללא גישת מדיה פרטית.</p>}
       <section aria-label="גרסאות תמונה" className="grid gap-4">
         <h2 className="text-2xl font-black">גרסאות תמונה</h2>
         {versions.map((v) => (
@@ -64,7 +84,7 @@ export default async function MediaDetailPage({
               גרסת תמונה {v.version_number}
               {v.id === asset.current_version_id ? " · נוכחית" : ""}
             </h3>
-            {v.storage_provider === "static" || trustedMediaEnvironmentEnabled() ? (
+            {mediaVersionReadable(v) ? (
               <Image
                 src={v.storage_provider === "static" ? staticMediaPath(v.id) : privateMediaUrl(v.id)}
                 width={320}
@@ -99,11 +119,9 @@ export default async function MediaDetailPage({
             <Link
               prefetch={false}
               className="underline"
-              href={isManagedServiceKey(u.serviceKey) ? `/admin/preview/services/${u.serviceKey}?revision=${u.revision_id}`
-                : u.serviceKey === "about" ? `/admin/preview/pages/about?revision=${u.revision_id}` : "/admin/pages/about/promotion"}
+              href={usageLink(u.serviceKey, u.revision_id)}
             >
-              {isManagedServiceKey(u.serviceKey) ? serviceRegistry[u.serviceKey].crmName
-                : u.serviceKey === "about" ? "עמוד אודות" : "מבצע אודות"} — גרסת תוכן {u.revisionNumber}
+              {usageLabel(u.serviceKey)} — גרסת תוכן {u.revisionNumber}
             </Link>{" "}
             ·{" "}
             {{ gallery: "גלריה", seo: "תמונת שיתוף", hero: "פתיחה", benefits: "יתרונות", result: "תוצאות", before: "לפני", after: "אחרי", "page-hero": "פתיח עמוד", "page-image": "תמונת עמוד", promotion: "מבצע" }[u.usage_role]}{" "}

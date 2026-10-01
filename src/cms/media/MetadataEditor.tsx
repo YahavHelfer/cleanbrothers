@@ -2,7 +2,7 @@
 import { useActionState, useState } from "react";
 import { mediaAction } from "./actions";
 import type { MediaAsset } from "./model";
-export function MetadataEditor({ asset }: { asset: MediaAsset }) {
+export function MetadataEditor({ asset, publishedUsageCount = 0 }: { asset: MediaAsset; publishedUsageCount?: number }) {
   // Keep the editor's base generation and input across an RSC refresh after a conflict.
   const [generation, setGeneration] = useState(asset.generation);
   const [state, action, pending] = useActionState(
@@ -92,6 +92,8 @@ export function MetadataEditor({ asset }: { asset: MediaAsset }) {
         ארכוב מסתיר את הנכס מבחירה חדשה. כל הגרסאות והשימושים נשמרים; אין מחיקה
         לצמיתות.
       </p>
+      {asset.status === "available" && publishedUsageCount > 0 &&
+        <p role="note">התמונה מופיעה ב־{publishedUsageCount} הפניות מפורסמות. ארכוב לא יסיר אותה מעמודים אלה.</p>}
       {state.message && (
         <p role={state.ok ? "status" : "alert"} className="rounded border p-3">
           {state.message}

@@ -4,9 +4,10 @@ import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, requireTrustedMediaEnvironment, trustedMediaEnvironmentEnabled } from "./environment";
+import { authenticatedMediaEnvironmentEnabled, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, trustedMediaEnvironmentEnabled } from "./environment";
 import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
+import { writeAuthenticatedImage, readAuthenticatedImage, readPublishedImage, discardUnregisteredAuthenticatedImage } from "./authenticated-storage";
 import { validateImage } from "./validate-image";
 import {
   writeLocalImage,
@@ -27,6 +28,7 @@ import {
 
 export type LibraryItem = MediaAsset & {
   version: MediaVersion;
+  versionCount: number;
   usageCount: number;
   publishedUsageCount: number;
   previewSrc: string | null;
@@ -34,7 +36,7 @@ export type LibraryItem = MediaAsset & {
 export type MediaDetail = {
   asset: MediaAsset;
   versions: MediaVersion[];
-  usages: (MediaRef & { serviceKey: ManagedServiceKey | "about" | "about-intro"; revisionNumber: number; published: boolean })[];
+  usages: (MediaRef & { serviceKey: ManagedServiceKey | "about" | "home" | "about-intro" | `new:${string}` | `campaign-${string}`; revisionNumber: number; published: boolean })[];
   audit: {
     id: string;
     actor_id: string | null;
@@ -42,6 +44,13 @@ export type MediaDetail = {
     occurred_at: string;
   }[];
 };
+export function mediaVersionReadable(version: Pick<MediaVersion, "storage_provider"> & { storage_bucket?: string | null }) {
+  return version.storage_provider === "static" ||
+    version.storage_provider === "local" && mediaLocalEnabled() ||
+    version.storage_provider === "supabase" && (
+      version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled() ||
+      version.storage_bucket === "cms-media-preview" && trustedMediaEnvironmentEnabled());
+}
 function check(error: { code?: string } | null) {
   if (error?.code === "PT409")
     throw new MediaError(
@@ -60,7 +69,7 @@ export async function listMedia(): Promise<LibraryItem[]> {
     ...item,
     previewSrc: item.version.storage_provider === "static"
       ? staticMediaPath(item.version.id)
-      : trustedMediaEnvironmentEnabled() ? privateMediaUrl(item.version.id) : null,
+      : mediaVersionReadable(item.version) ? privateMediaUrl(item.version.id) : null,
   }));
 }
 export async function getMediaDetail(id: string): Promise<MediaDetail | null> {
@@ -72,7 +81,12 @@ export async function getMediaDetail(id: string): Promise<MediaDetail | null> {
   });
   check(error);
   if (data && (!Array.isArray(data.usages) || data.usages.some((usage: { serviceKey?: unknown }) =>
-    !isManagedServiceKey(usage.serviceKey) && usage.serviceKey !== "about" && usage.serviceKey !== "about-intro"))) throw new MediaError();
+    !isManagedServiceKey(usage.serviceKey) && usage.serviceKey !== "about" && usage.serviceKey !== "home" &&
+    usage.serviceKey !== "about-intro" &&
+    !(typeof usage.serviceKey === "string" && (
+      /^new:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(usage.serviceKey) ||
+      /^campaign-[0-9a-f]{32}$/.test(usage.serviceKey)
+    ))))) throw new MediaError();
   return data;
 }
 export async function getMediaChoices(): Promise<MediaChoice[]> {
@@ -85,7 +99,7 @@ export async function getMediaChoices(): Promise<MediaChoice[]> {
     .select("*")
     .order("version_number", { ascending: false });
   check(error);
-  return (versions as MediaVersion[]).map((v) => {
+  return (versions as MediaVersion[]).filter(mediaVersionReadable).map((v) => {
     const a = items.find((a) => a.id === v.asset_id)!;
     return {
       assetId: a.id,
@@ -129,7 +143,7 @@ export async function uploadMedia(
   generation?: unknown,
 ) {
   const admin = await requireCmsAdmin();
-  requireTrustedMediaEnvironment();
+  if (!mediaUploadEnabled()) throw new MediaError("העלאת מדיה אינה זמינה בסביבה זו.", 503);
   const meta = mediaMetadata(metadata);
   const target = asset ? mediaId(asset) : null;
   const expected = asset ? mediaGeneration(generation) : null;
@@ -140,12 +154,14 @@ export async function uploadMedia(
     throw new MediaError("התמונה המעובדת גדולה מדי. בחרו תמונה קטנה יותר.", 413);
   const id = randomUUID();
   const cloud = mediaCloudEnabled();
-  const trusted = createTrustedMediaClient();
-  await (cloud ? writeCloudImage : writeLocalImage)(id, validated.bytes);
+  const authenticated = authenticatedMediaEnvironmentEnabled();
+  const client = authenticated ? await createCmsServerClient() : createTrustedMediaClient();
+  await (authenticated ? writeAuthenticatedImage : cloud ? writeCloudImage : writeLocalImage)(id, validated.bytes);
   const { bytes: processed, ...details } = validated;
   void processed;
-  const { data, error } = await trusted.rpc(cloud
-    ? "cms_register_preview_media_version" : "cms_register_media_version", {
+  const { data, error } = await client.rpc(authenticated
+    ? "cms_register_authenticated_media_version" : cloud
+      ? "cms_register_preview_media_version" : "cms_register_media_version", {
     target_asset: target,
     expected_generation: expected,
     version_id: id,
@@ -159,7 +175,7 @@ export async function uploadMedia(
     error &&
     ["PT409", "42501", "22023", "23514", "23503", "55000"].includes(error.code)
   )
-    await (cloud ? discardUnregisteredCloudImage : discardUnregisteredImage)(id);
+    await (authenticated ? discardUnregisteredAuthenticatedImage : cloud ? discardUnregisteredCloudImage : discardUnregisteredImage)(id);
   check(error);
   return mediaId(data);
 }
@@ -177,7 +193,8 @@ export async function readPrivateMedia(id: string) {
   return mediaBytes(data as MediaVersion);
 }
 export async function mediaBytes(
-  version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash">,
+  version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash"> & { storage_bucket?: string | null },
+  audience: "admin" | "public" = "admin",
 ) {
   requireMediaReadEnvironment();
   if (
@@ -185,7 +202,9 @@ export async function mediaBytes(
   )
     return { staticPath: staticMediaPath(version.id) };
   const id = mediaId(version.id);
-  if (version.storage_provider === "supabase" && mediaCloudEnabled() && trustedMediaEnvironmentEnabled())
+  if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled())
+    return { bytes: await (audience === "admin" ? readAuthenticatedImage : readPublishedImage)(id, version.content_hash) };
+  if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-preview" && mediaCloudEnabled() && trustedMediaEnvironmentEnabled())
     return { bytes: await readCloudImage(id, version.content_hash) };
   if (version.storage_provider === "local" && mediaLocalEnabled())
     return { bytes: await readLocalImage(id, version.content_hash) };
