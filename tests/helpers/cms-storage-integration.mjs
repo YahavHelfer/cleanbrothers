@@ -1,7 +1,7 @@
 // Integration runner invoked only by the isolated Playwright suite.
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {createHash} from "node:crypto";
+import {createHash,randomUUID} from "node:crypto";
 import {createClient} from "@supabase/supabase-js";
 import sharp from "sharp";
 import {createSourceLoader} from "./source-module.mjs";
@@ -28,11 +28,19 @@ try {
   }});
   const state=()=>JSON.parse(localSql("select row_to_json(s) from content_publication_state s"));
   const payload=id=>{assert.match(id,/^[0-9a-f-]{36}$/);return JSON.parse(localSql(`select cms_revision_payload(r) from content_revisions r where id='${id}'`));};
-  stage="AAL2 server upload and registration";
+  stage="legacy Preview object compatibility";
   const repo=load("src/cms/media/repository.ts");
-  const bytes=await sharp({create:{width:24,height:16,channels:3,background:"orange"}}).png().toBuffer();
-  const asset=await repo.uploadMedia(bytes,"fixture.png","image/png",{altText:"Cloud fixture",caption:"",folder:""});assert.match(asset,/^[0-9a-f-]{36}$/);
-  version=localSql(`select current_version_id from media_assets where id='${asset}'`);assert.match(version,/^[0-9a-f-]{36}$/);
+  const bytes=await sharp({create:{width:24,height:16,channels:3,background:"orange"}}).webp().toBuffer();
+  version=randomUUID();
+  await load("src/cms/media/cloud-storage.ts").writeCloudImage(version,bytes);
+  const registration=await trusted.rpc("cms_register_preview_media_version",{
+    target_asset:null,expected_generation:null,version_id:version,
+    details:{mimeType:"image/webp",byteSize:bytes.length,width:24,height:16,
+      contentHash:createHash("sha256").update(bytes).digest("hex"),originalFilename:"fixture.png"},
+    metadata:{altText:"Cloud fixture",caption:"",folder:""},actor:input.actor,
+  });
+  assert.equal(registration.error,null);
+  const asset=registration.data;assert.match(asset,/^[0-9a-f-]{36}$/);
   const record=JSON.parse(localSql(`select row_to_json(v) from media_versions v where id='${version}'`));
   assert.equal(record.storage_provider,"supabase");assert.equal(record.storage_bucket,bucket);assert.equal(record.storage_path,version+".webp");assert.equal(record.created_by,input.actor);
   stage="authenticated proxy and integrity";
@@ -57,6 +65,7 @@ try {
   const s2=state();const restored=await actor.rpc("cms_save_service_draft",{expected_generation:s2.generation,base_revision:s2.draft_revision_id,payload:null,restore_revision:input.baseline});assert.equal(restored.error,null);
   assert.equal((await actor.rpc("cms_publish_service_revision",{expected_generation:state().generation,revision:restored.data})).error,null);
   assert.deepEqual(payload(state().published_revision_id),payload(input.baseline));assert.equal(localSql(`select count(*) from revision_media_refs where media_version_id='${version}'`),"3");
+  assert.equal((await request()).status,404);
   assert.equal((await trusted.storage.from(bucket).download(record.storage_path)).error,null);
 } catch {
   // No SDK payloads, session credentials or raw errors in test artifacts.

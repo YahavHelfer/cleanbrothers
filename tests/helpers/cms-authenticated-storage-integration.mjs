@@ -86,8 +86,11 @@ try {
   assert.equal(createHash("sha256").update(Buffer.from(await (await publicImage(a)).arrayBuffer())).digest("hex"), aHash);
 
   stage = "publish B and rollback A";
-  await saveAndPublish(b);
+  const bRevision = await saveAndPublish(b);
   assert.equal((await publicImage(b)).status, 200);
+  assert.equal((await publicImage(a)).status, 404);
+  assert.equal((await anonymous.storage.from(bucket).download(`${a}.webp`)).data, null);
+  assert.equal((await actor.storage.from(bucket).download(`${a}.webp`)).error, null);
   const s = state();
   const restored = await actor.rpc("cms_save_service_draft", {
     expected_generation: s.generation, base_revision: s.draft_revision_id,
@@ -98,7 +101,11 @@ try {
     expected_generation: state().generation, revision: restored.data,
   })).error, null);
   assert.equal(createHash("sha256").update(Buffer.from(await (await publicImage(a)).arrayBuffer())).digest("hex"), aHash);
+  assert.equal((await publicImage(b)).status, 404);
+  assert.equal((await anonymous.storage.from(bucket).download(`${b}.webp`)).data, null);
+  assert.equal((await actor.storage.from(bucket).download(`${b}.webp`)).error, null);
   assert.equal(payload(state().published_revision_id).images[0], a);
+  assert.equal(payload(bRevision).images[0], b);
 } catch {
   console.error(`Local authenticated Storage integration failed at: ${stage}`);
   process.exitCode = 1;

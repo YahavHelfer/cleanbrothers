@@ -7,8 +7,13 @@ import { configuredCmsProduction, CMS_PRODUCTION_ORIGIN } from "@/cms/production
 import { MAX_IMAGE_BYTES, MAX_PREVIEW_IMAGE_BYTES } from "./model";
 
 export const PREVIEW_MEDIA_BUCKET = "cms-media-preview";
-export const PREVIEW_MEDIA_ORIGIN =
-  "https://cleanbrothers-git-feature-cms-c-061c94-yahavs-projects-6b5e850f.vercel.app";
+const PREVIEW_DEPLOYMENT_HOST = /^cleanbrothers-[a-z0-9]{8,20}-yahavs-projects-6b5e850f\.vercel\.app$/;
+const PREVIEW_BRANCH_HOST = /^cleanbrothers-git-[a-z0-9-]+-yahavs-projects-6b5e850f\.vercel\.app$/;
+function approvedPreviewHost(value: string | undefined, kind: "deployment" | "branch") {
+  if (!value) return null;
+  return (kind === "deployment" ? PREVIEW_DEPLOYMENT_HOST : PREVIEW_BRANCH_HOST).test(value)
+    ? value : null;
+}
 
 export function mediaLocalEnabled() {
   return (
@@ -40,19 +45,25 @@ export function requireMediaReadEnvironment() {
   getCmsConfig();
 }
 export function trustedMediaEnvironmentEnabled() {
-  return mediaLocalEnabled()
-    ? !!process.env.CMS_MEDIA_LOCAL_SERVICE_KEY?.trim()
-    : approvedCmsPreviewIdentity() && mediaCloudEnabled() && !!process.env.CMS_MEDIA_SERVER_KEY?.trim();
+  return mediaLocalEnabled() && !!process.env.CMS_MEDIA_LOCAL_SERVICE_KEY?.trim();
 }
-// Production Storage uses the AAL2 user's JWT and RLS, never a privileged key.
+// Historical Preview objects may still need the old read-only operator path.
+// It is never selected for new hosted uploads or registration.
+export function legacyPreviewMediaReadable() {
+  return approvedCmsPreviewIdentity() && mediaCloudEnabled() &&
+    !!process.env.CMS_MEDIA_SERVER_KEY?.trim();
+}
+// Hosted Preview and Production use the AAL2 user's JWT and Storage RLS.
 export function authenticatedMediaEnvironmentEnabled() {
-  return configuredCmsProduction() && mediaCloudEnabled();
+  return mediaCloudEnabled() &&
+    (approvedCmsPreviewIdentity() || configuredCmsProduction());
 }
 export function mediaUploadEnabled() {
   return trustedMediaEnvironmentEnabled() || authenticatedMediaEnvironmentEnabled();
 }
 export function requireTrustedMediaEnvironment() {
-  if (!trustedMediaEnvironmentEnabled()) throw new Error("Trusted CMS media unavailable");
+  if (!trustedMediaEnvironmentEnabled() && !legacyPreviewMediaReadable())
+    throw new Error("Trusted CMS media unavailable");
   getCmsConfig();
 }
 export function mediaEnabled() {
@@ -76,7 +87,11 @@ export function requireCloudMediaEnvironment() {
 export function mediaUploadOriginAllowed(request: Request) {
   const origin = request.headers.get("origin");
   const allowed = mediaCloudEnabled()
-    ? [configuredCmsProduction() ? CMS_PRODUCTION_ORIGIN : PREVIEW_MEDIA_ORIGIN]
+    ? configuredCmsProduction() ? [CMS_PRODUCTION_ORIGIN] : approvedCmsPreviewIdentity()
+      ? [approvedPreviewHost(process.env.VERCEL_URL, "deployment"),
+          approvedPreviewHost(process.env.VERCEL_BRANCH_URL, "branch")]
+        .filter((host): host is string => host !== null).map(host => `https://${host}`)
+      : []
     : mediaLocalEnabled()
       ? ["http://127.0.0.1:56300", "http://127.0.0.1:56301"]
       : [];

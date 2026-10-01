@@ -3,7 +3,6 @@ import { usesCmsSource } from "@/cms/content/environment";
 import { usesCmsPageSource } from "@/cms/pages/environment";
 import { newPagePublicAllowed } from "@/cms/pages/new-environment";
 import { usesCmsHomeSource } from "@/cms/home/environment";
-import { manualCampaignPublicAllowed } from "@/cms/promotions/environment";
 import { usesScheduledPublicPlacement } from "@/cms/schedules/public-environment";
 import { createClient } from "@supabase/supabase-js";
 import { getCmsConfig } from "@/cms/config";
@@ -32,11 +31,17 @@ export async function GET(
     const page = Array.isArray(data?.pageKeys) && data.pageKeys.some(usesCmsPageSource);
     const newPage = Array.isArray(data?.pageSlugs) && data.pageSlugs.some(newPagePublicAllowed);
     const home = data?.home === true && usesCmsHomeSource();
-    const promotion = data?.promotion === true && (manualCampaignPublicAllowed() ||
-      usesCmsPageSource("about") || usesCmsHomeSource() ||
-      usesScheduledPublicPlacement("global", "site") ||
-      usesScheduledPublicPlacement("home", "home") ||
-      managedServiceKeys.some((key) => usesScheduledPublicPlacement("service", key)));
+    const pinnedPage = Array.isArray(data?.pinnedPageKeys) && data.pinnedPageKeys.some(usesCmsPageSource);
+    const pinnedNewPage = Array.isArray(data?.pinnedPageSlugs) && data.pinnedPageSlugs.some(newPagePublicAllowed);
+    const pinnedHome = Array.isArray(data?.pinnedPageKeys) && data.pinnedPageKeys.includes("home") && usesCmsHomeSource();
+    const scheduled = Array.isArray(data?.scheduledPlacements) && data.scheduledPlacements.some((slot: unknown) => {
+      if (typeof slot !== "string") return false;
+      if (slot === "global:site") return usesScheduledPublicPlacement("global", "site");
+      if (slot === "home:home") return usesScheduledPublicPlacement("home", "home");
+      const key = slot.startsWith("service:") ? slot.slice(8) : "";
+      return managedServiceKeys.some((approved) => approved === key && usesScheduledPublicPlacement("service", approved));
+    });
+    const promotion = pinnedPage || pinnedNewPage || pinnedHome || scheduled;
     if (error || !data || !(service || page || newPage || home || promotion)) throw new Error("Not public");
     const file = await mediaBytes(data, "public");
     if (file.staticPath)

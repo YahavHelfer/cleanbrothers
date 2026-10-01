@@ -4,7 +4,7 @@ import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { authenticatedMediaEnvironmentEnabled, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, trustedMediaEnvironmentEnabled } from "./environment";
+import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled } from "./environment";
 import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { writeAuthenticatedImage, readAuthenticatedImage, readPublishedImage, discardUnregisteredAuthenticatedImage } from "./authenticated-storage";
@@ -49,7 +49,7 @@ export function mediaVersionReadable(version: Pick<MediaVersion, "storage_provid
     version.storage_provider === "local" && mediaLocalEnabled() ||
     version.storage_provider === "supabase" && (
       version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled() ||
-      version.storage_bucket === "cms-media-preview" && trustedMediaEnvironmentEnabled());
+      version.storage_bucket === "cms-media-preview" && legacyPreviewMediaReadable());
 }
 function check(error: { code?: string } | null) {
   if (error?.code === "PT409")
@@ -204,7 +204,7 @@ export async function mediaBytes(
   const id = mediaId(version.id);
   if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled())
     return { bytes: await (audience === "admin" ? readAuthenticatedImage : readPublishedImage)(id, version.content_hash) };
-  if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-preview" && mediaCloudEnabled() && trustedMediaEnvironmentEnabled())
+  if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-preview" && legacyPreviewMediaReadable())
     return { bytes: await readCloudImage(id, version.content_hash) };
   if (version.storage_provider === "local" && mediaLocalEnabled())
     return { bytes: await readLocalImage(id, version.content_hash) };

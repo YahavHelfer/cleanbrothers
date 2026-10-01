@@ -104,5 +104,36 @@ select throws_ok($$select public.cms_register_authenticated_media_version(null,n
  '62000000-0000-4000-8000-000000000001')$$,
  '23505',null,'duplicate version cannot overwrite immutable history');
 reset role;
+create temporary table current_media_fixture(payload jsonb, baseline uuid, media_revision uuid, restored uuid);
+grant select,update on current_media_fixture to authenticated;
+insert into current_media_fixture(payload) values ('{"schemaVersion":1,"publicTitle":"Baseline","h1":"Baseline h1","eyebrow":"Eyebrow","intro":"Intro","imageAlt":"Alt","signsTitle":"Signs","signsDescription":"Signs intro","processTitle":"Process","processDescription":"Process intro","benefitsDescription":"Benefits intro","resultDescription":"Result","seoTitle":"Baseline SEO","seoDescription":"Baseline description","images":["/images/services/delicate-upholstery-cleaning.jpeg"],"signs":["Sign"],"process":["Step"],"benefits":["Benefit"],"faqs":[{"question":"Question","answer":"Answer"}],"relatedLinks":[{"label":"Mattress","href":"/mattress-cleaning"}]}');
+select is(public.cms_import_static_pilot_media(),
+ 'd0000000-0000-4000-8000-000000000001'::uuid,'static baseline media imported for publication test');
+update current_media_fixture set baseline=public.cms_import_service_baseline(payload);
+select ok(public.cms_read_public_media_version('62000000-0000-4000-8000-000000000011') is null,
+ 'registered media is private before a current publication');
+set local role authenticated;
+select set_config('request.jwt.claims',
+ '{"sub":"62000000-0000-4000-8000-000000000001","aal":"aal2","role":"authenticated"}',true);
+update current_media_fixture set media_revision=public.cms_save_service_draft(1,baseline,
+ payload||'{"schemaVersion":2,"images":["62000000-0000-4000-8000-000000000011"]}'::jsonb);
+select ok(public.cms_read_public_media_version('62000000-0000-4000-8000-000000000011') is null,
+ 'a draft reference does not permit public media delivery');
+select is(public.cms_publish_service_revision(2,(select media_revision from current_media_fixture)),
+ (select media_revision from current_media_fixture),'media draft published');
+select is(public.cms_read_public_media_version('62000000-0000-4000-8000-000000000011')->'serviceKeys',
+ '["delicate-upholstery-cleaning"]'::jsonb,'current service reference is projected');
+select ok(public.cms_published_media_object('cms-media-production',
+ '62000000-0000-4000-8000-000000000011.webp'),
+ 'current published version permits exact Storage download');
+update current_media_fixture set restored=public.cms_save_service_draft(3,media_revision,null,baseline);
+select is(public.cms_publish_service_revision(4,(select restored from current_media_fixture)),
+ (select restored from current_media_fixture),'baseline restored as a new revision');
+select ok(public.cms_read_public_media_version('62000000-0000-4000-8000-000000000011') is null,
+ 'historically published but no longer current version is private again');
+select ok(not public.cms_published_media_object('cms-media-production',
+ '62000000-0000-4000-8000-000000000011.webp'),
+ 'Storage download also fails closed after rollback');
+reset role;
 select * from finish();
 rollback;

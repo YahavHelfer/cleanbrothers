@@ -207,29 +207,48 @@ test("upload, exact draft preview, publish, replacement and rollback preserve im
   );
   await saveSelection(page, v2, 3);
   await publish(page, 3);
+  const revision2 = state().published_revision_id;
   expect(
     await (
       await request.get(`${published}/delicate-upholstery-cleaning`)
     ).text(),
   ).toContain(`/cms-media/${v2}`);
+  expect((await request.get(`${published}/cms-media/${v2}`)).status()).toBe(200);
+  expect((await request.get(`${published}/cms-media/${v1}`)).status()).toBe(404);
+  await page.goto(preview(revision));
+  await expect(page.locator(`img[src$="/admin/media/file/${v1}"]`)).toHaveCount(3);
+  await page.goto(preview(revision2));
+  await expect(page.locator(`img[src$="/admin/media/file/${v2}"]`)).toHaveCount(3);
+  await page.goto(editor);
   await page
-    .locator(`[data-revision="${baseline}"]`)
+    .locator(`[data-revision="${revision}"]`)
     .getByRole("button", { name: "שחזור כטיוטה חדשה" })
     .click();
   await expect(page.getByLabel("מצב פרסום")).toContainText("טיוטה: גרסה 4");
   await publish(page, 4);
+  expect((await request.get(`${published}/cms-media/${v1}`)).status()).toBe(200);
+  expect((await request.get(`${published}/cms-media/${v2}`)).status()).toBe(404);
+  await page
+    .locator(`[data-revision="${baseline}"]`)
+    .getByRole("button", { name: "שחזור כטיוטה חדשה" })
+    .click();
+  await expect(page.getByLabel("מצב פרסום")).toContainText("טיוטה: גרסה 5");
+  await publish(page, 5);
   expect(
     await (
       await request.get(`${published}/delicate-upholstery-cleaning`)
     ).text(),
   ).not.toContain("/cms-media/");
   expect((await request.get(`${published}/cms-media/${v1}`)).status()).toBe(
-    200,
-  ); // Published disclosure is permanent, not draft secrecy.
+    404,
+  );
+  expect((await request.get(`${published}/cms-media/${v2}`)).status()).toBe(404);
   await page.goto(preview(revision));
   await expect(page.locator(`img[src$="/admin/media/file/${v1}"]`)).toHaveCount(
     3,
   );
+  await page.goto(preview(revision2));
+  await expect(page.locator(`img[src$="/admin/media/file/${v2}"]`)).toHaveCount(3);
   expect(
     localSql(`select count(*) from media_versions where asset_id='${asset}'`),
   ).toBe("2");
@@ -451,7 +470,7 @@ test("drag/drop upload and ordered library selection persist exact version order
   expect(state().published_revision_id).toBe(baseline);
 });
 
-test("Preview Storage adapter uses real isolated Storage/RPCs with AAL2, private delivery and immutable publication", async () => {
+test("legacy Preview Storage objects retain private Admin and current-publication delivery", async () => {
   const client = await session(admin);
   const { data } = await client.auth.getSession();
   if (!data.session) throw Error("Local Storage fixture session missing");

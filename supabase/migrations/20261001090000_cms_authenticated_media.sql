@@ -34,22 +34,9 @@ create function public.cms_published_media_object(object_bucket text, object_pat
 returns boolean language sql stable security definer set search_path='' as $$
  select object_bucket='cms-media-production' and exists(
    select 1 from public.media_versions v
-   join public.revision_media_refs ref on ref.media_version_id=v.id
-   join public.content_publication_events event on event.revision_id=ref.revision_id
-   join public.content_documents doc on doc.id=event.document_id
    where v.storage_bucket='cms-media-production' and v.storage_path=object_path
      and v.storage_provider='supabase'
-     and (doc.content_type<>'page' or doc.content_key in ('about','home')
-       or exists(select 1 from public.cms_page_routes route
-         join public.cms_new_page_identity identity on identity.document_id=route.page_id
-         where route.page_id=doc.id and route.kind='page' and identity.lifecycle='published')))
-   or (object_bucket='cms-media-production' and exists(
-   select 1 from public.media_versions v
-   join public.promotion_revision_media prm on prm.media_version_id=v.id
-   join public.content_publication_events event on event.revision_id=prm.revision_id
-   join public.content_documents doc on doc.id=event.document_id and doc.content_type='promotion'
-   join public.cms_promotion_identity identity on identity.document_id=doc.id and identity.status='active'
-   where v.storage_bucket='cms-media-production' and v.storage_path=object_path));
+     and public.cms_read_public_media_version(v.id) is not null);
 $$;
 alter function public.cms_published_media_object(text,text) owner to postgres;
 revoke all on function public.cms_published_media_object(text,text) from public,anon,authenticated,service_role;
@@ -149,34 +136,76 @@ revoke all on function public.cms_media_library() from public,anon,authenticated
 grant execute on function public.cms_media_library() to authenticated;
 
 -- Public projection returns identity/scope only. It never accepts a path or a
--- revision ID. Historical revisions disclosed by publication stay readable.
+-- revision ID. Only CURRENT published references qualify; historical Admin
+-- previews use their own authenticated route.
 create or replace function public.cms_read_public_media_version(target_version uuid)
 returns jsonb language sql stable security definer set search_path='' as $$
- with published_refs as (
+ with current_refs as (
    select doc.id as document_id,doc.content_type,doc.content_key
    from public.revision_media_refs ref
-   join public.content_publication_events event on event.revision_id=ref.revision_id
-   join public.content_documents doc on doc.id=event.document_id
-   where ref.media_version_id=target_version
- ), promoted as (
-   select 1 from public.promotion_revision_media prm
-   join public.content_publication_events event on event.revision_id=prm.revision_id
-   join public.content_documents doc on doc.id=event.document_id and doc.content_type='promotion'
-   join public.cms_promotion_identity identity on identity.document_id=doc.id and identity.status='active'
+   join public.content_revisions revision on revision.id=ref.revision_id
+   join public.content_publication_state state on state.document_id=revision.document_id
+     and state.published_revision_id=revision.id
+   join public.content_documents doc on doc.id=revision.document_id
+   where ref.media_version_id=target_version and
+     (doc.content_type='service' or (doc.content_type='page' and
+       (doc.content_key in ('about','home') or exists(
+         select 1 from public.cms_new_page_identity identity
+         join public.cms_page_routes route on route.page_id=identity.document_id
+           and route.kind='page'
+         where identity.document_id=doc.id and identity.lifecycle='published'))))
+ ), pinned as (
+   select page_doc.id as document_id,page_doc.content_key
+   from public.promotion_revision_media prm
+   join public.content_revisions promotion on promotion.id=prm.revision_id
+   join public.cms_promotion_identity identity on identity.document_id=promotion.document_id
+     and identity.status='active'
+   join public.page_revision_blocks block on block.promotion_revision_id=promotion.id
+     and block.block_type='promotionBanner' and not block.hidden
+   join public.content_revisions page_revision on page_revision.id=block.revision_id
+   join public.content_publication_state state on state.document_id=page_revision.document_id
+     and state.published_revision_id=page_revision.id
+   join public.content_documents page_doc on page_doc.id=page_revision.document_id
+     and page_doc.content_type='page'
    where prm.media_version_id=target_version
+     and public.cms_revision_payload(promotion)->>'mediaVersionId'=target_version::text
+     and public.cms_revision_payload(promotion)->>'enabled'='true'
+     and (page_doc.content_key in ('about','home') or exists(
+       select 1 from public.cms_new_page_identity page_identity
+       join public.cms_page_routes route on route.page_id=page_identity.document_id
+         and route.kind='page'
+       where page_identity.document_id=page_doc.id and page_identity.lifecycle='published'))
+ ), scheduled as (
+   select placement.placement_kind||':'||placement.target_key as placement
+   from public.promotion_revision_media prm
+   join public.content_revisions promotion on promotion.id=prm.revision_id
+   join public.cms_promotion_identity identity on identity.document_id=promotion.document_id
+     and identity.status='active'
+   join public.cms_active_promotion_placements placement
+     on placement.promotion_revision_id=promotion.id
+   join public.cms_promotion_schedules schedule on schedule.id=placement.schedule_id
+     and schedule.promotion_document_id=promotion.document_id
+     and schedule.promotion_revision_id=promotion.id and schedule.status='active'
+   where prm.media_version_id=target_version
+     and schedule.starts_at<=now() and (schedule.ends_at is null or schedule.ends_at>now())
+     and public.cms_revision_payload(promotion)->>'mediaVersionId'=target_version::text
+     and public.cms_revision_payload(promotion)->>'enabled'='true'
  )
  select jsonb_build_object('id',v.id,'storage_provider',v.storage_provider,'storage_bucket',v.storage_bucket,
    'mime_type',v.mime_type,'content_hash',v.content_hash,
-   'serviceKeys',(select coalesce(jsonb_agg(distinct content_key),'[]'::jsonb) from published_refs where content_type='service'),
-   'pageKeys',(select coalesce(jsonb_agg(distinct content_key),'[]'::jsonb) from published_refs where content_type='page'),
+   'serviceKeys',(select coalesce(jsonb_agg(distinct content_key),'[]'::jsonb) from current_refs where content_type='service'),
+   'pageKeys',(select coalesce(jsonb_agg(distinct content_key),'[]'::jsonb) from current_refs where content_type='page'),
    'pageSlugs',(select coalesce(jsonb_agg(distinct route.slug),'[]'::jsonb)
-     from published_refs ref join public.cms_page_routes route on route.page_id=ref.document_id and route.kind='page'
+     from current_refs ref join public.cms_page_routes route on route.page_id=ref.document_id and route.kind='page'
      join public.cms_new_page_identity identity on identity.document_id=route.page_id and identity.lifecycle='published'
      where ref.content_type='page' and ref.content_key like 'new:%'),
-   'home',exists(select 1 from published_refs where content_type='page' and content_key='home'),
-   'promotion',exists(select 1 from promoted))
+   'home',exists(select 1 from current_refs where content_type='page' and content_key='home'),
+   'pinnedPageKeys',(select coalesce(jsonb_agg(distinct content_key),'[]'::jsonb) from pinned),
+   'pinnedPageSlugs',(select coalesce(jsonb_agg(distinct route.slug),'[]'::jsonb)
+     from pinned ref join public.cms_page_routes route on route.page_id=ref.document_id and route.kind='page'),
+   'scheduledPlacements',(select coalesce(jsonb_agg(distinct placement),'[]'::jsonb) from scheduled))
  from public.media_versions v where v.id=target_version
- and (exists(select 1 from published_refs) or exists(select 1 from promoted));
+ and (exists(select 1 from current_refs) or exists(select 1 from pinned) or exists(select 1 from scheduled));
 $$;
 alter function public.cms_read_public_media_version(uuid) owner to postgres;
 revoke all on function public.cms_read_public_media_version(uuid) from public,anon,authenticated,service_role;

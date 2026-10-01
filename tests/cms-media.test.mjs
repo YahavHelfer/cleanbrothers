@@ -572,12 +572,16 @@ const cloudEnv = {
   CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning",
 };
 const previewOrigin = "https://cleanbrothers-git-feature-cms-c-061c94-yahavs-projects-6b5e850f.vercel.app";
+const manualOrigin = "https://cleanbrothers-git-feature-cms-m-29b923-yahavs-projects-6b5e850f.vercel.app";
+const deploymentOrigin = "https://cleanbrothers-qu997lkh7-yahavs-projects-6b5e850f.vercel.app";
+cloudEnv.VERCEL_URL = new URL(deploymentOrigin).host;
+cloudEnv.VERCEL_BRANCH_URL = new URL(previewOrigin).host;
 test("cloud media requires every Preview, project, branch and allowlist condition", () => {
   const enabled = createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
   assert.equal(enabled.mediaEnabled(),true);
   assert.doesNotThrow(()=>enabled.requireMediaEnvironment());
   assert.throws(()=>enabled.requireLocalMediaEnvironment());
-  for(const key of Object.keys(cloudEnv).filter(k=>!["CMS_SUPABASE_PUBLISHABLE_KEY","CMS_MEDIA_SERVER_KEY"].includes(k))) {
+  for(const key of Object.keys(cloudEnv).filter(k=>!["CMS_SUPABASE_PUBLISHABLE_KEY","CMS_MEDIA_SERVER_KEY","VERCEL_URL","VERCEL_BRANCH_URL"].includes(k))) {
     const loaded = createSourceLoader({env:{...cloudEnv,[key]:"wrong"}})("src/cms/media/environment.ts");
     assert.equal(loaded.mediaEnabled(),false,key);
     assert.throws(()=>loaded.requireCloudMediaEnvironment());
@@ -586,13 +590,22 @@ test("cloud media requires every Preview, project, branch and allowlist conditio
     assert.equal(createSourceLoader({env:{...cloudEnv,...extra}})("src/cms/media/environment.ts").mediaEnabled(),false);
   }
 });
-test("cloud upload accepts only exact stable Preview Origin and Host", () => {
-  const {mediaUploadOriginAllowed:allowed}=createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
-  const make=(origin,host)=>new Request(previewOrigin+"/admin/media/upload",{method:"POST",headers:{origin,host,"x-forwarded-host":new URL(previewOrigin).host}});
-  assert.equal(allowed(make(previewOrigin,new URL(previewOrigin).host)),true);
-  for(const origin of ["http://"+new URL(previewOrigin).host,previewOrigin+".attacker.invalid","https://www.cleanbrothers.co.il","http://127.0.0.1:56300","null",""])
-    assert.equal(allowed(make(origin,new URL(previewOrigin).host)),false);
-  assert.equal(allowed(make(previewOrigin,"attacker.invalid")),false);
+test("hosted upload accepts only exact Vercel deployment/branch Origins after CMS identity", () => {
+  const make=(origin,host)=>new Request(previewOrigin+"/admin/media/upload",{method:"POST",headers:{origin,host,"x-forwarded-host":"attacker.invalid"}});
+  for(const [branch,alias] of [["feature/cms-cloud-foundation",previewOrigin],["feature/cms-manual-promotions",manualOrigin]]) {
+    const env={...cloudEnv,VERCEL_GIT_COMMIT_REF:branch,VERCEL_BRANCH_URL:new URL(alias).host};
+    const {mediaUploadOriginAllowed:allowed,authenticatedMediaEnvironmentEnabled:authenticated,trustedMediaEnvironmentEnabled:trusted}=createSourceLoader({env:{...env,CMS_MEDIA_SERVER_KEY:undefined}})("src/cms/media/environment.ts");
+    assert.equal(authenticated(),true);assert.equal(trusted(),false);
+    for(const origin of [alias,deploymentOrigin])assert.equal(allowed(make(origin,new URL(origin).host)),true);
+    for(const origin of ["http://"+new URL(alias).host,alias+".attacker.invalid","https://foreign.vercel.app","https://www.cleanbrothers.co.il","null",""])
+      assert.equal(allowed(make(origin,new URL(alias).host)),false);
+    assert.equal(allowed(make(alias,"attacker.invalid")),false);
+    for(const bad of [{VERCEL_PROJECT_ID:"foreign"},{VERCEL_GIT_COMMIT_REF:"feature/unapproved"},{CMS_SUPABASE_URL:"https://foreign.supabase.co"},{VERCEL_BRANCH_URL:"foreign.vercel.app"}])
+      assert.equal(createSourceLoader({env:{...env,...bad}})("src/cms/media/environment.ts").mediaUploadOriginAllowed(make(alias,new URL(alias).host)),false);
+  }
+  const {mediaUploadOriginAllowed:productionAllowed}=createSourceLoader({env:{CMS_SUPABASE_URL:cloudEnv.CMS_SUPABASE_URL,CMS_SUPABASE_PUBLISHABLE_KEY:cloudEnv.CMS_SUPABASE_PUBLISHABLE_KEY,VERCEL:"1",VERCEL_ENV:"production",VERCEL_PROJECT_ID:cloudEnv.VERCEL_PROJECT_ID,VERCEL_GIT_COMMIT_REF:"main",CMS_MEDIA_PRODUCTION_ENABLED:"1"}})("src/cms/media/environment.ts");
+  assert.equal(productionAllowed(make("https://www.cleanbrothers.co.il","www.cleanbrothers.co.il")),true);
+  assert.equal(productionAllowed(make(manualOrigin,"www.cleanbrothers.co.il")),false);
 });
 test("Preview cannot use local filesystem storage even with the local flag", async()=>{
   const storage=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_LOCAL_ENABLED:"1"}})("src/cms/media/local-storage.ts");
@@ -633,14 +646,15 @@ test("cloud delivery rejects missing, oversized and corrupted objects without ex
     await assert.rejects(()=>loaded.readCloudImage(model.STATIC_MEDIA_VERSION,"a".repeat(64)),e=>e.name==="Error"&&!e.message.includes("upstream"));
   }
 });
-test("cloud upload authorizes, validates, writes and registers with actor attribution; compensates only definite failures",async()=>{
+test("Preview upload uses AAL2 session/RLS registration without privileged key and compensates only definite failures",async()=>{
   for(const code of [null,"PT409","42501","FETCH_ERROR"]){
     const calls=[];let removed=0;
-    const repo=createSourceLoader({env:cloudEnv,mocks:{
+    const repo=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined},mocks:{
       "@/cms/authorization":{requireCmsAdmin:async()=>{calls.push("auth");return {userId:model.STATIC_MEDIA_ASSET};}},
       "./validate-image":{validateImage:async()=>{calls.push("validate");return {bytes:Buffer.from("fixture"),contentHash:"a".repeat(64)};}},
-      "./trusted-client":{createTrustedMediaClient:()=>({rpc:async(name,args)=>{calls.push("register");assert.equal(name,"cms_register_preview_media_version");assert.equal(args.actor,model.STATIC_MEDIA_ASSET);assert.match(args.version_id,/^[0-9a-f-]{36}$/);return {data:model.STATIC_MEDIA_ASSET,error:code?{code}:null};}})},
-      "./cloud-storage":{writeCloudImage:async()=>{calls.push("write");},discardUnregisteredCloudImage:async()=>{removed++;}},
+      "@/cms/server":{createCmsServerClient:async()=>({rpc:async(name,args)=>{calls.push("register");assert.equal(name,"cms_register_authenticated_media_version");assert.equal(args.actor,model.STATIC_MEDIA_ASSET);assert.match(args.version_id,/^[0-9a-f-]{36}$/);return {data:model.STATIC_MEDIA_ASSET,error:code?{code}:null};}})},
+      "./trusted-client":{createTrustedMediaClient:()=>{throw Error("privileged client used");}},
+      "./authenticated-storage":{writeAuthenticatedImage:async()=>{calls.push("write");},discardUnregisteredAuthenticatedImage:async()=>{removed++;}},
       "./local-storage":{writeLocalImage:async()=>{throw Error("must never use Vercel disk");}},
     }})("src/cms/media/repository.ts");
     const run=()=>repo.uploadMedia(new Uint8Array(),"image.jpg","image/jpeg",{altText:"Alt",caption:"",folder:""});
@@ -667,6 +681,25 @@ test("Preview public image route never downloads draft objects and disables cach
     assert.equal(response.status,published?200:404);assert.equal(reads,published?1:0);
     assert.match(response.headers.get("cache-control"),/private.*no-store/);assert.match(response.headers.get("x-robots-tag"),/noindex/);
   }
+});
+
+test("public media delivery keeps shared current references and exact scheduled/pinned scopes separate",async()=>{
+  const id="a3000000-0000-4000-8000-000000000001";
+  const run=async(scope)=>{
+    const route=createSourceLoader({env:cloudEnv,mocks:{
+      "@supabase/supabase-js":{createClient:()=>({rpc:async()=>({data:{id,serviceKeys:[],pageKeys:[],pageSlugs:[],home:false,pinnedPageKeys:[],pinnedPageSlugs:[],scheduledPlacements:[],...scope},error:null})})},
+      "@/cms/pages/environment":{usesCmsPageSource:key=>key==="about"},
+      "@/cms/schedules/public-environment":{usesScheduledPublicPlacement:(kind,key)=>kind==="service"&&key==="sofa-cleaning"},
+      "@/cms/media/repository":{mediaBytes:async()=>({bytes:Buffer.from("fixture")})},
+    }})("src/app/cms-media/[id]/route.ts");
+    return (await route.GET(new Request(previewOrigin+"/cms-media/"+id),{params:Promise.resolve({id})})).status;
+  };
+  assert.equal(await run({serviceKeys:["sofa-cleaning","delicate-upholstery-cleaning"]}),200);
+  assert.equal(await run({serviceKeys:["sofa-cleaning"]}),404);
+  assert.equal(await run({pinnedPageKeys:["about"]}),200);
+  assert.equal(await run({scheduledPlacements:["service:sofa-cleaning"]}),200);
+  assert.equal(await run({scheduledPlacements:["service:carpet-cleaning"]}),404);
+  assert.equal(await run({scheduledPlacements:["service:sofa-cleaning:foreign"]}),404);
 });
 
 test("Preview payload limit reserves Vercel multipart margin and rejects oversized normalized output before Storage",async()=>{
@@ -701,7 +734,7 @@ test("Preview media stays enabled through each explicit one-service rollout step
 
 test("multi-service Preview media retains every environment and strict allowlist guard", () => {
  const base={...cloudEnv,CMS_CONTENT_SERVICE_ALLOWLIST:"delicate-upholstery-cleaning,sofa-cleaning"};
- const invalid=[...Object.keys(base).filter(key=>!["CMS_SUPABASE_PUBLISHABLE_KEY","CMS_MEDIA_SERVER_KEY"].includes(key)).map(key=>({[key]:"wrong"})),
+ const invalid=[...Object.keys(base).filter(key=>!["CMS_SUPABASE_PUBLISHABLE_KEY","CMS_MEDIA_SERVER_KEY","VERCEL_URL","VERCEL_BRANCH_URL"].includes(key)).map(key=>({[key]:"wrong"})),
   {VERCEL_ENV:"production"},{VERCEL_GIT_COMMIT_REF:"main"},{CMS_MEDIA_LOCAL_ENABLED:"1",CMS_SUPABASE_URL:env.CMS_SUPABASE_URL},
   ...["*","sofa-cleaning,*","sofa-cleaning,sofa-cleaning","sofa-cleaning,unknown-service","sofa-cleaning,",""].map(CMS_CONTENT_SERVICE_ALLOWLIST=>({CMS_CONTENT_SERVICE_ALLOWLIST}))];
  for(const invalidEnv of invalid) {
