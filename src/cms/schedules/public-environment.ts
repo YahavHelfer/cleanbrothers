@@ -1,5 +1,6 @@
 import "server-only";
 import { isManagedServiceKey } from "@/content/service-registry";
+import { approvedCmsPreviewIdentity } from "@/cms/preview-environment";
 import { configuredCmsProduction } from "@/cms/production-environment";
 
 export type PublicPlacement = { kind: "global"; target: "site" } |
@@ -14,10 +15,7 @@ export function scheduledPublicEnvironmentAllowed(): boolean {
   const local = !process.env.VERCEL && !process.env.VERCEL_ENV &&
     process.env.CMS_SCHEDULED_PROMOTIONS_LOCAL_ENABLED === "true" &&
     process.env.CMS_SUPABASE_URL === "http://127.0.0.1:56321";
-  const preview = process.env.VERCEL === "1" && process.env.VERCEL_ENV === "preview" &&
-    process.env.VERCEL_PROJECT_ID === "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A" &&
-    process.env.VERCEL_GIT_COMMIT_REF === "feature/cms-cloud-foundation" &&
-    process.env.CMS_SUPABASE_URL === "https://plbwefnwussxlglscfpn.supabase.co";
+  const preview = approvedCmsPreviewIdentity();
   return local || preview || configuredCmsProduction();
 }
 

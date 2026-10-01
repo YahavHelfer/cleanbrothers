@@ -566,6 +566,7 @@ const cloudEnv = {
   CMS_MEDIA_PREVIEW_ENABLED: "1",
   CMS_MEDIA_SERVER_KEY: "synthetic-server-key",
   VERCEL: "1", VERCEL_ENV: "preview",
+  VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
   VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation",
   CMS_PILOT_CONTENT_SOURCE: "published",
   CMS_CONTENT_SERVICE_ALLOWLIST: "delicate-upholstery-cleaning",

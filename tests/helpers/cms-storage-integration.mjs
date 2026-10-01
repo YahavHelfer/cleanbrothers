@@ -19,7 +19,7 @@ try {
   assert.equal((await trusted.storage.createBucket(bucket,{public:false,fileSizeLimit:8388608,allowedMimeTypes:["image/webp"]})).error,null);created=true;
   const load=createSourceLoader({env:{
     CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",CMS_SUPABASE_PUBLISHABLE_KEY:stack.key,CMS_MEDIA_SERVER_KEY:stack.serviceKey,
-    CMS_MEDIA_PREVIEW_ENABLED:"1",VERCEL:"1",VERCEL_ENV:"preview",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",
+    CMS_MEDIA_PREVIEW_ENABLED:"1",VERCEL:"1",VERCEL_ENV:"preview",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",
     CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:"delicate-upholstery-cleaning",
   },mocks:{"@/cms/server":{createCmsServerClient:async()=>actor},"./server":{createCmsServerClient:async()=>actor}},fetchImpl:async(url,init)=>{
     const u=new URL(url);assert.equal(u.origin,"https://plbwefnwussxlglscfpn.supabase.co");assert.match(u.pathname,/^\/(storage|rest)\/v1\//);

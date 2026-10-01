@@ -9,6 +9,7 @@ const baseline = () => load("src/cms/content/baseline.ts").pilotBaseline();
 const localEnv = { CMS_SUPABASE_URL: "http://127.0.0.1:56321", CMS_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_local_test" };
 const publishedEnv = { CMS_PILOT_CONTENT_SOURCE: "published", CMS_CONTENT_SERVICE_ALLOWLIST: model.PILOT_KEY };
 const previewEnv = { ...localEnv, VERCEL: "1", VERCEL_ENV: "preview",
+  VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
   VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation", CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co" };
 const revision = "a0000000-0000-4000-8000-000000000001";
 
@@ -155,12 +156,9 @@ for (const [name, env] of Object.entries({
       "@/cms/server": { createCmsServerClient: async () => { calls++; throw Error("unexpected"); } },
       "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },
     } });
-    if (name === "Production with both flags") {
-      // Preview's legacy source flag cannot select a Production public source.
-      assert.equal((await guarded("src/cms/content/public-source.ts").getPublicPilot()).revisionId, null);
-    } else {
-      await assert.rejects(() => guarded("src/cms/content/public-source.ts").getPublicPilot(), /unavailable/);
-    }
+    // An unapproved identity stays on the static public source even with both
+    // flags present. Direct editor access must still fail closed.
+    assert.equal((await guarded("src/cms/content/public-source.ts").getPublicPilot()).revisionId, null);
     await assert.rejects(() => guarded("src/cms/content/repository.ts").getPilotEditor(), /unavailable/);
     assert.equal(calls, 0);
   });

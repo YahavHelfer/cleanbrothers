@@ -2,6 +2,7 @@ import "server-only";
 import { managedServiceKeys } from "@/content/service-registry";
 import { usesCmsSource } from "@/cms/content/environment";
 import { getCmsConfig } from "@/cms/config";
+import { approvedCmsPreviewIdentity } from "@/cms/preview-environment";
 import { configuredCmsProduction, CMS_PRODUCTION_ORIGIN } from "@/cms/production-environment";
 import { MAX_IMAGE_BYTES, MAX_PREVIEW_IMAGE_BYTES } from "./model";
 
@@ -20,10 +21,7 @@ export function mediaLocalEnabled() {
 export function mediaCloudEnabled() {
   const preview = (
     process.env.CMS_MEDIA_PREVIEW_ENABLED === "1" &&
-    process.env.VERCEL === "1" &&
-    process.env.VERCEL_ENV === "preview" &&
-    process.env.VERCEL_GIT_COMMIT_REF === "feature/cms-cloud-foundation" &&
-    process.env.CMS_SUPABASE_URL === "https://plbwefnwussxlglscfpn.supabase.co" &&
+    approvedCmsPreviewIdentity() &&
     process.env.CMS_PILOT_CONTENT_SOURCE === "published" &&
     managedServiceKeys.some(usesCmsSource)
   );

@@ -44,7 +44,7 @@ test("approved cloud Preview enables only the explicit service at each rollout s
  const ordered=["delicate-upholstery-cleaning",...keys.filter(key=>key!=="delicate-upholstery-cleaning")];
  for(let count=1;count<=ordered.length;count++) {
   const allowlist=ordered.slice(0,count);
-  const source=createSourceLoader({env:{...local,VERCEL:"1",VERCEL_ENV:"preview",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:allowlist.join(",")}})("src/cms/content/public-source.ts");
+  const source=createSourceLoader({env:{...local,VERCEL:"1",VERCEL_ENV:"preview",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",VERCEL_GIT_COMMIT_REF:"feature/cms-cloud-foundation",CMS_SUPABASE_URL:"https://plbwefnwussxlglscfpn.supabase.co",CMS_PILOT_CONTENT_SOURCE:"published",CMS_CONTENT_SERVICE_ALLOWLIST:allowlist.join(",")}})("src/cms/content/public-source.ts");
   for(const key of keys)assert.equal(source.usesCmsSource(key),allowlist.includes(key));
  }
 });
@@ -81,6 +81,7 @@ test("public media requires an actual published owner in the explicit service al
 });
 
 const previewEnv = { ...local, VERCEL: "1", VERCEL_ENV: "preview",
+ VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
  VERCEL_GIT_COMMIT_REF: "feature/cms-cloud-foundation", CMS_SUPABASE_URL: "https://plbwefnwussxlglscfpn.supabase.co",
  CMS_PILOT_CONTENT_SOURCE: "published", CMS_MEDIA_PREVIEW_ENABLED: "1" };
 const rolloutKeys = ["delicate-upholstery-cleaning", ...keys.filter(key => key !== "delicate-upholstery-cleaning")];
