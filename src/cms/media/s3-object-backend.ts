@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { MAX_PREVIEW_IMAGE_BYTES, mediaId, MediaError } from "./model";
 import { mediaObjectKey, type ExactObjectBackend } from "./object-store";
 
-// An AWS SDK adapter can implement these four exact-object calls later.
+// The AWS SDK adapter implements these four exact-object calls without listing.
 // This contract intentionally contains no ListObjects or bucket API.
 export interface S3ExactObjectClient {
   putObject(input: {

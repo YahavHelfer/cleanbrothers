@@ -32,7 +32,7 @@ export function validatePublicActivePromotion(input: unknown, kind: string, targ
     if (pageUuid(projected.mediaVersionId) !== promotion.mediaVersionId ||
       projected.altText !== promotion.mediaAlt) throw new Error("Public promotion media mismatch");
     const src = projected.provider === "static" ? staticMediaPath(promotion.mediaVersionId) :
-      projected.provider === "local" || projected.provider === "supabase" ?
+      projected.provider === "local" || projected.provider === "supabase" || projected.provider === "s3" ?
         `/cms-media/${promotion.mediaVersionId}` : null;
     if (!src) throw new Error("Invalid public promotion media provider");
     media = { src, altText: projected.altText as string };

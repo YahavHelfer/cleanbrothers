@@ -5,7 +5,7 @@ select no_plan();
 truncate cms_manual_campaign_events,cms_manual_campaign_placements,cms_manual_campaign_revisions,
   cms_promotion_schedule_audit,cms_promotion_schedule_attempts,cms_active_promotion_placements,cms_promotion_schedule_placements,cms_promotion_schedules,
   cms_page_route_events,cms_page_routes,cms_new_page_identity,page_revision_blocks,promotion_revision_media,cms_promotion_identity,
-  media_audit_events,revision_media_refs,media_versions,media_assets,content_publication_events,content_publication_state,
+  media_audit_events,revision_media_refs,cms_media_upload_attempts,media_versions,media_assets,content_publication_events,content_publication_state,
   content_revisions,content_documents;
 
 create temporary table home_fixture(p jsonb, baseline uuid, draft uuid, rollback uuid);

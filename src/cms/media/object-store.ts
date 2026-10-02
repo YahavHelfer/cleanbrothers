@@ -2,7 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { MAX_PREVIEW_IMAGE_BYTES, mediaId, MediaError } from "./model";
 
-// Spike only: no production route or repository calls this abstraction yet.
+// Server-only boundary: callers may address exact immutable UUIDs, never keys.
 export interface MediaObjectStore {
   putExact(versionId: string, bytes: Uint8Array): Promise<void>;
   headExact(versionId: string): Promise<ExactObjectHead | null>;
@@ -17,8 +17,7 @@ export type ExactObjectHead = {
   contentHash: string;
 };
 
-// A future R2/S3 adapter must implement putIfAbsent atomically (for example,
-// PutObject with If-None-Match: *). It must not expose listing to this layer.
+// The S3 adapter implements putIfAbsent with PutObject If-None-Match: *.
 export interface ExactObjectBackend {
   putIfAbsent(key: string, bytes: Uint8Array): Promise<void>;
   head(key: string): Promise<ExactObjectHead | null>;

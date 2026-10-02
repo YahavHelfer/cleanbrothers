@@ -72,7 +72,7 @@ export type MediaVersion = {
   id: string;
   asset_id: string;
   version_number: number;
-  storage_provider: "static" | "local" | "supabase";
+  storage_provider: "static" | "local" | "supabase" | "s3";
   storage_path: string;
   mime_type: string;
   byte_size: number;

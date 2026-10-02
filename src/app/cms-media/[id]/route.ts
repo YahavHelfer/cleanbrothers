@@ -6,7 +6,7 @@ import { usesCmsHomeSource } from "@/cms/home/environment";
 import { usesScheduledPublicPlacement } from "@/cms/schedules/public-environment";
 import { createClient } from "@supabase/supabase-js";
 import { getCmsConfig } from "@/cms/config";
-import { mediaUploadEnabled } from "@/cms/media/environment";
+import { mediaReadEnvironmentEnabled } from "@/cms/media/environment";
 import { mediaId } from "@/cms/media/model";
 import { mediaBytes } from "@/cms/media/repository";
 import { privateMediaHeaders } from "@/cms/media/http";
@@ -16,7 +16,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    if (!mediaUploadEnabled()) throw new Error("Not enabled");
+    if (!mediaReadEnvironmentEnabled()) throw new Error("Not enabled");
     const { url, key } = getCmsConfig();
     const client = createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },

@@ -576,6 +576,23 @@ const manualOrigin = "https://cleanbrothers-git-feature-cms-m-29b923-yahavs-proj
 const deploymentOrigin = "https://cleanbrothers-qu997lkh7-yahavs-projects-6b5e850f.vercel.app";
 cloudEnv.VERCEL_URL = new URL(deploymentOrigin).host;
 cloudEnv.VERCEL_BRANCH_URL = new URL(previewOrigin).host;
+test("S3 writes require exact approved Preview identity and complete server configuration",()=>{
+  const s3={
+    CMS_MEDIA_S3_PREVIEW_ENABLED:"1",CMS_MEDIA_S3_REGION:"eu-central-1",
+    CMS_MEDIA_S3_BUCKET:"synthetic-cms-media",CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",
+    CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",CMS_MEDIA_UPLOAD_CAPABILITY:"1".repeat(64),
+  };
+  const enabled=(overrides={})=>createSourceLoader({env:{...cloudEnv,...s3,...overrides}})(
+    "src/cms/media/environment.ts").s3MediaEnvironmentEnabled();
+  assert.equal(enabled(),true);
+  for(const change of [
+    {CMS_MEDIA_S3_PREVIEW_ENABLED:"0"}, {CMS_MEDIA_S3_BUCKET:undefined},
+    {CMS_MEDIA_S3_ACCESS_KEY_ID:undefined},{CMS_MEDIA_UPLOAD_CAPABILITY:undefined},
+    {VERCEL_ENV:"production",VERCEL_GIT_COMMIT_REF:"main"},
+    {VERCEL_PROJECT_ID:"foreign"},{CMS_SUPABASE_URL:"https://foreign.supabase.co"},
+    {VERCEL_GIT_COMMIT_REF:"feature/foreign"},
+  ]) assert.equal(enabled(change),false);
+});
 test("cloud media requires every Preview, project, branch and allowlist condition", () => {
   const enabled = createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
   assert.equal(enabled.mediaEnabled(),true);
@@ -646,21 +663,42 @@ test("cloud delivery rejects missing, oversized and corrupted objects without ex
     await assert.rejects(()=>loaded.readCloudImage(model.STATIC_MEDIA_VERSION,"a".repeat(64)),e=>e.name==="Error"&&!e.message.includes("upstream"));
   }
 });
-test("Preview upload uses AAL2 session/RLS registration without privileged key and compensates only definite failures",async()=>{
-  for(const code of [null,"PT409","42501","FETCH_ERROR"]){
-    const calls=[];let removed=0;
-    const repo=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined},mocks:{
-      "@/cms/authorization":{requireCmsAdmin:async()=>{calls.push("auth");return {userId:model.STATIC_MEDIA_ASSET};}},
-      "./validate-image":{validateImage:async()=>{calls.push("validate");return {bytes:Buffer.from("fixture"),contentHash:"a".repeat(64)};}},
-      "@/cms/server":{createCmsServerClient:async()=>({rpc:async(name,args)=>{calls.push("register");assert.equal(name,"cms_register_authenticated_media_version");assert.equal(args.actor,model.STATIC_MEDIA_ASSET);assert.match(args.version_id,/^[0-9a-f-]{36}$/);return {data:model.STATIC_MEDIA_ASSET,error:code?{code}:null};}})},
-      "./trusted-client":{createTrustedMediaClient:()=>{throw Error("privileged client used");}},
-      "./authenticated-storage":{writeAuthenticatedImage:async()=>{calls.push("write");},discardUnregisteredAuthenticatedImage:async()=>{removed++;}},
-      "./local-storage":{writeLocalImage:async()=>{throw Error("must never use Vercel disk");}},
+test("Preview S3 upload uses AAL2 journal, server-only capability and definite-only cleanup",async()=>{
+  const bytes=Buffer.from("fixture"),hash=createHash("sha256").update(bytes).digest("hex");
+  for(const code of [null,"PT409","FETCH_ERROR"]){
+    const calls=[];
+    const repo=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined,
+      CMS_MEDIA_S3_PREVIEW_ENABLED:"1",CMS_MEDIA_S3_REGION:"eu-central-1",
+      CMS_MEDIA_S3_BUCKET:"synthetic-cms-media",CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",
+      CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",CMS_MEDIA_UPLOAD_CAPABILITY:"1".repeat(64)},mocks:{
+      "@/cms/authorization":{requireCmsAdmin:async()=>({userId:model.STATIC_MEDIA_ASSET})},
+      "./validate-image":{validateImage:async()=>({bytes,byteSize:bytes.length,width:12,height:8,
+        mimeType:"image/webp",contentHash:hash,originalFilename:"image.jpg"})},
+      "@/cms/server":{createCmsServerClient:async()=>({rpc:async(name,args)=>{
+        calls.push(name);
+        if(name==="cms_prepare_external_media_upload")return {error:null};
+        if(name==="cms_register_external_media_version")return {data:model.STATIC_MEDIA_ASSET,error:code?{code}:null};
+        if(name==="cms_mark_external_media_uploaded"){
+          assert.equal(args.server_capability,"1".repeat(64));
+          assert.equal(args.observed_content_hash,hash);
+        }
+        return {error:null};
+      }})},
+      "./trusted-client":{createTrustedMediaClient:()=>{throw Error("privileged client used")}},
+      "./authenticated-storage":{writeAuthenticatedImage:async()=>{throw Error("Supabase Storage used")}},
+      "./s3-store":{s3UploadCapability:()=> "1".repeat(64),getS3MediaStore:()=>({
+        putExact:async()=>calls.push("put"),
+        headExact:async(id)=>({versionId:id,byteSize:bytes.length,contentHash:hash,mimeType:"image/webp"}),
+        deleteExact:async()=>calls.push("delete"),
+      })},
     }})("src/cms/media/repository.ts");
     const run=()=>repo.uploadMedia(new Uint8Array(),"image.jpg","image/jpeg",{altText:"Alt",caption:"",folder:""});
     if(code)await assert.rejects(run);else assert.equal(await run(),model.STATIC_MEDIA_ASSET);
-    assert.deepEqual(calls,["auth","validate","write","register"]);
-    assert.equal(removed,["PT409","42501"].includes(code)?1:0);
+    assert.deepEqual(calls.slice(0,4),[
+      "cms_prepare_external_media_upload","put","cms_mark_external_media_uploaded",
+      "cms_register_external_media_version"]);
+    assert.equal(calls.includes("delete"),code==="PT409");
+    assert.equal(calls.includes("cms_mark_external_media_ambiguous"),code==="FETCH_ERROR");
   }
 });
 test("cloud media versions resolve to same-origin routes without signed URLs or raw Storage paths",()=>{
@@ -708,7 +746,10 @@ test("Preview payload limit reserves Vercel multipart margin and rejects oversiz
   const parser=createSourceLoader({env:cloudEnv})("src/cms/media/http.ts").boundedUploadForm;
   await assert.rejects(()=>parser(new Request(previewOrigin,{method:"POST",body:"x",headers:{"content-type":"multipart/form-data; boundary=x","content-length":String(4*1024*1024+64*1024+1)}})),e=>e.status===413);
   let validated=0,writes=0;
-  const repo=createSourceLoader({env:cloudEnv,mocks:{
+  const repo=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_S3_PREVIEW_ENABLED:"1",
+    CMS_MEDIA_S3_REGION:"eu-central-1",CMS_MEDIA_S3_BUCKET:"synthetic-cms-media",
+    CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",
+    CMS_MEDIA_UPLOAD_CAPABILITY:"1".repeat(64)},mocks:{
     "@/cms/authorization":{requireCmsAdmin:async()=>({userId:model.STATIC_MEDIA_ASSET})},
     "./validate-image":{validateImage:async()=>{validated++;return {bytes:Buffer.alloc(4*1024*1024+1)};}},
     "./trusted-client":{createTrustedMediaClient:()=>{writes++;throw Error("unexpected");}},

@@ -1,5 +1,5 @@
 import { staticMediaPath } from "./static-inventory";
-import { mediaCloudEnabled, mediaLocalEnabled, mediaUploadEnabled } from "./environment";
+import { mediaCloudEnabled, mediaLocalEnabled, s3MediaEnvironmentEnabled } from "./environment";
 import type { ResolvedMedia } from "./model";
 import {
   mediaId,
@@ -25,9 +25,11 @@ export function resolveMediaProjection(
     let src: string;
     if (row.provider === "static")
       src = staticMediaPath(id);
-    else if (row.provider === "local" || row.provider === "supabase") {
-      if (audience === "public" && row.provider === "supabase" && !(mediaCloudEnabled() && mediaUploadEnabled()))
+    else if (row.provider === "local" || row.provider === "supabase" || row.provider === "s3") {
+      if (audience === "public" && row.provider === "supabase" && !mediaCloudEnabled())
         throw new Error("Private CMS media unavailable");
+      if (audience === "public" && row.provider === "s3" && !s3MediaEnvironmentEnabled())
+        throw new Error("S3 CMS media unavailable");
       if (audience === "public" && row.provider === "local" && !mediaLocalEnabled())
         throw new Error("Local CMS media unavailable");
       src = audience === "admin" ? privateMediaUrl(id) : `/cms-media/${id}`;

@@ -4,11 +4,13 @@ import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled } from "./environment";
+import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, s3MediaEnvironmentEnabled } from "./environment";
 import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { writeAuthenticatedImage, readAuthenticatedImage, readPublishedImage, discardUnregisteredAuthenticatedImage } from "./authenticated-storage";
 import { validateImage } from "./validate-image";
+import { getS3MediaStore, s3UploadCapability, verifiedS3Bytes } from "./s3-store";
+import { mediaObjectKey } from "./object-store";
 import {
   writeLocalImage,
   discardUnregisteredImage,
@@ -44,9 +46,29 @@ export type MediaDetail = {
     occurred_at: string;
   }[];
 };
+export type ExternalMediaAttempt = {
+  versionId: string;
+  actorId: string;
+  assetId: string | null;
+  status: "prepared" | "uploaded" | "registered" | "definite_failure" | "ambiguous" | "cleaned";
+  createdAt: string;
+  updatedAt: string;
+  registeredMediaVersionId: string | null;
+  lastErrorCode: string | null;
+};
+export async function listExternalMediaAttempts(): Promise<ExternalMediaAttempt[]> {
+  await requireCmsAdmin();
+  if (!s3MediaEnvironmentEnabled()) return [];
+  const client = await createCmsServerClient();
+  const { data, error } = await client.rpc("cms_external_media_reconciliation");
+  check(error);
+  if (!Array.isArray(data)) throw new MediaError();
+  return data as ExternalMediaAttempt[];
+}
 export function mediaVersionReadable(version: Pick<MediaVersion, "storage_provider"> & { storage_bucket?: string | null }) {
   return version.storage_provider === "static" ||
     version.storage_provider === "local" && mediaLocalEnabled() ||
+    version.storage_provider === "s3" && s3MediaEnvironmentEnabled() ||
     version.storage_provider === "supabase" && (
       version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled() ||
       version.storage_bucket === "cms-media-preview" && legacyPreviewMediaReadable());
@@ -58,6 +80,11 @@ function check(error: { code?: string } | null) {
       409,
     );
   if (error) throw new MediaError();
+}
+function definiteConditionalPutRejection(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const result = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+  return result.name === "PreconditionFailed" || result.$metadata?.httpStatusCode === 412;
 }
 export async function listMedia(): Promise<LibraryItem[]> {
   await requireCmsAdmin();
@@ -155,6 +182,63 @@ export async function uploadMedia(
   const id = randomUUID();
   const cloud = mediaCloudEnabled();
   const authenticated = authenticatedMediaEnvironmentEnabled();
+  if (s3MediaEnvironmentEnabled()) {
+    const client = await createCmsServerClient();
+    const store = getS3MediaStore();
+    const { bytes: processed, ...details } = validated;
+    const { error: prepareError } = await client.rpc("cms_prepare_external_media_upload", {
+      version_id: id, target_asset: target, expected_generation: expected,
+      details, metadata: meta,
+    });
+    check(prepareError);
+    try {
+      await store.putExact(id, processed);
+      const head = await store.headExact(id);
+      if (!head || head.byteSize !== processed.length ||
+          head.contentHash !== details.contentHash ||
+          head.versionId !== id || head.mimeType !== "image/webp")
+        throw new MediaError("אימות אובייקט המדיה נכשל.");
+    } catch (error) {
+      if (definiteConditionalPutRejection(error)) {
+        await client.rpc("cms_mark_external_media_definite_failure", {
+          version_id: id, error_code: "PUT_REJECTED",
+        });
+        throw new MediaError("מפתח המדיה כבר קיים. נסו שוב.");
+      }
+      // A write or HEAD transport failure cannot prove that no object exists.
+      await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
+      throw new MediaError("מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.");
+    }
+    const { error: markError } = await client.rpc("cms_mark_external_media_uploaded", {
+      version_id: id,
+      observed_object_key: mediaObjectKey(id),
+      observed_byte_size: processed.length,
+      observed_content_hash: details.contentHash,
+      server_capability: s3UploadCapability(),
+    });
+    if (markError) {
+      await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
+      throw new MediaError("מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.");
+    }
+    const { data, error } = await client.rpc("cms_register_external_media_version", { version_id: id });
+    if (error) {
+      // Only explicit transaction failures are definite. A timeout or missing
+      // response may mean registration committed, so never delete in that case.
+      if (["PT409", "42501", "22023", "23514", "23503", "55000"].includes(error.code)) {
+        const { error: failureError } = await client.rpc("cms_mark_external_media_definite_failure", {
+          version_id: id, error_code: "REGISTER_REJECTED",
+        });
+        if (!failureError) {
+          await store.deleteExact(id);
+          await client.rpc("cms_mark_external_media_cleaned", { version_id: id });
+        }
+      } else {
+        await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
+      }
+      check(error);
+    }
+    return mediaId(data);
+  }
   const client = authenticated ? await createCmsServerClient() : createTrustedMediaClient();
   await (authenticated ? writeAuthenticatedImage : cloud ? writeCloudImage : writeLocalImage)(id, validated.bytes);
   const { bytes: processed, ...details } = validated;
@@ -193,7 +277,7 @@ export async function readPrivateMedia(id: string) {
   return mediaBytes(data as MediaVersion);
 }
 export async function mediaBytes(
-  version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash"> & { storage_bucket?: string | null },
+  version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash"> & { storage_bucket?: string | null; byte_size?: number },
   audience: "admin" | "public" = "admin",
 ) {
   requireMediaReadEnvironment();
@@ -202,6 +286,10 @@ export async function mediaBytes(
   )
     return { staticPath: staticMediaPath(version.id) };
   const id = mediaId(version.id);
+  if (version.storage_provider === "s3" && s3MediaEnvironmentEnabled()) {
+    if (typeof version.byte_size !== "number") throw new MediaError();
+    return { bytes: await verifiedS3Bytes({ ...version, byte_size: version.byte_size }) };
+  }
   if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled())
     return { bytes: await (audience === "admin" ? readAuthenticatedImage : readPublishedImage)(id, version.content_hash) };
   if (version.storage_provider === "supabase" && version.storage_bucket === "cms-media-preview" && legacyPreviewMediaReadable())

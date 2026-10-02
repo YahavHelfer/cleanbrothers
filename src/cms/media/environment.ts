@@ -58,8 +58,22 @@ export function authenticatedMediaEnvironmentEnabled() {
   return mediaCloudEnabled() &&
     (approvedCmsPreviewIdentity() || configuredCmsProduction());
 }
+// New hosted writes are deliberately Preview-only until a separate Production
+// rollout. Legacy Supabase rows remain readable under their existing policy.
+export function s3MediaEnvironmentEnabled() {
+  return approvedCmsPreviewIdentity() && mediaCloudEnabled() &&
+    process.env.CMS_MEDIA_S3_PREVIEW_ENABLED === "1" &&
+    !!process.env.CMS_MEDIA_S3_REGION?.trim() &&
+    !!process.env.CMS_MEDIA_S3_BUCKET?.trim() &&
+    !!process.env.CMS_MEDIA_S3_ACCESS_KEY_ID?.trim() &&
+    !!process.env.CMS_MEDIA_S3_SECRET_ACCESS_KEY?.trim() &&
+    !!process.env.CMS_MEDIA_UPLOAD_CAPABILITY?.trim();
+}
 export function mediaUploadEnabled() {
-  return trustedMediaEnvironmentEnabled() || authenticatedMediaEnvironmentEnabled();
+  // Keep the already reviewed Production upload behavior unchanged; the S3
+  // replacement is activated independently on the approved Preview branch.
+  return trustedMediaEnvironmentEnabled() || s3MediaEnvironmentEnabled() ||
+    configuredCmsProduction() && authenticatedMediaEnvironmentEnabled();
 }
 export function requireTrustedMediaEnvironment() {
   if (!trustedMediaEnvironmentEnabled() && !legacyPreviewMediaReadable())

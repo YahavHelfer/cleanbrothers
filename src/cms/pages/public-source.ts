@@ -21,7 +21,7 @@ export function publicMedia(input: unknown): BlockMedia {
       !Number.isInteger(row.position) || (row.position as number) < 0 || (row.position as number) > 49 ||
       typeof row.alt_text !== "string" || !row.alt_text.trim()) throw new Error("Invalid CMS page media");
     const src = row.provider === "static" ? staticMediaPath(id)
-      : row.provider === "local" || row.provider === "supabase" ? `/cms-media/${id}`
+      : row.provider === "local" || row.provider === "supabase" || row.provider === "s3" ? `/cms-media/${id}`
         : null;
     if (!src) throw new Error("Invalid CMS page media provider");
     return [id, { src, altText: row.alt_text }];
