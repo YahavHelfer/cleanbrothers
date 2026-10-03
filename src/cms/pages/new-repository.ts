@@ -16,10 +16,10 @@ export type NewPageSnapshot = { documentId: string; currentSlug: string; templat
   generation: number; draftRevisionId: string; publishedRevisionId: string | null;
   publishedBy: string | null; draft: PageDraft; history: TypedRevisionSummary[] };
 
-async function authorizedClient() {
+async function authorizedClient(mediaScopeMutation = false) {
   const admin = await requireCmsAdmin();
   requireNewPagesEnvironment();
-  return { userId: admin.userId, client: await createCmsServerClient() };
+  return { userId: admin.userId, client: await createCmsServerClient(false, mediaScopeMutation) };
 }
 function checkedSnapshot(data: unknown): NewPageSnapshot | null {
   if (!data) return null;
@@ -58,7 +58,7 @@ export async function getNewPageRevision(pageId: string, revisionId: string) {
     payload: validatePageDraft(data.payload) } : null;
 }
 export async function createNewPage(title: string, slug: string, template: NewPageTemplate): Promise<string> {
-  const { client } = await authorizedClient();
+  const { client } = await authorizedClient(true);
   const { data, error } = await client.rpc("cms_create_new_page", {
     title, slug: validateNewPageSlug(slug), template,
   });
@@ -66,7 +66,7 @@ export async function createNewPage(title: string, slug: string, template: NewPa
   return pageUuid(data);
 }
 export async function duplicateNewPage(source: string, title: string, slug: string): Promise<string> {
-  const { client } = await authorizedClient();
+  const { client } = await authorizedClient(true);
   const { data, error } = await client.rpc("cms_duplicate_new_page", {
     source_page: pageUuid(source), title, slug: validateNewPageSlug(slug),
   });
@@ -78,7 +78,7 @@ export type NewPageMutation = { kind: "save"; generation: number; revision: stri
   | { kind: "restore-revision"; generation: number; revision: string; source: string }
   | { kind: "unpublish" | "archive" | "restore-archive"; generation: number };
 export async function mutateNewPage(pageId: string, input: NewPageMutation): Promise<string | null> {
-  const { client } = await authorizedClient();
+  const { client } = await authorizedClient(true);
   const target_page = pageUuid(pageId);
   const expected_generation = pageGeneration(input.generation);
   let result: { data: unknown; error: { code?: string; message?: string } | null };

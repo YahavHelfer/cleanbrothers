@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { createCmsClient } from "./client";
 import { cmsCookieOptions, isCmsCookie } from "./config";
 
-export async function createCmsServerClient(writable = false) {
+export async function createCmsServerClient(writable = false, mediaScopeMutation = false) {
   const store = await cookies();
   return createCmsClient({
     getAll: () => store.getAll(),
@@ -12,7 +12,7 @@ export async function createCmsServerClient(writable = false) {
         if (isCmsCookie(name)) store.set(name, value, options);
       }
     } : undefined, // Proxy refreshes cookies before Server Components render.
-  });
+  }, mediaScopeMutation);
 }
 
 export async function clearCmsCookies() {

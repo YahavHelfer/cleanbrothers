@@ -26,6 +26,10 @@ insert into auth.users(id,invited_at) values
 insert into public.cms_admin_members(user_id,is_active) values
  ('62000000-0000-4000-8000-000000000001',true),
  ('62000000-0000-4000-8000-000000000003',false);
+insert into public.cms_external_media_capability(capability_name,token_hash)
+ values('s3-upload-production-v1',extensions.digest(decode(repeat('2',64),'hex'),'sha256'));
+select set_config('request.headers',
+ jsonb_build_object('x-cms-media-scope-capability',repeat('2',64))::text,true);
 insert into storage.objects(bucket_id,name,owner_id,metadata) values
  ('cms-media-production','62000000-0000-4000-8000-000000000011.webp',
   '62000000-0000-4000-8000-000000000001','{"size":200,"mimetype":"image/webp"}');

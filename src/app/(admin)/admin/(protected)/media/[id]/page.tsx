@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCmsAdmin } from "@/cms/authorization";
-import { getMediaDetail, mediaVersionReadable } from "@/cms/media/repository";
+import { getMediaDetail, mediaScopeUnavailableMessage, mediaVersionReadable } from "@/cms/media/repository";
 import { privateMediaUrl, mediaId } from "@/cms/media/model";
 import { staticMediaPath } from "@/cms/media/static-inventory";
 import { MetadataEditor } from "@/cms/media/MetadataEditor";
@@ -93,7 +93,7 @@ export default async function MediaDetailPage({
                 unoptimized
                 className="max-h-60 w-full object-contain"
               />
-            ) : <p>קובץ פרטי אינו זמין לצפייה בסביבה זו.</p>}
+            ) : <p>{mediaScopeUnavailableMessage(v) ?? "קובץ פרטי אינו זמין לצפייה בסביבה זו."}</p>}
             <p className="break-all" dir="auto">
               {v.original_filename}
             </p>

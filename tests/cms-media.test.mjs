@@ -748,9 +748,67 @@ test("Preview and Production S3 uploads select their fixed attestation RPCs",asy
 });
 test("cloud media versions resolve to same-origin routes without signed URLs or raw Storage paths",()=>{
   const resolve=createSourceLoader({env:cloudEnv})("src/cms/media/resolve.ts").resolveMediaProjection;
-  const row={media_version_id:"a3000000-0000-4000-8000-000000000001",usage_role:"hero",position:0,alt_text:"Alt",provider:"supabase"};
+  const row={media_version_id:"a3000000-0000-4000-8000-000000000001",usage_role:"hero",position:0,alt_text:"Alt",provider:"supabase",storage_bucket:"cms-media-preview",storage_scope:"preview"};
   assert.equal(resolve([row],"admin")[0].src,"/admin/media/file/"+row.media_version_id);
   assert.equal(resolve([row],"public")[0].src,"/cms-media/"+row.media_version_id);
+});
+test("S3 and legacy projections reject the other environment before emitting a media URL",()=>{
+  const s3={CMS_MEDIA_S3_PREVIEW_ENABLED:"1",CMS_MEDIA_S3_PRODUCTION_ENABLED:"1",
+    CMS_MEDIA_S3_REGION:"eu-central-1",CMS_MEDIA_S3_BUCKET:"synthetic",
+    CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",
+    CMS_MEDIA_UPLOAD_CAPABILITY:"1".repeat(64),CMS_MEDIA_SERVER_KEY:undefined};
+  const row={media_version_id:"a3000000-0000-4000-8000-000000000001",
+    usage_role:"hero",position:0,alt_text:"Alt",provider:"s3",storage_scope:"preview"};
+  const preview=createSourceLoader({env:{...cloudEnv,...s3}})("src/cms/media/resolve.ts").resolveMediaProjection;
+  const production=createSourceLoader({env:{...cloudEnv,...s3,VERCEL_ENV:"production",VERCEL_GIT_COMMIT_REF:"main"}})("src/cms/media/resolve.ts").resolveMediaProjection;
+  assert.equal(preview([row],"public")[0].src,"/cms-media/"+row.media_version_id);
+  assert.throws(()=>production([row],"public"),/S3 CMS media unavailable/);
+  assert.throws(()=>preview([{...row,storage_scope:"production"}],"admin"),/S3 CMS media unavailable/);
+  assert.equal(production([{...row,storage_scope:"production"}],"public")[0].src,"/cms-media/"+row.media_version_id);
+  assert.throws(()=>production([{...row,provider:"supabase",storage_bucket:"cms-media-preview"}],"public"));
+});
+test("server media-scope proof is sent only to CMS PostgREST RPC writes",async()=>{
+  const capability="1".repeat(64), requests=[];
+  const url="https://plbwefnwussxlglscfpn.supabase.co";
+  const env={...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined,CMS_MEDIA_S3_PREVIEW_ENABLED:"1",
+    CMS_MEDIA_S3_REGION:"eu-central-1",CMS_MEDIA_S3_BUCKET:"synthetic",
+    CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",
+    CMS_MEDIA_UPLOAD_CAPABILITY:capability};
+  const options=createSourceLoader({env,mocks:{"@supabase/ssr":{
+    createServerClient:(_url,_key,settings)=>settings}},
+    fetchImpl:async(input,init)=>{requests.push({url:String(input),headers:new Headers(init.headers)});return new Response(null,{status:204});}
+  })("src/cms/client.ts").createCmsClient({getAll:()=>[]},true);
+  for(const path of ["/rest/v1/rpc/cms_save_managed_draft","/auth/v1/user",
+    "/storage/v1/object/cms-media-production/test.webp","/rest/v1/rpc/cms_read_service_editor"])
+    await options.global.fetch(url+path,{headers:{"x-client-info":"fixture","x-cms-media-scope-capability":"forged"}});
+  assert.equal(requests[0].headers.get("x-cms-media-scope-capability"),capability);
+  assert.equal(requests[0].headers.get("x-client-info"),"fixture");
+  assert.equal(requests[1].headers.has("x-cms-media-scope-capability"),false);
+  assert.equal(requests[2].headers.has("x-cms-media-scope-capability"),false);
+  assert.equal(requests[3].headers.has("x-cms-media-scope-capability"),false);
+});
+test("private S3 bytes fail closed across environments before object-store access",async()=>{
+  const common={...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined,CMS_MEDIA_S3_PREVIEW_ENABLED:"1",
+    CMS_MEDIA_S3_PRODUCTION_ENABLED:"1",CMS_MEDIA_S3_REGION:"eu-central-1",
+    CMS_MEDIA_S3_BUCKET:"synthetic",CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",
+    CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",CMS_MEDIA_UPLOAD_CAPABILITY:"1".repeat(64)};
+  let reads=0;
+  const loadFor=(env)=>createSourceLoader({env,mocks:{"./s3-store":{
+    verifiedS3Bytes:async()=>{reads++;return new Uint8Array([1]);}}}})("src/cms/media/repository.ts");
+  const version={id:"a3000000-0000-4000-8000-000000000001",storage_provider:"s3",
+    content_hash:"a".repeat(64),byte_size:1,storage_scope:"preview"};
+  const preview=loadFor(common);
+  const production=loadFor({...common,VERCEL_ENV:"production",VERCEL_GIT_COMMIT_REF:"main"});
+  assert.equal(preview.mediaVersionReadable(version),true);
+  assert.equal(production.mediaVersionReadable(version),false);
+  await assert.rejects(()=>production.mediaBytes(version,"public"));
+  assert.equal(reads,0);
+  assert.deepEqual(Array.from((await preview.mediaBytes(version,"admin")).bytes),[1]);
+  assert.equal(reads,1);
+  const prodVersion={...version,storage_scope:"production"};
+  assert.equal(preview.mediaVersionReadable(prodVersion),false);
+  await assert.rejects(()=>preview.mediaBytes(prodVersion,"admin"));
+  assert.equal(reads,1);
 });
 test("Preview public image route never downloads draft objects and disables caching",async()=>{
   const id="a3000000-0000-4000-8000-000000000001";

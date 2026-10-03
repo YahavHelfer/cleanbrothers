@@ -10,7 +10,19 @@ const stack=getLocalStack(); // Exact unlinked local project; never cloud.
 const input=JSON.parse(readFileSync(0,"utf8"));
 assert.match(input.actor,/^[0-9a-f-]{36}$/);assert.match(input.baseline,/^[0-9a-f-]{36}$/);
 const options={auth:{persistSession:false,autoRefreshToken:false}};
-const trusted=createClient(stack.url,stack.serviceKey,options),actor=createClient(stack.url,stack.key,options);
+// Test-only Preview scope proof, distinct from any deployed capability.
+const scopeProof="1".repeat(64);
+localSql("insert into public.cms_external_media_capability(capability_name,token_hash) "+
+  "values('s3-upload-preview-v1',extensions.digest(decode(repeat('1',64),'hex'),'sha256')) "+
+  "on conflict(capability_name) do update set token_hash=excluded.token_hash");
+const scopedOptions={...options,global:{fetch:(input,init)=>{
+  const url=input instanceof Request?input.url:String(input),headers=new Headers(input instanceof Request?input.headers:undefined);
+  new Headers(init?.headers).forEach((value,name)=>headers.set(name,value));
+  if(/\/rest\/v1\/rpc\/cms_(save_service_draft|publish_service_revision)$/.test(url))
+    headers.set("x-cms-media-scope-capability",scopeProof);
+  return fetch(input,{...init,headers});
+}}};
+const trusted=createClient(stack.url,stack.serviceKey,options),actor=createClient(stack.url,stack.key,scopedOptions);
 const bucket="cms-media-preview";
 let version,created=false,stage="local authentication";
 try {

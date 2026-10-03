@@ -11,10 +11,10 @@ export type HomeRevisionSummary = { id: string; number: number; createdAt: strin
 export type HomeSnapshot = { updatedAt: string; generation: number; draftRevisionId: string;
   publishedRevisionId: string; publishedBy: string | null; draft: HomeDraft; history: HomeRevisionSummary[] };
 
-async function authorizedClient() {
+async function authorizedClient(mediaScopeMutation = false) {
   const admin = await requireCmsAdmin();
   requireHomeEnvironment();
-  return { userId: admin.userId, client: await createCmsServerClient() };
+  return { userId: admin.userId, client: await createCmsServerClient(false, mediaScopeMutation) };
 }
 export async function getHomeEditor(): Promise<{ userId: string; snapshot: HomeSnapshot | null }> {
   const { userId, client } = await authorizedClient();
@@ -33,7 +33,7 @@ export type HomeMutation = { kind: "save"; generation: number; revision: string;
   | { kind: "publish"; generation: number; revision: string }
   | { kind: "restore"; generation: number; revision: string; source: string };
 export async function mutateHome(input: HomeMutation): Promise<string> {
-  const { client } = await authorizedClient();
+  const { client } = await authorizedClient(true);
   const generation = pageGeneration(input.generation), revision = pageUuid(input.revision);
   const { data, error } = input.kind === "publish"
     ? await client.rpc("cms_publish_home_revision", { expected_generation: generation, revision })

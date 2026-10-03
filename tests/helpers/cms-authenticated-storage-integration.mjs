@@ -11,7 +11,22 @@ const stack = getLocalStack();
 const input = JSON.parse(readFileSync(0, "utf8"));
 assert.match(input.actor, /^[0-9a-f-]{36}$/);
 assert.match(input.baseline, /^[0-9a-f-]{36}$/);
-const actor = createClient(stack.url, stack.key, { auth: { persistSession: false, autoRefreshToken: false } });
+// Test-only Production scope proof. The local hash is never a cloud capability.
+const scopeProof = "2".repeat(64);
+localSql("insert into public.cms_external_media_capability(capability_name,token_hash) " +
+  "values('s3-upload-production-v1',extensions.digest(decode(repeat('2',64),'hex'),'sha256')) " +
+  "on conflict(capability_name) do update set token_hash=excluded.token_hash");
+const actor = createClient(stack.url, stack.key, {
+  auth: { persistSession: false, autoRefreshToken: false },
+  global: { fetch: (input, init) => {
+    const url = input instanceof Request ? input.url : String(input);
+    const headers = new Headers(input instanceof Request ? input.headers : undefined);
+    new Headers(init?.headers).forEach((value, name) => headers.set(name, value));
+    if (/\/rest\/v1\/rpc\/cms_(save_service_draft|publish_service_revision)$/.test(url))
+      headers.set("x-cms-media-scope-capability", scopeProof);
+    return fetch(input, { ...init, headers });
+  } },
+});
 const anonymous = createClient(stack.url, stack.key, { auth: { persistSession: false, autoRefreshToken: false } });
 const cleanup = createClient(stack.url, stack.serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 const bucket = "cms-media-production";

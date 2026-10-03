@@ -1,10 +1,12 @@
 import "server-only";
 import { isManagedServiceKey, type ManagedServiceKey } from "@/content/service-registry";
+import { approvedCmsPreviewIdentity } from "@/cms/preview-environment";
+import { configuredCmsProduction } from "@/cms/production-environment";
 import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, s3MediaEnvironmentEnabled, s3UploadMarkRpc } from "./environment";
+import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, s3MediaEnvironment, s3MediaEnvironmentEnabled, s3UploadMarkRpc } from "./environment";
 import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { writeAuthenticatedImage, readAuthenticatedImage, readPublishedImage, discardUnregisteredAuthenticatedImage } from "./authenticated-storage";
@@ -34,6 +36,7 @@ export type LibraryItem = MediaAsset & {
   usageCount: number;
   publishedUsageCount: number;
   previewSrc: string | null;
+  unavailableReason: string | null;
 };
 export type MediaDetail = {
   asset: MediaAsset;
@@ -65,13 +68,21 @@ export async function listExternalMediaAttempts(): Promise<ExternalMediaAttempt[
   if (!Array.isArray(data)) throw new MediaError();
   return data as ExternalMediaAttempt[];
 }
-export function mediaVersionReadable(version: Pick<MediaVersion, "storage_provider"> & { storage_bucket?: string | null }) {
+export function mediaVersionReadable(version: Pick<MediaVersion, "storage_provider"> & { storage_bucket?: string | null; storage_scope?: MediaVersion["storage_scope"] }) {
   return version.storage_provider === "static" ||
     version.storage_provider === "local" && mediaLocalEnabled() ||
-    version.storage_provider === "s3" && s3MediaEnvironmentEnabled() ||
+    version.storage_provider === "s3" && version.storage_scope === s3MediaEnvironment() && s3MediaEnvironmentEnabled() ||
     version.storage_provider === "supabase" && (
-      version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled() ||
-      version.storage_bucket === "cms-media-preview" && legacyPreviewMediaReadable());
+      version.storage_scope === "production" && version.storage_bucket === "cms-media-production" && authenticatedMediaEnvironmentEnabled() &&
+        process.env.VERCEL_ENV === "production" ||
+      version.storage_scope === "preview" && version.storage_bucket === "cms-media-preview" && legacyPreviewMediaReadable());
+}
+export function mediaScopeUnavailableMessage(version: Pick<MediaVersion, "storage_scope">): string | null {
+  const current = configuredCmsProduction() ? "production" : approvedCmsPreviewIdentity() ? "preview" : null;
+  if (!version.storage_scope || !current || version.storage_scope === current) return null;
+  return version.storage_scope === "preview"
+    ? "נכס היסטורי מסביבת Preview — אינו זמין לשימוש ב-Production"
+    : "נכס היסטורי מסביבת Production — אינו זמין לשימוש ב-Preview";
 }
 function check(error: { code?: string } | null) {
   if (error?.code === "PT409")
@@ -92,8 +103,9 @@ export async function listMedia(): Promise<LibraryItem[]> {
   const client = await createCmsServerClient();
   const { data, error } = await client.rpc("cms_media_library");
   check(error);
-  return (data as Omit<LibraryItem, "previewSrc">[]).map((item) => ({
+  return (data as Omit<LibraryItem, "previewSrc" | "unavailableReason">[]).map((item) => ({
     ...item,
+    unavailableReason: mediaScopeUnavailableMessage(item.version),
     previewSrc: item.version.storage_provider === "static"
       ? staticMediaPath(item.version.id)
       : mediaVersionReadable(item.version) ? privateMediaUrl(item.version.id) : null,
@@ -277,10 +289,11 @@ export async function readPrivateMedia(id: string) {
   return mediaBytes(data as MediaVersion);
 }
 export async function mediaBytes(
-  version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash"> & { storage_bucket?: string | null; byte_size?: number },
+  version: Pick<MediaVersion, "id" | "storage_provider" | "content_hash"> & { storage_bucket?: string | null; storage_scope?: MediaVersion["storage_scope"]; byte_size?: number },
   audience: "admin" | "public" = "admin",
 ) {
   requireMediaReadEnvironment();
+  if (!mediaVersionReadable(version)) throw new MediaError();
   if (
     version.storage_provider === "static"
   )

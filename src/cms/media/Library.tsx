@@ -49,7 +49,7 @@ export function Library({ items }: { items: LibraryItem[] }) {
               height={240}
               unoptimized
               className="h-48 w-full rounded-xl object-contain"
-            /> : <p className="flex h-48 items-center justify-center rounded-xl border theme-muted">קובץ פרטי אינו זמין לצפייה בסביבה זו.</p>}
+            /> : <p className="flex h-48 items-center justify-center rounded-xl border theme-muted">{a.unavailableReason ?? "קובץ פרטי אינו זמין לצפייה בסביבה זו."}</p>}
             <h2 className="break-all font-bold" dir="auto">
               {a.version.original_filename}
             </h2>
@@ -62,7 +62,7 @@ export function Library({ items }: { items: LibraryItem[] }) {
               {a.usageCount} הפניות שמורות · {a.publishedUsageCount} בתוכן
               מפורסם
             </p>
-            <p>{a.status === "archived" ? "בארכיון" : "זמין לבחירה"}</p>
+            <p>{a.unavailableReason ?? (a.status === "archived" ? "בארכיון" : "זמין לבחירה")}</p>
             <Link
               className="font-bold underline"
               prefetch={false}

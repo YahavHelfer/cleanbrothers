@@ -60,7 +60,7 @@ export async function mutateService(key: ManagedServiceKey, input: ContentMutati
   if (!Number.isSafeInteger(input.generation) || input.generation < 1) throw new ContentValidationError();
   const revision = parseRevisionId(input.revision);
   if (input.kind === "save" && validateManagedDraft(key, input.payload).schemaVersion >= 2) requireMediaReadEnvironment();
-  const client = await createCmsServerClient();
+  const client = await createCmsServerClient(false, true);
   const result = input.kind === "publish"
     ? await client.rpc("cms_publish_managed_revision", { target_key: key, expected_generation: input.generation, revision })
     : await client.rpc("cms_save_managed_draft", { target_key: key, expected_generation: input.generation, base_revision: revision,

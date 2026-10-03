@@ -46,6 +46,10 @@ select throws_ok($$insert into public.cms_external_media_capability(capability_n
  '23514',null,'arbitrary capability name rejected');
 insert into public.cms_external_media_capability(capability_name,token_hash)
  values('s3-upload-production-v1',extensions.digest(decode(repeat('2',64),'hex'),'sha256'));
+-- Local PostgREST transaction fixture: the server-only Preview capability is
+-- supplied as a request header for scoped content writes below.
+select set_config('request.headers',
+ jsonb_build_object('x-cms-media-scope-capability',repeat('1',64))::text,true);
 select is((select count(*)::integer from public.cms_external_media_capability),2,
  'separate Preview and Production hashes coexist');
 select ok((select token_hash from public.cms_external_media_capability
@@ -139,6 +143,9 @@ reset role;
 select is((select storage_provider from public.media_versions
   where id='64000000-0000-4000-8000-000000000011'),'s3',
   'registered provider is s3');
+select is((select storage_scope from public.media_versions
+  where id='64000000-0000-4000-8000-000000000011'),'preview',
+  'Preview mark capability pins immutable Preview scope');
 select is((select storage_path from public.media_versions
   where id='64000000-0000-4000-8000-000000000011'),
   'cms-media/64000000-0000-4000-8000-000000000011.webp',
@@ -220,6 +227,9 @@ reset role;
 select is((select status from public.cms_media_upload_attempts
   where version_id='64000000-0000-4000-8000-000000000015'),
   'uploaded','Production attestation uses the existing journal transition');
+select is((select storage_scope from public.cms_media_upload_attempts
+  where version_id='64000000-0000-4000-8000-000000000015'),
+  'production','Production mark capability records only Production scope');
 select is((select count(*)::integer from public.media_versions where
   id in ('64000000-0000-4000-8000-000000000011',
          '64000000-0000-4000-8000-000000000012')),2,
@@ -268,6 +278,31 @@ select is(public.cms_read_public_media_version('64000000-0000-4000-8000-00000000
   's3','rollback makes the first exact S3 version public again');
 select ok(public.cms_read_public_media_version('64000000-0000-4000-8000-000000000012') is null,
   'second S3 version becomes private after rollback');
+select is(public.cms_register_external_media_version('64000000-0000-4000-8000-000000000015') is not null,
+  true,'Production upload registers through its fixed journal identity');
+select is((select storage_scope from public.media_versions
+  where id='64000000-0000-4000-8000-000000000015'),'production',
+  'registered Production S3 version has Production scope');
+select throws_ok(format('select public.cms_save_service_draft(7,%L,%L::jsonb)',
+  (select restored_revision from s3_public_fixture),
+  (select payload||'{"schemaVersion":2,"images":["64000000-0000-4000-8000-000000000015"]}'::jsonb
+    from s3_public_fixture)),
+  '42501','CMS_MEDIA_SCOPE_MISMATCH',
+  'Preview cannot save the Production-only S3 version');
+select set_config('request.headers',
+  jsonb_build_object('x-cms-media-scope-capability',repeat('2',64))::text,true);
+update s3_public_fixture set restored_revision=public.cms_save_service_draft(7,restored_revision,
+  payload||'{"schemaVersion":2,"images":["64000000-0000-4000-8000-000000000015"]}'::jsonb);
+select is((select count(*)::integer from public.revision_media_refs
+  where revision_id=(select restored_revision from s3_public_fixture)
+    and media_version_id='64000000-0000-4000-8000-000000000015'),3,
+  'Production scope may save only the exact Production S3 version');
+select set_config('request.headers',
+  jsonb_build_object('x-cms-media-scope-capability',repeat('1',64))::text,true);
+select throws_ok(format('select public.cms_publish_service_revision(8,%L)',
+  (select restored_revision from s3_public_fixture)),
+  '42501','CMS_MEDIA_SCOPE_MISMATCH',
+  'Preview cannot publish a Production-scoped S3 draft');
 reset role;
 select * from finish();
 rollback;

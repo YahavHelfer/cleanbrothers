@@ -13,10 +13,10 @@ export type PromotionSnapshot = { updatedAt: string; generation: number; draftRe
   publishedRevisionId: string; status: "active" | "archived"; analyticsIdentity: "about-intro";
   draft: PromotionDraft; history: TypedRevisionSummary[] };
 
-async function authorizedClient() {
+async function authorizedClient(mediaScopeMutation = false) {
   const admin = await requireCmsAdmin();
   requirePagesEnvironment();
-  return { userId: admin.userId, client: await createCmsServerClient() };
+  return { userId: admin.userId, client: await createCmsServerClient(false, mediaScopeMutation) };
 }
 export async function getPageEditor(): Promise<{ userId: string; snapshot: PageSnapshot | null }> {
   const { userId, client } = await authorizedClient();
@@ -53,7 +53,7 @@ type Mutation<T> = { kind: "save"; generation: number; revision: string; payload
   | { kind: "publish"; generation: number; revision: string }
   | { kind: "restore"; generation: number; revision: string; source: string };
 async function mutation(kind: "page" | "promotion", input: Mutation<unknown>): Promise<string> {
-  const { client } = await authorizedClient();
+  const { client } = await authorizedClient(true);
   const generation = pageGeneration(input.generation);
   const revision = pageUuid(input.revision);
   const payload = input.kind === "save" ?

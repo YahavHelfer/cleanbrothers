@@ -1,5 +1,7 @@
 import { staticMediaPath } from "./static-inventory";
-import { mediaCloudEnabled, mediaLocalEnabled, s3MediaEnvironmentEnabled } from "./environment";
+import { mediaCloudEnabled, mediaLocalEnabled, s3MediaEnvironment } from "./environment";
+import { approvedCmsPreviewIdentity } from "@/cms/preview-environment";
+import { configuredCmsProduction } from "@/cms/production-environment";
 import type { ResolvedMedia } from "./model";
 import {
   mediaId,
@@ -28,8 +30,13 @@ export function resolveMediaProjection(
     else if (row.provider === "local" || row.provider === "supabase" || row.provider === "s3") {
       if (audience === "public" && row.provider === "supabase" && !mediaCloudEnabled())
         throw new Error("Private CMS media unavailable");
-      if (audience === "public" && row.provider === "s3" && !s3MediaEnvironmentEnabled())
+      const s3Scope = s3MediaEnvironment();
+      if (row.provider === "s3" && (!s3Scope || row.storage_scope !== s3Scope))
         throw new Error("S3 CMS media unavailable");
+      const supabaseScope = configuredCmsProduction() ? "production" :
+        approvedCmsPreviewIdentity() ? "preview" : null;
+      if (row.provider === "supabase" && (!supabaseScope || row.storage_scope !== supabaseScope))
+        throw new Error("CMS media scope unavailable");
       if (audience === "public" && row.provider === "local" && !mediaLocalEnabled())
         throw new Error("Local CMS media unavailable");
       src = audience === "admin" ? privateMediaUrl(id) : `/cms-media/${id}`;
