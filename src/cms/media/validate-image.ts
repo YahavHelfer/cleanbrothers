@@ -27,12 +27,6 @@ export function safeOriginalFilename(raw: unknown) {
   return name;
 }
 function containerType(b: Buffer): "jpeg" | "png" | "webp" {
-  // Reject active-document payloads even when embedded in image metadata.
-  if (
-    /<\s*(?:script|svg|html|!doctype)|<\?php/i.test(b.toString("latin1")) ||
-    b.includes(Buffer.from([0x50, 0x4b, 0x03, 0x04]))
-  )
-    throw new MediaError("הקובץ אינו תמונה בטוחה.");
   if (b.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
     let pos = 8,
       first = true,

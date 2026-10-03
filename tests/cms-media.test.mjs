@@ -21,6 +21,24 @@ const fixture = async (format) =>
   })
     [format]()
     .toBuffer();
+function pngChunk(type, data) {
+  const name = Buffer.from(type, "ascii"),
+    length = Buffer.alloc(4),
+    checksum = Buffer.alloc(4);
+  length.writeUInt32BE(data.length);
+  let crc = 0xffffffff;
+  for (const byte of Buffer.concat([name, data])) {
+    crc ^= byte;
+    for (let i = 0; i < 8; i++)
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+  }
+  checksum.writeUInt32BE((crc ^ 0xffffffff) >>> 0);
+  return Buffer.concat([length, name, data, checksum]);
+}
+function pngAfterHeader(png, chunk) {
+  // The 8-byte signature and fixed 25-byte IHDR are unchanged.
+  return Buffer.concat([png.subarray(0, 33), chunk, png.subarray(33)]);
+}
 for (const format of ["jpeg", "png", "webp"])
   test(`image pipeline decodes ${format}, strips metadata and emits bounded WebP`, async () => {
     const result = await validateImage(
@@ -41,6 +59,31 @@ for (const format of ["jpeg", "png", "webp"])
     assert.equal(meta.xmp, undefined);
     assert.equal(meta.icc, undefined);
   });
+test("valid PNG pixel data may contain ZIP magic without being a ZIP", async () => {
+  const pixels = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0, 0, 0, 255]);
+  const input = await sharp(pixels, { raw: { width: 2, height: 1, channels: 4 } })
+    .png({ compressionLevel: 0, adaptiveFiltering: false })
+    .toBuffer();
+  assert.ok(input.includes(Buffer.from([0x50, 0x4b, 0x03, 0x04])));
+  const result = await validateImage(input, "pixels.png", "image/png");
+  assert.equal(result.mimeType, "image/webp");
+  assert.equal(result.width, 2);
+  assert.equal(result.height, 1);
+});
+test("valid PNG text metadata is stripped without scanning it as an active document", async () => {
+  const input = pngAfterHeader(await fixture("png"), pngChunk("tEXt",
+    Buffer.from("Description\0Printed examples: <script> and <?php")));
+  const result = await validateImage(input, "caption.png", "image/png");
+  assert.equal(result.mimeType, "image/webp");
+  assert.equal(result.bytes.includes(Buffer.from("<script>")), false);
+  assert.equal(result.bytes.includes(Buffer.from("<?php")), false);
+});
+test("animated PNG control chunk is rejected even with a valid CRC", async () => {
+  const control = Buffer.alloc(8);
+  control.writeUInt32BE(2, 0);
+  const input = pngAfterHeader(await fixture("png"), pngChunk("acTL", control));
+  await assert.rejects(() => validateImage(input, "animated.png", "image/png"));
+});
 test("orientation is applied while private EXIF is removed", async () => {
   const input = await sharp(await fixture("jpeg"))
     .withMetadata({ orientation: 6 })
