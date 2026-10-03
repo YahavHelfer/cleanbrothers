@@ -9,7 +9,7 @@ const scopedMediaMutationRpcs = new Set([
   "cms_save_page_draft", "cms_publish_page_revision",
   "cms_save_promotion_draft", "cms_publish_promotion_revision",
   "cms_save_new_page_draft", "cms_publish_new_page", "cms_duplicate_new_page",
-  "cms_save_home_draft", "cms_publish_home_revision",
+  "cms_save_home_draft", "cms_save_home_shared_draft", "cms_publish_home_revision",
 ]);
 
 export function createCmsClient(cookies: CookieMethodsServer, mediaScopeMutation = false) {

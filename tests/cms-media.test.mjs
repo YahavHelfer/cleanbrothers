@@ -863,6 +863,8 @@ test("server media-scope proof is sent only to CMS PostgREST RPC writes",async()
   assert.equal(requests[1].headers.has("x-cms-media-scope-capability"),false);
   assert.equal(requests[2].headers.has("x-cms-media-scope-capability"),false);
   assert.equal(requests[3].headers.has("x-cms-media-scope-capability"),false);
+  await options.global.fetch(url+"/rest/v1/rpc/cms_save_home_shared_draft");
+  assert.equal(requests[4].headers.get("x-cms-media-scope-capability"),capability);
 });
 test("private S3 bytes fail closed across environments before object-store access",async()=>{
   const common={...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined,CMS_MEDIA_S3_PREVIEW_ENABLED:"1",
