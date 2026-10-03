@@ -1,3 +1,4 @@
+import { isManagedServiceKey } from "@/content/service-registry";
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { connection } from "next/server";
@@ -17,7 +18,8 @@ function resolveMedia(input: unknown): BlockMedia {
   if (!Array.isArray(input)) throw new Error("Published homepage media unavailable");
   return Object.fromEntries(input.map((row: MediaRow) => {
     const id = pageUuid(row.media_version_id);
-    if (!["home-hero","home-before","home-after","page-image","promotion"].includes(String(row.usage_role)) ||
+    const serviceRole = typeof row.usage_role === "string" && row.usage_role.startsWith("home-service:") && isManagedServiceKey(row.usage_role.slice(13));
+    if ((!serviceRole && !["home-hero","home-before","home-after","page-image","promotion"].includes(String(row.usage_role))) ||
       !Number.isInteger(row.position) || (row.position as number) < 0 || (row.position as number) > 49 ||
       typeof row.alt_text !== "string" || !row.alt_text.trim()) throw new Error("Invalid homepage media");
     const src = row.provider === "static" ? staticMediaPath(id) :

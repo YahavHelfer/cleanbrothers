@@ -60,8 +60,20 @@ function content(type: HomeBlockType, value: unknown): Record<string, unknown> {
       if (!cards || typeof cards !== "object" || Array.isArray(cards) ||
         Object.keys(cards).length > 8 || Object.keys(cards).some(key => !isManagedServiceKey(key)))
         throw new PageValidationError("כרטיס שירות אינו מאושר.");
-      const checked = Object.fromEntries(Object.entries(cards).map(([key, card]) =>
-        [key, copy(object(card, ["title", "benefit", "description"]), ["title", "benefit", "description"])]));
+      const checked = Object.fromEntries(Object.entries(cards).map(([key, card]) => {
+          const fields = card && typeof card === "object" && Object.hasOwn(card, "images")
+            ? ["title", "benefit", "description", "images"] : ["title", "benefit", "description"];
+          const row = object(card, fields);
+          const images = Object.hasOwn(row, "images") ? rows(row.images, 0, 8).map(value => {
+            const image = object(value, ["versionId", "alt", "position"]);
+            if (!["object-center","object-[center_48%]","object-[58%_center]","object-[52%_center]","object-[center_42%]","object-[center_38%]","object-[center_55%]"].includes(String(image.position)))
+              throw new PageValidationError("מיקום התמונה אינו מאושר.");
+            return { versionId: pageUuid(image.versionId), alt: plain(image.alt, 300), position: image.position as string };
+          }) : undefined;
+          if (images && new Set(images.map(image => image.versionId)).size !== images.length)
+            throw new PageValidationError("אין לשכפל תמונות בכרטיס.");
+          return [key, { ...copy(row, ["title", "benefit", "description"]), ...(images ? { images } : {}) }];
+        }));
       if (serviceKeys.some(key => !checked[key])) throw new PageValidationError("חסר כרטיס שירות.");
       return { ...copy(p, ["eyebrow", "title", "mobileDescription", "description", "note"]), serviceKeys, cards: checked };
     }
