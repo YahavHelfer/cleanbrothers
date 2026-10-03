@@ -4,7 +4,7 @@ import { staticMediaPath } from "./static-inventory";
 import { randomUUID } from "node:crypto";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { createCmsServerClient } from "@/cms/server";
-import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, s3MediaEnvironmentEnabled } from "./environment";
+import { authenticatedMediaEnvironmentEnabled, legacyPreviewMediaReadable, mediaByteLimit, mediaCloudEnabled, mediaLocalEnabled, requireMediaReadEnvironment, mediaUploadEnabled, s3MediaEnvironmentEnabled, s3UploadMarkRpc } from "./environment";
 import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { writeAuthenticatedImage, readAuthenticatedImage, readPublishedImage, discardUnregisteredAuthenticatedImage } from "./authenticated-storage";
@@ -209,7 +209,7 @@ export async function uploadMedia(
       await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
       throw new MediaError("מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.");
     }
-    const { error: markError } = await client.rpc("cms_mark_external_media_uploaded", {
+    const { error: markError } = await client.rpc(s3UploadMarkRpc(), {
       version_id: id,
       observed_object_key: mediaObjectKey(id),
       observed_byte_size: processed.length,

@@ -58,20 +58,29 @@ export function authenticatedMediaEnvironmentEnabled() {
   return mediaCloudEnabled() &&
     (approvedCmsPreviewIdentity() || configuredCmsProduction());
 }
-// New hosted writes are deliberately Preview-only until a separate Production
-// rollout. Legacy Supabase rows remain readable under their existing policy.
-export function s3MediaEnvironmentEnabled() {
-  return approvedCmsPreviewIdentity() && mediaCloudEnabled() &&
-    process.env.CMS_MEDIA_S3_PREVIEW_ENABLED === "1" &&
+export function s3MediaEnvironment(): "preview" | "production" | null {
+  const enabled = (approvedCmsPreviewIdentity() && mediaCloudEnabled() &&
+    process.env.CMS_MEDIA_S3_PREVIEW_ENABLED === "1") ? "preview" :
+    (configuredCmsProduction() &&
+      process.env.CMS_MEDIA_S3_PRODUCTION_ENABLED === "1") ? "production" : null;
+  return enabled &&
     !!process.env.CMS_MEDIA_S3_REGION?.trim() &&
     !!process.env.CMS_MEDIA_S3_BUCKET?.trim() &&
     !!process.env.CMS_MEDIA_S3_ACCESS_KEY_ID?.trim() &&
     !!process.env.CMS_MEDIA_S3_SECRET_ACCESS_KEY?.trim() &&
-    !!process.env.CMS_MEDIA_UPLOAD_CAPABILITY?.trim();
+    !!process.env.CMS_MEDIA_UPLOAD_CAPABILITY?.trim() ? enabled : null;
+}
+export function s3MediaEnvironmentEnabled() {
+  return s3MediaEnvironment() !== null;
+}
+export function s3UploadMarkRpc() {
+  const environment = s3MediaEnvironment();
+  if (environment === "preview") return "cms_mark_external_media_uploaded";
+  if (environment === "production") return "cms_mark_external_media_uploaded_production";
+  throw new Error("S3 CMS media unavailable");
 }
 export function mediaUploadEnabled() {
-  // Keep the already reviewed Production upload behavior unchanged; the S3
-  // replacement is activated independently on the approved Preview branch.
+  // The S3 replacement has its own exact Preview and Production gates.
   return trustedMediaEnvironmentEnabled() || s3MediaEnvironmentEnabled() ||
     configuredCmsProduction() && authenticatedMediaEnvironmentEnabled();
 }
@@ -84,7 +93,8 @@ export function mediaEnabled() {
   return mediaReadEnvironmentEnabled();
 }
 export function mediaByteLimit() {
-  return mediaCloudEnabled() ? MAX_PREVIEW_IMAGE_BYTES : MAX_IMAGE_BYTES;
+  return mediaCloudEnabled() || s3MediaEnvironmentEnabled()
+    ? MAX_PREVIEW_IMAGE_BYTES : MAX_IMAGE_BYTES;
 }
 export function requireMediaEnvironment() {
   requireMediaReadEnvironment();
@@ -100,7 +110,7 @@ export function requireCloudMediaEnvironment() {
 }
 export function mediaUploadOriginAllowed(request: Request) {
   const origin = request.headers.get("origin");
-  const allowed = mediaCloudEnabled()
+  const allowed = mediaCloudEnabled() || s3MediaEnvironmentEnabled()
     ? configuredCmsProduction() ? [CMS_PRODUCTION_ORIGIN] : approvedCmsPreviewIdentity()
       ? [approvedPreviewHost(process.env.VERCEL_URL, "deployment"),
           approvedPreviewHost(process.env.VERCEL_BRANCH_URL, "branch")]

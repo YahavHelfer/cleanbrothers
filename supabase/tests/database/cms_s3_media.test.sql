@@ -16,6 +16,15 @@ select ok(not has_function_privilege('service_role',
 select ok(has_function_privilege('authenticated',
   'public.cms_mark_external_media_uploaded(uuid,text,integer,text,text)','EXECUTE'),
   'authenticated RPC still enforces AAL2 and server capability');
+select ok(not has_function_privilege('anon',
+  'public.cms_mark_external_media_uploaded_production(uuid,text,integer,text,text)','EXECUTE'),
+  'anonymous cannot mark a Production object uploaded');
+select ok(not has_function_privilege('service_role',
+  'public.cms_mark_external_media_uploaded_production(uuid,text,integer,text,text)','EXECUTE'),
+  'service_role cannot mark a Production object uploaded');
+select ok(has_function_privilege('authenticated',
+  'public.cms_mark_external_media_uploaded_production(uuid,text,integer,text,text)','EXECUTE'),
+  'Production attestation RPC requires authenticated AAL2 and capability');
 select ok((select relforcerowsecurity from pg_class where oid='public.cms_media_upload_attempts'::regclass),
   'journal forces RLS');
 
@@ -28,7 +37,22 @@ insert into public.cms_admin_members(user_id,is_active) values
  ('64000000-0000-4000-8000-000000000002',true),
  ('64000000-0000-4000-8000-000000000003',false);
 insert into public.cms_external_media_capability(capability_name,token_hash)
- values('s3-upload-v1',extensions.digest(decode(repeat('1',64),'hex'),'sha256'));
+ values('s3-upload-preview-v1',extensions.digest(decode(repeat('1',64),'hex'),'sha256'));
+select is((select count(*)::integer from public.cms_external_media_capability
+  where capability_name='s3-upload-production-v1'),0,
+  'migration does not provision a Production capability');
+select throws_ok($$insert into public.cms_external_media_capability(capability_name,token_hash)
+ values('s3-upload-other',extensions.digest(decode(repeat('3',64),'hex'),'sha256'))$$,
+ '23514',null,'arbitrary capability name rejected');
+insert into public.cms_external_media_capability(capability_name,token_hash)
+ values('s3-upload-production-v1',extensions.digest(decode(repeat('2',64),'hex'),'sha256'));
+select is((select count(*)::integer from public.cms_external_media_capability),2,
+ 'separate Preview and Production hashes coexist');
+select ok((select token_hash from public.cms_external_media_capability
+  where capability_name='s3-upload-preview-v1') <>
+  (select token_hash from public.cms_external_media_capability
+  where capability_name='s3-upload-production-v1'),
+  'Production capability cannot overwrite the Preview hash');
 
 set local role anon;
 select set_config('request.jwt.claims','{"role":"anon"}',true);
@@ -59,8 +83,20 @@ select throws_ok($$select public.cms_mark_external_media_uploaded(
  '64000000-0000-4000-8000-000000000011',
  'cms-media/64000000-0000-4000-8000-000000000011.webp',200,
  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
- '2222222222222222222222222222222222222222222222222222222222222222')$$,
+ '3333333333333333333333333333333333333333333333333333333333333333')$$,
  '42501',null,'wrong server capability denied');
+select throws_ok($$select public.cms_mark_external_media_uploaded(
+ '64000000-0000-4000-8000-000000000011',
+ 'cms-media/64000000-0000-4000-8000-000000000011.webp',200,
+ 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+ '2222222222222222222222222222222222222222222222222222222222222222')$$,
+ '42501',null,'Preview RPC rejects the Production capability');
+select throws_ok($$select public.cms_mark_external_media_uploaded_production(
+ '64000000-0000-4000-8000-000000000011',
+ 'cms-media/64000000-0000-4000-8000-000000000011.webp',200,
+ 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+ '1111111111111111111111111111111111111111111111111111111111111111')$$,
+ '42501',null,'Production RPC rejects the Preview capability');
 select throws_ok($$select public.cms_mark_external_media_uploaded(
  '64000000-0000-4000-8000-000000000011','cms-media/wrong.webp',200,
  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -166,9 +202,24 @@ select lives_ok($$select public.cms_mark_external_media_definite_failure(
 select lives_ok($$select public.cms_mark_external_media_cleaned(
  '64000000-0000-4000-8000-000000000014')$$,
  'only definite failure may be marked cleaned');
+select is(public.cms_prepare_external_media_upload(
+ '64000000-0000-4000-8000-000000000015',null,null,
+ '{"mimeType":"image/webp","byteSize":204,"width":12,"height":8,"contentHash":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","originalFilename":"production.png"}',
+ '{"altText":"Production alt","caption":"","folder":""}'),
+ '64000000-0000-4000-8000-000000000015'::uuid,
+ 'Production test attempt prepared with unchanged journal');
+select lives_ok($$select public.cms_mark_external_media_uploaded_production(
+ '64000000-0000-4000-8000-000000000015',
+ 'cms-media/64000000-0000-4000-8000-000000000015.webp',204,
+ 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+ '2222222222222222222222222222222222222222222222222222222222222222')$$,
+ 'Production-only capability attests a separate prepared object');
 select ok(jsonb_array_length(public.cms_external_media_reconciliation())>=4,
  'AAL2 Admin can inspect known journal IDs without bucket listing');
 reset role;
+select is((select status from public.cms_media_upload_attempts
+  where version_id='64000000-0000-4000-8000-000000000015'),
+  'uploaded','Production attestation uses the existing journal transition');
 select is((select count(*)::integer from public.media_versions where
   id in ('64000000-0000-4000-8000-000000000011',
          '64000000-0000-4000-8000-000000000012')),2,

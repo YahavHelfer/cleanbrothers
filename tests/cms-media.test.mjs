@@ -592,6 +592,43 @@ test("S3 writes require exact approved Preview identity and complete server conf
     {VERCEL_PROJECT_ID:"foreign"},{CMS_SUPABASE_URL:"https://foreign.supabase.co"},
     {VERCEL_GIT_COMMIT_REF:"feature/foreign"},
   ]) assert.equal(enabled(change),false);
+  const preview=createSourceLoader({env:{...cloudEnv,...s3}})("src/cms/media/environment.ts");
+  assert.equal(preview.s3MediaEnvironment(),"preview");
+  assert.equal(preview.s3UploadMarkRpc(),"cms_mark_external_media_uploaded");
+});
+test("Production S3 requires exact CMS identity and its own flag and attestation RPC",()=>{
+  const production={...cloudEnv,VERCEL_ENV:"production",VERCEL_GIT_COMMIT_REF:"main",
+    CMS_MEDIA_S3_PREVIEW_ENABLED:undefined,CMS_MEDIA_S3_PRODUCTION_ENABLED:"1",
+    CMS_MEDIA_S3_REGION:"eu-central-1",CMS_MEDIA_S3_BUCKET:"synthetic-cms-media",
+    CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",
+    CMS_MEDIA_UPLOAD_CAPABILITY:"2".repeat(64)};
+  const get=(changes={})=>createSourceLoader({env:{...production,...changes}})(
+    "src/cms/media/environment.ts");
+  assert.equal(get().s3MediaEnvironment(),"production");
+  assert.equal(get().s3UploadMarkRpc(),"cms_mark_external_media_uploaded_production");
+  assert.equal(get().mediaUploadEnabled(),true);
+  assert.equal(get().mediaByteLimit(),4*1024*1024);
+  const request=new Request("https://www.cleanbrothers.co.il/admin/media/upload",{
+    method:"POST",headers:{origin:"https://www.cleanbrothers.co.il",host:"www.cleanbrothers.co.il"}});
+  assert.equal(get().mediaUploadOriginAllowed(request),true);
+  for(const change of [
+    {CMS_MEDIA_S3_PRODUCTION_ENABLED:undefined},
+    {CMS_MEDIA_S3_PRODUCTION_ENABLED:"all"},
+    {VERCEL_ENV:"preview"},
+    {VERCEL_GIT_COMMIT_REF:"feature/cms-manual-promotions"},
+    {VERCEL_PROJECT_ID:"foreign"},
+    {CMS_SUPABASE_URL:"https://foreign.supabase.co"},
+    {CMS_SUPABASE_PUBLISHABLE_KEY:undefined},
+    {CMS_MEDIA_S3_ACCESS_KEY_ID:undefined},
+    {CMS_MEDIA_UPLOAD_CAPABILITY:undefined},
+  ]) {
+    assert.equal(get(change).s3MediaEnvironment(),null,JSON.stringify(change));
+    assert.equal(get(change).s3MediaEnvironmentEnabled(),false);
+    assert.throws(()=>get(change).s3UploadMarkRpc());
+  }
+  assert.equal(get({VERCEL_ENV:"preview",VERCEL_GIT_COMMIT_REF:"feature/cms-manual-promotions",
+    CMS_MEDIA_S3_PREVIEW_ENABLED:"1",CMS_MEDIA_S3_PRODUCTION_ENABLED:"1"}).s3UploadMarkRpc(),
+    "cms_mark_external_media_uploaded");
 });
 test("cloud media requires every Preview, project, branch and allowlist condition", () => {
   const enabled = createSourceLoader({env:cloudEnv})("src/cms/media/environment.ts");
@@ -663,14 +700,22 @@ test("cloud delivery rejects missing, oversized and corrupted objects without ex
     await assert.rejects(()=>loaded.readCloudImage(model.STATIC_MEDIA_VERSION,"a".repeat(64)),e=>e.name==="Error"&&!e.message.includes("upstream"));
   }
 });
-test("Preview S3 upload uses AAL2 journal, server-only capability and definite-only cleanup",async()=>{
+test("Preview and Production S3 uploads select their fixed attestation RPCs",async()=>{
   const bytes=Buffer.from("fixture"),hash=createHash("sha256").update(bytes).digest("hex");
-  for(const code of [null,"PT409","FETCH_ERROR"]){
+  for(const environment of ["preview","production"]) for(const code of [null,"PT409","FETCH_ERROR"]){
+    const production=environment==="production";
+    const capability=(production?"2":"1").repeat(64);
+    const markRpc=production?"cms_mark_external_media_uploaded_production":
+      "cms_mark_external_media_uploaded";
     const calls=[];
     const repo=createSourceLoader({env:{...cloudEnv,CMS_MEDIA_SERVER_KEY:undefined,
-      CMS_MEDIA_S3_PREVIEW_ENABLED:"1",CMS_MEDIA_S3_REGION:"eu-central-1",
+      VERCEL_ENV:production?"production":"preview",
+      VERCEL_GIT_COMMIT_REF:production?"main":"feature/cms-cloud-foundation",
+      CMS_MEDIA_S3_PREVIEW_ENABLED:production?undefined:"1",
+      CMS_MEDIA_S3_PRODUCTION_ENABLED:production?"1":undefined,
+      CMS_MEDIA_S3_REGION:"eu-central-1",
       CMS_MEDIA_S3_BUCKET:"synthetic-cms-media",CMS_MEDIA_S3_ACCESS_KEY_ID:"synthetic",
-      CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",CMS_MEDIA_UPLOAD_CAPABILITY:"1".repeat(64)},mocks:{
+      CMS_MEDIA_S3_SECRET_ACCESS_KEY:"synthetic",CMS_MEDIA_UPLOAD_CAPABILITY:capability},mocks:{
       "@/cms/authorization":{requireCmsAdmin:async()=>({userId:model.STATIC_MEDIA_ASSET})},
       "./validate-image":{validateImage:async()=>({bytes,byteSize:bytes.length,width:12,height:8,
         mimeType:"image/webp",contentHash:hash,originalFilename:"image.jpg"})},
@@ -678,15 +723,15 @@ test("Preview S3 upload uses AAL2 journal, server-only capability and definite-o
         calls.push(name);
         if(name==="cms_prepare_external_media_upload")return {error:null};
         if(name==="cms_register_external_media_version")return {data:model.STATIC_MEDIA_ASSET,error:code?{code}:null};
-        if(name==="cms_mark_external_media_uploaded"){
-          assert.equal(args.server_capability,"1".repeat(64));
+        if(name===markRpc){
+          assert.equal(args.server_capability,capability);
           assert.equal(args.observed_content_hash,hash);
         }
         return {error:null};
       }})},
       "./trusted-client":{createTrustedMediaClient:()=>{throw Error("privileged client used")}},
       "./authenticated-storage":{writeAuthenticatedImage:async()=>{throw Error("Supabase Storage used")}},
-      "./s3-store":{s3UploadCapability:()=> "1".repeat(64),getS3MediaStore:()=>({
+      "./s3-store":{s3UploadCapability:()=> capability,getS3MediaStore:()=>({
         putExact:async()=>calls.push("put"),
         headExact:async(id)=>({versionId:id,byteSize:bytes.length,contentHash:hash,mimeType:"image/webp"}),
         deleteExact:async()=>calls.push("delete"),
@@ -695,7 +740,7 @@ test("Preview S3 upload uses AAL2 journal, server-only capability and definite-o
     const run=()=>repo.uploadMedia(new Uint8Array(),"image.jpg","image/jpeg",{altText:"Alt",caption:"",folder:""});
     if(code)await assert.rejects(run);else assert.equal(await run(),model.STATIC_MEDIA_ASSET);
     assert.deepEqual(calls.slice(0,4),[
-      "cms_prepare_external_media_upload","put","cms_mark_external_media_uploaded",
+      "cms_prepare_external_media_upload","put",markRpc,
       "cms_register_external_media_version"]);
     assert.equal(calls.includes("delete"),code==="PT409");
     assert.equal(calls.includes("cms_mark_external_media_ambiguous"),code==="FETCH_ERROR");
