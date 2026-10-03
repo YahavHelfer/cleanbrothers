@@ -78,12 +78,46 @@ test("valid PNG text metadata is stripped without scanning it as an active docum
   assert.equal(result.bytes.includes(Buffer.from("<script>")), false);
   assert.equal(result.bytes.includes(Buffer.from("<?php")), false);
 });
+test("valid caBX ancillary chunk like the rejected Production PNG is accepted", async () => {
+  const metadata = Buffer.alloc(21878, 0x5a);
+  const input = pngAfterHeader(await fixture("png"), pngChunk("caBX", metadata));
+  const result = await validateImage(input, "carpet.PNG", "image/png");
+  assert.equal(result.mimeType, "image/webp");
+  assert.equal(result.width, 12);
+  assert.equal(result.height, 8);
+  assert.equal(result.bytes.includes(metadata), false);
+});
+test("other unknown ancillary PNG chunks with valid CRC are skipped", async () => {
+  const input = pngAfterHeader(await fixture("png"), pngChunk("vpAg", Buffer.from("private metadata")));
+  const result = await validateImage(input, "private.png", "image/png");
+  assert.equal(result.mimeType, "image/webp");
+});
+test("unknown ancillary PNG chunks with bad CRC are rejected", async () => {
+  const chunk = pngChunk("caBX", Buffer.from("metadata"));
+  chunk[chunk.length - 1] ^= 1;
+  const input = pngAfterHeader(await fixture("png"), chunk);
+  await assert.rejects(() => validateImage(input, "bad.png", "image/png"));
+});
+test("unknown critical PNG chunks with valid CRC are rejected", async () => {
+  const input = pngAfterHeader(await fixture("png"), pngChunk("CaBX", Buffer.from("data")));
+  await assert.rejects(() => validateImage(input, "critical.png", "image/png"));
+});
+for (const type of ["c1BX", "caxX"])
+  test(`invalid PNG chunk type ${type} is rejected`, async () => {
+    const input = pngAfterHeader(await fixture("png"), pngChunk(type, Buffer.from("data")));
+    await assert.rejects(() => validateImage(input, "invalid.png", "image/png"));
+  });
 test("animated PNG control chunk is rejected even with a valid CRC", async () => {
   const control = Buffer.alloc(8);
   control.writeUInt32BE(2, 0);
   const input = pngAfterHeader(await fixture("png"), pngChunk("acTL", control));
   await assert.rejects(() => validateImage(input, "animated.png", "image/png"));
 });
+for (const type of ["fcTL", "fdAT"])
+  test(`APNG ${type} chunk is rejected even with a valid CRC`, async () => {
+    const input = pngAfterHeader(await fixture("png"), pngChunk(type, Buffer.alloc(8)));
+    await assert.rejects(() => validateImage(input, "animated.png", "image/png"));
+  });
 test("orientation is applied while private EXIF is removed", async () => {
   const input = await sharp(await fixture("jpeg"))
     .withMetadata({ orientation: 6 })

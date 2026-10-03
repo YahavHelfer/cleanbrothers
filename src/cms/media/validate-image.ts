@@ -33,36 +33,10 @@ function containerType(b: Buffer): "jpeg" | "png" | "webp" {
       data = false;
     while (pos + 12 <= b.length) {
       const n = b.readUInt32BE(pos),
+        typeBytes = b.subarray(pos + 4, pos + 8),
         type = b.toString("ascii", pos + 4, pos + 8),
         end = pos + 12 + n;
-      if (
-        end > b.length ||
-        (first && (type !== "IHDR" || n !== 13)) ||
-        type === "acTL"
-      )
-        throw new MediaError();
-      if (
-        ![
-          "IHDR",
-          "PLTE",
-          "IDAT",
-          "IEND",
-          "tRNS",
-          "gAMA",
-          "cHRM",
-          "sRGB",
-          "pHYs",
-          "iCCP",
-          "eXIf",
-          "tEXt",
-          "zTXt",
-          "iTXt",
-          "sBIT",
-          "bKGD",
-          "tIME",
-        ].includes(type)
-      )
-        throw new MediaError();
+      if (end > b.length) throw new MediaError();
       let crc = 0xffffffff;
       for (const byte of b.subarray(pos + 4, end - 4)) {
         crc ^= byte;
@@ -70,6 +44,37 @@ function containerType(b: Buffer): "jpeg" | "png" | "webp" {
           crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
       }
       if ((crc ^ 0xffffffff) >>> 0 !== b.readUInt32BE(end - 4))
+        throw new MediaError();
+      if (
+        (first && (type !== "IHDR" || n !== 13)) ||
+        ["acTL", "fcTL", "fdAT"].includes(type) ||
+        [...typeBytes].some((byte) =>
+          !((byte >= 65 && byte <= 90) || (byte >= 97 && byte <= 122))) ||
+        (typeBytes[2] & 0x20) !== 0
+      )
+        throw new MediaError();
+      const known = [
+        "IHDR",
+        "PLTE",
+        "IDAT",
+        "IEND",
+        "tRNS",
+        "gAMA",
+        "cHRM",
+        "sRGB",
+        "pHYs",
+        "iCCP",
+        "eXIf",
+        "tEXt",
+        "zTXt",
+        "iTXt",
+        "sBIT",
+        "bKGD",
+        "tIME",
+      ].includes(type);
+      // PNG readers may skip unknown ancillary chunks; unknown critical chunks
+      // cannot be interpreted safely. The first type byte carries that property.
+      if (!known && (typeBytes[0] & 0x20) === 0)
         throw new MediaError();
       if (type === "IDAT") data = true;
       if (type === "IEND") {
