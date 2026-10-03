@@ -1,5 +1,7 @@
 "use client";
 
+import { ServiceCardImagesEditor } from "./ServiceCardImagesEditor";
+import { baselineServiceImages, type HomeServiceImage } from "./service-card-images";
 import Link from "next/link";
 import { useActionState, useState, useSyncExternalStore } from "react";
 import type { MediaChoice } from "@/cms/media/model";
@@ -27,7 +29,7 @@ const labels: Record<string,string> = {
   whatsappLabel: "תווית WhatsApp", phoneLabel: "תווית חיוג", trustNotes: "הערות אמון",
 };
 const serviceCatalog = Object.fromEntries(services.map(service => [service.landingPath.slice(1),
-  { title: service.title, benefit: service.benefit, description: service.description }]));
+  { title: service.title, benefit: service.benefit, description: service.description, images: baselineServiceImages(service.landingPath.slice(1)) }]));
 function label(key: string) { return labels[key] || serviceRegistry[key as ManagedServiceKey]?.crmName || key; }
 type AnyValue = string | boolean | AnyValue[] | { [key: string]: AnyValue };
 
@@ -52,6 +54,9 @@ function ValueFields({ name, value, onChange, choices, section }: { name: string
         <input className={field} value={value} maxLength={320} required onChange={event => onChange(event.target.value)} />}
     </label>;
   }
+  if (name === "images" && section === "homeServices" && Array.isArray(value))
+    return <ServiceCardImagesEditor images={value as HomeServiceImage[]} choices={choices}
+      onChange={next => onChange(next)} />;
   if (Array.isArray(value)) {
     if (name === "serviceKeys") return <fieldset className="grid gap-3 rounded-xl border p-3"><legend className="font-black">שירותים לפי סדר הופעה</legend>
       {(value as string[]).map((key, index) => <div className="flex flex-wrap gap-2" key={`${key}-${index}`}>
@@ -84,7 +89,7 @@ function ValueFields({ name, value, onChange, choices, section }: { name: string
         onClick={() => onChange([...value,{ question: "שאלה חדשה", answer: "תשובה חדשה" }])}>הוספת שאלה</button>}
     </fieldset>;
   }
-  return <fieldset className="grid gap-3 rounded-xl border p-3"><legend className="font-black">{label(name)}</legend>
+  return <fieldset data-home-service-card={section === "homeServices" && "images" in value ? name : undefined} className="grid gap-3 rounded-xl border p-3"><legend className="font-black">{label(name)}</legend>
     {Object.entries(value).map(([key,item]) => <ValueFields key={key} name={key} value={item}
       onChange={next => onChange({ ...value, [key]: next })} choices={choices} section={section} />)}
   </fieldset>;

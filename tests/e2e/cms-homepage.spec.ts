@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import sharp from "sharp";
 import { expect, test } from "@playwright/test";
 import { appOrigin, localSql } from "../../scripts/cms-local.mjs";
 import { cleanupActors, createActor, resetContent, session, type Actor } from "./helpers/content-fixtures";
@@ -199,4 +200,101 @@ test("review block can be re-added; exact preview pauses for focus and reduced m
   await section.hover();
   await expect(section).toHaveAttribute("data-attention-paused", "true");
   await expect(section).toHaveAttribute("data-paused", "true");
+});
+
+test("homepage service images persist through refresh and publication on desktop and mobile", async ({ page, context, request }) => {
+  test.setTimeout(120_000);
+  await session(actor, context);
+  await page.goto("/admin/media");
+  const upload = page.getByRole("form", { name: "העלאת תמונה", exact: true });
+  await upload.getByLabel("בחירת תמונה").setInputFiles({ name: "homepage-card-fixture.png", mimeType: "image/png",
+    buffer: await sharp({ create: { width: 96, height: 64, channels: 3, background: "#27a6a3" } }).png().toBuffer() });
+  await upload.getByLabel("תיאור חלופי", { exact: true }).fill("תמונה שנוספה מספריית המדיה");
+  await upload.getByRole("button", { name: "העלאה לספרייה", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "פרטי תמונה", exact: true })).toBeVisible();
+  const asset = page.url().split("/").pop()!;
+  if (!/^[a-f0-9-]{36}$/.test(asset)) throw new Error("Invalid local test asset");
+  const uploadedVersion = localSql(`select current_version_id from media_assets where id='${asset}'`);
+  await page.goto("/admin/pages/home");
+  const cards = page.locator('[data-block-id="d4000000-0000-4000-8000-000000000003"]');
+  const sofa = cards.locator('[data-home-service-card="sofa-cleaning"]');
+  const gallery = sofa.getByRole("group", { name: "תמונות השירות בעמוד הבית", exact: true });
+  await expect(gallery.locator("[data-home-service-image]")).toHaveCount(4);
+  await gallery.getByRole("button", { name: "הוספת תמונת עמוד הבית", exact: true }).click();
+  await gallery.getByRole("combobox", { name: "תמונת עמוד הבית 5", exact: true }).selectOption(uploadedVersion);
+  await gallery.getByRole("combobox", { name: "תמונת עמוד הבית 1", exact: true }).selectOption("1733a278-1a4c-4230-860d-0db0e62cc57a");
+  await gallery.getByLabel("תיאור חלופי לתמונת עמוד הבית 1", { exact: true }).fill("תמונת כרטיס שהוחלפה");
+  await gallery.getByRole("button", { name: "הסרת תמונת עמוד הבית 2", exact: true }).click();
+  await gallery.getByRole("button", { name: "העלאת תמונת עמוד הבית 2", exact: true }).click();
+  const saved = await gallery.locator("[data-home-service-image]").evaluateAll(rows => rows.map(row => ({
+    id: (row.querySelector("select") as HTMLSelectElement).value,
+    src: row.querySelector("img")?.getAttribute("src"),
+    alt: (row.querySelector("input") as HTMLInputElement).value,
+  })));
+  for (const image of saved) if (image.id === uploadedVersion) image.src = `/cms-media/${uploadedVersion}`;
+  const before = state();
+  await page.getByRole("button", { name: "שמירת טיוטה", exact: true }).click();
+  await expect.poll(() => state().draft_revision_id).not.toBe(before.draft_revision_id);
+  expect(state().published_revision_id).toBe(before.published_revision_id);
+  expect((await request.get(`${publishedOrigin}/cms-media/${uploadedVersion}`)).status()).toBe(404);
+  await page.reload();
+  await expect(gallery.locator("[data-home-service-image]")).toHaveCount(saved.length);
+  for (const [index, image] of saved.entries()) {
+    await expect(gallery.getByRole("combobox", { name: `תמונת עמוד הבית ${index + 1}`, exact: true })).toHaveValue(image.id);
+    await expect(gallery.getByLabel(`תיאור חלופי לתמונת עמוד הבית ${index + 1}`, { exact: true })).toHaveValue(image.alt);
+  }
+  await page.getByRole("checkbox", { name: /מאשר.*לפרסם/ }).check();
+  await page.getByRole("button", { name: "פרסום", exact: true }).click();
+  await expect.poll(() => state().published_revision_id).toBe(state().draft_revision_id);
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`${publishedOrigin}/`);
+    const card = page.locator("#services article").filter({ has: page.getByRole("heading", { name: "ניקוי ספות", exact: true }) });
+    await card.scrollIntoViewIfNeeded();
+    await card.hover();
+    await card.getByRole("button", { name: `הצגת תמונה 1 מתוך ${saved.length}`, exact: true }).click();
+    for (const [index, image] of saved.entries()) {
+      await card.getByRole("button", { name: `הצגת תמונה ${index + 1} מתוך ${saved.length}`, exact: true }).click();
+      await expect(card.locator("img")).toHaveAttribute("alt", image.alt);
+      await expect.poll(async () => {
+        const src = new URL((await card.locator("img").getAttribute("src"))!, publishedOrigin);
+        return src.searchParams.get("url") || src.pathname;
+      }).toBe(image.src);
+      await expect.poll(() => card.locator("img").evaluate(img => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0)).toBe(true);
+      await expect(card.locator("img")).toHaveCSS("opacity", "1");
+    }
+    await card.getByRole("button", { name: `הצגת תמונה 1 מתוך ${saved.length}`, exact: true }).click();
+    await expect(card.locator("img")).toHaveCSS("opacity", "1");
+    await card.screenshot({ path: `/tmp/cleanbrothers-home-service-card-${width}.png` });
+    await card.getByRole("button", { name: "התמונה הבאה של ניקוי ספות", exact: true }).click();
+    await expect(card.locator("img")).toHaveAttribute("alt", saved[1].alt);
+    await card.getByRole("button", { name: "התמונה הקודמת של ניקוי ספות", exact: true }).click();
+    await expect(card.locator("img")).toHaveAttribute("alt", saved[0].alt);
+    const singleCard = page.locator("#services article").filter({ has: page.getByRole("heading", { name: "ניקוי מזרנים", exact: true }) });
+    await expect(singleCard.locator("img")).toHaveCount(1);
+    await expect(singleCard.getByRole("button")).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  }
+  // Removing the last image remains saved as an empty list, rather than reseeding.
+  await page.goto("/admin/pages/home");
+  for (let count = saved.length; count > 0; count--)
+    await gallery.getByRole("button", { name: "הסרת תמונת עמוד הבית 1", exact: true }).click();
+  const prior = state().draft_revision_id;
+  await page.getByRole("button", { name: "שמירת טיוטה", exact: true }).click();
+  await expect.poll(() => state().draft_revision_id).not.toBe(prior);
+  await page.reload();
+  await expect(gallery.locator("[data-home-service-image]")).toHaveCount(0);
+  await page.getByRole("checkbox", { name: /מאשר.*לפרסם/ }).check();
+  await page.getByRole("button", { name: "פרסום", exact: true }).click();
+  await expect.poll(() => state().published_revision_id).toBe(state().draft_revision_id);
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`${publishedOrigin}/`);
+    const emptyCard = page.locator("#services article").filter({ has: page.getByRole("heading", { name: "ניקוי ספות", exact: true }) });
+    await expect(emptyCard.locator("img")).toHaveCount(0);
+    await expect(emptyCard.getByRole("img", { name: "ניקוי ספות", exact: true })).toBeVisible();
+    await expect(emptyCard.getByRole("button")).toHaveCount(0);
+    await emptyCard.screenshot({ path: `/tmp/cleanbrothers-home-service-card-empty-${width}.png` });
+  }
+  expect((await request.get(`${publishedOrigin}/cms-media/${uploadedVersion}`)).status()).toBe(404);
 });

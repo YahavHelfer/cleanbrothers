@@ -1,3 +1,4 @@
+import { baselineServiceImages, homeImagePositions } from "./service-card-images";
 import { isManagedServiceKey } from "@/content/service-registry";
 import { homeBlockDefinitions, PageValidationError, pageUuid, validateBlock } from "@/cms/pages/model";
 
@@ -66,13 +67,13 @@ function content(type: HomeBlockType, value: unknown): Record<string, unknown> {
           const row = object(card, fields);
           const images = Object.hasOwn(row, "images") ? rows(row.images, 0, 8).map(value => {
             const image = object(value, ["versionId", "alt", "position"]);
-            if (!["object-center","object-[center_48%]","object-[58%_center]","object-[52%_center]","object-[center_42%]","object-[center_38%]","object-[center_55%]"].includes(String(image.position)))
+            if (!homeImagePositions.includes(image.position as typeof homeImagePositions[number]))
               throw new PageValidationError("מיקום התמונה אינו מאושר.");
             return { versionId: pageUuid(image.versionId), alt: plain(image.alt, 300), position: image.position as string };
-          }) : undefined;
-          if (images && new Set(images.map(image => image.versionId)).size !== images.length)
+          }) : baselineServiceImages(key);
+          if (new Set(images.map(image => image.versionId)).size !== images.length)
             throw new PageValidationError("אין לשכפל תמונות בכרטיס.");
-          return [key, { ...copy(row, ["title", "benefit", "description"]), ...(images ? { images } : {}) }];
+          return [key, { ...copy(row, ["title", "benefit", "description"]), images }];
         }));
       if (serviceKeys.some(key => !checked[key])) throw new PageValidationError("חסר כרטיס שירות.");
       return { ...copy(p, ["eyebrow", "title", "mobileDescription", "description", "note"]), serviceKeys, cards: checked };

@@ -2,6 +2,8 @@ import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { SectionHeading } from "@/components/SectionHeading";
 import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
 import Link from "next/link";
+import { baselineServiceImages, type HomeServiceCard } from "@/cms/home/service-card-images";
+import type { BlockMedia } from "@/cms/pages/PageBlocksView";
 import { services } from "@/data/site";
 
 const primaryServiceTitles = new Set([
@@ -22,7 +24,8 @@ export const servicesContent = {
   serviceKeys: primaryServicesBaseline.map(service => service.landingPath.slice(1)),
   cards: Object.fromEntries(primaryServicesBaseline.map(service => [service.landingPath.slice(1), {
     title: service.title, benefit: service.benefit, description: service.description,
-  }])),
+    images: baselineServiceImages(service.landingPath.slice(1)),
+  }])) as Record<string, HomeServiceCard>,
   note: "בנוסף: ניקוי כורסאות, כיסאות וריפודים עדינים.",
 };
 
@@ -74,12 +77,20 @@ function ServiceAccentIcon({ title }: { title: string }) {
   );
 }
 
-export function Services({ content = servicesContent }: { content?: typeof servicesContent } = {}) {
+export function Services({ content = servicesContent, media = {} }: { content?: typeof servicesContent; media?: BlockMedia } = {}) {
   const primaryServices = content.serviceKeys.map(key => {
     const service = services.find(row => row.landingPath === `/${key}`);
     const copy = content.cards[key];
     if (!service || !copy) throw new Error("Unsupported homepage service identity");
-    return { ...service, ...copy };
+    const images = copy.images.map(image => {
+      const src = media[image.versionId]?.src;
+      if (!src) throw new Error("Homepage service image unavailable");
+      return { ...image, src };
+    });
+    return { ...service, ...copy, images: images.map(image => image.src),
+      imageAlts: Object.fromEntries(images.map(image => [image.src, image.alt])),
+      imagePositions: Object.fromEntries(images.map(image => [image.src, image.position])),
+    };
   });
 
   return (
@@ -103,13 +114,14 @@ export function Services({ content = servicesContent }: { content?: typeof servi
               className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
             >
               <div className="relative">
-                {service.landingPath === "/window-cleaning" ? (
+                {service.landingPath === "/window-cleaning" && !service.images.length ? (
                   <div className="aspect-[16/10] sm:aspect-[4/3]">
                     <WindowCleaningVisual compact />
                   </div>
                 ) : (
                   <ServiceImageCarousel
                     images={service.images}
+                    imageAlts={service.imageAlts}
                     alt={service.title}
                     fallbackLabel={service.title}
                     className="image-reveal relative aspect-[16/10] w-full sm:aspect-[4/3]"

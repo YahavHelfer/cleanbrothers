@@ -1,5 +1,5 @@
-import { isManagedServiceKey } from "@/content/service-registry";
 import "server-only";
+import { isManagedServiceKey } from "@/content/service-registry";
 import { createClient } from "@supabase/supabase-js";
 import { connection } from "next/server";
 import { cache } from "react";
@@ -18,7 +18,8 @@ function resolveMedia(input: unknown): BlockMedia {
   if (!Array.isArray(input)) throw new Error("Published homepage media unavailable");
   return Object.fromEntries(input.map((row: MediaRow) => {
     const id = pageUuid(row.media_version_id);
-    const serviceRole = typeof row.usage_role === "string" && row.usage_role.startsWith("home-service:") && isManagedServiceKey(row.usage_role.slice(13));
+    const serviceRole = typeof row.usage_role === "string" && row.usage_role.startsWith("home-service:") &&
+      isManagedServiceKey(row.usage_role.slice(13));
     if ((!serviceRole && !["home-hero","home-before","home-after","page-image","promotion"].includes(String(row.usage_role))) ||
       !Number.isInteger(row.position) || (row.position as number) < 0 || (row.position as number) > 49 ||
       typeof row.alt_text !== "string" || !row.alt_text.trim()) throw new Error("Invalid homepage media");
@@ -55,6 +56,10 @@ export const getPublicHome = cache(async () => {
   const media = resolveMedia(data.media);
   for (const block of page.blocks) {
     if (block.mediaVersionId && !media[block.mediaVersionId]) throw new Error("Homepage block media missing");
+    if (block.type === "homeServices") for (const key of block.payload.serviceKeys as string[]) {
+      const card = (block.payload.cards as Record<string, { images: { versionId: string }[] }>)[key];
+      if (card.images.some(image => !media[image.versionId])) throw new Error("Homepage service media missing");
+    }
     if (block.type === "homeBeforeAfter") for (const item of block.payload.items as { beforeVersionId: string; afterVersionId: string }[])
       if (!media[item.beforeVersionId] || !media[item.afterVersionId]) throw new Error("Homepage gallery media missing");
   }
