@@ -37,9 +37,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 }
 export default async function AirConditionerCleaningPage() {
-  const { content, media } = await getPublicSpecialService("air-conditioner-cleaning");
+  const { content, media, images } = await getPublicSpecialService("air-conditioner-cleaning");
   if (content.schemaVersion !== 4) throw new Error("Invalid AC content");
   const active = await getPublicActivePromotion("service", "air-conditioner-cleaning");
-  const page = <AirConditionerCleaningLandingPage content={content} media={media} />;
+  const page = <AirConditionerCleaningLandingPage content={content} media={media} serviceImages={images} />;
   return active ? <><PublicScheduledPromotion active={active} />{page}</> : page;
 }

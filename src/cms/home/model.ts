@@ -59,7 +59,7 @@ function content(type: HomeBlockType, value: unknown): Record<string, unknown> {
       if (new Set(serviceKeys).size !== serviceKeys.length) throw new PageValidationError("אין לשכפל שירותים.");
       const cards = p.cards;
       if (!cards || typeof cards !== "object" || Array.isArray(cards) ||
-        Object.keys(cards).length > 8 || Object.keys(cards).some(key => !isManagedServiceKey(key)))
+        Object.keys(cards).length > 9 || Object.keys(cards).some(key => !isManagedServiceKey(key)))
         throw new PageValidationError("כרטיס שירות אינו מאושר.");
       const checked = Object.fromEntries(Object.entries(cards).map(([key, card]) => {
           const fields = card && typeof card === "object" && Object.hasOwn(card, "images")

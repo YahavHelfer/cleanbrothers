@@ -110,7 +110,8 @@ export function Services({ content = servicesContent, media = {} }: { content?: 
         <div className="mt-5 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
           {primaryServices.map((service, index) => (
             <article
-              key={service.title}
+              key={service.landingPath}
+              data-service-card={service.landingPath.slice(1)}
               className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
             >
               <div className="relative">

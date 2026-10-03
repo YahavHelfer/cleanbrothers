@@ -90,6 +90,7 @@ test("revision and generation parsers refuse missing, malformed or unsafe identi
 for (const operation of ["editor", "revision", "save", "publish", "restore"]) test(`${operation} independently denies before accessing storage`, async () => {
   let authCalls = 0; let dbCalls = 0;
   const repository = createSourceLoader({ env: localEnv, mocks: {
+      "next/server": { connection: async () => {} },
     "@/cms/authorization": { requireCmsAdmin: async () => { authCalls++; throw Error("denied"); } },
     "@/cms/server": { createCmsServerClient: async () => { dbCalls++; throw Error("must not access"); } },
   } })("src/cms/content/repository.ts");
@@ -101,6 +102,7 @@ for (const operation of ["editor", "revision", "save", "publish", "restore"]) te
 for (const code of ["PT409", "40001"]) test(`stale editor (${code}) returns a Hebrew conflict without retrying a new generation`, async () => {
   let calls = 0;
   const repository = createSourceLoader({ env: localEnv, mocks: {
+      "next/server": { connection: async () => {} },
     "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "local" }) },
     "@/cms/server": { createCmsServerClient: async () => ({ rpc: async () => { calls++; return { error: { code } }; } }) },
   } })("src/cms/content/repository.ts");
@@ -111,6 +113,7 @@ for (const code of ["PT409", "40001"]) test(`stale editor (${code}) returns a He
 test("Server Action does not trust a layout or caller-supplied previous success", async () => {
   let writes = 0;
   const actions = createSourceLoader({ mocks: {
+      "next/server": { connection: async () => {} },
     "@/cms/authorization": { requireCmsAdmin: async () => { throw Error("denied"); } },
     "./repository": { mutatePilot: async () => { writes++; } },
   } })("src/cms/content/actions.ts");
@@ -131,6 +134,7 @@ test("public source requires both independent flags and the exact pilot allowlis
     ...["", "*", "sofa-cleaning", `${model.PILOT_KEY},unknown-service`].map((value) => ({ ...publishedEnv, CMS_CONTENT_SERVICE_ALLOWLIST: value }))]) {
     let calls = 0;
     const source = createSourceLoader({ env: { ...previewEnv, ...flags }, mocks: {
+      "next/server": { connection: async () => {} },
       "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },
     } })("src/cms/content/public-source.ts");
     assert.equal((await source.getPublicPilot()).revisionId, null);
@@ -152,6 +156,7 @@ for (const [name, env] of Object.entries({
   test(`content fails closed for ${name}, including direct repository access`, async () => {
     let calls = 0;
     const guarded = createSourceLoader({ env: { ...env, ...publishedEnv }, mocks: {
+      "next/server": { connection: async () => {} },
       "@/cms/authorization": { requireCmsAdmin: async () => ({ userId: "test" }) },
       "@/cms/server": { createCmsServerClient: async () => { calls++; throw Error("unexpected"); } },
       "@supabase/supabase-js": { createClient: () => { calls++; throw Error("unexpected"); } },
@@ -167,6 +172,7 @@ for (const [name, env] of Object.entries({
 for (const [name, env] of Object.entries({ local: localEnv, preview: previewEnv })) test(`${name} published adapter queries only no-argument projection with uncached requests`, async () => {
   const calls = []; let options; let fetchOptions;
   const source = createSourceLoader({ env: { ...env, ...publishedEnv }, fetchImpl: async (_input, init) => { fetchOptions = init; }, mocks: {
+      "next/server": { connection: async () => {} },
     "next/server": { connection: async () => {} },
     "@supabase/supabase-js": { createClient: (url, key, config) => { options = config; return { rpc: async (...args) => {
       calls.push(args); return { data: { revisionId: revision, payload: baseline() } };

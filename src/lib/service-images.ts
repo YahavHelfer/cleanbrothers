@@ -8,7 +8,7 @@ export function getServiceImages({
   images,
 }: ServiceImageSource): string[] {
   return Array.from(
-    new Set([...(images ?? []), ...(image ? [image] : [])].filter(Boolean)),
+    new Set((images !== undefined ? images : image ? [image] : []).filter(Boolean)),
   );
 }
 

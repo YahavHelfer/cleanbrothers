@@ -15,19 +15,22 @@ async function snapshot(page:Page,key:SpecialServiceKey,origin:string){
  const response=await page.goto(`${origin}/${key}`);expect(response?.status()).toBe(200);await expect(page.locator('main h1')).toBeVisible();
  return page.evaluate(()=>({text:document.querySelector('main')!.textContent?.replace(/\s+/g,' ').trim(),links:[...document.querySelectorAll('main a')].map(a=>[a.getAttribute('href'),a.textContent]),images:[...document.querySelectorAll('main img')].map(i=>[((src)=>{if(!src)return src;const u=new URL(src,location.origin);return u.origin===location.origin?u.pathname+u.search:src;})(i.getAttribute('src')),i.getAttribute('alt')]),service:(document.querySelector('[name="service"]') as HTMLSelectElement)?.value,title:document.title,metadata:[...document.querySelectorAll('meta[name="description"],meta[property^="og:"],meta[name^="twitter:"]')].map(m=>[m.getAttribute('name')||m.getAttribute('property'),m.getAttribute('content')]),canonical:document.querySelector('link[rel="canonical"]')?.getAttribute('href'),jsonld:[...document.querySelectorAll('main script[type="application/ld+json"]')].map(s=>JSON.parse(s.textContent!))}));
 }
-test.beforeEach(async({context})=>{resetContent();bootstrap();actor=await createActor(true);await context.route('**/*',route=>{const u=new URL(route.request().url());return [appOrigin,published].includes(u.origin)&&!u.pathname.startsWith('/api/')?route.continue():route.abort();});});
+test.beforeEach(async({context})=>{resetContent();bootstrap();execFileSync(process.execPath,["scripts/cms-import-home.mjs"],{stdio:"pipe"});actor=await createActor(true);await context.route('**/*',route=>{const u=new URL(route.request().url());return [appOrigin,published].includes(u.origin)&&!u.pathname.startsWith('/api/')?route.continue():route.abort();});});
 test.afterEach(async()=>{await cleanupActors();});
 for(const key of specialServiceKeys)test(`${key}: actual UI lifecycle, exact revision, SEO, media history, fresh publish and rollback`,async({page,context})=>{
  const initial=state(key),others=otherState(key),before=allState();bootstrap();expect(allState()).toBe(before);
- expect(localSql('select count(*) from content_documents')).toBe('9');expect(localSql('select count(*) from media_versions')).toBe('27');
+ expect(localSql('select count(*) from content_documents')).toBe('10');expect(localSql('select count(*) from media_versions')).toBe('28');
  const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);
  await session(actor,context);await page.goto(`/admin/services/${key}`);
  const heading=page.getByRole('textbox',{name:'כותרת ראשית',exact:true});await expect(heading).toBeEnabled();await heading.fill(`טיוטה מיוחדת ${key}`);
  await page.getByRole('textbox',{name:'כותרת SEO',exact:true}).fill(`SEO טיוטה ${key}`);
- if(key==='window-cleaning')await page.getByRole('button',{name:'הוספת פריט — תמונות ראש העמוד',exact:true}).click();
- const hero=page.getByRole('group',{name:'תמונות ראש העמוד',exact:true});
- await hero.getByRole('combobox').first().selectOption({label:'armchair-chair-cleaning.jpeg — גרסה 1'});
- await hero.getByRole('textbox',{name:'תיאור חלופי',exact:true}).first().fill('תמונת בדיקה מקומית');
+ await expect(page.getByRole('link',{name:'עריכת תמונות השירות',exact:true})).toHaveAttribute('href',`/admin/pages/home#service-images-${key}`);
+ await expect(page.getByRole('group',{name:'תמונות ראש העמוד',exact:true})).toHaveCount(0);
+ if(key==='air-conditioner-cleaning') {
+  const gallery=page.getByRole('group',{name:'גלריה',exact:true});
+  await gallery.getByRole('combobox').first().selectOption({label:'armchair-chair-cleaning.jpeg — גרסה 1'});
+  await gallery.getByRole('textbox',{name:'תיאור חלופי',exact:true}).first().fill('תמונת בדיקה מקומית');
+ }
  await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('טיוטה: גרסה 2');
  const draft=state(key);expect(draft.published_revision_id).toBe(initial.published_revision_id);expect(otherState(key)).toBe(others);
  expect(await snapshot(page,key,published)).toEqual(original);expect(await snapshot(page,key,appOrigin)).toEqual(original);
@@ -36,7 +39,7 @@ for(const key of specialServiceKeys)test(`${key}: actual UI lifecycle, exact rev
  await expect(page.locator('main h1')).toHaveText(`טיוטה מיוחדת ${key}`);
  expect(await page.locator('meta[name="robots"]').getAttribute('content')).toMatch(/noindex, nofollow/);
  await expect(page.locator('main form,a[href^="/api/whatsapp"],a[href^="tel:"],script[src*="googletagmanager"],script[src*="facebook"]')).toHaveCount(0);
- await expect(page.locator('main img').first()).toHaveAttribute('alt',/תמונת בדיקה מקומית/);
+ if(key==='air-conditioner-cleaning') await expect(page.locator('main img[alt="תמונת בדיקה מקומית"]')).toHaveCount(1);
  const other=key==='window-cleaning'?'air-conditioner-cleaning':'window-cleaning';expect((await page.goto(`/admin/preview/services/${other}?revision=${draft.draft_revision_id}`))?.status()).toBe(404);
  await page.goto(`/admin/services/${key}`);await page.getByLabel('אני מאשר/ת לפרסם את הגרסה השמורה').check();await page.getByRole('button',{name:'פרסום',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('פורסם: גרסה 2');
  const changed=await snapshot(page,key,published);expect(changed.text).toContain(`טיוטה מיוחדת ${key}`);expect(changed.title).toContain(`SEO טיוטה ${key}`);expect(changed.service).toBe(serviceRegistry[key].crmName);expect(otherState(key)).toBe(others);
@@ -99,10 +102,20 @@ test('uploaded special-page media bypasses public image optimization; replacemen
  const v1=version(),initial=Object.fromEntries(specialServiceKeys.map(key=>[key,state(key)]));
  for(const key of specialServiceKeys){
   await page.goto(`/admin/services/${key}`);
-  if(key==='window-cleaning')await page.getByRole('button',{name:'הוספת פריט — תמונות ראש העמוד',exact:true}).click();
-  const group=page.getByRole('group',{name:key==='window-cleaning'?'תמונות ראש העמוד':'גלריה',exact:true});
-  await group.getByRole('combobox').first().selectOption(v1);await group.getByRole('textbox',{name:'תיאור חלופי',exact:true}).first().fill('מדיה מקומית מאומתת');
-  await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('טיוטה: גרסה 2');
+  if(key==='window-cleaning') {
+   await page.goto('/admin/pages/home');
+   const group=page.locator('[data-home-service-card="window-cleaning"]').getByRole('group',{name:'תמונות השירות',exact:true});
+   await group.getByRole('button',{name:'הוספת תמונת שירות',exact:true}).click();
+   await group.getByRole('combobox',{name:'תמונת שירות 1',exact:true}).selectOption(v1);
+   await group.getByLabel('תיאור חלופי לתמונת שירות 1',{exact:true}).fill('מדיה מקומית מאומתת');
+   const previous=localSql("select draft_revision_id from content_publication_state where document_id='d4000000-0000-4000-8000-000000000000'");
+   await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();
+   await expect.poll(()=>localSql("select draft_revision_id from content_publication_state where document_id='d4000000-0000-4000-8000-000000000000'")).not.toBe(previous);
+  } else {
+   const group=page.getByRole('group',{name:'גלריה',exact:true});
+   await group.getByRole('combobox').first().selectOption(v1);await group.getByRole('textbox',{name:'תיאור חלופי',exact:true}).first().fill('מדיה מקומית מאומתת');
+   await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('טיוטה: גרסה 2');
+  }
  }
  // Reuse the approved JPEG bytes: the existing upload validator rejects both legacy PNGs.
  // A new immutable version ID still must never replace the version bound to a revision.
@@ -111,9 +124,19 @@ test('uploaded special-page media bypasses public image optimization; replacemen
   await page.goto(`/admin/preview/services/${key}?revision=${state(key).draft_revision_id}`);
   const image=page.locator(`img[src="/admin/media/file/${v1}"]`);await expect(image).toHaveCount(1);await image.scrollIntoViewIfNeeded();await expect.poll(()=>image.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth>0)).toBe(true);
   await expect(page.locator('img[src*="/_next/image?url=%2Fadmin%2Fmedia"]')).toHaveCount(0);
-  await page.goto(`/admin/services/${key}`);await page.getByLabel('אני מאשר/ת לפרסם את הגרסה השמורה').check();await page.getByRole('button',{name:'פרסום',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('פורסם: גרסה 2');
+  await page.goto(key==='window-cleaning'?'/admin/pages/home':`/admin/services/${key}`);await page.getByLabel('אני מאשר/ת לפרסם את הגרסה השמורה').check();await page.getByRole('button',{name:'פרסום',exact:true}).click();
+  if(key==='window-cleaning') await expect.poll(()=>localSql("select draft_revision_id=published_revision_id from content_publication_state where document_id='d4000000-0000-4000-8000-000000000000'")).toBe('t');
+  else await expect(page.getByLabel('מצב פרסום')).toContainText('פורסם: גרסה 2');
   await page.goto(`${published}/${key}`);const publicImage=page.locator(`img[src="/cms-media/${v1}"]`);await expect(publicImage).toHaveCount(1);await publicImage.scrollIntoViewIfNeeded();await expect.poll(()=>publicImage.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth>0)).toBe(true);
-  await page.goto(`/admin/services/${key}`);await page.locator(`[data-revision="${initial[key].draft_revision_id}"]`).getByRole('button',{name:'שחזור כטיוטה חדשה'}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('טיוטה: גרסה 3');await page.getByLabel('אני מאשר/ת לפרסם את הגרסה השמורה').check();await page.getByRole('button',{name:'פרסום',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('פורסם: גרסה 3');
+  if(key==='window-cleaning') {
+   await page.goto('/admin/pages/home');
+   await page.getByRole('article').filter({hasText:'גרסה 1'}).getByRole('button',{name:'שחזור כטיוטה חדשה'}).click();
+   await expect.poll(()=>localSql("select draft_revision_id<>published_revision_id from content_publication_state where document_id='d4000000-0000-4000-8000-000000000000'")).toBe('t');
+   await page.reload();await page.getByLabel('אני מאשר/ת לפרסם את הגרסה השמורה').check();await page.getByRole('button',{name:'פרסום',exact:true}).click();
+   await expect.poll(()=>localSql("select draft_revision_id=published_revision_id from content_publication_state where document_id='d4000000-0000-4000-8000-000000000000'")).toBe('t');
+  } else {
+   await page.goto(`/admin/services/${key}`);await page.locator(`[data-revision="${initial[key].draft_revision_id}"]`).getByRole('button',{name:'שחזור כטיוטה חדשה'}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('טיוטה: גרסה 3');await page.getByLabel('אני מאשר/ת לפרסם את הגרסה השמורה').check();await page.getByRole('button',{name:'פרסום',exact:true}).click();await expect(page.getByLabel('מצב פרסום')).toContainText('פורסם: גרסה 3');
+  }
   await page.goto(`${published}/${key}`);await expect(page.locator(`img[src="/cms-media/${v1}"]`)).toHaveCount(0);
  }
 });

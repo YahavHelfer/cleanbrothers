@@ -28,7 +28,11 @@ function label(key:string):string {
 function blank(c:Contract):unknown {
  switch(c.kind){case "text":case "uuid":return "";case "number":return c.min;case "boolean":return false;case "literal":return c.value;case "list":return Array.from({length:c.min},()=>blank(c.item));case "object":return Object.fromEntries(Object.entries(c.fields).map(([k,v])=>[k,blank(v)]));}
 }
-function Field({contract:c,value,onChange,name,choices,path}: {contract:Contract;value:unknown;onChange:(v:unknown)=>void;name:string;choices:MediaChoice[];path:string}) {
+function Field({contract:c,value,onChange,name,choices,path,serviceKey}: {contract:Contract;value:unknown;onChange:(v:unknown)=>void;name:string;choices:MediaChoice[];path:string;serviceKey:SpecialServiceKey}) {
+ if (path === "content.media.hero") return <section className="rounded-xl border p-4" aria-label="תמונות השירות">
+  <p>תמונות השירות משותפות לעמוד הבית, לרשימת השירותים ולעמוד השירות. מנהלים ומפרסמים אותן בעורך דף הבית.</p>
+  <Link href={`/admin/pages/home#service-images-${serviceKey}`} prefetch={false} className="underline">עריכת תמונות השירות</Link>
+ </section>;
  if(c.kind==="literal")return null;
  if(c.kind==="text")return <label className="grid gap-2">{name}<textarea className="field min-h-20" required maxLength={c.max} value={value as string} onChange={e=>onChange(e.target.value)} /></label>;
  if(c.kind==="boolean")return <label className="flex gap-3"><input type="checkbox" checked={value as boolean} onChange={e=>onChange(e.target.checked)} />{name}</label>;
@@ -36,10 +40,10 @@ function Field({contract:c,value,onChange,name,choices,path}: {contract:Contract
  if(c.kind==="uuid")return <label className="grid gap-2">{name}<select className="field" required value={value as string} onChange={e=>onChange(e.target.value)}><option value="" disabled>בחרו תמונה</option>{choices.filter(x=>!x.archived||x.versionId===value).map(x=><option key={x.versionId} value={x.versionId}>{x.label} — גרסה {x.number}{x.archived?" (בארכיון)":""}</option>)}</select></label>;
  if(c.kind==="object"){
   const object=value as Record<string,unknown>;
-  return <fieldset className="grid gap-4 rounded-xl border p-4"><legend className="px-2 font-black">{name}</legend>{Object.entries(c.fields).filter(([,v])=>v.kind!=="literal").map(([k,rule])=><Field key={k} contract={rule} value={object[k]} name={label(k)} path={`${path}.${k}`} choices={choices} onChange={v=>onChange({...object,[k]:v})}/>)}</fieldset>;
+  return <fieldset className="grid gap-4 rounded-xl border p-4"><legend className="px-2 font-black">{name}</legend>{Object.entries(c.fields).filter(([,v])=>v.kind!=="literal").map(([k,rule])=><Field key={k} contract={rule} value={object[k]} name={label(k)} path={`${path}.${k}`} serviceKey={serviceKey} choices={choices} onChange={v=>onChange({...object,[k]:v})}/>)}</fieldset>;
  }
  const items=value as unknown[];
- return <fieldset className="grid gap-4 rounded-xl border p-4"><legend className="px-2 font-black">{name}</legend>{items.map((item,i)=><div key={i} className="grid gap-3"><Field contract={c.item} value={item} name={`${name} ${i+1}`} path={`${path}.${i}`} choices={choices} onChange={v=>onChange(items.map((x,j)=>j===i?v:x))}/><div className="flex gap-3"><button className="rounded border px-3 py-2" type="button" disabled={items.length<=c.min} onClick={()=>onChange(items.filter((_,j)=>j!==i))}>הסרת {name} {i+1}</button><button type="button" className="rounded border px-3 py-2" disabled={i===0} aria-label={`העלאת ${name} ${i+1}`} onClick={()=>{const next=[...items];[next[i-1],next[i]]=[next[i],next[i-1]];onChange(next);}}>↑</button></div></div>)}<button className="justify-self-start rounded border px-3 py-2" type="button" disabled={items.length>=c.max} onClick={()=>onChange([...items,blank(c.item)])}>הוספת פריט — {name}</button></fieldset>;
+ return <fieldset className="grid gap-4 rounded-xl border p-4"><legend className="px-2 font-black">{name}</legend>{items.map((item,i)=><div key={i} className="grid gap-3"><Field contract={c.item} value={item} name={`${name} ${i+1}`} path={`${path}.${i}`} serviceKey={serviceKey} choices={choices} onChange={v=>onChange(items.map((x,j)=>j===i?v:x))}/><div className="flex gap-3"><button className="rounded border px-3 py-2" type="button" disabled={items.length<=c.min} onClick={()=>onChange(items.filter((_,j)=>j!==i))}>הסרת {name} {i+1}</button><button type="button" className="rounded border px-3 py-2" disabled={i===0} aria-label={`העלאת ${name} ${i+1}`} onClick={()=>{const next=[...items];[next[i-1],next[i]]=[next[i],next[i-1]];onChange(next);}}>↑</button></div></div>)}<button className="justify-self-start rounded border px-3 py-2" type="button" disabled={items.length>=c.max} onClick={()=>onChange([...items,blank(c.item)])}>הוספת פריט — {name}</button></fieldset>;
 }
 export function SpecialServiceEditor({serviceKey,snapshot,mediaChoices=[]}:{serviceKey:SpecialServiceKey;snapshot:ServiceEditorSnapshot;mediaChoices?:MediaChoice[]}) {
  const [draft,setDraft]=useState<SpecialContent>(()=>validateSpecialContent(serviceKey,snapshot.draft));
@@ -49,7 +53,7 @@ export function SpecialServiceEditor({serviceKey,snapshot,mediaChoices=[]}:{serv
  const dirty=JSON.stringify(draft)!==JSON.stringify(snapshot.draft);
  return <form action={action} aria-label="עריכת השירות" className="grid gap-6 rounded-3xl border theme-card p-5" dir="rtl">
   <input type="hidden" name="serviceKey" value={serviceKey}/><input type="hidden" name="generation" value={snapshot.generation}/><input type="hidden" name="revision" value={snapshot.draftRevisionId}/><input type="hidden" name="payload" value={JSON.stringify(draft)}/>
-  <fieldset disabled={pending}><Field contract={specialContracts[serviceKey]} value={draft} onChange={v=>setDraft(v as SpecialContent)} name={serviceKey==="air-conditioner-cleaning"?"תוכן ניקוי מזגנים":"תוכן ניקוי חלונות"} path="content" choices={mediaChoices}/></fieldset>
+  <fieldset disabled={pending}><Field contract={specialContracts[serviceKey]} value={draft} onChange={v=>setDraft(v as SpecialContent)} name={serviceKey==="air-conditioner-cleaning"?"תוכן ניקוי מזגנים":"תוכן ניקוי חלונות"} path="content" serviceKey={serviceKey} choices={mediaChoices}/></fieldset>
   <Link href="/admin/media" prefetch={false} className="underline">לספריית המדיה</Link>
   <p role="status">{dirty?"יש שינויים בטופס שטרם נשמרו. תצוגה מקדימה מציגה רק את הגרסה השמורה.":"כל השינויים בטופס נשמרו בטיוטה."}</p>
   {state.message&&<p role={state.ok?"status":"alert"}>{state.message}</p>}

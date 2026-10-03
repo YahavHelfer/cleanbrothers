@@ -9,9 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
  return buildMetadata({ title: content.seoTitle, description: content.seoDescription, path: "/window-cleaning" });
 }
 export default async function WindowCleaningPage() {
- const {content, media} = await getPublicSpecialService("window-cleaning");
+ const {content, media, images} = await getPublicSpecialService("window-cleaning");
  if(content.schemaVersion !== 5) throw new Error("Invalid Window content");
  const active = await getPublicActivePromotion("service", "window-cleaning");
- const page = <WindowCleaningLandingPage content={content} media={media} />;
+ const page = <WindowCleaningLandingPage content={content} media={media} serviceImages={images} />;
  return active ? <><PublicScheduledPromotion active={active} />{page}</> : page;
 }

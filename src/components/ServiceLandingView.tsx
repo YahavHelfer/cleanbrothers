@@ -92,9 +92,9 @@ export function ServiceLandingView({
               priority
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
-            <p className="absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
+            {serviceImages.length > 0 && <p className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
               תמונה אמיתית מעבודה בשטח
-            </p>
+            </p>}
           </div>
         </div>
       </section>
@@ -203,14 +203,14 @@ export function ServiceLandingView({
                     key={image.src}
                     className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy"
                   >
-                    <Image
+                    {image.src ? <Image
                       src={image.src}
                       unoptimized={image.src.startsWith("/admin/media/file/") || image.src.startsWith("/cms-media/")}
                       alt={image.alt}
                       fill
                       className="object-cover object-center"
                       sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 40vw, (min-width: 640px) 45vw, 100vw"
-                    />
+                    /> : <ServiceImageCarousel images={[]} alt={config.serviceName} className="absolute inset-0 h-full w-full" />}
                   </div>
                 ))}
               </div>
@@ -219,8 +219,7 @@ export function ServiceLandingView({
                   מציגים רק תמונות ותוצאות שתועדו באמת
                 </h3>
                 <p className="mt-4 text-base leading-8 theme-muted sm:text-lg">
-                  לא נמצא בפרויקט זוג תמונות לפני ואחרי מאותו טיפול לשירות הזה,
-                  ולכן מוצגת תמונת עבודה אמיתית בלי לחבר בין עבודות שונות.
+                  {primaryImage ? "לא נמצא בפרויקט זוג תמונות לפני ואחרי מאותו טיפול לשירות הזה, ולכן מוצגת תמונת עבודה אמיתית בלי לחבר בין עבודות שונות." : "לצפייה בתיעוד עבודות נוספות, היכנסו לגלריית העבודות שלנו."}
                 </p>
                 <NavLink href="/gallery" className="btn-secondary mt-6 inline-flex">
                   <Icon name="gallery" className="ml-2 h-5 w-5" />

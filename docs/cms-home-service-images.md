@@ -1,5 +1,7 @@
 # Homepage service card images
 
+The later shared-image extension and its local verification/deployment instructions are documented in [cms-shared-service-images.md](cms-shared-service-images.md). The production evidence below describes the earlier homepage-only release.
+
 Manage images at `/admin/pages/home`, in **שירותים**, under each service's **תמונות השירות בעמוד הבית** field. Select immutable versions from the existing media library, edit alt text/cropping, add, replace, remove (including the last image), and move images up or down. Uploads and file replacements remain in `/admin/media`, with existing validation and permissions. After uploading, save the open home draft and reload it to refresh the choices.
 
 Save a draft, preview it, then publish the saved home revision. Service detail images remain independent. Published home reads use the existing `CMS_HOME_SOURCE=published` / `CMS_HOME_ALLOWLIST=home` gates and a request-memoized, uncached published-only RPC. The home action already revalidates `/` after publication.

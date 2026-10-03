@@ -1,14 +1,13 @@
 "use client";
 
 import { ServiceCardImagesEditor } from "./ServiceCardImagesEditor";
-import { baselineServiceImages, type HomeServiceImage } from "./service-card-images";
+import { baselineServiceCard, type HomeServiceImage, type ServiceImageCollections } from "./service-card-images";
 import Link from "next/link";
 import { useActionState, useState, useSyncExternalStore } from "react";
 import type { MediaChoice } from "@/cms/media/model";
 import { BlockFields } from "@/cms/pages/PageEditor";
 import { blockDefinitions, defaultBlock, homeBlockDefinitions, type PageBlock } from "@/cms/pages/model";
-import { serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
-import { services } from "@/data/site";
+import { serviceRegistry, isManagedServiceKey, type ManagedServiceKey } from "@/content/service-registry";
 import { homeAction } from "./actions";
 import type { HomeSnapshot } from "./repository";
 import { HOME_GOOGLE_REVIEWS_BLOCK_ID, validateHomeDraft, type HomeBlock, type HomeBlockType, type HomeDraft } from "./model";
@@ -28,13 +27,12 @@ const labels: Record<string,string> = {
   factors: "גורמי מחיר", ctaNote: "הערת פעולה", question: "שאלה", answer: "תשובה",
   whatsappLabel: "תווית WhatsApp", phoneLabel: "תווית חיוג", trustNotes: "הערות אמון",
 };
-const serviceCatalog = Object.fromEntries(services.map(service => [service.landingPath.slice(1),
-  { title: service.title, benefit: service.benefit, description: service.description, images: baselineServiceImages(service.landingPath.slice(1)) }]));
+const serviceCatalog = Object.fromEntries(Object.keys(serviceRegistry).map(key => [key, baselineServiceCard(key as ManagedServiceKey)]));
 function label(key: string) { return labels[key] || serviceRegistry[key as ManagedServiceKey]?.crmName || key; }
 type AnyValue = string | boolean | AnyValue[] | { [key: string]: AnyValue };
 
-function ValueFields({ name, value, onChange, choices, section }: { name: string; value: AnyValue;
-  onChange: (value: AnyValue) => void; choices: MediaChoice[]; section: HomeBlockType }) {
+function ValueFields({ name, value, onChange, choices, section, collections, onImagesChange }: { name: string; value: AnyValue;
+  onChange: (value: AnyValue) => void; choices: MediaChoice[]; section: HomeBlockType; collections: ServiceImageCollections; onImagesChange: (key: ManagedServiceKey, images: HomeServiceImage[]) => void }) {
   if (typeof value === "boolean") return <label className="flex items-center gap-2 font-bold">
     <input type="checkbox" checked={value} onChange={event => onChange(event.target.checked)} />הצגת דירוג Google הכללי
   </label>;
@@ -54,9 +52,6 @@ function ValueFields({ name, value, onChange, choices, section }: { name: string
         <input className={field} value={value} maxLength={320} required onChange={event => onChange(event.target.value)} />}
     </label>;
   }
-  if (name === "images" && section === "homeServices" && Array.isArray(value))
-    return <ServiceCardImagesEditor images={value as HomeServiceImage[]} choices={choices}
-      onChange={next => onChange(next)} />;
   if (Array.isArray(value)) {
     if (name === "serviceKeys") return <fieldset className="grid gap-3 rounded-xl border p-3"><legend className="font-black">שירותים לפי סדר הופעה</legend>
       {(value as string[]).map((key, index) => <div className="flex flex-wrap gap-2" key={`${key}-${index}`}>
@@ -77,7 +72,7 @@ function ValueFields({ name, value, onChange, choices, section }: { name: string
     return <fieldset className="grid gap-3 rounded-xl border p-3"><legend className="font-black">{label(name)}</legend>
       {value.map((item,index) => <div key={index} className="grid gap-2 rounded-xl border p-3">
         <ValueFields name={typeof item === "string" ? `${label(name)} ${index+1}` : name} value={item}
-          onChange={next => onChange(value.map((entry,i)=>i===index?next:entry))} choices={choices} section={section} />
+          onChange={next => onChange(value.map((entry,i)=>i===index?next:entry))} choices={choices} section={section} collections={collections} onImagesChange={onImagesChange} />
         <div className="flex flex-wrap gap-2"><button className={button} type="button" disabled={index===0} onClick={() => {
           const next=[...value];[next[index-1],next[index]]=[next[index],next[index-1]];onChange(next);
         }}>למעלה</button><button className={button} type="button" disabled={index===value.length-1} onClick={() => {
@@ -89,9 +84,11 @@ function ValueFields({ name, value, onChange, choices, section }: { name: string
         onClick={() => onChange([...value,{ question: "שאלה חדשה", answer: "תשובה חדשה" }])}>הוספת שאלה</button>}
     </fieldset>;
   }
-  return <fieldset data-home-service-card={section === "homeServices" && "images" in value ? name : undefined} className="grid gap-3 rounded-xl border p-3"><legend className="font-black">{label(name)}</legend>
-    {Object.entries(value).map(([key,item]) => <ValueFields key={key} name={key} value={item}
-      onChange={next => onChange({ ...value, [key]: next })} choices={choices} section={section} />)}
+  return <fieldset id={section === "homeServices" && isManagedServiceKey(name) ? `service-images-${name}` : undefined} data-home-service-card={section === "homeServices" && isManagedServiceKey(name) ? name : undefined} className="grid gap-3 rounded-xl border p-3"><legend className="font-black">{label(name)}</legend>
+    {Object.entries(value).filter(([key]) => !(section === "homeServices" && key === "images")).map(([key,item]) => <ValueFields key={key} name={key} value={item}
+      onChange={next => onChange({ ...value, [key]: next })} choices={choices} section={section} collections={collections} onImagesChange={onImagesChange} />)}
+    {section === "homeServices" && isManagedServiceKey(name) && <ServiceCardImagesEditor images={collections[name]} choices={choices}
+      onChange={images => onImagesChange(name, images)} />}
   </fieldset>;
 }
 
@@ -100,10 +97,14 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
   promotionRevisions: { id: string; number: number }[];
 }) {
   const [draft,setDraft] = useState<HomeDraft>(() => validateHomeDraft(snapshot.draft));
+  const [collections,setCollections] = useState<ServiceImageCollections>(snapshot.serviceImages);
+  const onImagesChange = (key: ManagedServiceKey, images: HomeServiceImage[]) => setCollections(current => ({...current,[key]:images}));
+  const draftForSave = {...draft, blocks: draft.blocks.map(block => block.type !== "homeServices" ? block : {...block,payload:{...block.payload,
+    cards:Object.fromEntries(Object.entries(block.payload.cards as Record<string,object>).map(([key,card]) => [key,{...card,images:collections[key as ManagedServiceKey]}]))}})};
   const [selectedType,setSelectedType] = useState<HomeBlock["type"]>("richText");
   const [state,action,actionPending] = useActionState(homeAction,initialAction);
   const ready=useReady(),pending=actionPending||!ready;
-  const dirty=JSON.stringify(draft)!==JSON.stringify(snapshot.draft);
+  const dirty=JSON.stringify(draftForSave)!==JSON.stringify(snapshot.draft) || JSON.stringify(collections)!==JSON.stringify(snapshot.serviceImages);
   const blocks=draft.blocks;
   const reorder=(next: HomeBlock[]) => setDraft(current=>({ ...current,
     blocks:next.map((block,position)=>({ ...block,position })) }));
@@ -129,7 +130,8 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
   return <form action={action} aria-label="עריכת דף הבית" className="grid gap-7 rounded-3xl border theme-card p-5 sm:p-8" dir="rtl">
     <input type="hidden" name="generation" value={snapshot.generation} />
     <input type="hidden" name="revision" value={snapshot.draftRevisionId} />
-    <input type="hidden" name="payload" value={JSON.stringify(draft)} />
+    <input type="hidden" name="payload" value={JSON.stringify(draftForSave)} />
+    <input type="hidden" name="serviceImages" value={JSON.stringify(collections)} />
     <fieldset disabled={pending} className="grid gap-4"><legend className="text-xl font-black">דף הבית ו־SEO</legend>
       <p>זהות: דף הבית · כתובת ו־canonical קבועים: <bdi>/</bdi></p>
       {(["h1","seoTitle","seoDescription"] as const).map(key => <label key={key} className="grid gap-2 font-bold">
@@ -157,7 +159,7 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
             <select className={field} value={block.mediaVersionId||""} onChange={event=>update(index,{...block,mediaVersionId:event.target.value||null})}>
               {mediaChoices.filter(choice=>!choice.archived||choice.versionId===block.mediaVersionId).map(choice=><option key={choice.versionId} value={choice.versionId}>{choice.label} — גרסה {choice.number}</option>)}
             </select></label>}
-          <ValueFields name="payload" value={block.payload as AnyValue} choices={mediaChoices} section={block.type as HomeBlockType}
+          <ValueFields name="payload" value={block.payload as AnyValue} choices={mediaChoices} section={block.type as HomeBlockType} collections={collections} onImagesChange={onImagesChange}
             onChange={value=>{
               const payload=value as Record<string,unknown>;
               if(block.type==="homeServices"&&Array.isArray(payload.serviceKeys)){
@@ -169,6 +171,11 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
               if(block.type==="homeHero"&&typeof (value as Record<string,unknown>).title==="string")
                 setDraft(current=>({...current,h1:(value as Record<string,string>).title}));
             }}/>
+          {block.type === "homeServices" && Object.keys(serviceRegistry).filter(key => !Object.hasOwn(block.payload.cards as object, key)).map(key =>
+            <fieldset key={key} id={`service-images-${key}`} data-home-service-card={key} className="grid gap-3 rounded-xl border p-3">
+              <legend className="font-black">{serviceRegistry[key as ManagedServiceKey].crmName}</legend>
+              <ServiceCardImagesEditor images={collections[key as ManagedServiceKey]} choices={mediaChoices} onChange={images => onImagesChange(key as ManagedServiceKey, images)} />
+            </fieldset>)}
         </> : <BlockFields block={block as PageBlock} onChange={next=>update(index,next as HomeBlock)}
           choices={mediaChoices} promotionRevisions={promotionRevisions}/>}
       </section>)}
@@ -181,6 +188,11 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
         onClick={addBlock}>הוספת מקטע</button>
     </fieldset>
     <p role="status">{dirty?"יש שינויים בטופס שטרם נשמרו. התצוגה המדויקת מציגה רק גרסה שמורה.":"כל השינויים בטופס נשמרו בטיוטה."}</p>
+    {!blocks.some(block => block.type === "homeServices") && <fieldset disabled={pending} className="grid gap-4"><legend className="font-black">שירותים — תמונות השירות</legend>
+      {Object.entries(collections).map(([key,images]) => <fieldset id={`service-images-${key}`} data-home-service-card={key} key={key}><legend>{serviceRegistry[key as ManagedServiceKey].crmName}</legend>
+        <ServiceCardImagesEditor images={images} choices={mediaChoices} onChange={next => onImagesChange(key as ManagedServiceKey,next)} />
+      </fieldset>)}
+    </fieldset>}
     {state.message&&<p role={state.ok?"status":"alert"}>{state.message}</p>}
     <div className="flex flex-wrap gap-3"><button className="btn-primary" name="intent" value="save" disabled={pending}>שמירת טיוטה</button>
       <Link className="btn-secondary" prefetch={false} href={`/admin/preview/pages/home?revision=${snapshot.draftRevisionId}`}>תצוגה מקדימה מדויקת</Link></div>

@@ -3,6 +3,8 @@ import { PageHero } from "@/components/PageHero";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
 import Link from "next/link";
+import { getPublicServiceImages } from "@/cms/service-images/public-source";
+import { requireServiceKey } from "@/content/service-registry";
 import { services } from "@/data/site";
 import { buildMetadata } from "@/lib/seo";
 import { getWhatsAppLink } from "@/lib/whatsapp";
@@ -14,7 +16,11 @@ export const metadata = buildMetadata({
   path: "/services",
 });
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const rows = await Promise.all(services.map(async service => {
+    const key = requireServiceKey(service.landingPath.slice(1));
+    return { ...service, key, sharedImages: await getPublicServiceImages(key) };
+  }));
   return (
     <>
       <PageHero
@@ -46,18 +52,21 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid gap-5 sm:gap-7">
-            {services.map((service, index) => (
+            {rows.map((service, index) => (
               <article
-                key={service.title}
+                key={service.key}
+                data-service-card={service.key}
                 className={`card-lift reveal grid overflow-hidden rounded-[1.5rem] border theme-card sm:rounded-[2rem] lg:grid-cols-[0.42fr_1fr] stagger-${(index % 6) + 1}`}
               >
-                {service.landingPath === "/window-cleaning" ? (
+                {service.key === "window-cleaning" && !service.sharedImages.length ? (
                   <div className="aspect-[16/10] lg:h-full lg:min-h-72">
                     <WindowCleaningVisual compact />
                   </div>
                 ) : (
                   <ServiceImageCarousel
-                    images={service.images}
+                    images={service.sharedImages.map(image => image.src)}
+                    imageAlts={Object.fromEntries(service.sharedImages.map(image => [image.src,image.alt]))}
+                    imagePositions={Object.fromEntries(service.sharedImages.map(image => [image.src,image.position]))}
                     alt={service.title}
                     fallbackLabel={service.title}
                     className="relative aspect-[16/10] w-full lg:h-full lg:min-h-72"

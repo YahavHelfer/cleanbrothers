@@ -1,14 +1,13 @@
 "use client";
 
 import { sharedServiceKeys, serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
-import { validateServiceDraft, imagePositions, type ServiceDraft } from "./service-model";
+import { validateServiceDraft, type ServiceDraft } from "./service-model";
 import Link from "next/link";
-import Image from "next/image";
-import { STATIC_MEDIA_VERSION, type MediaChoice } from "@/cms/media/model";
+import { type MediaChoice } from "@/cms/media/model";
 import { useActionState, useState, useSyncExternalStore } from "react";
 import { contentAction } from "./actions";
 import type { ServiceEditorSnapshot } from "./repository";
-import { PILOT_IMAGES, PILOT_KEY, PILOT_RELATED_PATHS, pilotTextFields, type PilotTextField } from "./pilot-model";
+import { PILOT_KEY, PILOT_RELATED_PATHS, pilotTextFields, type PilotTextField } from "./pilot-model";
 
 const initialAction = { ok: false, message: "" };
 const subscribeToReadiness = () => () => {};
@@ -35,7 +34,7 @@ export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }
     <input type="hidden" name="payload" value={JSON.stringify(draft)} />
     <fieldset disabled={pending} className="grid gap-5 sm:grid-cols-2">
       <legend className="mb-5 text-xl font-black">תוכן השירות</legend>
-      {(Object.keys(pilotTextFields) as PilotTextField[]).map((key) => <label key={key} className="grid gap-2 font-bold">
+      {(Object.keys(pilotTextFields) as PilotTextField[]).filter(key => key !== "imageAlt").map((key) => <label key={key} className="grid gap-2 font-bold">
         {pilotTextFields[key].label}
         <textarea className="field min-h-24" value={draft[key]} maxLength={pilotTextFields[key].max} required
           onChange={(event) => update(key, event.target.value)} />
@@ -82,44 +81,10 @@ export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }
       <button type="button" className="justify-self-start rounded border px-4 py-2" disabled={draft.relatedLinks.length >= relatedPaths.length}
         onClick={() => update("relatedLinks", [...draft.relatedLinks, { label: "", href: relatedPaths.find((path) => !draft.relatedLinks.some((link) => link.href === path))! }])}>הוספת קישור</button>
     </fieldset>
-    {mediaChoices ? <fieldset disabled={pending} className="grid gap-4">
-      <legend className="mb-3 font-black">תמונות מספריית המדיה</legend>
-      <p>בחירת תמונה נשמרת בטיוטה חדשה בלבד. גרסה שפורסמה שומרת את התמונה המדויקת שנבחרה בה.</p>
-      {(draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images).map((selected,index)=>{
-        const selectedIds=draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images;
-        const choice=mediaChoices.find(c=>c.versionId===selected);
-        const change=(ids:string[])=>setDraft(current=>({...current,schemaVersion:current.schemaVersion === 3 ? 3 : 2,images:ids,...(current.imagePositions ? {imagePositions:Object.fromEntries(Object.entries(current.imagePositions).filter(([id])=>ids.includes(id)))} : {})}));
-        return <div key={index} className="grid gap-3 rounded-xl border p-4">
-          {choice&&<Image src={choice.src} alt={draft.imageAlt} width={200} height={150} unoptimized className="h-36 w-full object-contain"/>}
-          <label className="grid gap-2">תמונת השירות {index+1}<select className="field" value={selected} onChange={e=>{
-            const next=mediaChoices.find(c=>c.versionId===e.target.value)!;
-            setDraft(current=>({...current,schemaVersion:current.schemaVersion === 3 ? 3 : 2,images:selectedIds.map((id,i)=>i===index?next.versionId:id),...(index===0?{imageAlt:next.altText}:{}),...(current.imagePositions ? {imagePositions:Object.fromEntries(Object.entries(current.imagePositions).map(([id,crop])=>[id===selected?next.versionId:id,crop]))} : {})}));
-          }}>{mediaChoices.filter(c=>!c.archived||c.versionId===selected).map(c=><option key={c.versionId} value={c.versionId} disabled={selectedIds.includes(c.versionId)&&c.versionId!==selected}>{c.label} — גרסה {c.number}{c.archived?' (בארכיון)':''}</option>)}</select></label>
-          <div className="flex gap-3"><button type="button" className="rounded border p-2" disabled={index===0} aria-label={`העלאת תמונה ${index+1}`} onClick={()=>{const ids=[...selectedIds];[ids[index-1],ids[index]]=[ids[index],ids[index-1]];change(ids);}}>↑</button>
-          <button type="button" className="rounded border p-2" disabled={selectedIds.length===1} aria-label={`הסרת תמונה ${index+1}`} onClick={()=>change(selectedIds.filter((_,i)=>i!==index))}>הסרה</button></div>
-        </div>;
-      })}
-      <button type="button" className="rounded border px-4 py-2 justify-self-start" disabled={draft.images.length>=8||!mediaChoices.some(c=>!c.archived&&!(draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images).includes(c.versionId))} onClick={()=>{
-        const ids=draft.schemaVersion===1?[STATIC_MEDIA_VERSION]:draft.images;
-        const next=mediaChoices.find(c=>!c.archived&&!ids.includes(c.versionId));if(next)setDraft(current=>({...current,schemaVersion:current.schemaVersion === 3 ? 3 : 2,images:[...ids,next.versionId]}));
-      }}>הוספת תמונה</button>
-      <Link prefetch={false} href="/admin/media" className="underline">לספריית המדיה</Link>
-    </fieldset> : draft.schemaVersion === 1 ? <><fieldset disabled={pending} className="grid gap-3">
-      <legend className="mb-3 font-black">תמונות מאושרות</legend>
-      <label className="grid gap-2">תמונת השירות<select className="field" value={draft.images[0]} onChange={(event) => update("images", [event.target.value])}>
-        {PILOT_IMAGES.map((image) => <option key={image} value={image}>תמונת העבודה הקיימת — ריפוד עדין</option>)}
-      </select></label>
-      <p className="text-sm theme-muted">לשירות יש תמונה מאושרת אחת. תיאור התמונה ניתן לעריכה; העלאת תמונות חדשות אינה זמינה.</p>
-    </fieldset></> : <p>בחירת תמונות זמינה דרך ספריית המדיה כאשר היא פעילה.</p>}
-    {draft.schemaVersion === 3 && <fieldset disabled={pending} className="grid gap-4">
-      <legend className="font-black">מיקום התמונות</legend>
-      {draft.images.map((id, index) => <label key={id} className="grid gap-2">מיקום תמונה {index + 1}
-        <select className="field" value={draft.imagePositions?.[id] || draft.imagePosition || "object-center"}
-          onChange={event => update("imagePositions", { ...draft.imagePositions, [id]: event.target.value })}>
-          {imagePositions.map((position, i) => <option key={position} value={position}>{["מרכז", "מרכז, מעט למעלה", "מעט ימינה", "מרכז ימינה", "מרכז עליון"][i]}</option>)}
-        </select>
-      </label>)}
-    </fieldset>}
+    <section className="rounded-xl border p-4" aria-label="תמונות השירות">
+      <p>תמונות השירות משותפות לעמוד הבית, לרשימת השירותים ולעמוד השירות. מנהלים אותן בעורך דף הבית ומפרסמים שם יחד.</p>
+      <Link href={`/admin/pages/home#service-images-${serviceKey}`} prefetch={false} className="underline">עריכת תמונות השירות</Link>
+    </section>
     {draft.beforeAfter && <fieldset disabled={pending} className="grid gap-4">
       <legend className="font-black">תמונות לפני ואחרי</legend>
       {(["title", "description", "beforeAlt", "afterAlt"] as const).map((key, index) => <label key={key} className="grid gap-2">

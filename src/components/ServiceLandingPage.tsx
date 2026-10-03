@@ -29,13 +29,13 @@ export function buildServiceLandingMetadata(
       siteName: businessConfig.name,
       locale: "he_IL",
       type: "website",
-      images: [{ url: primaryImage, alt: config.imageAlt }],
+      images: primaryImage ? [{ url: primaryImage, alt: config.imageAlt }] : [],
     },
     twitter: {
       card: "summary_large_image",
       title: config.metaTitle,
       description: config.metaDescription,
-      images: [primaryImage],
+      images: primaryImage ? [primaryImage] : [],
     },
   };
 }

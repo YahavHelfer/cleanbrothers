@@ -92,7 +92,7 @@ test("new shared services stay static outside the dedicated approved Preview and
   {VERCEL:""},{VERCEL:"",VERCEL_ENV:""},{CMS_SUPABASE_PUBLISHABLE_KEY:""}]) {
   let reads=0;
   const source=createSourceLoader({env:{...previewEnv,...invalid,CMS_CONTENT_SERVICE_ALLOWLIST:keys.join(",")},
-   mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected cloud access");}}}})("src/cms/content/public-source.ts");
+   mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected cloud access");}}}})("src/cms/content/public-source.ts");
   for(const key of keys.filter(key=>key!=="delicate-upholstery-cleaning")) {
    assert.equal(source.usesCmsSource(key),false);
    assert.equal((await source.getPublicService(key)).revisionId,null);
@@ -113,11 +113,11 @@ test("non-allowlisted Preview services retain static content without querying CM
  for(let count=1;count<rolloutKeys.length;count++) {
   let reads=0;
   const source=createSourceLoader({env:{...previewEnv,CMS_CONTENT_SERVICE_ALLOWLIST:rolloutKeys.slice(0,count).join(",")},
-   mocks:{"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected cloud access");}}}})("src/cms/content/public-source.ts");
+   mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("unexpected cloud access");}}}})("src/cms/content/public-source.ts");
   for(const key of rolloutKeys.slice(count)) {
    const page=await source.getPublicService(key);
    assert.equal(page.revisionId,null);
-   assert.deepEqual(plain(page.page),plain(load("src/content/static-source.ts").staticContentSource.getServiceLanding(key)));
+   assert.deepEqual(plain(page.page),plain(load("src/cms/service-images/presentation.ts").withSharedServiceImages(load("src/content/static-source.ts").staticContentSource.getServiceLanding(key), await createSourceLoader()("src/cms/service-images/public-source.ts").getPublicServiceImages(key))));
   }
   assert.equal(reads,0);
  }
@@ -133,7 +133,7 @@ test("each explicitly enabled Preview service uses only its keyed published snap
    }})}}})("src/cms/content/public-source.ts");
   const result=await source.getPublicService(key);
   assert.deepEqual(plain(calls),[["cms_read_published_service",{target_key:key}]]);
-  const actual=toServiceLandingProps(result.page),expected=toServiceLandingProps(load("src/content/static-source.ts").staticContentSource.getServiceLanding(key));
+  const actual=toServiceLandingProps(result.page),expected=toServiceLandingProps(load("src/cms/service-images/presentation.ts").withSharedServiceImages(load("src/content/static-source.ts").staticContentSource.getServiceLanding(key), await createSourceLoader()("src/cms/service-images/public-source.ts").getPublicServiceImages(key)));
   assert.equal(renderToStaticMarkup(ServiceLandingPage(actual)),renderToStaticMarkup(ServiceLandingPage(expected)));
   assert.deepEqual(plain(buildServiceLandingMetadata(actual.config)),plain(buildServiceLandingMetadata(expected.config)));
  }

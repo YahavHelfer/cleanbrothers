@@ -6,7 +6,8 @@ import { sharedServiceKeys, serviceRegistry, type ManagedServiceKey } from "../.
 test.setTimeout(120_000);
 const published="http://127.0.0.1:56301";
 let actor: Actor;
-function bootstrap(){execFileSync(process.execPath,["scripts/cms-import-shared-services.mjs"],{stdio:["ignore","pipe","pipe"]});}
+function bootstrap(){execFileSync(process.execPath,["scripts/cms-import-shared-services.mjs"],{stdio:["ignore","pipe","pipe"]});
+ execFileSync(process.execPath,["scripts/cms-import-home.mjs"],{stdio:"pipe"});}
 function state(key: ManagedServiceKey){return JSON.parse(localSql(`select row_to_json(s) from content_publication_state s where document_id='${serviceRegistry[key].documentId}'`)) as {generation:number;draft_revision_id:string;published_revision_id:string};}
 function immutableSnapshot(){return localSql("select jsonb_build_object('documents',(select jsonb_agg(d order by id) from content_documents d),'revisions',(select jsonb_agg(r order by id) from content_revisions r),'refs',(select jsonb_agg(r order by revision_id,usage_role,position) from revision_media_refs r),'events',(select jsonb_agg(e order by id) from content_publication_events e),'states',(select jsonb_agg(s order by document_id) from content_publication_state s),'assets',(select jsonb_agg(a order by id) from media_assets a),'versions',(select jsonb_agg(v order by id) from media_versions v),'mediaAudit',(select jsonb_agg(e order by id) from media_audit_events e))");}
 async function snapshot(page: Page,key:ManagedServiceKey,origin:string){
@@ -94,8 +95,8 @@ test("generic editor waits for JavaScript before editing or submitting under no-
 
 test("all seven imported database baselines render exactly like static public pages; bootstrap preserves all history",async({page,context})=>{
  const before=immutableSnapshot();bootstrap();expect(immutableSnapshot()).toBe(before);
- expect(localSql("select count(*) from content_documents")).toBe("7");
- expect(localSql("select count(*) from media_versions")).toBe("24");
+ expect(localSql("select count(*) from content_documents")).toBe("8");
+ expect(localSql("select count(*) from media_versions")).toBe("28");
  for(const key of sharedServiceKeys){const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);expect(original.service).toBe(serviceRegistry[key].crmName);}
  const client=await session(actor,context);
  for(const key of sharedServiceKeys.filter(k=>k!=="sofa-cleaning"&&k!=="mattress-cleaning")){

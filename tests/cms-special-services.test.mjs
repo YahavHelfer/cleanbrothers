@@ -62,7 +62,7 @@ test("AC Preview stays request-rendered before allowlisting and reads the newly 
  const before=createSourceLoader({env,mocks:{"next/server":{connection:async()=>{connections++;}},"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("AC must remain static while disabled");}}}})("src/cms/content/public-source.ts");
  assert.equal((await before.getPublicSpecialService("air-conditioner-cleaning")).revisionId,null);
  assert.equal(reads,0);
- assert.equal(connections,1,"a static Preview build can preserve the old AC page across allowlist redeployment");
+ assert.equal(connections,2,"a static Preview build can preserve the old AC page across allowlist redeployment");
 
  const published=clone(acBaseline);
  published.copy.heroDescription+=" בדיקת פרסום חדשה.";

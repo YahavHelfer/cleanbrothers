@@ -1,4 +1,6 @@
 import "server-only";
+import { validateImageCollections } from "@/cms/service-images/model";
+import { baselineImageCollections } from "./service-card-images";
 import { isManagedServiceKey } from "@/content/service-registry";
 import { createClient } from "@supabase/supabase-js";
 import { connection } from "next/server";
@@ -35,7 +37,7 @@ function resolveMedia(input: unknown): BlockMedia {
 export const getPublicHome = cache(async () => {
   if (approvedHomePreview()) await connection();
   if (!usesCmsHomeSource()) return { source: "static" as const, revisionId: null,
-    page: homeBaseline, media: staticHomeMedia, promotions: {} as BlockPromotions };
+    page: homeBaseline, serviceImages: baselineImageCollections(), media: staticHomeMedia, promotions: {} as BlockPromotions };
   requireHomeEnvironment();
   if (!approvedHomePreview()) await connection();
   const { url, key } = getCmsConfig();
@@ -63,5 +65,8 @@ export const getPublicHome = cache(async () => {
     if (block.type === "homeBeforeAfter") for (const item of block.payload.items as { beforeVersionId: string; afterVersionId: string }[])
       if (!media[item.beforeVersionId] || !media[item.afterVersionId]) throw new Error("Homepage gallery media missing");
   }
-  return { source: "cms" as const, revisionId, page, media, promotions };
+  const serviceImages = validateImageCollections(data.serviceImages);
+  for (const images of Object.values(serviceImages)) for (const image of images)
+    if (!media[image.versionId]) throw new Error("Shared service media missing");
+  return { source: "cms" as const, revisionId, page, media, promotions, serviceImages };
 });
