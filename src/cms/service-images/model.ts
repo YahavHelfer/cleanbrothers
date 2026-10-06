@@ -2,8 +2,8 @@ import { isManagedServiceKey, managedServiceKeys } from "@/content/service-regis
 import { PageValidationError, pageUuid } from "@/cms/pages/model";
 import { homeImagePositions, type ServiceImageCollections } from "@/cms/home/service-card-images";
 export function validateImageCollections(input: unknown): ServiceImageCollections {
-  if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).length !== managedServiceKeys.length ||
-    Object.keys(input).some(key => !isManagedServiceKey(key))) throw new PageValidationError("אוסף תמונות השירות אינו תקין.");
+  if (!input || typeof input !== "object" || Array.isArray(input) || ![managedServiceKeys.length, managedServiceKeys.length + 1].includes(Object.keys(input).length) ||
+    Object.keys(input).some(key => !isManagedServiceKey(key) && key !== "mini-central-air-conditioner-cleaning")) throw new PageValidationError("אוסף תמונות השירות אינו תקין.");
   return Object.fromEntries(managedServiceKeys.map(key => {
     const images = (input as Record<string, unknown>)[key];
     if (!Array.isArray(images) || images.length > 8) throw new PageValidationError();
