@@ -13,7 +13,7 @@ test("campaign uses closed typed placements and plain content", () => {
   assert.equal(campaign.displayMode, "popup");
   assert.equal(campaign.delaySeconds, 2);
   assert.equal(campaign.frequency, "session");
-  assert.equal(placementKeys.length, 13);
+  assert.equal(placementKeys.length, 14);
   assert.deepEqual(plain(validatePlacements(["home:home", "service:post-renovation-cleaning"])),
     ["home:home", "service:post-renovation-cleaning"]);
   for (const bad of [[], ["global:*"], ["service:unknown"], ["home:home", "home:home"], ["/about"]])

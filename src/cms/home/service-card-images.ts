@@ -25,7 +25,7 @@ export function baselineServiceImages(key: string): HomeServiceImage[] {
   }
   const crops = "imagePositions" in service ? service.imagePositions : undefined;
   return service.images.map((src, index) => ({ versionId: staticMediaId(src),
-    alt: service.images.length > 1 ? `${service.title}, תמונה ${index + 1} מתוך ${service.images.length}` : service.title,
+    alt: key === "mini-central-air-conditioner-cleaning" ? staticServiceConfigs[key].imageAlt : service.images.length > 1 ? `${service.title}, תמונה ${index + 1} מתוך ${service.images.length}` : service.title,
     position: crops?.[src as keyof typeof crops] || service.imagePosition,
   }));
 }

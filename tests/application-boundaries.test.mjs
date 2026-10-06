@@ -16,7 +16,7 @@ const publicRoutes = [
   "/", "/services", "/gallery", "/about", "/contact", "/sofa-cleaning",
   "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning",
   "/armchair-chair-cleaning", "/delicate-upholstery-cleaning",
-  "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning", "/privacy-policy",
+  "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning", "/mini-central-air-conditioner-cleaning", "/privacy-policy",
   "/accessibility-statement", "/data-deletion",
 ];
 const appDirectory = resolve(projectRoot, "src/app");

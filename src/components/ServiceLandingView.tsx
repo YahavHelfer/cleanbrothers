@@ -34,6 +34,7 @@ export function ServiceLandingView({
   video?: ReactNode;
   preview?: boolean;
 }) {
+  const copy = config.pageCopy;
   const NavLink = preview ? DisabledLink : Link;
   const serviceImages = getServiceImages(config);
   const primaryImage = getPrimaryServiceImage(config);
@@ -58,10 +59,10 @@ export function ServiceLandingView({
               {config.intro}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href="#contact-form" className="btn-primary inline-flex">לקבלת הצעת מחיר</a>
+              <a href="#contact-form" className="btn-primary inline-flex">{copy?.heroCta || "לקבלת הצעת מחיר"}</a>
               <a href={whatsappHref} aria-disabled={preview || undefined} aria-label={`שליחת WhatsApp לקבלת הצעת מחיר עבור ${config.serviceName}`} className="btn-secondary inline-flex text-white">
                 <Icon name="whatsapp" className="ml-2 h-5 w-5" />
-                שלחו לנו WhatsApp
+                {copy?.whatsappCta || "שלחו לנו WhatsApp"}
               </a>
               <a href={phoneHref} aria-disabled={preview || undefined} aria-label="חיוג ל-CleanBrothers במספר 055-957-7731" className="inline-flex min-h-12 items-center justify-center rounded-full px-4 font-black text-white underline decoration-turquoise decoration-2 underline-offset-4 focus:ring-2 focus:ring-turquoise">
                 <Icon name="phone" className="ml-2 h-5 w-5" />
@@ -93,7 +94,7 @@ export function ServiceLandingView({
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
             {serviceImages.length > 0 && <p className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
-              תמונה אמיתית מעבודה בשטח
+              {copy?.imageCaption || "תמונה אמיתית מעבודה בשטח"}
             </p>}
           </div>
         </div>
@@ -112,7 +113,7 @@ export function ServiceLandingView({
       </section>
       <section className="section-block theme-section-soft">
         <div className="section-container">
-          <SectionHeading eyebrow="סימנים שכדאי לבדוק" title={config.signsTitle} description={config.signsDescription} tone="light" />
+          <SectionHeading eyebrow={copy?.signsEyebrow || "סימנים שכדאי לבדוק"} title={config.signsTitle} description={config.signsDescription} tone="light" />
           <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-5">
             {config.signs.map((item, index) => (
               <article key={item} className="card-lift reveal rounded-3xl border theme-card p-5">
@@ -127,7 +128,7 @@ export function ServiceLandingView({
       </section>
       <section className="section-block theme-section-contrast">
         <div className="section-container">
-          <SectionHeading eyebrow="תהליך מסודר" title={config.processTitle} description={config.processDescription} />
+          <SectionHeading eyebrow={copy?.processEyebrow || "תהליך מסודר"} title={config.processTitle} description={config.processDescription} />
           <ol className="mt-7 grid gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
             {config.process.map((step, index) => (
               <li key={step} className="card-lift rounded-3xl border theme-inverse-card p-5 sm:p-6">
@@ -145,7 +146,7 @@ export function ServiceLandingView({
           <div>
             <SectionHeading
               eyebrow="CleanBrothers"
-              title="למה לבחור ב-CleanBrothers?"
+              title={copy?.benefitsTitle || "למה לבחור ב-CleanBrothers?"}
               description={config.benefitsDescription}
               align="start"
               tone="light"
@@ -186,8 +187,8 @@ export function ServiceLandingView({
       <section className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
-            eyebrow="תוצאות אמיתיות"
-            title={config.beforeAfter ? "לפני ואחרי מאותה עבודת ניקוי" : "תיעוד אמיתי מהעבודה בשטח"}
+            eyebrow={copy?.resultEyebrow || "תוצאות אמיתיות"}
+            title={copy?.resultTitle || (config.beforeAfter ? "לפני ואחרי מאותה עבודת ניקוי" : "תיעוד אמיתי מהעבודה בשטח")}
             description={config.resultDescription}
             tone="light"
           />
@@ -216,14 +217,14 @@ export function ServiceLandingView({
               </div>
               <div>
                 <h3 className="text-3xl font-black leading-tight sm:text-4xl">
-                  מציגים רק תמונות ותוצאות שתועדו באמת
+                  {copy?.resultHeading || "מציגים רק תמונות ותוצאות שתועדו באמת"}
                 </h3>
                 <p className="mt-4 text-base leading-8 theme-muted sm:text-lg">
-                  {primaryImage ? "לא נמצא בפרויקט זוג תמונות לפני ואחרי מאותו טיפול לשירות הזה, ולכן מוצגת תמונת עבודה אמיתית בלי לחבר בין עבודות שונות." : "לצפייה בתיעוד עבודות נוספות, היכנסו לגלריית העבודות שלנו."}
+                  {copy?.resultNote || (primaryImage ? "לא נמצא בפרויקט זוג תמונות לפני ואחרי מאותו טיפול לשירות הזה, ולכן מוצגת תמונת עבודה אמיתית בלי לחבר בין עבודות שונות." : "לצפייה בתיעוד עבודות נוספות, היכנסו לגלריית העבודות שלנו.")}
                 </p>
                 <NavLink href="/gallery" className="btn-secondary mt-6 inline-flex">
                   <Icon name="gallery" className="ml-2 h-5 w-5" />
-                  לצפייה בגלריית לפני ואחרי
+                  {copy?.galleryCta || "לצפייה בגלריית לפני ואחרי"}
                 </NavLink>
               </div>
             </div>
@@ -232,7 +233,7 @@ export function ServiceLandingView({
       </section>
       <section className="section-block theme-section-clean">
         <div className="section-container max-w-4xl">
-          <SectionHeading eyebrow="שאלות נפוצות" title={`מה חשוב לדעת על ${config.serviceName}?`} tone="light" />
+          <SectionHeading eyebrow="שאלות נפוצות" title={copy?.faqTitle || `מה חשוב לדעת על ${config.serviceName}?`} tone="light" />
           <div className="mt-7 grid gap-3 sm:mt-10">
             {config.faqs.map((faq) => (
               <details key={faq.question} className="group rounded-2xl border theme-card p-5 open:border-turquoise/40">
@@ -251,13 +252,13 @@ export function ServiceLandingView({
       <section id="contact-form" className="scroll-mt-24 section-block theme-section-soft pb-28 sm:pb-20">
         <div className="section-container grid items-start gap-7 lg:grid-cols-[0.78fr_1.22fr] lg:gap-10">
           <div className="lg:sticky lg:top-28">
-            <p className="text-sm font-black text-turquoise-dark">הצעת מחיר עבור {config.serviceName}</p>
-            <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">השאירו פרטים ונחזור אליכם</h2>
+            <p className="text-sm font-black text-turquoise-dark">{copy?.contactEyebrow || `הצעת מחיר עבור ${config.serviceName}`}</p>
+            <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{copy?.contactTitle || "השאירו פרטים ונחזור אליכם"}</h2>
             <p className="mt-4 text-base leading-8 theme-muted">
-              {preview ? "תצוגה מקדימה בלבד — הטופס ופעולות יצירת הקשר מושבתים." : "השירות כבר מסומן בטופס. הפרטים נשלחים דרך טופס האתר הקיים ישירות לצוות CleanBrothers."}
+              {preview ? "תצוגה מקדימה בלבד — הטופס ופעולות יצירת הקשר מושבתים." : copy?.contactDescription || "השירות כבר מסומן בטופס. הפרטים נשלחים דרך טופס האתר הקיים ישירות לצוות CleanBrothers."}
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <a href={whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">שלחו תמונה ב-WhatsApp</a>
+              <a href={whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{copy?.contactWhatsappCta || "שלחו תמונה ב-WhatsApp"}</a>
               <a href={phoneHref} aria-disabled={preview || undefined} className="btn-secondary inline-flex">
                 התקשרו: {phoneNumber}
               </a>
@@ -278,7 +279,7 @@ export function ServiceLandingView({
             התקשרו עכשיו
           </a>
           <a href="#contact-form" className="flex min-h-11 items-center justify-center rounded-xl bg-turquoise px-2 text-center text-xs font-black text-navy focus:ring-2 focus:ring-white">
-            קבלת הצעת מחיר
+            {copy?.heroCta || "קבלת הצעת מחיר"}
           </a>
         </div>
       </div>

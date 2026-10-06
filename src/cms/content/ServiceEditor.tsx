@@ -1,5 +1,6 @@
 "use client";
 
+import { servicePageCopyFields } from "@/content/service-page-copy";
 import { sharedServiceKeys, serviceRegistry, type ManagedServiceKey } from "@/content/service-registry";
 import { validateServiceDraft, type ServiceDraft } from "./service-model";
 import Link from "next/link";
@@ -41,6 +42,12 @@ export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }
         <span className="text-xs theme-muted">עד {pilotTextFields[key].max} תווים</span>
       </label>)}
     </fieldset>
+    {draft.pageCopy && <fieldset disabled={pending} className="grid gap-5 sm:grid-cols-2">
+      <legend className="mb-5 text-xl font-black">כותרות וכפתורי יצירת קשר</legend>
+      {(Object.keys(servicePageCopyFields) as (keyof typeof servicePageCopyFields)[]).map(key => <label key={key} className="grid gap-2">{servicePageCopyFields[key]}
+        <textarea className="field" required maxLength={2000} value={draft.pageCopy![key]} onChange={event => update("pageCopy", { ...draft.pageCopy!, [key]: event.target.value })} />
+      </label>)}
+    </fieldset>}
     {(Object.keys(lists) as (keyof typeof lists)[]).map((key) => <fieldset key={key} disabled={pending} className="grid gap-3">
       <legend className="mb-3 font-black">{lists[key]}</legend>
       {draft[key].map((text, index) => <div key={index} className="flex items-start gap-2">

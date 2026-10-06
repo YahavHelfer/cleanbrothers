@@ -21,6 +21,7 @@
     "test:contact-leads": "node --experimental-strip-types --test tests/contact-lead-contract.test.mjs",
     "test:attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs",
     "test:whatsapp-attribution": "node --experimental-strip-types --test tests/whatsapp-attribution.test.mjs",
+    "cms:import-mini-central": "node scripts/cms-import-mini-central.mjs",
     "cms:import-shared-services": "node scripts/cms-import-shared-services.mjs",
     "cms:import-media": "node scripts/cms-import-media.mjs",
     "cms:import-special-services": "node scripts/cms-import-special-services.mjs",

@@ -11,7 +11,7 @@ const { ServiceLandingPage, buildServiceLandingMetadata } = load("src/components
 const local = { CMS_SUPABASE_URL:"http://127.0.0.1:56321", CMS_SUPABASE_PUBLISHABLE_KEY:"sb_publishable_local_test" };
 import {baselineMedia} from "./helpers/shared-service-media.mjs";
 
-const expected={"sofa-cleaning":"ניקוי ספות","mattress-cleaning":"ניקוי מזרנים","carpet-cleaning":"ניקוי שטיחים","car-upholstery-cleaning":"ניקוי ריפודי רכב","armchair-chair-cleaning":"ניקוי כורסאות וכיסאות","delicate-upholstery-cleaning":"ניקוי ריפודים עדינים","post-renovation-cleaning":"ניקיון אחרי שיפוץ ולפני אכלוס"};
+const expected={"sofa-cleaning":"ניקוי ספות","mattress-cleaning":"ניקוי מזרנים","carpet-cleaning":"ניקוי שטיחים","car-upholstery-cleaning":"ניקוי ריפודי רכב","armchair-chair-cleaning":"ניקוי כורסאות וכיסאות","delicate-upholstery-cleaning":"ניקוי ריפודים עדינים","post-renovation-cleaning":"ניקיון אחרי שיפוץ ולפני אכלוס","mini-central-air-conditioner-cleaning":"ניקוי מזגן מיני מרכזי"};
 for(const key of keys){
  test(`${key}: exact baseline SSR, FAQ/JSON-LD, images, crop, alt, CTAs, form and metadata equivalence`,()=>{
   const draft=serviceBaseline(key),cms=toServiceLandingProps(toServiceLanding(key,draft,baselineMedia(draft)));

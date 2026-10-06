@@ -55,7 +55,17 @@ export function ServiceLandingPage({ config, crmServiceName = config.serviceName
     phoneNumber: <GoogleCallTrackingNumber>055-957-7731</GoogleCallTrackingNumber>,
     phoneHref,
     whatsappHref: getWhatsAppLink(`היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`),
-    jsonLd: <JsonLd id={`${config.path.slice(1)}-faq-jsonld`} data={faqJsonLd} />,
+    jsonLd: <>
+      <JsonLd id={`${config.path.slice(1)}-faq-jsonld`} data={faqJsonLd} />
+      {config.pageCopy && <JsonLd id={`${config.path.slice(1)}-breadcrumb-jsonld`} data={{
+        "@context": "https://schema.org", "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "בית", item: businessConfig.siteUrl },
+          { "@type": "ListItem", position: 2, name: "שירותים", item: `${businessConfig.siteUrl}/services` },
+          { "@type": "ListItem", position: 3, name: config.serviceName, item: `${businessConfig.siteUrl}${config.path}` },
+        ],
+      }} />}
+    </>,
     video: config.video ? <YouTubeLiteEmbed videoId={config.video.youtubeId} title={config.video.title}
       poster={config.video.poster} watchUrl={config.video.watchUrl} /> : null,
   });

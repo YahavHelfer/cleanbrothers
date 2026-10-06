@@ -8,7 +8,7 @@ import type { SharedServiceImage } from "./model";
 export const getPublicServiceImages = cache(async (key: ManagedServiceKey): Promise<SharedServiceImage[]> => {
   requireServiceKey(key);
   const home = await getPublicHome();
-  return home.serviceImages[key].map(image => {
+  return (home.serviceImages[key] ?? []).map(image => {
     const src = home.media[image.versionId]?.src;
     if (!src) throw new Error("Shared service media unavailable");
     return { ...image, src };

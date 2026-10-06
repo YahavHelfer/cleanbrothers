@@ -1,6 +1,6 @@
 "use server";
 
-import { requireServiceKey } from "@/content/service-registry";
+import { requireServiceKey, serviceRegistry } from "@/content/service-registry";
 import { revalidatePath } from "next/cache";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { mutateService } from "./repository";
@@ -30,6 +30,10 @@ export async function contentAction(_previous: ContentActionState, form: FormDat
     } else throw new ContentValidationError();
     revalidatePath("/admin/services");
     revalidatePath(`/admin/services/${key}`);
+    if (kind === "publish") {
+      revalidatePath(serviceRegistry[key].path);
+      revalidatePath("/services");
+    }
     return { ok: true, revision: result, message: kind === "publish" ? "הגרסה פורסמה בסביבת התוכן הנוכחית." : "הטיוטה נשמרה. הפרסום לא השתנה." };
   } catch (error) {
     return { ok: false, message: error instanceof ContentValidationError ? error.message : "הפעולה לא הושלמה. בדקו את ההרשאה וטענו מחדש את העמוד." };

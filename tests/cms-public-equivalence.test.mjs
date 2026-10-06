@@ -36,7 +36,7 @@ for(const file of pages)test(`approved public layout and editorial content prese
   if (file.endsWith("/services/page.tsx")) {
    const cards = html => html.match(/<article\b[\s\S]*?<\/article>/g) ?? [];
    assert.deepEqual(cards(actual).slice(0,8).map(editorial), cards(expected).map(editorial));
-   assert.equal(cards(actual).length,9);
+   assert.equal(cards(actual).length,10);
   } else {
    assert.deepEqual(editorial(actual), editorial(expected));
    assert.deepEqual(actual.match(/<section class="[^"]*"/g), expected.match(/<section class="[^"]*"/g));
@@ -49,7 +49,7 @@ for(const file of pages)test(`approved public layout and editorial content prese
   return;
  }
 
- const existingOutput=actual.replace(/ data-service-card="[^"]+"/g,'').replace('<option>ניקיון אחרי שיפוץ ולפני אכלוס</option>','');
+ const existingOutput=actual.replace(/ data-service-card="[^"]+"/g,'').replace('<option>ניקיון אחרי שיפוץ ולפני אכלוס</option>','').replace('<option>ניקוי מזגן מיני מרכזי</option>','');
  assert.equal(file==="src/app/(site)/page.tsx"?canonicalReactIds(existingOutput):existingOutput,
   file==="src/app/(site)/page.tsx"?canonicalReactIds(expected):expected);
  assert.deepEqual(JSON.parse(JSON.stringify(b.metadata??await b.generateMetadata())),JSON.parse(JSON.stringify(a.metadata??await a.generateMetadata())));

@@ -1,3 +1,4 @@
+import { getPublicService } from "@/cms/content/public-source";
 import { Icon } from "@/components/Icon";
 import { PageHero } from "@/components/PageHero";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
@@ -19,7 +20,8 @@ export const metadata = buildMetadata({
 export default async function ServicesPage() {
   const rows = await Promise.all(services.map(async service => {
     const key = requireServiceKey(service.landingPath.slice(1));
-    return { ...service, key, sharedImages: await getPublicServiceImages(key) };
+    const source = key === "mini-central-air-conditioner-cleaning" ? await getPublicService(key) : null;
+    return { ...service, ...(source ? { title: source.page.displayTitle, details: source.page.content.signsDescription } : {}), key, sharedImages: await getPublicServiceImages(key) };
   }));
   return (
     <>

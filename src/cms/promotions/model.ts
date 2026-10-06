@@ -4,7 +4,7 @@ import { PageValidationError, pageUuid, validateCta, type SafeCta } from "@/cms/
 export const placementKeys = ["global:site", "home:home", "page:about", "page:services",
   "service:delicate-upholstery-cleaning", "service:sofa-cleaning", "service:mattress-cleaning",
   "service:carpet-cleaning", "service:car-upholstery-cleaning", "service:armchair-chair-cleaning",
-  "service:air-conditioner-cleaning", "service:window-cleaning", "service:post-renovation-cleaning"] as const;
+  "service:air-conditioner-cleaning", "service:window-cleaning", "service:post-renovation-cleaning", "service:mini-central-air-conditioner-cleaning"] as const;
 export type PlacementKey = (typeof placementKeys)[number];
 export type Frequency = "every-visit" | "session" | "24-hours";
 

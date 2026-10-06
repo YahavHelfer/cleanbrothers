@@ -1,6 +1,8 @@
 import {createSourceLoader} from "./source-module.mjs";
 const load=createSourceLoader();
-const {staticMediaInventory:inventory}=load("src/cms/media/static-inventory.ts");
+const {staticMediaInventory}=load("src/cms/media/static-inventory.ts");
+const {specialStaticMediaInventory}=load("src/cms/media/special-static-inventory.ts");
+const inventory=[...staticMediaInventory,...specialStaticMediaInventory];
 const {resolveMediaProjection}=load("src/cms/media/resolve.ts");
 export function baselineMedia(d) {
   if(d.schemaVersion===1)return undefined;

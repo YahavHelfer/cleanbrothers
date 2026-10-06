@@ -1,3 +1,4 @@
+import type { ServicePageCopy } from "./service-page-copy";
 import type { PilotServiceId } from "./service-identity";
 
 type Faq = { question: string; answer: string };
@@ -20,6 +21,7 @@ type BeforeAfter = {
 
 // Existing renderer contract, moved out of the UI without changing its fields.
 export type ServiceLandingConfig = {
+  pageCopy?: ServicePageCopy;
   path: string;
   serviceName: string;
   metaTitle: string;

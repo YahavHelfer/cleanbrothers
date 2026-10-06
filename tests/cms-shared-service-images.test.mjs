@@ -8,7 +8,7 @@ const { baselineImageCollections } = load("src/cms/home/service-card-images.ts")
 const { validateImageCollections } = load("src/cms/service-images/model.ts");
 const collections = () => plain(baselineImageCollections());
 
-test("all nine stable service identities have one strictly validated collection; explicit emptiness is retained", () => {
+test("all ten stable service identities have one strictly validated collection; explicit emptiness is retained", () => {
   const input = collections(); input["sofa-cleaning"] = [];
   assert.deepEqual(plain(validateImageCollections(input)), input);
   for(const mutate of [p=>delete p["sofa-cleaning"],p=>p["ניקוי ספות"]=[],p=>p["unknown"]=[],
@@ -31,7 +31,7 @@ test("shared public reader uses one published home projection, including service
     assert.deepEqual(result.map(image=>({versionId:image.versionId,alt:image.alt,position:image.position})),serviceImages[key]);
     assert.deepEqual(result.map(image=>image.src),serviceImages[key].map(image=>media[image.versionId].src));
   }
-  assert.equal(reads,9); // React request cache is tested in real requests, not outside request scope.
+  assert.equal(reads,10); // React request cache is tested in real requests, not outside request scope.
   await assert.rejects(()=>source.getPublicServiceImages("Unknown title"));
 });
 

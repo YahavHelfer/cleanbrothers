@@ -93,10 +93,10 @@ test("generic editor waits for JavaScript before editing or submitting under no-
  } finally {release();}
 });
 
-test("all seven imported database baselines render exactly like static public pages; bootstrap preserves all history",async({page,context})=>{
+test("all eight imported database baselines render exactly like static public pages; bootstrap preserves all history",async({page,context})=>{
  const before=immutableSnapshot();bootstrap();expect(immutableSnapshot()).toBe(before);
- expect(localSql("select count(*) from content_documents")).toBe("8");
- expect(localSql("select count(*) from media_versions")).toBe("28");
+ expect(localSql("select count(*) from content_documents")).toBe("9");
+ expect(localSql("select count(*) from media_versions")).toBe("31");
  for(const key of sharedServiceKeys){const original=await snapshot(page,key,appOrigin);expect(await snapshot(page,key,published)).toEqual(original);expect(original.service).toBe(serviceRegistry[key].crmName);}
  const client=await session(actor,context);
  for(const key of sharedServiceKeys.filter(k=>k!=="sofa-cleaning"&&k!=="mattress-cleaning")){

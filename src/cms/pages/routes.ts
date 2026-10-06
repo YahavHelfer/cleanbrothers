@@ -6,7 +6,7 @@ export const reservedPageSlugs = [
   "icon", "apple-icon", "favicon", "manifest", "opengraph-image", "twitter-image",
   "sofa-cleaning", "mattress-cleaning", "carpet-cleaning", "delicate-upholstery-cleaning",
   "car-upholstery-cleaning", "armchair-chair-cleaning", "air-conditioner-cleaning", "window-cleaning",
-  "post-renovation-cleaning",
+  "post-renovation-cleaning", "mini-central-air-conditioner-cleaning",
 ] as const;
 
 export class PageSlugError extends Error {

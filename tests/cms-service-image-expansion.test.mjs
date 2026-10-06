@@ -6,6 +6,7 @@ test("existing image readers preserve all historical collections when mini-centr
  const old=plain(load("src/cms/home/service-card-images.ts").baselineImageCollections());
  const next={...old,"mini-central-air-conditioner-cleaning":[]};
  const result=plain(load("src/cms/service-images/model.ts").validateImageCollections(next));
- for(const key of Object.keys(old)) assert.deepEqual(result[key],old[key]);
+ for(const key of Object.keys(old).filter(key=>key!=="mini-central-air-conditioner-cleaning")) assert.deepEqual(result[key],old[key]);
+ assert.deepEqual(result["mini-central-air-conditioner-cleaning"],[]);
  assert.throws(()=>load("src/cms/service-images/model.ts").validateImageCollections({...next,unexpected:[]}));
 });
