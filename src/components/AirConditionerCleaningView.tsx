@@ -139,7 +139,6 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
               sizes="(min-width: 1024px) 46vw, 100vw"
               priority
             />
-            {hero.length > 0 && <p className="pointer-events-none absolute bottom-3 right-3 z-20 rounded-full bg-navy/80 px-3 py-1.5 text-xs font-black text-white backdrop-blur">{content.copy.imageCaption}</p>}
           </div>
         </div>
       </section>

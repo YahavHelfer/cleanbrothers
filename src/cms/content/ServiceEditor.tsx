@@ -42,6 +42,10 @@ export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }
         <span className="text-xs theme-muted">עד {pilotTextFields[key].max} תווים</span>
       </label>)}
     </fieldset>
+    {draft.schemaVersion === 3 && <label className="flex items-center gap-3">
+      <input type="checkbox" checked={draft.resultsHidden ?? false} disabled={pending} onChange={event => update("resultsHidden", event.target.checked)} />
+      הסתרת מקטע עבודות ותוצאות
+    </label>}
     {draft.pageCopy && <fieldset disabled={pending} className="grid gap-5 sm:grid-cols-2">
       <legend className="mb-5 text-xl font-black">כותרות וכפתורי יצירת קשר</legend>
       {(Object.keys(servicePageCopyFields) as (keyof typeof servicePageCopyFields)[]).map(key => <label key={key} className="grid gap-2">{servicePageCopyFields[key]}

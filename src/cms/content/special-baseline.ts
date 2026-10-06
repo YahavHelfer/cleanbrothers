@@ -11,7 +11,7 @@ export const acBaseline: AirConditionerCleaningContent = {
     "heroDescription": "ניקוי מקצועי למזגנים עיליים בבית הלקוח, עם טיפול באבק, לכלוך וריחות לא נעימים בחלקים הנגישים לניקוי.",
     "heroCta": "שלחו תמונה וקבלו הערכת מחיר",
     "callCta": "התקשרו עכשיו",
-    "imageCaption": "תמונות אמיתיות מהשטח",
+    "imageCaption": "תמונות מהשטח",
     "signsEyebrow": "סימנים שכדאי לבדוק",
     "signsTitle": "מתי כדאי להזמין ניקוי מזגן?",
     "signsDescription": "הסימנים הבאים יכולים להעיד שהגיע הזמן לנקות הצטברות אבק ולכלוך. הם אינם אבחון של תקלה טכנית.",
@@ -26,8 +26,8 @@ export const acBaseline: AirConditionerCleaningContent = {
     "processDescription": "מתמונה ראשונה ועד ביקור מתואם בבית — בלי מנגנון פנייה חדש ובלי שלבים מיותרים.",
     "processCta": "שלחו תמונה עכשיו",
     "galleryEyebrow": "עבודות מהשטח",
-    "galleryTitle": "עבודות ניקוי מזגנים אמיתיות",
-    "galleryDescription": "תמונות מעבודות אמיתיות שבוצעו על ידי CleanBrothers. איננו מציגים זוג לפני ואחרי כאשר אין תיעוד מלא מאותה עבודה.",
+    "galleryTitle": "עבודות ניקוי מזגנים",
+    "galleryDescription": "תמונות מעבודות שבוצעו על ידי CleanBrothers. איננו מציגים זוג לפני ואחרי כאשר אין תיעוד מלא מאותה עבודה.",
     "pricingEyebrow": "הערכת מחיר לפי תמונה",
     "pricingTitle": "כמה עולה ניקוי מזגן?",
     "pricingDescription": "המחיר נקבע לפי סוג המזגן, מצב הלכלוך, הנגישות וכמות המזגנים. שלחו תמונה בוואטסאפ לקבלת הערכה מדויקת יותר.",
@@ -153,29 +153,29 @@ export const acBaseline: AirConditionerCleaningContent = {
     "hero": [
       {
         "versionId": "b920443f-55c5-4b27-a232-154b3688320e",
-        "alt": "עבודות ניקוי מזגנים אמיתיות של CleanBrothers"
+        "alt": "עבודות ניקוי מזגנים של CleanBrothers"
       },
       {
         "versionId": "ba7745a4-fe0c-44fb-913c-971aaef4f486",
-        "alt": "עבודות ניקוי מזגנים אמיתיות של CleanBrothers"
+        "alt": "עבודות ניקוי מזגנים של CleanBrothers"
       },
       {
         "versionId": "9c3e4c0f-d64b-47c7-9fb4-8f643af949a2",
-        "alt": "עבודות ניקוי מזגנים אמיתיות של CleanBrothers"
+        "alt": "עבודות ניקוי מזגנים של CleanBrothers"
       }
     ],
     "gallery": [
       {
         "versionId": "ba7745a4-fe0c-44fb-913c-971aaef4f486",
-        "alt": "עבודת ניקוי מזגן אמיתית של CleanBrothers, תמונה 1"
+        "alt": "עבודת ניקוי מזגן של CleanBrothers, תמונה 1"
       },
       {
         "versionId": "9c3e4c0f-d64b-47c7-9fb4-8f643af949a2",
-        "alt": "עבודת ניקוי מזגן אמיתית של CleanBrothers, תמונה 2"
+        "alt": "עבודת ניקוי מזגן של CleanBrothers, תמונה 2"
       },
       {
         "versionId": "b920443f-55c5-4b27-a232-154b3688320e",
-        "alt": "עבודת ניקוי מזגן אמיתית של CleanBrothers, תמונה 3"
+        "alt": "עבודת ניקוי מזגן של CleanBrothers, תמונה 3"
       }
     ],
     "seo": [

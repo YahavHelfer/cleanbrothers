@@ -93,8 +93,8 @@ export function ServiceLandingView({
               priority
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
-            {serviceImages.length > 0 && <p className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
-              {copy?.imageCaption || "תמונה אמיתית מעבודה בשטח"}
+            {serviceImages.length > 0 && copy?.imageCaption && <p className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
+              {copy.imageCaption}
             </p>}
           </div>
         </div>
@@ -162,7 +162,7 @@ export function ServiceLandingView({
           </div>
           <ServiceImageCarousel
             images={serviceImages}
-            alt={`תיעוד אמיתי של ${config.serviceName} על ידי CleanBrothers`}
+            alt={`צילום של ${config.serviceName} על ידי CleanBrothers`}
             imageAlts={config.mediaPresentation?.benefitAlts}
             className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border theme-card bg-navy"
             imageClassName="object-cover"
@@ -184,11 +184,11 @@ export function ServiceLandingView({
           </div>
         </section>
       ) : null}
-      <section className="section-block theme-section-soft">
+      {config.resultsHidden !== true && <section data-service-results className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
-            eyebrow={copy?.resultEyebrow || "תוצאות אמיתיות"}
-            title={copy?.resultTitle || (config.beforeAfter ? "לפני ואחרי מאותה עבודת ניקוי" : "תיעוד אמיתי מהעבודה בשטח")}
+            eyebrow={copy?.resultEyebrow || "עבודות ניקוי"}
+            title={copy?.resultTitle || (config.beforeAfter ? "לפני ואחרי מאותה עבודת ניקוי" : "דוגמאות לעבודות ניקוי")}
             description={config.resultDescription}
             tone="light"
           />
@@ -217,10 +217,10 @@ export function ServiceLandingView({
               </div>
               <div>
                 <h3 className="text-3xl font-black leading-tight sm:text-4xl">
-                  {copy?.resultHeading || "מציגים רק תמונות ותוצאות שתועדו באמת"}
+                  {copy?.resultHeading || "עבודות ניקוי של CleanBrothers"}
                 </h3>
                 <p className="mt-4 text-base leading-8 theme-muted sm:text-lg">
-                  {copy?.resultNote || (primaryImage ? "לא נמצא בפרויקט זוג תמונות לפני ואחרי מאותו טיפול לשירות הזה, ולכן מוצגת תמונת עבודה אמיתית בלי לחבר בין עבודות שונות." : "לצפייה בתיעוד עבודות נוספות, היכנסו לגלריית העבודות שלנו.")}
+                  {copy?.resultNote || (primaryImage ? "לצפייה בעבודות נוספות, היכנסו לגלריית העבודות שלנו." : "לצפייה בתיעוד עבודות נוספות, היכנסו לגלריית העבודות שלנו.")}
                 </p>
                 <NavLink href="/gallery" className="btn-secondary mt-6 inline-flex">
                   <Icon name="gallery" className="ml-2 h-5 w-5" />
@@ -230,7 +230,7 @@ export function ServiceLandingView({
             </div>
           )}
         </div>
-      </section>
+      </section>}
       <section className="section-block theme-section-clean">
         <div className="section-container max-w-4xl">
           <SectionHeading eyebrow="שאלות נפוצות" title={copy?.faqTitle || `מה חשוב לדעת על ${config.serviceName}?`} tone="light" />

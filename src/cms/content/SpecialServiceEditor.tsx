@@ -29,6 +29,8 @@ function blank(c:Contract):unknown {
  switch(c.kind){case "text":case "uuid":return "";case "number":return c.min;case "boolean":return false;case "literal":return c.value;case "list":return Array.from({length:c.min},()=>blank(c.item));case "object":return Object.fromEntries(Object.entries(c.fields).map(([k,v])=>[k,blank(v)]));}
 }
 function Field({contract:c,value,onChange,name,choices,path,serviceKey}: {contract:Contract;value:unknown;onChange:(v:unknown)=>void;name:string;choices:MediaChoice[];path:string;serviceKey:SpecialServiceKey}) {
+ // Retain the legacy payload field for history compatibility; the retired overlay is not rendered.
+ if (path === "content.copy.imageCaption") return null;
  if (path === "content.media.hero") return <section className="rounded-xl border p-4" aria-label="תמונות השירות">
   <p>תמונות השירות משותפות לעמוד הבית, לרשימת השירותים ולעמוד השירות. מנהלים ומפרסמים אותן בעורך דף הבית.</p>
   <Link href={`/admin/pages/home#service-images-${serviceKey}`} prefetch={false} className="underline">עריכת תמונות השירות</Link>

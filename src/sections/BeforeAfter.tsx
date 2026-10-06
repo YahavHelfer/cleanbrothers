@@ -5,7 +5,7 @@ import { getWhatsAppLink } from "@/lib/whatsapp";
 
 export const beforeAfterContent = {
   eyebrow: "לפני ואחרי",
-  title: "תוצאות אמיתיות, בלי פילטרים מיותרים",
+  title: "תוצאות לפני ואחרי ניקוי",
   mobileDescription: "תוצאות לדוגמה לפני ואחרי ניקוי.",
   description: "דוגמאות מניקוי ספה, מזרן, שטיח וריפודי רכב. התמונות עוזרות להבין את מצב הריפוד ולקבל הצעת מחיר מדויקת יותר.",
   items: galleryItems,

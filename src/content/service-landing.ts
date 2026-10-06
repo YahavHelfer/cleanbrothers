@@ -22,6 +22,7 @@ type BeforeAfter = {
 // Existing renderer contract, moved out of the UI without changing its fields.
 export type ServiceLandingConfig = {
   pageCopy?: ServicePageCopy;
+  resultsHidden?: boolean;
   path: string;
   serviceName: string;
   metaTitle: string;

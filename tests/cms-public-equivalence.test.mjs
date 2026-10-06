@@ -5,10 +5,11 @@ import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createSourceLoader, projectRoot } from "./helpers/source-module.mjs";
 import { repairHistoricalAcMedia } from "./helpers/ac-approved-baseline.mjs";
+import { approvedPhotoCleanup } from "./helpers/approved-photo-cleanup.mjs";
 const baseline="02af571d8d1c15b38e1e203711921b0b512a87e7";
 // All tracked source overrides ensure this remains valid before AND after commit.
 const files=execFileSync("git",["ls-tree","-r","--name-only",baseline,"src"],{encoding:"utf8"}).trim().split("\n").filter(f=>/\.tsx?$/.test(f));
-const overrides=Object.fromEntries(files.map(f=>[resolve(projectRoot,f),repairHistoricalAcMedia(f,execFileSync("git",["show",`${baseline}:${f}`],{encoding:"utf8"}))]));
+const overrides=Object.fromEntries(files.map(f=>[resolve(projectRoot,f),approvedPhotoCleanup(f,repairHistoricalAcMedia(f,execFileSync("git",["show",`${baseline}:${f}`],{encoding:"utf8"})))]));
 const before=createSourceLoader({sourceOverrides:overrides}),after=createSourceLoader({ env: {
  VERCEL:"1",VERCEL_ENV:"production",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
  VERCEL_GIT_COMMIT_REF:"main",
@@ -27,7 +28,12 @@ function canonicalReactIds(html) {
 }
 for(const file of pages)test(`approved public layout and editorial content preserved: ${file}`,async()=>{
  const a=before(file),b=after(file);
- const actual=renderToStaticMarkup(await b.default()),expected=renderToStaticMarkup(await a.default());
+ const actual=renderToStaticMarkup(await b.default()).replace(/ data-service-results="(?:true)?"/g,""),expected=renderToStaticMarkup(await a.default())
+  .replace(/<p class="(?:pointer-events-none )?absolute bottom-[^>]*>[\s\S]*?<\/p>/g, "")
+  .replaceAll("עבודות ניקוי מזגנים אמיתיות", "עבודות ניקוי מזגנים")
+  .replaceAll("עבודת ניקוי מזגן אמיתית", "עבודת ניקוי מזגן")
+  .replace(/(תיעוד|תמונה|תמונות|צילום|צילומים|תוצאות|עבודה|עבודות|מזרן|שטיח ביתי|ספת בד|ריפודי רכב) (אמיתיות|אמיתיים|אמיתית|אמיתי)([^א-ת]|$)/g, "$1$3")
+  .replace("לא נמצא בפרויקט זוג תמונות לפני ואחרי מאותו טיפול לשירות הזה, ולכן מוצגת תמונת עבודה בלי לחבר בין עבודות שונות.", "לצפייה בעבודות נוספות, היכנסו לגלריית העבודות שלנו.");
  // Shared service photography intentionally changes. Compare the existing
  // section layout and editorial text independently of carousel image markup.
  const serviceRoute = /\/(?:services|sofa-cleaning|mattress-cleaning|carpet-cleaning|car-upholstery-cleaning|armchair-chair-cleaning|delicate-upholstery-cleaning|air-conditioner-cleaning)\/page\.tsx$/.test(file);

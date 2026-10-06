@@ -10,6 +10,7 @@ export const imagePositions = ["object-center", "object-[center_48%]", "object-[
 export type ServiceDraft = Omit<PilotDraft, "schemaVersion"> & {
   schemaVersion: 1 | 2 | 3;
   pageCopy?: ServicePageCopy;
+  resultsHidden?: boolean;
   imagePosition?: string;
   imagePositions?: Record<string, string>;
   beforeAfter?: NonNullable<ServiceLandingConfig["beforeAfter"]>;
@@ -26,7 +27,7 @@ export function validateServiceDraft(serviceKey: ManagedServiceKey, value: unkno
     if (serviceKey !== PILOT_KEY) throw new ContentValidationError();
     return validatePilotDraft(value);
   }
-  const { pageCopy, beforeAfter, imagePosition, imagePositions: crops, relatedLinks, ...base } = data;
+  const { resultsHidden, pageCopy, beforeAfter, imagePosition, imagePositions: crops, relatedLinks, ...base } = data;
   // Reuse the strict plain-text/list/FAQ/UUID contract, preserving schema 1/2.
   const validated = validatePilotDraft({ ...base, schemaVersion: 2, relatedLinks: [] });
   if (!Array.isArray(relatedLinks) || relatedLinks.length > sharedServiceKeys.length) throw new ContentValidationError();
@@ -37,6 +38,10 @@ export function validateServiceDraft(serviceKey: ManagedServiceKey, value: unkno
   });
   if (new Set(links.map(link => link.href)).size !== links.length) throw new ContentValidationError();
   const result: ServiceDraft = { ...validated, schemaVersion: 3, relatedLinks: links };
+  if (resultsHidden !== undefined) {
+    if (typeof resultsHidden !== "boolean") throw new ContentValidationError();
+    result.resultsHidden = resultsHidden;
+  }
   if (pageCopy !== undefined) {
     if (!pageCopy || typeof pageCopy !== "object" || Array.isArray(pageCopy) || Object.keys(pageCopy).sort().join() !== Object.keys(servicePageCopyFields).sort().join()) throw new ContentValidationError();
     result.pageCopy = Object.fromEntries(Object.keys(servicePageCopyFields).map(key => [key, plainText((pageCopy as Record<string,unknown>)[key], 2000)])) as ServicePageCopy;
@@ -67,7 +72,7 @@ export function validateServiceDraft(serviceKey: ManagedServiceKey, value: unkno
 export function toServiceLanding(key: ManagedServiceKey, input: unknown, media?: ResolvedMedia[]): ServiceLandingContent {
   const d = validateServiceDraft(key, input);
   if (d.schemaVersion !== 3) return toPilotLanding(d, media);
-  const { pageCopy, beforeAfter, imagePosition, imagePositions: crops, ...base } = d;
+  const { resultsHidden, pageCopy, beforeAfter, imagePosition, imagePositions: crops, ...base } = d;
   const page = toPilotLanding({ ...base, schemaVersion: 2, relatedLinks: [] }, media);
   const hero = media!.filter(r => r.usage_role === "hero").sort((a,b) => a.position-b.position);
   if (hero.length > 1) {
@@ -76,7 +81,7 @@ export function toServiceLanding(key: ManagedServiceKey, input: unknown, media?:
       for (const ref of media!.filter(r => r.usage_role === role)) map[ref.src] = `${ref.alt_text}, תמונה ${ref.position + 1} מתוך ${hero.length}`;
     }
   }
-  const content = { ...page.content, ...(pageCopy ? { pageCopy } : {}), path: serviceRegistry[key].path, relatedLinks: d.relatedLinks };
+  const content = { ...page.content, ...(resultsHidden !== undefined ? { resultsHidden } : {}), ...(pageCopy ? { pageCopy } : {}), path: serviceRegistry[key].path, relatedLinks: d.relatedLinks };
   if (imagePosition !== undefined) content.imagePosition = imagePosition;
   if (crops !== undefined) content.imagePositions = Object.fromEntries(hero.filter(r => crops[r.media_version_id]).map(r => [r.src, crops[r.media_version_id]]));
   if (beforeAfter) {

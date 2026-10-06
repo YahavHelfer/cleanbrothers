@@ -2,6 +2,7 @@ import type { ServiceLandingConfig } from "@/content/service-landing";
 // Import baseline. Scope evidence: special-baseline.ts (accessible parts and
 // suitability by type/access), QuickPriceEstimate.tsx (mini-central inquiry).
 export const miniCentralAirConditionerLanding: ServiceLandingConfig = {
+  resultsHidden: true,
   path: "/mini-central-air-conditioner-cleaning",
   serviceName: "ניקוי מזגן מיני מרכזי",
   metaTitle: "ניקוי מזגן מיני מרכזי | בדיקת התאמה ותיאום | CleanBrothers",
@@ -37,7 +38,7 @@ export const miniCentralAirConditionerLanding: ServiceLandingConfig = {
     "benefitsTitle": "למה לתאם עם CleanBrothers?",
     "resultEyebrow": "תיעוד עבודות",
     "resultTitle": "ניקוי מזגנים בעבודות קודמות",
-    "resultHeading": "תמונות אמיתיות של ניקוי מזגנים",
+    "resultHeading": "תמונות של ניקוי מזגנים",
     "resultNote": "התמונות הן מתיעוד ניקוי מזגנים קיים ואינן תיעוד של ניקוי מיני מרכזי. היקף השירות למערכת שלכם ייבדק בנפרד.",
     "galleryCta": "לגלריית העבודות",
     "faqTitle": "מה כדאי לדעת לפני תיאום ניקוי מיני מרכזי?",
