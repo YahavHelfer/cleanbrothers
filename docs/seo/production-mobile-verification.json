@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/",
+    "brokenImages": [],
+    "h1": "ניקיון מקצועי לבית, לעסק ולרכב",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "path": "/sofa-cleaning",
+    "brokenImages": [],
+    "h1": "ניקוי ספות מקצועי עד הבית",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "path": "/mattress-cleaning",
+    "brokenImages": [],
+    "h1": "ניקוי מזרנים מקצועי עד הבית",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "path": "/air-conditioner-cleaning",
+    "brokenImages": [],
+    "h1": "ניקוי מזגנים מקצועי",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "path": "/mini-central-air-conditioner-cleaning",
+    "brokenImages": [],
+    "h1": "ניקוי מזגן מיני מרכזי",
+    "scrollWidth": 390,
+    "width": 390
+  }
+]

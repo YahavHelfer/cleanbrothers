@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-14",
+  "origin": "https://www.cleanbrothers.co.il",
+  "readOnly": true,
+  "pages": [
+    {
+      "path": "/",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il",
+      "schemas": 2,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/services",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/services",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/gallery",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/gallery",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/about",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/about",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/contact",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/contact",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/privacy-policy",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/privacy-policy",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/data-deletion",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/data-deletion",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/accessibility-statement",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/accessibility-statement",
+      "schemas": 1,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/sofa-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/sofa-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/mattress-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/mattress-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/carpet-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/carpet-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/car-upholstery-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/car-upholstery-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/armchair-chair-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/armchair-chair-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/delicate-upholstery-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/delicate-upholstery-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/air-conditioner-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/air-conditioner-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/window-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/window-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/mini-central-air-conditioner-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/mini-central-air-conditioner-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    },
+    {
+      "path": "/post-renovation-cleaning",
+      "status": 200,
+      "mainH1": 1,
+      "canonical": "https://www.cleanbrothers.co.il/post-renovation-cleaning",
+      "schemas": 3,
+      "noindex": false,
+      "email": true,
+      "hours": true
+    }
+  ],
+  "missing": [
+    {
+      "path": "/seo-release-missing",
+      "status": 404
+    },
+    {
+      "path": "/seo-release-missing/deeper",
+      "status": 404
+    }
+  ],
+  "sitemapUrls": 18
+}

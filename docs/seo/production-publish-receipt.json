@@ -1,0 +1,54 @@
+[
+  {
+    "service": "sofa-cleaning",
+    "published": 5
+  },
+  {
+    "service": "mattress-cleaning",
+    "published": 6
+  },
+  {
+    "service": "carpet-cleaning",
+    "published": 7
+  },
+  {
+    "service": "car-upholstery-cleaning",
+    "published": 5
+  },
+  {
+    "service": "armchair-chair-cleaning",
+    "published": 5
+  },
+  {
+    "service": "delicate-upholstery-cleaning",
+    "published": 12
+  },
+  {
+    "service": "air-conditioner-cleaning",
+    "published": 10
+  },
+  {
+    "service": "window-cleaning",
+    "published": 4
+  },
+  {
+    "service": "mini-central-air-conditioner-cleaning",
+    "published": 11
+  },
+  {
+    "service": "post-renovation-cleaning",
+    "published": 5
+  },
+  {
+    "service": "settings",
+    "published": 9
+  },
+  {
+    "service": "home",
+    "published": 44
+  },
+  {
+    "service": "mini-central-promotion",
+    "published": 11
+  }
+]
