@@ -48,9 +48,7 @@ export function ImageWithFallback({
           preload={preload || priority}
           sizes={sizes}
           decoding="async"
-          className={`${imageClassName} transition-opacity duration-500 ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          className={imageClassName}
           onLoad={() => setIsLoaded(true)}
           onError={() => setHasError(true)}
         />

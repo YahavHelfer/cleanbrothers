@@ -1,3 +1,4 @@
+import { baselineServiceImages, homeImagePositions } from "./service-card-images";
 import { isManagedServiceKey } from "@/content/service-registry";
 import { homeBlockDefinitions, PageValidationError, pageUuid, validateBlock } from "@/cms/pages/model";
 
@@ -58,10 +59,22 @@ function content(type: HomeBlockType, value: unknown): Record<string, unknown> {
       if (new Set(serviceKeys).size !== serviceKeys.length) throw new PageValidationError("אין לשכפל שירותים.");
       const cards = p.cards;
       if (!cards || typeof cards !== "object" || Array.isArray(cards) ||
-        Object.keys(cards).length > 8 || Object.keys(cards).some(key => !isManagedServiceKey(key)))
+        Object.keys(cards).length > 10 || Object.keys(cards).some(key => !isManagedServiceKey(key)))
         throw new PageValidationError("כרטיס שירות אינו מאושר.");
-      const checked = Object.fromEntries(Object.entries(cards).map(([key, card]) =>
-        [key, copy(object(card, ["title", "benefit", "description"]), ["title", "benefit", "description"])]));
+      const checked = Object.fromEntries(Object.entries(cards).map(([key, card]) => {
+          const fields = card && typeof card === "object" && Object.hasOwn(card, "images")
+            ? ["title", "benefit", "description", "images"] : ["title", "benefit", "description"];
+          const row = object(card, fields);
+          const images = Object.hasOwn(row, "images") ? rows(row.images, 0, 8).map(value => {
+            const image = object(value, ["versionId", "alt", "position"]);
+            if (!homeImagePositions.includes(image.position as typeof homeImagePositions[number]))
+              throw new PageValidationError("מיקום התמונה אינו מאושר.");
+            return { versionId: pageUuid(image.versionId), alt: plain(image.alt, 300), position: image.position as string };
+          }) : baselineServiceImages(key);
+          if (new Set(images.map(image => image.versionId)).size !== images.length)
+            throw new PageValidationError("אין לשכפל תמונות בכרטיס.");
+          return [key, { ...copy(row, ["title", "benefit", "description"]), images }];
+        }));
       if (serviceKeys.some(key => !checked[key])) throw new PageValidationError("חסר כרטיס שירות.");
       return { ...copy(p, ["eyebrow", "title", "mobileDescription", "description", "note"]), serviceKeys, cards: checked };
     }

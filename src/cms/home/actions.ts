@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { managedServiceKeys, serviceRegistry } from "@/content/service-registry";
+import { validateImageCollections } from "@/cms/service-images/model";
 import { requireCmsAdmin } from "@/cms/authorization";
 import { PageValidationError, pageGeneration, pageUuid } from "@/cms/pages/model";
 import { bootstrapHomeGoogleReviews, mutateHome } from "./repository";
@@ -18,7 +20,9 @@ export async function homeAction(_previous: HomeActionState, form: FormData): Pr
       if (typeof raw !== "string" || raw.length > 150_000) throw new PageValidationError();
       let payload: unknown;
       try { payload = JSON.parse(raw); } catch { throw new PageValidationError(); }
-      result = await mutateHome({ kind: "save", generation, revision, payload: payload as never });
+      const images = form.get("serviceImages");
+      result = await mutateHome({ kind: "save", generation, revision, payload: payload as never,
+        ...(typeof images === "string" ? { serviceImages: validateImageCollections(JSON.parse(images)) } : {}) });
     } else if (intent === "publish") {
       if (form.get("confirmPublish") !== "yes") throw new PageValidationError("יש לאשר במפורש את פרסום הגרסה השמורה.");
       result = await mutateHome({ kind: "publish", generation, revision });
@@ -28,6 +32,8 @@ export async function homeAction(_previous: HomeActionState, form: FormData): Pr
     revalidatePath("/admin/pages");
     revalidatePath("/admin/pages/home");
     revalidatePath("/");
+    revalidatePath("/services");
+    for (const key of managedServiceKeys) revalidatePath(serviceRegistry[key].path);
     return { ok: true, revision: result, message: intent === "publish" ?
       "גרסת דף הבית פורסמה בסביבת התוכן המאושרת." : "טיוטת דף הבית נשמרה. הפרסום לא השתנה." };
   } catch (error) {

@@ -112,7 +112,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
           phone: values.phone,
           service: values.service,
           city: values.city,
-          message: values.message,
+          message: `עמוד הפנייה: ${window.location.pathname}\n${values.message}`,
           submissionId,
           marketingAttribution: getStoredMarketingAttribution(),
         }),

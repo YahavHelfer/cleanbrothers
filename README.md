@@ -30,7 +30,7 @@ Environment variables:
 ```bash
 NEXT_PUBLIC_WHATSAPP_PHONE=972559577731
 NEXT_PUBLIC_BUSINESS_PHONE=0559577731
-NEXT_PUBLIC_BUSINESS_EMAIL=CleanBrothers.ISR@gmail.com
+NEXT_PUBLIC_BUSINESS_EMAIL=info@cleanbrothers.co.il
 ```
 
 For production, update `NEXT_PUBLIC_WHATSAPP_PHONE` and
@@ -82,7 +82,7 @@ git push -u origin main
 ```bash
 NEXT_PUBLIC_WHATSAPP_PHONE=972559577731
 NEXT_PUBLIC_BUSINESS_PHONE=0559577731
-NEXT_PUBLIC_BUSINESS_EMAIL=CleanBrothers.ISR@gmail.com
+NEXT_PUBLIC_BUSINESS_EMAIL=info@cleanbrothers.co.il
 ```
 
 A temporary Vercel URL is fine for testing and sharing. Canonical metadata

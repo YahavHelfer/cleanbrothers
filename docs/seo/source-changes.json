@@ -1,0 +1,31 @@
+{
+  "note": "Isolates captured source edits from earlier uncommitted work. The AC page metadata change and test updates are separately listed in the report. Apply only against the original working tree used in this task.",
+  "files": [
+    "src/proxy.ts",
+    "src/lib/structured-data.ts",
+    "src/lib/seo.ts",
+    "src/app/sitemap.ts",
+    "src/app/(site)/page.tsx",
+    "src/components/ServiceLandingPage.tsx",
+    "src/components/ServiceLandingView.tsx",
+    "src/components/ImageWithFallback.tsx",
+    "src/components/AirConditionerCleaningView.tsx",
+    "src/components/WindowCleaningView.tsx",
+    "src/cms/pages/PageBlocksView.tsx",
+    "src/app/(site)/window-cleaning/page.tsx",
+    "src/components/ContactForm.tsx",
+    "src/components/CookieConsent.tsx",
+    "src/data/serviceLandingPages.ts",
+    "src/cms/content/special-baseline.ts",
+    "src/config/business.ts",
+    "src/sections/Footer.tsx",
+    "src/sections/ServiceAreas.tsx",
+    "src/app/globals.css",
+    "src/app/(site)/layout.tsx",
+    "src/app/(site)/contact/page.tsx",
+    "src/app/(site)/[slug]/page.tsx",
+    "src/app/(site)/about/page.tsx",
+    "src/components/WhatsAppButton.tsx",
+    "src/lib/public-routes.ts"
+  ]
+}

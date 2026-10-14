@@ -1,0 +1,86 @@
+{
+  "pages": [
+    {
+      "path": "/",
+      "status": 200,
+      "hours": true,
+      "email": true,
+      "schemaHours": true,
+      "overflow": false
+    },
+    {
+      "path": "/air-conditioner-cleaning",
+      "status": 200,
+      "hours": true,
+      "email": true,
+      "schemaHours": true,
+      "overflow": false
+    },
+    {
+      "path": "/mini-central-air-conditioner-cleaning",
+      "status": 200,
+      "hours": true,
+      "email": true,
+      "schemaHours": true,
+      "overflow": false
+    },
+    {
+      "path": "/sofa-cleaning",
+      "status": 200,
+      "hours": true,
+      "email": true,
+      "schemaHours": true,
+      "overflow": false
+    },
+    {
+      "path": "/mattress-cleaning",
+      "status": 200,
+      "hours": true,
+      "email": true,
+      "schemaHours": true,
+      "overflow": false
+    }
+  ],
+  "calculator": [
+    {
+      "label": "מזגן עילי עד 2 כ״ס (כולל)",
+      "price": "199 ₪"
+    },
+    {
+      "label": "מזגן עילי מעל 2 כ״ס",
+      "price": "249 ₪"
+    },
+    {
+      "label": "מיני מרכזי",
+      "price": "550 ₪"
+    },
+    {
+      "label": "יחיד — צד אחד",
+      "price": "200 ₪"
+    },
+    {
+      "label": "יחיד — שני צדדים",
+      "price": "250 ₪"
+    },
+    {
+      "label": "זוגי — צד אחד",
+      "price": "300 ₪"
+    },
+    {
+      "label": "זוגי — שני צדדים",
+      "price": "350 ₪"
+    },
+    {
+      "label": "מיטה וחצי — צד אחד",
+      "price": "250 ₪"
+    },
+    {
+      "label": "מיטה וחצי — שני צדדים",
+      "price": "300 ₪"
+    },
+    {
+      "label": "מיטת נוער — היקף לפי תמונה",
+      "price": "300 ₪"
+    }
+  ]
+}

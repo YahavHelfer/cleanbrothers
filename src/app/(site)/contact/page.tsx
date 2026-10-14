@@ -41,7 +41,11 @@ export const metadata = buildMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+export default async function ContactPage(props: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = await props?.searchParams || {};
+  const initialService = typeof query.service === "string" ? query.service : "";
   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
   const emailHref = `mailto:${businessConfig.email}`;
@@ -121,7 +125,7 @@ export default function ContactPage() {
           </aside>
 
           <div className="order-2 lg:order-none">
-            <ContactForm />
+            <ContactForm initialService={initialService} />
           </div>
         </div>
       </section>

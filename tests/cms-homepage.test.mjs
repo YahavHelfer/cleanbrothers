@@ -273,7 +273,8 @@ test("static and CMS Revision 1 homepage produce identical HTML, metadata and JS
   source = "cms";
   assert.equal(renderToStaticMarkup(await pageModule.default()), staticHtml);
   assert.deepEqual(plain(await pageModule.generateMetadata()), staticMetadata);
-  assert.ok(staticHtml.includes("FAQPage"));
+  assert.ok(!staticHtml.includes("FAQPage"));
+  assert.ok(staticHtml.includes("שאלות נפוצות"));
   assert.ok(staticHtml.includes("Service"));
 });
 

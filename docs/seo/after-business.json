@@ -1,0 +1,2668 @@
+{
+  "phase": "after-business",
+  "origin": "http://127.0.0.1:56411",
+  "conditions": {
+    "viewport": "390x844",
+    "cpuSlowdown": 4,
+    "latencyMs": 150,
+    "downloadBytesPerSecond": 200000,
+    "uploadBytesPerSecond": 93750,
+    "runs": 3,
+    "reducedMotion": "reduce",
+    "externalServices": "blocked",
+    "cache": "disabled per browser context"
+  },
+  "pages": [
+    {
+      "path": "/",
+      "title": "CleanBrothers | ניקיון מקצועי לבית, לעסק ולרכב",
+      "description": "ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק. שירות מקצועי עד הלקוח באזור המרכז מבית CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/",
+      "h1": [
+        "ניקיון מקצועי לבית, לעסק ולרכב"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "שירותי ניקיון מקצועיים לבית, לעסק ולרכב",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          },
+          "areaServed": "פתח תקווה, רמת גן, הוד השרון, תל אביב, רעננה, הרצליה, רמת השרון, גבעתיים, והסביבה",
+          "serviceType": [
+            "ניקוי ספות",
+            "ניקוי מזרנים",
+            "ניקוי שטיחים",
+            "ניקוי ריפודי רכב",
+            "ניקוי מזגנים",
+            "ניקוי חלונות",
+            "ניקוי כורסאות וכיסאות",
+            "ניקוי ריפודים עדינים",
+            "ניקיון אחרי שיפוץ ולפני אכלוס",
+            "ניקוי מזגן מיני מרכזי"
+          ],
+          "description": "שירות ניקוי מקצועי לספות, מזרנים, שטיחים, כורסאות, ריפודי רכב, מזגנים וחלונות לבית ולעסק."
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A9%D7%99%D7%A8%D7%95%D7%AA%20%D7%A0%D7%99%D7%A7%D7%99%D7%95%D7%9F.",
+        "/services",
+        "/sofa-cleaning",
+        "/mattress-cleaning",
+        "/carpet-cleaning",
+        "/car-upholstery-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA%20%D7%9C%D7%A4%D7%A0%D7%99%20%D7%95%D7%90%D7%97%D7%A8%D7%99%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%9C%D7%A7%D7%91%D7%9C%D7%AA%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%20CleanBrothers%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9E%D7%93%D7%95%D7%99%D7%A7%20%D7%9C%D7%A4%D7%99%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94.%0A%D7%A9%D7%99%D7%A8%D7%95%D7%AA%3A%20%D7%9E%D7%96%D7%92%D7%9F%0A%D7%A1%D7%95%D7%92%20%D7%A4%D7%A8%D7%99%D7%98%3A%20%D7%9E%D7%96%D7%92%D7%9F%20%D7%A2%D7%99%D7%9C%D7%99%20%D7%A2%D7%93%202%20%D7%9B%D7%B4%D7%A1%20(%D7%9B%D7%95%D7%9C%D7%9C)%0A%D7%A8%D7%9E%D7%AA%20%D7%9C%D7%9B%D7%9C%D7%95%D7%9A%3A%20%D7%91%D7%99%D7%A0%D7%95%D7%A0%D7%99%0A%D7%9E%D7%97%D7%99%D7%A8%20%D7%9E%D7%95%D7%A6%D7%92%20%D7%91%D7%90%D7%AA%D7%A8%3A%20199%20%E2%82%AA%0A%D7%90%D7%A0%D7%99%20%D7%9E%D7%A6%D7%A8%D7%A3%2F%D7%AA%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%91%D7%94%D7%95%D7%93%D7%A2%D7%94%20%D7%94%D7%91%D7%90%D7%94.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F%20%D7%90%D7%95%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/services",
+      "title": "שירותי ניקיון לבית, לעסק ולרכב | CleanBrothers",
+      "description": "שירותי ניקיון אחרי שיפוץ ולפני אכלוס, ניקוי ספות, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות באזור המרכז מבית CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/services",
+      "h1": [
+        "ניקוי מקצועי לבית, לעסק ולרכב"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D.",
+        "/sofa-cleaning",
+        "/mattress-cleaning",
+        "/carpet-cleaning",
+        "/car-upholstery-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "/armchair-chair-cleaning",
+        "/delicate-upholstery-cleaning",
+        "/post-renovation-cleaning",
+        "/mini-central-air-conditioner-cleaning",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/sofa-cleaning",
+      "title": "ניקוי ספות מקצועי במרכז | CleanBrothers",
+      "description": "ניקוי ספות בד וריפודים בבית הלקוח לטיפול בלכלוך, כתמים וריחות. שירות מקצועי באזור המרכז והשרון מבית CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/sofa-cleaning",
+      "h1": [
+        "ניקוי ספות מקצועי עד הבית"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/sofa-cleaning#service",
+          "name": "ניקוי ספות",
+          "serviceType": "ניקוי ספות",
+          "description": "ניקוי ספות בד בבית הלקוח, החל מ־300 ₪ כולל מע״מ, בהתאם לגודל הספה. העבודה אורכת בדרך כלל כ־40 דקות עד שעה; לאחר הניקוי יש לאפשר ייבוש של כ־4–6 שעות.",
+          "url": "https://www.cleanbrothers.co.il/sofa-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי ספות",
+              "item": "https://www.cleanbrothers.co.il/sofa-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA",
+        "/armchair-chair-cleaning",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/mattress-cleaning",
+      "title": "ניקוי מזרנים מקצועי במרכז | CleanBrothers",
+      "description": "ניקוי ורענון של מזרני יחיד, מזרנים זוגיים ומיטות מרופדות בבית הלקוח באזור המרכז והשרון. קבלו הצעת מחיר מ-CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/mattress-cleaning",
+      "h1": [
+        "ניקוי מזרנים מקצועי עד הבית"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/mattress-cleaning#service",
+          "name": "ניקוי מזרנים",
+          "serviceType": "ניקוי מזרנים",
+          "description": "ניקוי מזרנים בבית הלקוח, במחיר לפי גודל המזרן ומספר הצדדים. מזרן יחיד, צד אחד: 200 ₪; מזרן זוגי, צד אחד: 300 ₪. המחירים כוללים מע״מ. לאחר הניקוי יש לאפשר ייבוש של כ־4–6 שעות.",
+          "url": "https://www.cleanbrothers.co.il/mattress-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי מזרנים",
+              "item": "https://www.cleanbrothers.co.il/mattress-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%A8%D7%A0%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%A8%D7%A0%D7%99%D7%9D",
+        "/delicate-upholstery-cleaning",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%A8%D7%A0%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%A8%D7%A0%D7%99%D7%9D.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/carpet-cleaning",
+      "title": "ניקוי שטיחים מקצועי במרכז | CleanBrothers",
+      "description": "ניקוי שטיחים ביתיים בהתאמה לסוג הסיב, הבד ורמת הלכלוך. שירות בבית הלקוח באזור המרכז והשרון.",
+      "canonical": "https://www.cleanbrothers.co.il/carpet-cleaning",
+      "h1": [
+        "ניקוי שטיחים מקצועי עד הבית"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/carpet-cleaning#service",
+          "name": "ניקוי שטיחים",
+          "serviceType": "ניקוי שטיחים",
+          "description": "ניקוי שטיחים ורענון יסודי בהתאם לסוג השטיח, הבד ורמת הלכלוך.",
+          "url": "https://www.cleanbrothers.co.il/carpet-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי שטיחים",
+              "item": "https://www.cleanbrothers.co.il/carpet-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D",
+        "/sofa-cleaning",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/car-upholstery-cleaning",
+      "title": "ניקוי ריפודי רכב במרכז | CleanBrothers",
+      "description": "ניקוי מושבים וריפודי בד ברכב לטיפול בלכלוך, כתמים וריחות. שירות מקצועי במיקום הלקוח באזור המרכז והשרון.",
+      "canonical": "https://www.cleanbrothers.co.il/car-upholstery-cleaning",
+      "h1": [
+        "ניקוי ריפודי רכב מקצועי"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/car-upholstery-cleaning#service",
+          "name": "ניקוי ריפודי רכב",
+          "serviceType": "ניקוי ריפודי רכב",
+          "description": "ניקוי מושבים וריפודי רכב לטיפול בלכלוך, כתמים וריחות - לרכב נקי ונעים יותר.",
+          "url": "https://www.cleanbrothers.co.il/car-upholstery-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי ריפודי רכב",
+              "item": "https://www.cleanbrothers.co.il/car-upholstery-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%20%D7%A8%D7%9B%D7%91.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%20%D7%A8%D7%9B%D7%91",
+        "/delicate-upholstery-cleaning",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%20%D7%A8%D7%9B%D7%91.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%20%D7%A8%D7%9B%D7%91.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/armchair-chair-cleaning",
+      "title": "ניקוי כורסאות וכיסאות במרכז | CleanBrothers",
+      "description": "ניקוי כורסאות, כיסאות אוכל וכיסאות משרדיים מרופדים בבית הלקוח באזור המרכז והשרון.",
+      "canonical": "https://www.cleanbrothers.co.il/armchair-chair-cleaning",
+      "h1": [
+        "ניקוי כורסאות וכיסאות מקצועי"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/armchair-chair-cleaning#service",
+          "name": "ניקוי כורסאות וכיסאות",
+          "serviceType": "ניקוי כורסאות וכיסאות",
+          "description": "ניקוי כורסאות, כורסאות טלוויזיה, כיסאות אוכל וכיסאות משרדיים בשירות עד הבית.",
+          "url": "https://www.cleanbrothers.co.il/armchair-chair-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי כורסאות וכיסאות",
+              "item": "https://www.cleanbrothers.co.il/armchair-chair-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9B%D7%95%D7%A8%D7%A1%D7%90%D7%95%D7%AA%20%D7%95%D7%9B%D7%99%D7%A1%D7%90%D7%95%D7%AA.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9B%D7%95%D7%A8%D7%A1%D7%90%D7%95%D7%AA%20%D7%95%D7%9B%D7%99%D7%A1%D7%90%D7%95%D7%AA",
+        "/sofa-cleaning",
+        "/gallery",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9B%D7%95%D7%A8%D7%A1%D7%90%D7%95%D7%AA%20%D7%95%D7%9B%D7%99%D7%A1%D7%90%D7%95%D7%AA.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9B%D7%95%D7%A8%D7%A1%D7%90%D7%95%D7%AA%20%D7%95%D7%9B%D7%99%D7%A1%D7%90%D7%95%D7%AA.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/delicate-upholstery-cleaning",
+      "title": "ניקוי ריפודים עדינים | CleanBrothers",
+      "description": "בדיקה והתאמת ניקוי לריפודים עדינים לפי סוג הבד, הצבע, הוראות היצרן ומצב הריפוד בבית הלקוח.",
+      "canonical": "https://www.cleanbrothers.co.il/delicate-upholstery-cleaning",
+      "h1": [
+        "ניקוי ריפודים עדינים בהתאמה לבד"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/delicate-upholstery-cleaning#service",
+          "name": "ניקוי ריפודים עדינים",
+          "serviceType": "ניקוי ריפודים עדינים",
+          "description": "בדיקה והתאמת שיטת הניקוי לסוג הבד, הצבע ומצב הריפוד לפני תחילת העבודה.",
+          "url": "https://www.cleanbrothers.co.il/delicate-upholstery-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי ריפודים עדינים",
+              "item": "https://www.cleanbrothers.co.il/delicate-upholstery-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%D7%A2%D7%93%D7%99%D7%A0%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%D7%A2%D7%93%D7%99%D7%A0%D7%99%D7%9D",
+        "/mattress-cleaning",
+        "/car-upholstery-cleaning",
+        "/gallery",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%D7%A2%D7%93%D7%99%D7%A0%D7%99%D7%9D.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%D7%A2%D7%93%D7%99%D7%A0%D7%99%D7%9D.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/air-conditioner-cleaning",
+      "title": "ניקוי מזגן עילי עד הבית במרכז ובשרון | CleanBrothers",
+      "description": "ניקוי מזגנים מקצועי עד הבית באזור המרכז. שלחו תמונה בוואטסאפ, קבלו הערכת מחיר ותיאום מהיר עם CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/air-conditioner-cleaning",
+      "h1": [
+        "ניקוי מזגן עילי עד הבית"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "ניקוי מזגנים מקצועי עד הבית",
+          "serviceType": "ניקוי מזגנים",
+          "url": "https://www.cleanbrothers.co.il/air-conditioner-cleaning",
+          "description": "ניקוי מזגנים מקצועי בבית הלקוח, עם טיפול באבק ובלכלוך בחלקים הנגישים לניקוי.",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          },
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי מזגנים",
+              "item": "https://www.cleanbrothers.co.il/air-conditioner-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%A9%D7%9C%20%D7%94%D7%9E%D7%96%D7%92%D7%9F%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%A9%D7%9C%20%D7%94%D7%9E%D7%96%D7%92%D7%9F%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%A9%D7%9C%20%D7%94%D7%9E%D7%96%D7%92%D7%9F%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%9B%D7%9E%D7%94%20%D7%9E%D7%96%D7%92%D7%A0%D7%99%D7%9D%20%D7%91%D7%91%D7%99%D7%AA.%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%90%D7%AA%20%D7%9B%D7%9C%20%D7%94%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%94%20%D7%9E%D7%A8%D7%95%D7%9B%D7%96%D7%AA.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%A9%D7%9C%20%D7%94%D7%9E%D7%96%D7%92%D7%9F%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%A9%D7%9C%20%D7%94%D7%9E%D7%96%D7%92%D7%9F%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F.",
+        "tel:0559577731",
+        "/services",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/window-cleaning",
+      "title": "ניקוי חלונות מקצועי לבית ולעסק | CleanBrothers",
+      "description": "ניקוי חלונות בדירות, בתים ומשרדים, כולל זכוכית, מסגרות, מסילות, תריסים ורשתות בחלונות בעלי גישה בטוחה. לקבלת הערכת מחיר מ-CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/window-cleaning",
+      "h1": [
+        "ניקוי חלונות מקצועי לבית ולעסק"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "דף הבית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי חלונות",
+              "item": "https://www.cleanbrothers.co.il/window-cleaning"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "ניקוי חלונות מקצועי לבית ולעסק",
+          "description": "ניקוי חלונות בדירות, בתים ומשרדים, כולל זכוכית, מסגרות, מסילות, תריסים ורשתות בחלונות בעלי גישה בטוחה. לקבלת הערכת מחיר מ-CleanBrothers.",
+          "url": "https://www.cleanbrothers.co.il/window-cleaning",
+          "serviceType": "ניקוי חלונות",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%97%D7%9C%D7%95%D7%A0%D7%95%D7%AA.%20%D7%9E%D7%A6%D7%95%D7%A8%D7%A4%D7%95%D7%AA%20%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA%20%D7%A9%D7%9C%20%D7%94%D7%97%D7%9C%D7%95%D7%A0%D7%95%D7%AA%20%D7%95%D7%94%D7%92%D7%99%D7%A9%D7%94%20%D7%90%D7%9C%D7%99%D7%94%D7%9D.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%97%D7%9C%D7%95%D7%A0%D7%95%D7%AA.%20%D7%9E%D7%A6%D7%95%D7%A8%D7%A4%D7%95%D7%AA%20%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA%20%D7%A9%D7%9C%20%D7%94%D7%97%D7%9C%D7%95%D7%A0%D7%95%D7%AA%20%D7%95%D7%94%D7%92%D7%99%D7%A9%D7%94%20%D7%90%D7%9C%D7%99%D7%94%D7%9D.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%97%D7%9C%D7%95%D7%A0%D7%95%D7%AA.%20%D7%9E%D7%A6%D7%95%D7%A8%D7%A4%D7%95%D7%AA%20%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA%20%D7%A9%D7%9C%20%D7%94%D7%97%D7%9C%D7%95%D7%A0%D7%95%D7%AA%20%D7%95%D7%94%D7%92%D7%99%D7%A9%D7%94%20%D7%90%D7%9C%D7%99%D7%94%D7%9D.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/mini-central-air-conditioner-cleaning",
+      "title": "ניקוי מזגן מיני מרכזי | בדיקת התאמה ותיאום | CleanBrothers",
+      "description": "ניקוי מיני מרכזי ב־550 ₪: מנוע, מאייד, פתחים ופילטרים, בכפוף לבדיקת גישה. ניקוי תעלות בתוספת 150 ₪ לתעלה. תיאום עם CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/mini-central-air-conditioner-cleaning",
+      "h1": [
+        "ניקוי מזגן מיני מרכזי"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/mini-central-air-conditioner-cleaning#service",
+          "name": "ניקוי מזגן מיני מרכזי",
+          "serviceType": "ניקוי מזגן מיני מרכזי",
+          "description": "ניקוי מזגן מיני מרכזי כולל מנוע, מאייד, פתחים ופילטרים במחיר 550 ₪. לפני התיאום בודקים את הגישה למנוע ולמאייד. ניקוי תעלות מוצע בנפרד בתוספת 150 ₪ לכל תעלה, עם מברשת ייעודית ושואב אבק תעשייתי לשאיבת האבק. המחירים כוללים מע״מ.",
+          "url": "https://www.cleanbrothers.co.il/mini-central-air-conditioner-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקוי מזגן מיני מרכזי",
+              "item": "https://www.cleanbrothers.co.il/mini-central-air-conditioner-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F%20%D7%9E%D7%99%D7%A0%D7%99%20%D7%9E%D7%A8%D7%9B%D7%96%D7%99.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F%20%D7%9E%D7%99%D7%A0%D7%99%20%D7%9E%D7%A8%D7%9B%D7%96%D7%99",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F%20%D7%9E%D7%99%D7%A0%D7%99%20%D7%9E%D7%A8%D7%9B%D7%96%D7%99.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F%20%D7%9E%D7%99%D7%A0%D7%99%20%D7%9E%D7%A8%D7%9B%D7%96%D7%99.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/post-renovation-cleaning",
+      "title": "ניקיון אחרי שיפוץ ולפני אכלוס במרכז | CleanBrothers",
+      "description": "ניקיון דירה אחרי שיפוץ או לפני אכלוס, בהתאמה למצב הנכס ולמשטחים הקיימים. שלחו פרטים ותמונות לקבלת הערכת עבודה מ-CleanBrothers.",
+      "canonical": "https://www.cleanbrothers.co.il/post-renovation-cleaning",
+      "h1": [
+        "ניקיון אחרי שיפוץ ולפני אכלוס"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "@id": "https://www.cleanbrothers.co.il/post-renovation-cleaning#service",
+          "name": "ניקיון אחרי שיפוץ ולפני אכלוס",
+          "serviceType": "ניקיון אחרי שיפוץ ולפני אכלוס",
+          "description": "ניקיון יסודי של נכס לאחר עבודות שיפוץ או לקראת כניסה, עם תיאום היקף העבודה לפי מצב הדירה, סוגי המשטחים והגישה אליהם.",
+          "url": "https://www.cleanbrothers.co.il/post-renovation-cleaning",
+          "provider": {
+            "@id": "https://www.cleanbrothers.co.il/#business"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "בית",
+              "item": "https://www.cleanbrothers.co.il"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "שירותים",
+              "item": "https://www.cleanbrothers.co.il/services"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "ניקיון אחרי שיפוץ ולפני אכלוס",
+              "item": "https://www.cleanbrothers.co.il/post-renovation-cleaning"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/",
+        "/services",
+        "#contact-form",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%99%D7%95%D7%9F%20%D7%90%D7%97%D7%A8%D7%99%20%D7%A9%D7%99%D7%A4%D7%95%D7%A5%20%D7%95%D7%9C%D7%A4%D7%A0%D7%99%20%D7%90%D7%9B%D7%9C%D7%95%D7%A1.",
+        "tel:0559577731",
+        "/services",
+        "/gallery",
+        "/contact?service=%D7%A0%D7%99%D7%A7%D7%99%D7%95%D7%9F%20%D7%90%D7%97%D7%A8%D7%99%20%D7%A9%D7%99%D7%A4%D7%95%D7%A5%20%D7%95%D7%9C%D7%A4%D7%A0%D7%99%20%D7%90%D7%9B%D7%9C%D7%95%D7%A1",
+        "/gallery",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%99%D7%95%D7%9F%20%D7%90%D7%97%D7%A8%D7%99%20%D7%A9%D7%99%D7%A4%D7%95%D7%A5%20%D7%95%D7%9C%D7%A4%D7%A0%D7%99%20%D7%90%D7%9B%D7%9C%D7%95%D7%A1.",
+        "tel:0559577731",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%A2%D7%91%D7%95%D7%A8%20%D7%A0%D7%99%D7%A7%D7%99%D7%95%D7%9F%20%D7%90%D7%97%D7%A8%D7%99%20%D7%A9%D7%99%D7%A4%D7%95%D7%A5%20%D7%95%D7%9C%D7%A4%D7%A0%D7%99%20%D7%90%D7%9B%D7%9C%D7%95%D7%A1.",
+        "tel:0559577731",
+        "#contact-form",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement"
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/gallery",
+      "title": "גלריית לפני ואחרי | CleanBrothers ניקוי ריפודים",
+      "description": "גלריית לפני ואחרי לניקוי ספות, ריפודים, שטיחים וריפודי רכב. CleanBrothers מספקים שירות ניקוי מקצועי בבית הלקוח במרכז.",
+      "canonical": "https://www.cleanbrothers.co.il/gallery",
+      "h1": [
+        "לפני ואחרי - תוצאות שמדברות ברור"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%92%D7%9C%D7%A8%D7%99%D7%94%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%9C%D7%A7%D7%91%D7%9C%D7%AA%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8.",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/about",
+      "title": "אודות CleanBrothers | ניקוי ספות וריפודים בבית הלקוח",
+      "description": "הכירו את CleanBrothers, עסק צעיר ומקצועי לניקוי ספות, ריפודים, מזרנים, שטיחים וריפודי רכב בבית הלקוח באזור המרכז.",
+      "canonical": "https://www.cleanbrothers.co.il/about",
+      "h1": [
+        "עסק צעיר, רציני ומקצועי שמגיע עד אליכם"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%A2%D7%9C%20%D7%A9%D7%99%D7%A8%D7%95%D7%AA%D7%99%20%D7%94%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A9%D7%9C%20CleanBrothers.",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/contact",
+      "title": "צור קשר | CleanBrothers ניקוי ספות וריפודים במרכז",
+      "description": "צרו קשר עם CleanBrothers לקבלת הצעת מחיר לניקוי ספות, ריפודים, מזרנים, שטיחים וריפודי רכב בבית הלקוח באזור המרכז.",
+      "canonical": "https://www.cleanbrothers.co.il/contact",
+      "h1": [
+        "שלחו תמונה וקבלו מחיר ברור יותר"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D.",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%94.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%A8%D7%9F.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A9%D7%98%D7%99%D7%97.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%20%D7%A8%D7%9B%D7%91.",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%AA%D7%9E%D7%95%D7%A0%D7%94%20%D7%95%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%9E%D7%96%D7%92%D7%9F.",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/privacy-policy",
+      "title": "מדיניות פרטיות וקוקיז | CleanBrothers",
+      "description": "מדיניות פרטיות וקוקיז בסיסית של CleanBrothers: איזה מידע נאסף, למה הוא משמש ואיך ניתן ליצור קשר.",
+      "canonical": "https://www.cleanbrothers.co.il/privacy-policy",
+      "h1": [
+        "מדיניות פרטיות ושימוש בקוקיז"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/accessibility-statement",
+      "title": "הצהרת נגישות | CleanBrothers",
+      "description": "הצהרת נגישות של אתר CleanBrothers, פעולות שבוצעו ודרכי פנייה בנושא נגישות.",
+      "canonical": "https://www.cleanbrothers.co.il/accessibility-statement",
+      "h1": [
+        "הצהרת נגישות"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    },
+    {
+      "path": "/data-deletion",
+      "title": "הוראות למחיקת מידע | CleanBrothers",
+      "description": "הנחיות להגשת בקשה למחיקת מידע אישי שנמסר ל-CleanBrothers דרך האתר, WhatsApp, Instagram וערוצי תקשורת נוספים.",
+      "canonical": "https://www.cleanbrothers.co.il/data-deletion",
+      "h1": [
+        "הוראות למחיקת מידע"
+      ],
+      "lang": "he",
+      "dir": "rtl",
+      "schemas": [
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://www.cleanbrothers.co.il/#business",
+          "name": "CleanBrothers",
+          "url": "https://www.cleanbrothers.co.il",
+          "telephone": "0559577731",
+          "email": "info@cleanbrothers.co.il",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "07:30",
+              "closes": "15:00"
+            }
+          ],
+          "logo": "https://www.cleanbrothers.co.il/images/logo/cleanbrothers-logo.png",
+          "description": "CleanBrothers מספקים ניקוי ספות, ריפודים, מזרנים, שטיחים, ריפודי רכב, מזגנים וחלונות לבית ולעסק באזור המרכז.",
+          "areaServed": [
+            {
+              "@type": "Place",
+              "name": "פתח תקווה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת גן"
+            },
+            {
+              "@type": "Place",
+              "name": "הוד השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "תל אביב"
+            },
+            {
+              "@type": "Place",
+              "name": "רעננה"
+            },
+            {
+              "@type": "Place",
+              "name": "הרצליה"
+            },
+            {
+              "@type": "Place",
+              "name": "רמת השרון"
+            },
+            {
+              "@type": "Place",
+              "name": "גבעתיים"
+            }
+          ]
+        }
+      ],
+      "links": [
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/privacy-policy",
+        "mailto:info@cleanbrothers.co.il",
+        "/privacy-policy",
+        "/",
+        "/",
+        "/services",
+        "/gallery",
+        "/about",
+        "/contact",
+        "/sofa-cleaning",
+        "/air-conditioner-cleaning",
+        "/window-cleaning",
+        "tel:0559577731",
+        "mailto:info@cleanbrothers.co.il",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91.",
+        "/privacy-policy",
+        "/data-deletion",
+        "/accessibility-statement",
+        "/api/whatsapp?message=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A7%D7%91%D7%9C%20%D7%94%D7%A6%D7%A2%D7%AA%20%D7%9E%D7%97%D7%99%D7%A8%20%D7%9C%D7%A0%D7%99%D7%A7%D7%95%D7%99%20%D7%A1%D7%A4%D7%95%D7%AA%20%2F%20%D7%A8%D7%99%D7%A4%D7%95%D7%93%D7%99%D7%9D%20%2F%20%D7%A9%D7%98%D7%99%D7%97%D7%99%D7%9D%20%2F%20%D7%A8%D7%9B%D7%91."
+      ],
+      "overflow": false,
+      "invisibleImages": 0,
+      "status": 200
+    }
+  ],
+  "performance": [],
+  "issues": [],
+  "unknown": [
+    {
+      "path": "/seo-audit-nonexistent",
+      "status": 404
+    },
+    {
+      "path": "/seo-audit-nonexistent/deeper",
+      "status": 404
+    }
+  ],
+  "robots": "User-Agent: *\nAllow: /\n\nSitemap: https://www.cleanbrothers.co.il/sitemap.xml\n",
+  "admin": {
+    "status": 307,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store, max-age=0"
+  }
+}

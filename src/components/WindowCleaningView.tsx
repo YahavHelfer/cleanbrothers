@@ -1,3 +1,4 @@
+import type { SharedServiceImage } from "@/cms/service-images/model";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { windowBaseline } from "@/cms/content/special-baseline";
@@ -10,6 +11,7 @@ import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { JsonLd } from "@/components/JsonLd";
 import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
+import { businessEntityId } from "@/lib/structured-data";
 import { businessConfig } from "@/config/business";
 
 const path = "/window-cleaning";
@@ -24,9 +26,9 @@ const breadcrumbJsonLd = {
   ],
 };
 
-export function WindowCleaningView({ content = windowBaseline, media, preview = false, contact, phone, whatsappHref, phoneHref }: {content?: WindowCleaningContent; media?: ResolvedMedia[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string}) {
+export function WindowCleaningView({ content = windowBaseline, media, serviceImages, preview = false, contact, phone, whatsappHref, phoneHref }: {content?: WindowCleaningContent; media?: ResolvedMedia[]; serviceImages?: SharedServiceImage[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string}) {
  const { includedItems, propertyTypes, process, faqs } = content;
- const hero = specialMedia(content, "hero", media);
+ const hero = serviceImages ?? specialMedia(content, "hero", media);
 const serviceJsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
@@ -34,12 +36,7 @@ const serviceJsonLd = {
   description: content.seoDescription,
   url: pageUrl,
   serviceType: "ניקוי חלונות",
-  provider: {
-    "@type": "LocalBusiness",
-    name: businessConfig.name,
-    url: businessConfig.siteUrl,
-    telephone: businessConfig.phoneDisplay,
-  },
+  provider: { "@id": businessEntityId },
 };
 
 
@@ -75,7 +72,7 @@ const serviceJsonLd = {
               </div>
             </div>
             <div className="reveal stagger-2 mx-auto w-full max-w-xl">
-              {hero.length ? <Image unoptimized={hero[0].src.startsWith("/admin/media/file/") || hero[0].src.startsWith("/cms-media/")} src={hero[0].src} alt={hero[0].alt} width={900} height={900} className="h-full w-full object-cover" /> : <WindowCleaningVisual />}
+              {hero.length ? <Image unoptimized={hero[0].src.startsWith("/admin/media/file/") || hero[0].src.startsWith("/cms-media/")} src={hero[0].src} alt={hero[0].alt} width={900} height={900} className={`h-full w-full object-cover ${serviceImages?.[0]?.position || "object-center"}`} /> : <WindowCleaningVisual />}
             </div>
           </div>
         </div>

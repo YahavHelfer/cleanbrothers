@@ -1,0 +1,67 @@
+{
+  "origin": "https://cleanbrothers-h3138fw4i-yahavs-projects-6b5e850f.vercel.app",
+  "readOnly": true,
+  "externalServicesBlocked": true,
+  "pages": [
+    {
+      "path": "/",
+      "status": 200,
+      "noindex": true,
+      "canonical": true,
+      "schemas": 2,
+      "mobileOverflow": false,
+      "hours": true,
+      "email": true
+    },
+    {
+      "path": "/sofa-cleaning",
+      "status": 200,
+      "noindex": true,
+      "canonical": true,
+      "schemas": 3,
+      "mobileOverflow": false,
+      "hours": true,
+      "email": true
+    },
+    {
+      "path": "/mattress-cleaning",
+      "status": 200,
+      "noindex": true,
+      "canonical": true,
+      "schemas": 3,
+      "mobileOverflow": false,
+      "hours": true,
+      "email": true
+    },
+    {
+      "path": "/air-conditioner-cleaning",
+      "status": 200,
+      "noindex": true,
+      "canonical": true,
+      "schemas": 3,
+      "mobileOverflow": false,
+      "hours": true,
+      "email": true
+    },
+    {
+      "path": "/mini-central-air-conditioner-cleaning",
+      "status": 200,
+      "noindex": true,
+      "canonical": true,
+      "schemas": 3,
+      "mobileOverflow": false,
+      "hours": true,
+      "email": true
+    }
+  ],
+  "missing": [
+    {
+      "path": "/seo-preview-missing",
+      "status": 404
+    },
+    {
+      "path": "/seo-preview-missing/deeper",
+      "status": 404
+    }
+  ]
+}

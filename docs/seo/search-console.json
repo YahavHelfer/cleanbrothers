@@ -1,0 +1,2401 @@
+{
+  "queries": {
+    "rows": [
+      {
+        "keys": [
+          "clean brothers"
+        ],
+        "clicks": 4,
+        "impressions": 11,
+        "ctr": 0.36363636363636365,
+        "position": 1
+      },
+      {
+        "keys": [
+          "cleanbrothers - ניקוי ספות, מזגנים ורכבים"
+        ],
+        "clicks": 3,
+        "impressions": 15,
+        "ctr": 0.2,
+        "position": 1.4
+      },
+      {
+        "keys": [
+          "בעברית"
+        ],
+        "clicks": 1,
+        "impressions": 1,
+        "ctr": 1,
+        "position": 1
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים"
+        ],
+        "clicks": 1,
+        "impressions": 348,
+        "ctr": 0.0028735632183908046,
+        "position": 37.55172413793103
+      },
+      {
+        "keys": [
+          "ניקוי ספות ראש העין"
+        ],
+        "clicks": 1,
+        "impressions": 1,
+        "ctr": 1,
+        "position": 1
+      },
+      {
+        "keys": [
+          "air clean car"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "air conditioner cleaning car"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 5
+      },
+      {
+        "keys": [
+          "area carpet cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "area rug cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 13,
+        "ctr": 0,
+        "position": 1.4615384615384617
+      },
+      {
+        "keys": [
+          "area rug cleaning services"
+        ],
+        "clicks": 0,
+        "impressions": 9,
+        "ctr": 0,
+        "position": 1.1111111111111112
+      },
+      {
+        "keys": [
+          "area rugs cleaned near me"
+        ],
+        "clicks": 0,
+        "impressions": 15,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "business carpet cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 13,
+        "ctr": 0,
+        "position": 1.3076923076923077
+      },
+      {
+        "keys": [
+          "car air cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 4.5
+      },
+      {
+        "keys": [
+          "car air conditioner clean"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 8.5
+      },
+      {
+        "keys": [
+          "car carpet clean"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "car carpet cleaner"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 9.5
+      },
+      {
+        "keys": [
+          "car carpet cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "car carpet washer"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 6
+      },
+      {
+        "keys": [
+          "car detailing"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "car detailing service"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 41
+      },
+      {
+        "keys": [
+          "car wash"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": [
+          "car wash open near me"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet & upholstery cleaners"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet and furniture cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaner and repair"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "carpet cleaner business near me"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaner companies near me"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 1.5
+      },
+      {
+        "keys": [
+          "carpet cleaners business"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning and disinfecting near me"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 1.1428571428571428
+      },
+      {
+        "keys": [
+          "carpet cleaning and repair"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning and repair near me"
+        ],
+        "clicks": 0,
+        "impressions": 18,
+        "ctr": 0,
+        "position": 1.0555555555555556
+      },
+      {
+        "keys": [
+          "carpet cleaning and repairs near me"
+        ],
+        "clicks": 0,
+        "impressions": 15,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning auto"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 5
+      },
+      {
+        "keys": [
+          "carpet cleaning business near me"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 1.4
+      },
+      {
+        "keys": [
+          "carpet cleaning businesses near me"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning companies near me"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning company near me"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning company prices"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 6
+      },
+      {
+        "keys": [
+          "carpet cleaning contractors near me"
+        ],
+        "clicks": 0,
+        "impressions": 14,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning in house"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet cleaning repair shop"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 1.2
+      },
+      {
+        "keys": [
+          "carpet cleaning specialist near me"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet foam renovator"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 11
+      },
+      {
+        "keys": [
+          "carpet machine service"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "carpet restoration services"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 3.5
+      },
+      {
+        "keys": [
+          "carpet shampoo service"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet shampooer service near me"
+        ],
+        "clicks": 0,
+        "impressions": 15,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet shampooing for cars"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 5.5
+      },
+      {
+        "keys": [
+          "carpet vacuum cleaner"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 12
+      },
+      {
+        "keys": [
+          "carpet wash near me"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet washer service"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet washing services near me"
+        ],
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "carpet+cleaners+service"
+        ],
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 1.25
+      },
+      {
+        "keys": [
+          "carpets cleaning service"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 1.4166666666666667
+      },
+      {
+        "keys": [
+          "carpets cleaning services"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 1.1666666666666667
+      },
+      {
+        "keys": [
+          "cleaing"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "cleanbrothers"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 14
+      },
+      {
+        "keys": [
+          "cleaners that clean area rugs"
+        ],
+        "clicks": 0,
+        "impressions": 11,
+        "ctr": 0,
+        "position": 1.9090909090909092
+      },
+      {
+        "keys": [
+          "cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "cleaning air conditioning in car"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "cleaning area carpets"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 5.5
+      },
+      {
+        "keys": [
+          "cleaning brothers"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 57
+      },
+      {
+        "keys": [
+          "cleaning car"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "cleaning carpet company near me"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "cleaning fabric seats"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": [
+          "cleaning sofa company"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 1.5
+      },
+      {
+        "keys": [
+          "cleaning."
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "clening"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "commercial carpet cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 11,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "commercial carpet cleaning services near me"
+        ],
+        "clicks": 0,
+        "impressions": 13,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "detail wash"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 17
+      },
+      {
+        "keys": [
+          "drop off rug cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 1.25
+      },
+      {
+        "keys": [
+          "hand cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "leather conditioner"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 13
+      },
+      {
+        "keys": [
+          "local carpet cleaning services"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "oriental rug cleaning services near me"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "persian carpet cleaning and repair near me"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 1.9
+      },
+      {
+        "keys": [
+          "persian carpet cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 14,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "professional carpet cleaning in my area"
+        ],
+        "clicks": 0,
+        "impressions": 13,
+        "ctr": 0,
+        "position": 1.3846153846153846
+      },
+      {
+        "keys": [
+          "professional carpet cleaning service near me"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "professional carpet cleaning specialist near me"
+        ],
+        "clicks": 0,
+        "impressions": 17,
+        "ctr": 0,
+        "position": 2.1176470588235294
+      },
+      {
+        "keys": [
+          "professional silk rug cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 2.166666666666667
+      },
+      {
+        "keys": [
+          "professional wool rug cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 14,
+        "ctr": 0,
+        "position": 1.2142857142857142
+      },
+      {
+        "keys": [
+          "restoration carpet cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "rug cleaners near me"
+        ],
+        "clicks": 0,
+        "impressions": 11,
+        "ctr": 0,
+        "position": 1.6363636363636362
+      },
+      {
+        "keys": [
+          "rug cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 1.25
+      },
+      {
+        "keys": [
+          "rug cleaning and repair"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "rug cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "rug cleaning service"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 1.1428571428571428
+      },
+      {
+        "keys": [
+          "rug cleaning specialist near me"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 1.5833333333333335
+      },
+      {
+        "keys": [
+          "rug repair and cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "rug service"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "rug wash near me"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "rug washing services"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 1.2857142857142856
+      },
+      {
+        "keys": [
+          "rugs cleaning services near me"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "seat service"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "shark deep clean solution"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 11
+      },
+      {
+        "keys": [
+          "silk rug cleaners near me"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "sofa cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "specialist rug cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 13,
+        "ctr": 0,
+        "position": 2.6153846153846154
+      },
+      {
+        "keys": [
+          "specialist rug cleaning near me"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 1.8
+      },
+      {
+        "keys": [
+          "steam cleaner"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 14
+      },
+      {
+        "keys": [
+          "the cleaning brothers"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "upholstery carpet cleaning companies near me"
+        ],
+        "clicks": 0,
+        "impressions": 17,
+        "ctr": 0,
+        "position": 1.8823529411764706
+      },
+      {
+        "keys": [
+          "upholstery cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "where can i get my rug cleaned"
+        ],
+        "clicks": 0,
+        "impressions": 14,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "where to get rugs cleaned near me"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 1.3333333333333333
+      },
+      {
+        "keys": [
+          "who cleans rugs near me"
+        ],
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "zone carpet cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 11,
+        "ctr": 0,
+        "position": 1.9090909090909092
+      },
+      {
+        "keys": [
+          "אוויר נקי ניקוי מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 8
+      },
+      {
+        "keys": [
+          "אויר נקי"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 5
+      },
+      {
+        "keys": [
+          "אוכל קרוב אליי"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 11
+      },
+      {
+        "keys": [
+          "אייר קלין"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "איפה יש בראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "התאמת מזרן מקצועית"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 39.2
+      },
+      {
+        "keys": [
+          "חברה לניקוי מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 44
+      },
+      {
+        "keys": [
+          "חברה לניקוי ספות"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": [
+          "חברת כימניר"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "חוות דעת"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "לא"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "מה חשוב לדעת לפני שמזמינים ניקוי מזגן לבית?"
+        ],
+        "clicks": 0,
+        "impressions": 15,
+        "ctr": 0,
+        "position": 4.066666666666666
+      },
+      {
+        "keys": [
+          "מוצרי ניקיון"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 6
+      },
+      {
+        "keys": [
+          "מזגן נקי"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 36
+      },
+      {
+        "keys": [
+          "מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 22
+      },
+      {
+        "keys": [
+          "מכבסה אלפי מנשה"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "מכבסה בראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 6.166666666666667
+      },
+      {
+        "keys": [
+          "מכבסה ראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 34,
+        "ctr": 0,
+        "position": 5.5588235294117645
+      },
+      {
+        "keys": [
+          "מנקה וילונות"
+        ],
+        "clicks": 0,
+        "impressions": 11,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": [
+          "מנקה מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 140,
+        "ctr": 0,
+        "position": 40.77142857142857
+      },
+      {
+        "keys": [
+          "מנקה רכבים"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 5
+      },
+      {
+        "keys": [
+          "מנקי ספות"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 6.5
+      },
+      {
+        "keys": [
+          "ניקוי"
+        ],
+        "clicks": 0,
+        "impressions": 32,
+        "ctr": 0,
+        "position": 2.28125
+      },
+      {
+        "keys": [
+          "ניקוי אוויר"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "ניקוי וחיטוי מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 80.5
+      },
+      {
+        "keys": [
+          "ניקוי וילונות"
+        ],
+        "clicks": 0,
+        "impressions": 20,
+        "ctr": 0,
+        "position": 5.65
+      },
+      {
+        "keys": [
+          "ניקוי וילונות מחיר"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "ניקוי טלפון"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": [
+          "ניקוי כללי"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "ניקוי מושבים ברכב"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 9.5
+      },
+      {
+        "keys": [
+          "ניקוי מזגן"
+        ],
+        "clicks": 0,
+        "impressions": 36,
+        "ctr": 0,
+        "position": 33.75
+      },
+      {
+        "keys": [
+          "ניקוי מזגן בדירה שכורה"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 35
+      },
+      {
+        "keys": [
+          "ניקוי מזגן לרכב"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "ניקוי מזגן מקצועי"
+        ],
+        "clicks": 0,
+        "impressions": 22,
+        "ctr": 0,
+        "position": 37.5
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים 199"
+        ],
+        "clicks": 0,
+        "impressions": 26,
+        "ctr": 0,
+        "position": 3.576923076923077
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים 2 ב300"
+        ],
+        "clicks": 0,
+        "impressions": 20,
+        "ctr": 0,
+        "position": 9.5
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים באשקלון"
+        ],
+        "clicks": 0,
+        "impressions": 19,
+        "ctr": 0,
+        "position": 71.15789473684211
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים בנתניה"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 64
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים המלצות"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 10
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים טבריה"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 63
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים מומלץ"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 24
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים מילואימניקים"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "ניקוי מזגנים מקצועי"
+        ],
+        "clicks": 0,
+        "impressions": 32,
+        "ctr": 0,
+        "position": 33.28125
+      },
+      {
+        "keys": [
+          "ניקוי מזרנים במרכז"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 38.2
+      },
+      {
+        "keys": [
+          "ניקוי מזרנים מחיר"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 25.2
+      },
+      {
+        "keys": [
+          "ניקוי מפוח מזגן"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 29
+      },
+      {
+        "keys": [
+          "ניקוי ספה בבית"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 11
+      },
+      {
+        "keys": [
+          "ניקוי ספה מעור"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "ניקוי ספות"
+        ],
+        "clicks": 0,
+        "impressions": 36,
+        "ctr": 0,
+        "position": 18.22222222222222
+      },
+      {
+        "keys": [
+          "ניקוי ספות בבית"
+        ],
+        "clicks": 0,
+        "impressions": 17,
+        "ctr": 0,
+        "position": 30.88235294117647
+      },
+      {
+        "keys": [
+          "ניקוי ספות בבית הלקוח"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 93.5
+      },
+      {
+        "keys": [
+          "ניקוי ספות במרכז"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 42
+      },
+      {
+        "keys": [
+          "ניקוי ספות בפתח תקווה"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 10
+      },
+      {
+        "keys": [
+          "ניקוי ספות המלצות"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 16
+      },
+      {
+        "keys": [
+          "ניקוי ספות כפר סבא"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 99
+      },
+      {
+        "keys": [
+          "ניקוי ספות מחיר"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 5
+      },
+      {
+        "keys": [
+          "ניקוי ספות מעור"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 10
+      },
+      {
+        "keys": [
+          "ניקוי ספות עד הבית"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 33
+      },
+      {
+        "keys": [
+          "ניקוי ספות עור"
+        ],
+        "clicks": 0,
+        "impressions": 9,
+        "ctr": 0,
+        "position": 4.555555555555555
+      },
+      {
+        "keys": [
+          "ניקוי ספות עור מחיר"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "ניקוי ספות עור מקצועי"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "ניקוי עור"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 10
+      },
+      {
+        "keys": [
+          "ניקוי ריפוד"
+        ],
+        "clicks": 0,
+        "impressions": 13,
+        "ctr": 0,
+        "position": 7.076923076923077
+      },
+      {
+        "keys": [
+          "ניקוי ריפוד לרכב"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "ניקוי ריפוד רכב"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 6
+      },
+      {
+        "keys": [
+          "ניקוי ריפודים לרכב ברמת גן"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 86
+      },
+      {
+        "keys": [
+          "ניקוי רכב"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "ניקוי רכב יסודי"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 3.25
+      },
+      {
+        "keys": [
+          "ניקוי רכב לפני מכירה"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 12
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים איסוף מהבית במרכז"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 79
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים אפגניים"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 69
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים אשקלון"
+        ],
+        "clicks": 0,
+        "impressions": 14,
+        "ctr": 0,
+        "position": 55.857142857142854
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים באשקלון"
+        ],
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 60.75
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים בהוד השרון"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 94.85714285714286
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים בכפר סבא"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 95.66666666666667
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים במרכז"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 62
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים בנתניה"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 98.71428571428571
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים בראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 2.5
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים ברחובות"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 69
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים ברמלה"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 99
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים ברעננה"
+        ],
+        "clicks": 0,
+        "impressions": 9,
+        "ctr": 0,
+        "position": 96.11111111111111
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים בשרון"
+        ],
+        "clicks": 0,
+        "impressions": 9,
+        "ctr": 0,
+        "position": 52.111111111111114
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים בתל אביב"
+        ],
+        "clicks": 0,
+        "impressions": 17,
+        "ctr": 0,
+        "position": 76.94117647058823
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים הוד השרון"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 99
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים כפר סבא"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 99
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים לבד"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 73.5
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים לבנקים"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 63
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים למגזר המוסדי"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 50.333333333333336
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים למשרדים"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 5.142857142857143
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים לעסקים"
+        ],
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 5.5
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים מומלץ"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 21
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים מקיר לקיר ראשון לציון"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 84
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים מקיר לקיר רחובות"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 90
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים מקצועי"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 92
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים נתניה"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 45
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים ראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 3.75
+      },
+      {
+        "keys": [
+          "ניקוי שטיחים שוטף למרכזי קניות"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 83.16666666666667
+      },
+      {
+        "keys": [
+          "ניקיון מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 11
+      },
+      {
+        "keys": [
+          "ניקיון ספות"
+        ],
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 3
+      },
+      {
+        "keys": [
+          "ניקיון רכב לפני מכירה"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 10
+      },
+      {
+        "keys": [
+          "ניקיון רכב עד הבית"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "נקיון"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "נקיון ספות"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 4
+      },
+      {
+        "keys": [
+          "נקיון רכב"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "ספות"
+        ],
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 7.857142857142857
+      },
+      {
+        "keys": [
+          "ספיד וואש ניקוי מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 16
+      },
+      {
+        "keys": [
+          "עוד המלצות"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "קלין בד"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 78
+      },
+      {
+        "keys": [
+          "רוצה תמונה"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 23
+      },
+      {
+        "keys": [
+          "ריפוד ספות"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "keys": [
+          "ריפוד ספות עור ראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 19,
+        "ctr": 0,
+        "position": 7.105263157894737
+      },
+      {
+        "keys": [
+          "ריפודי רכב"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 7.6
+      },
+      {
+        "keys": [
+          "שוטף מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 63.333333333333336
+      },
+      {
+        "keys": [
+          "שטיפה כפר קאסם"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 6
+      },
+      {
+        "keys": [
+          "שטיפת מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 41,
+        "ctr": 0,
+        "position": 41.829268292682926
+      },
+      {
+        "keys": [
+          "שטיפת מזגנים מחיר"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "שטיפת רכב"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "שטיפת רכב מקצועית"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "שטיפת רכבים ראש העין"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "keys": [
+          "שירות ניקוי מזגנים"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 36
+      },
+      {
+        "keys": [
+          "שירות ניקוי ספות"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 93
+      },
+      {
+        "keys": [
+          "שירותי ניקוי שטיחים לפנטהאוזים מפוארים"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 76
+      }
+    ],
+    "row_count": 233,
+    "truncated": false,
+    "query": {
+      "start_date": "2026-07-16",
+      "end_date": "2026-10-13",
+      "search_type": "web",
+      "data_state": "all",
+      "dimensions": [
+        "query"
+      ],
+      "row_limit": 250,
+      "start_row": 0,
+      "estimated_data_finalized_through": "2026-10-11"
+    },
+    "anonymized_queries_note": "Rare queries are anonymised and withheld by Google, so query-level rows never sum to site totals."
+  },
+  "pages": {
+    "rows": [
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/"
+        ],
+        "clicks": 14,
+        "impressions": 97,
+        "ctr": 0.14432989690721648,
+        "position": 4.793814432989691
+      },
+      {
+        "keys": [
+          "https://cleanbrothers.co.il/"
+        ],
+        "clicks": 9,
+        "impressions": 1227,
+        "ctr": 0.007334963325183374,
+        "position": 4.044824775876121
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/air-conditioner-cleaning"
+        ],
+        "clicks": 2,
+        "impressions": 749,
+        "ctr": 0.0026702269692923898,
+        "position": 34.91455273698264
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/about"
+        ],
+        "clicks": 1,
+        "impressions": 53,
+        "ctr": 0.018867924528301886,
+        "position": 6.566037735849057
+      },
+      {
+        "keys": [
+          "https://cleanbrothers.co.il/air-conditioner-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/accessibility-statement"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 6.25
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/armchair-chair-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 9
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/car-upholstery-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 14,
+        "ctr": 0,
+        "position": 46.857142857142854
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/carpet-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 114,
+        "ctr": 0,
+        "position": 75.06140350877193
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/contact"
+        ],
+        "clicks": 0,
+        "impressions": 45,
+        "ctr": 0,
+        "position": 5.733333333333333
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/gallery"
+        ],
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 5.75
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/mattress-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 26,
+        "ctr": 0,
+        "position": 25.923076923076923
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/post-renovation-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 6.8
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/sofa-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 65,
+        "ctr": 0,
+        "position": 19.276923076923076
+      },
+      {
+        "keys": [
+          "https://www.cleanbrothers.co.il/window-cleaning"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 12.666666666666666
+      }
+    ],
+    "row_count": 15,
+    "truncated": false,
+    "query": {
+      "start_date": "2026-07-16",
+      "end_date": "2026-10-13",
+      "search_type": "web",
+      "data_state": "all",
+      "dimensions": [
+        "page"
+      ],
+      "row_limit": 250,
+      "start_row": 0,
+      "estimated_data_finalized_through": "2026-10-11"
+    }
+  },
+  "totals": {
+    "rows": [
+      {
+        "clicks": 26,
+        "impressions": 2193,
+        "ctr": 0.011855905152758778,
+        "position": 19.238030095759235
+      }
+    ],
+    "row_count": 1,
+    "truncated": false,
+    "query": {
+      "start_date": "2026-07-16",
+      "end_date": "2026-10-13",
+      "search_type": "web",
+      "data_state": "all",
+      "dimensions": [],
+      "row_limit": 250,
+      "start_row": 0,
+      "estimated_data_finalized_through": "2026-10-11"
+    }
+  },
+  "brand": {
+    "rows": [
+      {
+        "clicks": 7,
+        "impressions": 37,
+        "ctr": 0.1891891891891892,
+        "position": 6.297297297297297
+      }
+    ],
+    "row_count": 1,
+    "truncated": false,
+    "query": {
+      "start_date": "2026-07-16",
+      "end_date": "2026-10-13",
+      "search_type": "web",
+      "data_state": "all",
+      "dimensions": [],
+      "row_limit": 250,
+      "start_row": 0,
+      "filters": [
+        {
+          "dimension": "query",
+          "operator": "includingRegex",
+          "expression": "(?i)clean.?brothers|cleaning brothers|קלין.?בר[או]דרס"
+        }
+      ],
+      "estimated_data_finalized_through": "2026-10-11"
+    }
+  },
+  "nonBrandServices": {
+    "rows": [
+      {
+        "clicks": 2,
+        "impressions": 1560,
+        "ctr": 0.001282051282051282,
+        "position": 24.862179487179485
+      }
+    ],
+    "row_count": 1,
+    "truncated": false,
+    "query": {
+      "start_date": "2026-07-16",
+      "end_date": "2026-10-13",
+      "search_type": "web",
+      "data_state": "all",
+      "dimensions": [],
+      "row_limit": 250,
+      "start_row": 0,
+      "filters": [
+        {
+          "dimension": "query",
+          "operator": "includingRegex",
+          "expression": "ניקוי|ניקיון|נקיון|מנקה|מנקי|שטיפת|cleaning|cleaner"
+        },
+        {
+          "dimension": "query",
+          "operator": "excludingRegex",
+          "expression": "(?i)clean.?brothers|cleaning brothers|קלין.?בר[או]דרס"
+        }
+      ],
+      "estimated_data_finalized_through": "2026-10-11"
+    }
+  },
+  "device": {
+    "rows": [
+      {
+        "keys": [
+          "MOBILE"
+        ],
+        "clicks": 17,
+        "impressions": 678,
+        "ctr": 0.025073746312684365,
+        "position": 13.991150442477876
+      },
+      {
+        "keys": [
+          "DESKTOP"
+        ],
+        "clicks": 9,
+        "impressions": 1509,
+        "ctr": 0.005964214711729622,
+        "position": 21.59509609012591
+      },
+      {
+        "keys": [
+          "TABLET"
+        ],
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 19.333333333333332
+      }
+    ],
+    "row_count": 3,
+    "truncated": false,
+    "query": {
+      "start_date": "2026-07-16",
+      "end_date": "2026-10-13",
+      "search_type": "web",
+      "data_state": "all",
+      "dimensions": [
+        "device"
+      ],
+      "row_limit": 250,
+      "start_row": 0,
+      "estimated_data_finalized_through": "2026-10-11"
+    }
+  }
+}

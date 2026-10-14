@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createCmsClient } from "@/cms/client";
 import { isCmsCookie } from "@/cms/config";
 import { newPagePublicAllowed } from "@/cms/pages/new-environment";
+import { isPublicPagePath } from "@/lib/public-routes";
 
 async function localNewPageRoute(request: NextRequest, slug: string): Promise<NextResponse> {
   try {
@@ -30,6 +31,19 @@ export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname !== "/admin" && !request.nextUrl.pathname.startsWith("/admin/")) {
     const slug = request.nextUrl.pathname.slice(1);
     if (newPagePublicAllowed(slug)) return localNewPageRoute(request, slug);
+    // The catch-all page sits behind loading.tsx, which can otherwise commit
+    // a streamed 200 before notFound() runs. Reject unknown page slugs first.
+    // File requests and infrastructure routes retain their own route handlers.
+    if (slug && !slug.includes("/") &&
+        !["/robots.txt", "/sitemap.xml", "/favicon.ico", "/icon.png", "/apple-icon.png",
+          "/file.svg", "/globe.svg", "/next.svg", "/vercel.svg", "/window.svg"].includes(request.nextUrl.pathname) &&
+        !["api", "_next", "cms-media"].includes(slug) &&
+        !isPublicPagePath(request.nextUrl.pathname)) {
+      return new NextResponse("העמוד לא נמצא. חזרה לאתר: https://www.cleanbrothers.co.il/", {
+        status: 404, headers: { "Content-Type": "text/plain; charset=utf-8",
+          "X-Robots-Tag": "noindex, nofollow" },
+      });
+    }
     return NextResponse.next();
   }
   let response = NextResponse.next({ request });

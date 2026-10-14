@@ -1,0 +1,17 @@
+# Only source and public assets belong in a deployment, never local builds.
+.git/
+.next/
+.next-cms-published/
+node_modules/
+.vercel/
+.env
+.env.*
+!.env.example
+supabase/.cloud/
+.aws/
+.codex/
+.agents/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo

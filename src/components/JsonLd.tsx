@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { serializeJsonLd } from "@/lib/json-ld";
 
 type JsonLdProps = {
@@ -8,7 +7,7 @@ type JsonLdProps = {
 
 export function JsonLd({ data, id }: JsonLdProps) {
   return (
-    <Script
+    <script
       id={id}
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}

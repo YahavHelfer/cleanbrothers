@@ -1,17 +1,10 @@
 "use client";
 
+import { managedServiceKeys } from "@/content/service-registry";
 import { usePathname } from "next/navigation";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
-const serviceLandingPaths = new Set([
-  "/air-conditioner-cleaning",
-  "/sofa-cleaning",
-  "/mattress-cleaning",
-  "/carpet-cleaning",
-  "/car-upholstery-cleaning",
-  "/armchair-chair-cleaning",
-  "/delicate-upholstery-cleaning",
-]);
+const serviceLandingPaths = new Set(managedServiceKeys.map(key => `/${key}`));
 
 function WhatsAppIcon() {
   return (

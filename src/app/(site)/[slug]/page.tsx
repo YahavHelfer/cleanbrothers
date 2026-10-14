@@ -17,7 +17,7 @@ function queryString(input: Record<string,string | string[] | undefined>): strin
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const snapshot = await getPublicNewPage((await params).slug);
   if (!snapshot || snapshot.kind === "redirect") return { robots: { index: false, follow: false } };
-  return pageRevisionMetadata(snapshot.page);
+  return pageRevisionMetadata(snapshot.page, snapshot.media);
 }
 export default async function NewCmsPage({ params, searchParams }: Props) {
   const snapshot = await getPublicNewPage((await params).slug);

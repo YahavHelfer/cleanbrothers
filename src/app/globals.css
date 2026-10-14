@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Keep anchored forms clear of navigation and the mobile service actions. */
+html { scroll-padding-bottom: 6rem; }
+#contact-form { scroll-margin-top: 6rem; scroll-margin-bottom: 6rem; }
+
 :root {
   color-scheme: light;
   --background: #f3f8fa;

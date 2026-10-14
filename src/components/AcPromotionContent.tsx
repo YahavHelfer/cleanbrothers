@@ -11,9 +11,6 @@ export function AcPromotionContent({promotion, preview = false, whatsappHref, on
           >
             {promotion.pricePrefix}<span className="text-turquoise-dark">{promotion.startingPrice} ₪</span>
           </h2>
-          <p className="mt-1.5 text-sm font-bold theme-muted">
-            במקום <span className="line-through decoration-2">{promotion.regularPrice} ₪</span>
-          </p>
 
           {promotion.bundleEnabled && <div className="mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/[0.08] px-4 py-3 sm:mt-5">
             <p className="text-lg font-black sm:text-xl">

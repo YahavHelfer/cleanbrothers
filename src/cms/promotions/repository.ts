@@ -68,7 +68,7 @@ export async function disableCampaign(id: string, generation: number): Promise<v
 const paths = new Set(["/", "/about", "/services", "/contact", "/gallery", "/privacy-policy",
   "/accessibility-statement", "/data-deletion", "/delicate-upholstery-cleaning", "/sofa-cleaning",
   "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning", "/armchair-chair-cleaning",
-  "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning"]);
+  "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning", "/mini-central-air-conditioner-cleaning"]);
 export async function readPublicCampaign(path: string): Promise<{ revisionId: string; campaign: PublicCampaign } | null> {
   if (!paths.has(path) || !manualCampaignPublicAllowed()) return null;
   let stage: "config" | "rpc" | "projection" = "config";

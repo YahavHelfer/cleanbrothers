@@ -8,7 +8,8 @@ import { createSourceLoader } from "../tests/helpers/source-module.mjs";
 export function importSharedServices() {
   const load = createSourceLoader();
   const { staticMediaInventory } = load("src/cms/media/static-inventory.ts");
-  for (const image of staticMediaInventory) {
+  const { specialStaticMediaInventory } = load("src/cms/media/special-static-inventory.ts");
+  for (const image of [...staticMediaInventory, ...specialStaticMediaInventory]) {
     const bytes = readFileSync(`public${image.path}`);
     if (bytes.length !== image.byteSize || createHash("sha256").update(bytes).digest("hex") !== image.hash) throw new Error("Static inventory changed");
   }
@@ -16,9 +17,9 @@ export function importSharedServices() {
   const { serviceBaseline } = load("src/cms/content/baseline.ts");
   const statements = sharedServiceKeys.map(key => `select public.cms_import_shared_baseline('${key}', '${JSON.stringify(serviceBaseline(key)).replaceAll("'", "''")}'::jsonb);`);
   // One operator transaction; existing documents/pointers/history are untouched.
-  localSql(`begin; select public.cms_import_shared_media(); ${statements.join("\n")} commit;`);
+  localSql(`begin; select public.cms_import_shared_media(); select public.cms_import_special_media(); ${statements.join("\n")} commit;`);
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   importSharedServices();
-  console.log("Seven local shared-service baselines present; existing history preserved; no media bytes copied.");
+  console.log("Local shared-service baselines present; existing history preserved; no media bytes copied.");
 }

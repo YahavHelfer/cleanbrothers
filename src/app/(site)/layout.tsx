@@ -62,12 +62,12 @@ export default async function RootLayout({
       className={`${heebo.variable} h-full scroll-smooth antialiased`}
     >
       <head>
-        <Script id="google-consent-defaults" strategy="beforeInteractive">
-          {getGoogleConsentBootstrapScript()}
-        </Script>
         <JsonLd id="cleanbrothers-local-business-jsonld" data={buildLocalBusinessJsonLd(chrome.settings)} />
       </head>
       <body className="flex min-h-full flex-col">
+        <Script id="google-consent-defaults" strategy="beforeInteractive">
+          {getGoogleConsentBootstrapScript()}
+        </Script>
         <GoogleAdsTag
           adsId={googleAdsId}
           phoneConversionId={googleAdsPhoneConversionId}
@@ -79,6 +79,7 @@ export default async function RootLayout({
         <MetaPixel pixelId={metaPixelId} />
         <ScrollProgress />
         <Navbar links={chrome.navLinks} />
+        <CookieConsent />
         {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
         <PublicCampaigns />
         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
@@ -88,7 +89,6 @@ export default async function RootLayout({
           services={chrome.featuredServiceLinks} />
         <AccessibilityControls />
         <WhatsAppButton />
-        <CookieConsent />
       </body>
     </html>
   );

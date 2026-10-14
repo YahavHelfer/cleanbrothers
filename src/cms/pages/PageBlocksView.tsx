@@ -1,7 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { Icon } from "@/components/Icon";
-import { JsonLd } from "@/components/JsonLd";
 import { PageHero } from "@/components/PageHero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { buildMetadata } from "@/lib/seo";
@@ -12,9 +11,12 @@ import { resolveSafeTarget, validatePageDraft, validatePromotionDraft,
 export type BlockMedia = Record<string, { src: string; altText: string }>;
 export type BlockPromotions = Record<string, PromotionDraft>;
 
-export function pageRevisionMetadata(page: PageDraft) {
+export function pageRevisionMetadata(page: PageDraft, media: BlockMedia = {}) {
   const draft = validatePageDraft(page);
-  return buildMetadata({ title: draft.seoTitle, description: draft.seoDescription, path: draft.canonical });
+  const hero = draft.blocks.find(block => block.type === "hero" && !block.hidden && block.mediaVersionId);
+  const image = hero?.mediaVersionId ? media[hero.mediaVersionId] : undefined;
+  return buildMetadata({ title: draft.seoTitle, description: draft.seoDescription, path: draft.canonical,
+    image: image ? { url: image.src, alt: hero?.payload.mediaAlt as string || image.altText } : undefined });
 }
 function SafeAction({ cta, preview, className = "btn-primary inline-flex" }: { cta: SafeCta; preview: boolean; className?: string }) {
   const href = resolveSafeTarget(cta.target, preview);
@@ -71,7 +73,7 @@ function AboutOverview({ payload }: { payload: Record<string, unknown> }) {
     </div>
   </section>;
 }
-export function BlockView({ block, media, promotions, preview, revisionId }: {
+export function BlockView({ block, media, promotions, preview }: {
   block: PageBlock; media: BlockMedia; promotions: BlockPromotions; preview: boolean; revisionId: string;
 }) {
   const p = block.payload;
@@ -94,14 +96,10 @@ export function BlockView({ block, media, promotions, preview, revisionId }: {
     </div></section>;
     case "faq": {
       const items = p.items as { question: string; answer: string }[];
-      const faqData = { "@context": "https://schema.org", "@type": "FAQPage",
-        mainEntity: items.map(item => ({ "@type": "Question", name: item.question,
-          acceptedAnswer: { "@type": "Answer", text: item.answer } })) };
       return <section className="section-block theme-section-soft"><div className="section-container max-w-4xl">
         <h2 className="text-2xl font-black">שאלות נפוצות</h2>
         <div className="mt-6 grid gap-4">{items.map(item => <article key={item.question} className="rounded-2xl border theme-card p-5">
           <h3 className="font-black">{item.question}</h3><p className="mt-2 leading-8">{item.answer}</p></article>)}</div>
-        {!preview && <JsonLd id={`cms-faq-${revisionId}-${block.id}`} data={faqData} />}
       </div></section>;
     }
     case "cta": return <section className="section-block theme-section-contrast"><div className="section-container text-center">

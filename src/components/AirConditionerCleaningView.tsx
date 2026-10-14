@@ -1,3 +1,4 @@
+import type { SharedServiceImage } from "@/cms/service-images/model";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,6 +6,7 @@ import { Icon } from "@/components/Icon";
 import { JsonLd } from "@/components/JsonLd";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
+import { businessEntityId } from "@/lib/structured-data";
 import { businessConfig } from "@/config/business";
 import { acBaseline } from "@/cms/content/special-baseline";
 import type { AirConditionerCleaningContent } from "@/cms/content/special-model";
@@ -15,7 +17,7 @@ import { AcPromotionContent } from "@/components/AcPromotionContent";
 import { serviceRegistry } from "@/content/service-registry";
 
 function buildStructuredData(content: AirConditionerCleaningContent) {
-  const { airConditionerServiceAreas, faqs } = content;
+  const { airConditionerServiceAreas } = content;
   const pageUrl = `${businessConfig.siteUrl}/air-conditioner-cleaning`;
 
   return {
@@ -27,14 +29,9 @@ function buildStructuredData(content: AirConditionerCleaningContent) {
       url: pageUrl,
       description:
         content.serviceDescription,
-      provider: {
-        "@type": "LocalBusiness",
-        name: businessConfig.name,
-        telephone: businessConfig.phoneDisplay,
-        url: businessConfig.siteUrl,
-      },
-      areaServed: airConditionerServiceAreas.map((area) => ({
-        "@type": "City",
+      provider: { "@id": businessEntityId },
+      areaServed: airConditionerServiceAreas.filter(area => area !== "והסביבה").map((area) => ({
+        "@type": "Place",
         name: area,
       })),
     },
@@ -62,35 +59,33 @@ function buildStructuredData(content: AirConditionerCleaningContent) {
         },
       ],
     },
-    faq: {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faqs.map((faq) => ({
-        "@type": "Question",
-        name: faq.question,
-        acceptedAnswer: { "@type": "Answer", text: faq.answer },
-      })),
-    },
+
   };
 }
 
-export function AirConditionerCleaningView({ content = acBaseline, media, preview = false, contact, phone, popup, whatsappHref, multipleUnitsHref, phoneHref }: { content?: AirConditionerCleaningContent; media?: ResolvedMedia[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string }) {
+export function AirConditionerCleaningView({ content = acBaseline, media, serviceImages, preview = false, contact, phone, popup, whatsappHref, multipleUnitsHref, phoneHref }: { content?: AirConditionerCleaningContent; media?: ResolvedMedia[]; serviceImages?: SharedServiceImage[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string }) {
   const { trustItems, intentSignals, cleaningAreas, processSteps, airConditionerServiceAreas, faqs, promotion } = content;
-  const hero = specialMedia(content, "hero", media);
+  const hero = serviceImages ?? specialMedia(content, "hero", media);
   const gallery = specialMedia(content, "gallery", media);
-  const displayedPrice = promotion.enabled ? promotion.startingPrice : promotion.regularPrice;
+  const displayedPrice = promotion.startingPrice;
   const structuredData = buildStructuredData(content);
 
   return (
     <div className="pb-20 sm:pb-0">
       <JsonLd id="ac-cleaning-service-jsonld" data={structuredData.service} />
       <JsonLd id="ac-cleaning-breadcrumb-jsonld" data={structuredData.breadcrumb} />
-      <JsonLd id="ac-cleaning-faq-jsonld" data={structuredData.faq} />
       {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
 
       <section className="theme-section-strong overflow-hidden py-7 sm:py-14 lg:py-16">
         <div className="section-container grid items-center gap-6 lg:grid-cols-[1.03fr_0.97fr] lg:gap-12">
           <div className="reveal">
+            <nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
+              <ol className="flex flex-wrap gap-2">
+                <li><Link href="/">בית</Link></li><li aria-hidden="true">/</li>
+                <li><Link href="/services">שירותים</Link></li><li aria-hidden="true">/</li>
+                <li aria-current="page">{content.h1}</li>
+              </ol>
+            </nav>
             <p className="text-sm font-black text-turquoise">{content.copy.heroEyebrow}</p>
             {promotion.enabled && <p className="mt-2 inline-flex rounded-full border border-turquoise/35 bg-turquoise/10 px-3 py-1.5 text-xs font-black text-turquoise sm:text-sm">
               {promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪
@@ -128,15 +123,16 @@ export function AirConditionerCleaningView({ content = acBaseline, media, previe
           <div className="reveal stagger-2 relative aspect-[16/11] overflow-hidden rounded-[1.5rem] border border-white/15 bg-navy shadow-2xl sm:rounded-[2rem] lg:aspect-[4/3]">
             <ServiceImageCarousel
               images={hero.map(image => image.src)}
-              imageAlts={Object.fromEntries(hero.map((image, index) => [image.src, `${image.alt}, תמונה ${index + 1} מתוך ${hero.length}`]))}
-              alt={hero[0].alt}
+              imageAlts={Object.fromEntries(hero.map((image, index) => [image.src, serviceImages ? image.alt : `${image.alt}, תמונה ${index + 1} מתוך ${hero.length}`]))}
+              alt={hero[0]?.alt || content.publicTitle}
+              fallbackLabel={content.publicTitle}
+              imagePositions={Object.fromEntries((serviceImages || []).map(image => [image.src,image.position]))}
               className="absolute inset-0 h-full w-full"
               imageClassName="object-cover"
               imagePosition="object-[center_38%]"
               sizes="(min-width: 1024px) 46vw, 100vw"
               priority
             />
-            <p className="absolute bottom-3 right-3 z-20 rounded-full bg-navy/80 px-3 py-1.5 text-xs font-black text-white backdrop-blur">{content.copy.imageCaption}</p>
           </div>
         </div>
       </section>
@@ -272,9 +268,6 @@ export function AirConditionerCleaningView({ content = acBaseline, media, previe
             <div className="mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/[0.08] p-4">
               <p className="text-xl font-black sm:text-2xl">
                 {promotion.pricePrefix}<span className="text-turquoise-dark">{displayedPrice} ₪</span>{" "}
-                {promotion.enabled && <span className="text-sm theme-muted">
-                  במקום <span className="line-through">{promotion.regularPrice} ₪</span>
-                </span>}
               </p>
               {promotion.enabled && promotion.bundleEnabled && <p className="mt-2 font-black">
                 מנקים 5 מזגנים? המזגן ה־6 עלינו.
@@ -305,7 +298,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, previe
             tone="light"
           />
           <div className="flex flex-wrap gap-2" aria-label="אזורי שירות לניקוי מזגנים">
-            {airConditionerServiceAreas.map((area) => (
+            {airConditionerServiceAreas.filter(area => area !== "והסביבה").map((area) => (
               <span
                 key={area}
                 className="rounded-full border border-turquoise/20 bg-turquoise/[0.08] px-3 py-2 text-sm font-black"

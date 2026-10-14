@@ -1,7 +1,7 @@
 import { JsonLd } from "@/components/JsonLd";
 import { buildServiceJsonLd } from "@/lib/structured-data";
 import { getPublicSiteChrome } from "@/cms/site/public-source";
-import { HomeBlocksView, homeFaqJsonLd } from "@/cms/home/HomeBlocksView";
+import { HomeBlocksView } from "@/cms/home/HomeBlocksView";
 import { getPublicHome } from "@/cms/home/public-source";
 import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
 import { getPublicActivePromotion } from "@/cms/schedules/public-source";
@@ -23,12 +23,10 @@ export async function generateMetadata() {
 export default async function Home() {
   const [{ settings }, source, homePromotion] = await Promise.all([getPublicSiteChrome(), getPublicHome(),
     getPublicActivePromotion("home", "home")]);
-  const faq = homeFaqJsonLd(source.page);
   const reviews = source.page.blocks.some(block => block.type === "homeGoogleReviews" && !block.hidden) ?
     await getGoogleReviews("public") : null;
   return (
     <>
-      {faq && <JsonLd id="cleanbrothers-faq-jsonld" data={faq} />}
       <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
       {homePromotion && <PublicScheduledPromotion active={homePromotion} />}
       <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}

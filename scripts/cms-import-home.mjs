@@ -11,11 +11,14 @@ export function importHomeBaseline() {
   const load = createSourceLoader();
   const { homeBaseline } = load("src/cms/home/baseline.ts");
   const { staticMediaInventory } = load("src/cms/media/static-inventory.ts");
+  const { specialStaticMediaInventory } = load("src/cms/media/special-static-inventory.ts");
+  const inventory = [...staticMediaInventory, ...specialStaticMediaInventory];
   const pinned = new Set(homeBaseline.blocks.flatMap(block => [block.mediaVersionId,
+    ...(block.type === "homeServices" ? Object.values(block.payload.cards).flatMap(card => card.images.map(image => image.versionId)) : []),
     ...(block.type === "homeBeforeAfter" ? block.payload.items.flatMap(item =>
       [item.beforeVersionId,item.afterVersionId]) : [])].filter(Boolean)));
   for (const versionId of pinned) {
-    const image = staticMediaInventory.find(item => item.versionId === versionId);
+    const image = inventory.find(item => item.versionId === versionId);
     if (!image) throw new Error("Homepage baseline media must be in the reviewed static inventory");
     const bytes = readFileSync(`public${image.path}`);
     if (bytes.length !== image.byteSize || createHash("sha256").update(bytes).digest("hex") !== image.hash)

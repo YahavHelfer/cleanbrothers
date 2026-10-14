@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-14",
+  "services": [
+    {
+      "service": "sofa-cleaning",
+      "versions": "פורסם: גרסה 4 · טיוטה: גרסה 5",
+      "preview": "/admin/preview/services/sofa-cleaning?revision=24599861-f1bf-442c-b17f-b43c01edafae",
+      "water": true,
+      "electricity": true,
+      "drying": true,
+      "saved": true
+    },
+    {
+      "service": "mattress-cleaning",
+      "versions": "פורסם: גרסה 5 · טיוטה: גרסה 6",
+      "preview": "/admin/preview/services/mattress-cleaning?revision=44b0c475-6854-4735-b1b4-2d7fd9bb045c",
+      "water": true,
+      "electricity": true,
+      "drying": true,
+      "saved": true
+    },
+    {
+      "service": "carpet-cleaning",
+      "versions": "פורסם: גרסה 6 · טיוטה: גרסה 7",
+      "preview": "/admin/preview/services/carpet-cleaning?revision=24c2165e-3964-4697-95fd-257ac1032e19",
+      "water": true,
+      "electricity": true,
+      "drying": true,
+      "saved": true
+    },
+    {
+      "service": "car-upholstery-cleaning",
+      "versions": "פורסם: גרסה 4 · טיוטה: גרסה 5",
+      "preview": "/admin/preview/services/car-upholstery-cleaning?revision=1ae5b508-10ed-4ed3-803b-b42c517761c4",
+      "water": true,
+      "electricity": true,
+      "drying": true,
+      "saved": true
+    },
+    {
+      "service": "armchair-chair-cleaning",
+      "versions": "פורסם: גרסה 4 · טיוטה: גרסה 5",
+      "preview": "/admin/preview/services/armchair-chair-cleaning?revision=9105a8f2-56f7-4ded-a87a-48ff4028d098",
+      "water": true,
+      "electricity": true,
+      "drying": false,
+      "saved": true
+    },
+    {
+      "service": "delicate-upholstery-cleaning",
+      "versions": "פורסם: גרסה 11 · טיוטה: גרסה 12",
+      "preview": "/admin/preview/services/delicate-upholstery-cleaning?revision=d686bed6-fae4-440a-8698-6e41d4959482",
+      "water": true,
+      "electricity": true,
+      "saved": true
+    },
+    {
+      "service": "air-conditioner-cleaning",
+      "versions": "פורסם: גרסה 8 · טיוטה: גרסה 10",
+      "preview": "/admin/preview/services/air-conditioner-cleaning?revision=83992332-a814-41f1-9267-8930e0c15c7b",
+      "water": true,
+      "electricity": true,
+      "saved": true
+    },
+    {
+      "service": "window-cleaning",
+      "versions": "פורסם: גרסה 3 · טיוטה: גרסה 4",
+      "preview": "/admin/preview/services/window-cleaning?revision=a490225a-957e-41e1-aa9f-8214f7413b7c",
+      "water": true,
+      "electricity": true,
+      "saved": true
+    },
+    {
+      "service": "mini-central-air-conditioner-cleaning",
+      "versions": "פורסם: גרסה 10 · טיוטה: גרסה 11",
+      "preview": "/admin/preview/services/mini-central-air-conditioner-cleaning?revision=7d0caf11-29c5-45de-a1f9-5eb5d4df72b4",
+      "water": true,
+      "electricity": true,
+      "saved": true
+    },
+    {
+      "service": "post-renovation-cleaning",
+      "versions": "פורסם: גרסה 4 · טיוטה: גרסה 5",
+      "preview": "/admin/preview/services/post-renovation-cleaning?revision=397243ad-fe04-42cf-a8c8-dfafdb01eaf4",
+      "water": true,
+      "electricity": true,
+      "saved": true
+    }
+  ],
+  "calculator": [
+    {
+      "choice": "בחירת מזגן עילי מעל 2 כ״ס",
+      "result": "מחיר השירות\n\nמזגן · מזגן עילי מעל 2 כ״ס · בינוני\n\n249 ₪\n\nהמחירים כוללים מע״מ. מחירי הספות הם מחיר התחלתי. במיני מרכזי נבדקת גישה למנוע ולמאייד; ניקוי תעלות בתוספת 150 ₪ לתעלה. מאשרים סוג והיקף לפני ההגעה.\n\nשלחו תמונה לקבלת מחיר מדויק\n\nללא התחייבות - הערכה מהירה לפי תמונה."
+    },
+    {
+      "choice": "בחירת מיני מרכזי",
+      "result": "מחיר השירות\n\nמזגן · מיני מרכזי · בינוני\n\n550 ₪\n\nהמחירים כוללים מע״מ. מחירי הספות הם מחיר התחלתי. במיני מרכזי נבדקת גישה למנוע ולמאייד; ניקוי תעלות בתוספת 150 ₪ לתעלה. מאשרים סוג והיקף לפני ההגעה.\n\nשלחו תמונה לקבלת מחיר מדויק\n\nללא התחייבות - הערכה מהירה לפי תמונה."
+    },
+    {
+      "choice": "בחירת יחיד — צד אחד",
+      "price": "200 ₪"
+    },
+    {
+      "choice": "בחירת יחיד — שני צדדים",
+      "price": "250 ₪"
+    },
+    {
+      "choice": "בחירת זוגי — צד אחד",
+      "price": "300 ₪"
+    },
+    {
+      "choice": "בחירת זוגי — שני צדדים",
+      "price": "350 ₪"
+    },
+    {
+      "choice": "בחירת מיטה וחצי — צד אחד",
+      "price": "250 ₪"
+    },
+    {
+      "choice": "בחירת מיטה וחצי — שני צדדים",
+      "price": "300 ₪"
+    },
+    {
+      "choice": "בחירת מיטת נוער — היקף לפי תמונה",
+      "price": "300 ₪"
+    }
+  ]
+}

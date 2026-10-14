@@ -16,7 +16,7 @@ const publicRoutes = [
   "/", "/services", "/gallery", "/about", "/contact", "/sofa-cleaning",
   "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning",
   "/armchair-chair-cleaning", "/delicate-upholstery-cleaning",
-  "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning", "/privacy-policy",
+  "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning", "/mini-central-air-conditioner-cleaning", "/privacy-policy",
   "/accessibility-statement", "/data-deletion",
 ];
 const appDirectory = resolve(projectRoot, "src/app");
@@ -76,11 +76,8 @@ test("public metadata, sitemap and robots preserve canonical routes and behavior
   const sitemap = await load("src/app/sitemap.ts").default();
   assert.deepEqual(
     plain(sitemap).sort((a, b) => a.url.localeCompare(b.url)),
-    publicRoutes.filter((route) => route !== "/data-deletion").map((route) => ({
-      url: `${businessConfig.siteUrl}${route === "/" ? "" : route}`,
-      changeFrequency: route === "/" ? "weekly" : "monthly",
-      priority: route === "/" ? 1 : 0.8,
-    })).sort((a, b) => a.url.localeCompare(b.url)),
+    publicRoutes.map(route => ({ url: `${businessConfig.siteUrl}${route}` }))
+      .sort((a, b) => a.url.localeCompare(b.url)),
   );
   assert.deepEqual(plain(load("src/app/robots.ts").default()), {
     rules: { userAgent: "*", allow: "/" },
@@ -102,6 +99,10 @@ test("the public root retains one of each tracking integration and the early con
   assert.equal(bootstrap.length, 1);
   assert.equal(bootstrap[0].props.strategy, "beforeInteractive");
   assert.equal(bootstrap[0].props.children, load("src/lib/consent.ts").getGoogleConsentBootstrapScript());
+  const head = nodes.find(node => node.type === "head");
+  const body = nodes.find(node => node.type === "body");
+  assert.equal(elementTree(head).some(node => node.props.id === "google-consent-defaults"), false);
+  assert.equal(elementTree(body).some(node => node.props.id === "google-consent-defaults"), true);
   assert.ok(nodes.indexOf(bootstrap[0]) < nodes.findIndex((node) => node.type.name === "GoogleAdsTag"));
   assert.equal(nodes.filter((node) => node.props.id === "cleanbrothers-local-business-jsonld").length, 1);
 });

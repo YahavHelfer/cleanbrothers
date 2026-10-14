@@ -1,4 +1,6 @@
 import "server-only";
+import { getPublicServiceImages } from "@/cms/service-images/public-source";
+import { withSharedServiceImages } from "@/cms/service-images/presentation";
 import { requireMediaReadEnvironment } from "@/cms/media/environment";
 import { resolveMediaProjection } from "@/cms/media/resolve";
 import { cache } from "react";
@@ -19,7 +21,7 @@ export { usesCmsSource } from "./environment";
 // between generateMetadata and page rendering. No session or privileged key.
 export const getPublicService = cache(async (key: SharedServiceKey) => {
   requireServiceKey(key);
-  if (!usesCmsSource(key)) return { revisionId: null, page: staticContentSource.getServiceLanding(key) };
+  if (!usesCmsSource(key)) return { revisionId: null, page: withSharedServiceImages(staticContentSource.getServiceLanding(key), await getPublicServiceImages(key)) };
   requireContentEnvironment();
   await connection();
   const { url, key: publishableKey } = getCmsConfig();
@@ -33,7 +35,7 @@ export const getPublicService = cache(async (key: SharedServiceKey) => {
     requireMediaReadEnvironment();
     return resolveMediaProjection(data.media, "public");
   })() : undefined;
-  return { revisionId: parseRevisionId(data.revisionId), page: toServiceLanding(key, data.payload, media) };
+  return { revisionId: parseRevisionId(data.revisionId), page: withSharedServiceImages(toServiceLanding(key, data.payload, media), await getPublicServiceImages(key)) };
 });
 
 export const getPublicPilot = () => getPublicService(PILOT_KEY);
@@ -48,7 +50,7 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   // baseline response cannot outlive the deployment that produced it.
   const acPreview = key === "air-conditioner-cleaning" && approvedCmsPreviewIdentity();
   if (acPreview) await connection();
-  if (!usesCmsSource(key)) return { revisionId: null, content: key === "air-conditioner-cleaning" ? acBaseline : windowBaseline, media: undefined };
+  if (!usesCmsSource(key)) return { revisionId: null, content: key === "air-conditioner-cleaning" ? acBaseline : windowBaseline, media: undefined, images: await getPublicServiceImages(key) };
   requireContentEnvironment();
   requireMediaReadEnvironment();
   if (!acPreview) await connection();
@@ -57,5 +59,5 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
     global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store", signal: AbortSignal.timeout(8000) }) } });
   const { data, error } = await client.rpc("cms_read_published_service", { target_key: key });
   if (error || !data) throw new Error("Published CMS service unavailable");
-  return { revisionId: parseRevisionId(data.revisionId), content: validateSpecialContent(key, data.payload), media: resolveMediaProjection(data.media, "public") };
+  return { revisionId: parseRevisionId(data.revisionId), content: validateSpecialContent(key, data.payload), media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
 });

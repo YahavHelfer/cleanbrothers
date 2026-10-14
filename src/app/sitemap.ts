@@ -1,31 +1,11 @@
 import type { MetadataRoute } from "next";
 import { businessConfig } from "@/config/business";
 import { listPublicNewPageSlugs } from "@/cms/pages/new-public-source";
+import { publicPagePaths } from "@/lib/public-routes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const routes = [
-    "",
-    "/services",
-    "/air-conditioner-cleaning",
-    "/window-cleaning",
-    "/sofa-cleaning",
-    "/mattress-cleaning",
-    "/carpet-cleaning",
-    "/car-upholstery-cleaning",
-    "/armchair-chair-cleaning",
-    "/delicate-upholstery-cleaning",
-    "/post-renovation-cleaning",
-    "/gallery",
-    "/about",
-    "/contact",
-    "/privacy-policy",
-    "/accessibility-statement",
-  ];
-
   const published = await listPublicNewPageSlugs();
-  return [...routes,...published.map(slug => `/${slug}`)].map((route) => ({
-    url: `${businessConfig.siteUrl}${route}`,
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.8,
-  }));
+  // No synthetic lastmod: there is no reliable edit date for code-owned pages.
+  return [...new Set([...publicPagePaths, ...published.map(slug => `/${slug}`)])]
+    .map(path => ({ url: new URL(path, businessConfig.siteUrl).href }));
 }

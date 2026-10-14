@@ -1,0 +1,11 @@
+{
+  "mocked": true,
+  "sentToCRM": false,
+  "calls": 1,
+  "service": "ניקוי ספות",
+  "pageContextPreserved": true,
+  "attributionEmptyAfterConsentRejection": true,
+  "submissionIdPresent": true,
+  "canonicalQueryFree": true,
+  "successVisible": true
+}

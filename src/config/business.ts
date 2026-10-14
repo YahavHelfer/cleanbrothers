@@ -5,7 +5,7 @@ const WHATSAPP_PHONE =
   cleanEnv(process.env.NEXT_PUBLIC_WHATSAPP_PHONE) || "972559577731";
 const BUSINESS_EMAIL =
   cleanEnv(process.env.NEXT_PUBLIC_BUSINESS_EMAIL) ||
-  "CleanBrothers.ISR@gmail.com";
+  "info@cleanbrothers.co.il";
 
 function cleanEnv(value?: string) {
   const trimmed = value?.trim();
@@ -25,15 +25,14 @@ export const businessConfig = {
   email: BUSINESS_EMAIL,
   whatsappDefaultMessage:
     "היי, אשמח לקבל הצעת מחיר לניקוי ספות / ריפודים / שטיחים / רכב.",
+  // Confirmed by the business owner on 2026-10-14.
+  operatingHoursDisplay: "ראשון–חמישי 08:00–18:00, שישי 07:30–15:00",
+  openingHoursSpecification: [
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"], opens: "08:00", closes: "18:00" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Friday"], opens: "07:30", closes: "15:00" },
+  ],
   serviceAreas: [
-    "ראש העין",
-    "פתח תקווה",
-    "הוד השרון",
-    "כפר סבא",
-    "רמת גן",
-    "גבעת שמואל",
-    "גבעתיים",
-    "תל אביב",
-    "מרכז הארץ",
+    "פתח תקווה", "רמת גן", "הוד השרון", "תל אביב", "רעננה",
+    "הרצליה", "רמת השרון", "גבעתיים", "והסביבה",
   ],
 };

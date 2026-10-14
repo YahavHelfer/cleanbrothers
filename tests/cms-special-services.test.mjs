@@ -62,7 +62,7 @@ test("AC Preview stays request-rendered before allowlisting and reads the newly 
  const before=createSourceLoader({env,mocks:{"next/server":{connection:async()=>{connections++;}},"@supabase/supabase-js":{createClient:()=>{reads++;throw Error("AC must remain static while disabled");}}}})("src/cms/content/public-source.ts");
  assert.equal((await before.getPublicSpecialService("air-conditioner-cleaning")).revisionId,null);
  assert.equal(reads,0);
- assert.equal(connections,1,"a static Preview build can preserve the old AC page across allowlist redeployment");
+ assert.equal(connections,2,"a static Preview build can preserve the old AC page across allowlist redeployment");
 
  const published=clone(acBaseline);
  published.copy.heroDescription+=" בדיקת פרסום חדשה.";
@@ -102,7 +102,7 @@ test("AC promotion is bounded structured data, shares prices, and no partial sch
  for(const mutate of [p=>p.promotion.startingPrice=251,p=>p.promotion.regularPrice=-1,p=>p.promotion.startingPrice=1.5,p=>p.promotion.enabled="true",p=>p.promotion.startAt="tomorrow"]){const p=clone(acBaseline);mutate(p);assert.throws(()=>validateSpecialContent("air-conditioner-cleaning",p));}
  const p=clone(acBaseline);p.promotion.enabled=false;p.promotion.bundleEnabled=false;
  const {AirConditionerCleaningView}=load("src/components/AirConditionerCleaningView.tsx");const html=renderToStaticMarkup(AirConditionerCleaningView({content:p,preview:true}));
- assert.ok(!html.includes('summer-ac-promotion-title'));assert.ok(!html.includes('199'));assert.ok(html.includes('250'));
+ assert.ok(!html.includes('summer-ac-promotion-title'));assert.ok(html.includes('199'));assert.ok(!html.includes('line-through'));
 });
 test("SQL closed contracts and TS contracts agree exactly; no arbitrary field escapes",()=>{
  const sql=readFileSync('supabase/migrations/20260924090000_cms_special_services.sql','utf8');

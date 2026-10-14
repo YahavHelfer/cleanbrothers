@@ -27,9 +27,11 @@ test("pilot page uses the static adapter and preserves existing SEO metadata", a
   const route = load("src/app/(site)/delicate-upholstery-cleaning/page.tsx");
   const page = await route.default();
   assert.equal(page.type, ServiceLandingPage);
-  assert.deepEqual(plain(page.props.config), plain(delicateUpholsteryLanding));
+  const shared = await load("src/cms/service-images/public-source.ts").getPublicServiceImages(serviceId);
+  const expected = toServiceLandingProps(load("src/cms/service-images/presentation.ts").withSharedServiceImages(staticContentSource.getServiceLanding(serviceId), shared)).config;
+  assert.deepEqual(plain(page.props.config), plain(expected));
   assert.equal(page.props.crmServiceName, existingCrmValue);
-  assert.deepEqual(plain(await route.generateMetadata()), plain(buildServiceLandingMetadata(delicateUpholsteryLanding)));
+  assert.deepEqual(plain(await route.generateMetadata()), plain(buildServiceLandingMetadata(expected)));
 });
 
 test("renaming pilot display text cannot change the service submitted through ContactForm", () => {

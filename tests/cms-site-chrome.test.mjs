@@ -62,7 +62,8 @@ test("static baselines reproduce Navbar, Footer, contact and LocalBusiness data"
   assert.deepEqual(plain(structured.buildLocalBusinessJsonLd(settings)),plain(structured.localBusinessJsonLd));
   assert.deepEqual(plain(structured.buildServiceJsonLd(settings)),plain(structured.serviceJsonLd));
   const changed = {...settings,businessName:"שם בדיקה",email:"site@example.com"};
-  assert.equal(structured.buildServiceJsonLd(changed).provider.name,"שם בדיקה");
+  assert.equal(structured.buildServiceJsonLd(changed).provider["@id"],structured.businessEntityId);
+  assert.equal(structured.buildLocalBusinessJsonLd(changed).name,"שם בדיקה");
   assert.equal(structured.buildLocalBusinessJsonLd(changed).email,"site@example.com");
   assert.equal(chrome.settings.phoneDisplay,"0559577731");
   assert.equal(chrome.footer.whatsappCtaLabel,"שלחו תמונה וקבלו מחיר");

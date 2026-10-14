@@ -1,4 +1,5 @@
 import { businessConfig } from "@/config/business";
+import { miniCentralAirConditionerLanding as miniCentral } from "./miniCentralAirConditionerCopy";
 import { serviceImages, sofaImagePositions } from "@/data/serviceImages";
 
 export const navLinks = [
@@ -107,6 +108,15 @@ export const services = [
     images: serviceImages.postRenovation,
     imagePosition: "object-[center_55%]",
     details: "ניקיון דירה לאחר עבודות שיפוץ או לפני אכלוס, עם בדיקה של המשטחים, האזורים הנגישים והלכלוך שנותר. נציע היקף עבודה ומחיר לאחר קבלת פרטים ותמונות של הנכס.",
+  },
+  {
+    title: miniCentral.serviceName,
+    landingPath: miniCentral.path,
+    description: miniCentral.intro,
+    details: miniCentral.signsDescription,
+    benefit: miniCentral.benefits[0],
+    images: miniCentral.images!,
+    imagePosition: "object-center",
   },
 ];
 

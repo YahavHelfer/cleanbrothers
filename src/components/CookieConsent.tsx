@@ -11,11 +11,10 @@ import {
 } from "@/lib/consent";
 
 export function CookieConsent() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [choice, setChoice] = useState<ConsentChoice>("unknown");
   const acceptButtonRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
-
   useEffect(() => {
     const hydrationTimeout = window.setTimeout(() => {
       const storedChoice = getStoredConsent();
@@ -58,7 +57,7 @@ export function CookieConsent() {
       role="dialog"
       aria-label="בחירת העדפות עוגיות"
       aria-modal="false"
-      className="fixed inset-x-3 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-4xl rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-3 text-[var(--foreground)] shadow-[0_18px_44px_rgba(8,19,31,0.18)] sm:bottom-5 sm:px-4 sm:py-3"
+      className="relative my-3 w-[calc(100%-1.5rem)] z-[60] mx-auto max-w-4xl rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-3 text-[var(--foreground)] shadow-[0_18px_44px_rgba(8,19,31,0.18)] sm:px-4 sm:py-3"
     >
       <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
         <div>

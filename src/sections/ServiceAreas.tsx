@@ -5,7 +5,7 @@ export const serviceAreasContent = {
   eyebrow: "אזורי שירות",
   title: "שירותי ניקיון עד הלקוח באזור המרכז",
   mobileDescription: "מגיעים לערי המרכז. שולחים תמונה ומקבלים הערכה.",
-  description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, ראש העין, רמת גן, גבעת שמואל, תל אביב וערים נוספות במרכז. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
+  description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, רמת גן, הוד השרון, תל אביב, רעננה, הרצליה, רמת השרון, גבעתיים והסביבה. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
 };
 
 export function ServiceAreas({ content = serviceAreasContent }: { content?: typeof serviceAreasContent } = {}) {

@@ -1,0 +1,764 @@
+--- a/src/proxy.ts
++++ b/src/proxy.ts
+@@ -2,6 +2,7 @@
+ import { createCmsClient } from "@/cms/client";
+ import { isCmsCookie } from "@/cms/config";
+ import { newPagePublicAllowed } from "@/cms/pages/new-environment";
++import { isPublicPagePath } from "@/lib/public-routes";
+ 
+ async function localNewPageRoute(request: NextRequest, slug: string): Promise<NextResponse> {
+   try {
+@@ -30,6 +31,19 @@
+   if (request.nextUrl.pathname !== "/admin" && !request.nextUrl.pathname.startsWith("/admin/")) {
+     const slug = request.nextUrl.pathname.slice(1);
+     if (newPagePublicAllowed(slug)) return localNewPageRoute(request, slug);
++    // The catch-all page sits behind loading.tsx, which can otherwise commit
++    // a streamed 200 before notFound() runs. Reject unknown page slugs first.
++    // File requests and infrastructure routes retain their own route handlers.
++    if (slug && !slug.includes("/") &&
++        !["/robots.txt", "/sitemap.xml", "/favicon.ico", "/icon.png", "/apple-icon.png",
++          "/file.svg", "/globe.svg", "/next.svg", "/vercel.svg", "/window.svg"].includes(request.nextUrl.pathname) &&
++        !["api", "_next", "cms-media"].includes(slug) &&
++        !isPublicPagePath(request.nextUrl.pathname)) {
++      return new NextResponse("העמוד לא נמצא. חזרה לאתר: https://www.cleanbrothers.co.il/", {
++        status: 404, headers: { "Content-Type": "text/plain; charset=utf-8",
++          "X-Robots-Tag": "noindex, nofollow" },
++      });
++    }
+     return NextResponse.next();
+   }
+   let response = NextResponse.next({ request });
+--- a/src/lib/structured-data.ts
++++ b/src/lib/structured-data.ts
+@@ -3,17 +3,20 @@
+ import type { SiteSettings } from "@/cms/site/model";
+ import { faqs, services } from "@/data/site";
+ 
++export const businessEntityId = `${businessConfig.siteUrl}/#business`;
++
+ export function buildLocalBusinessJsonLd(settings: SiteSettings = siteSettingsBaseline) { return {
+   "@context": "https://schema.org",
+   "@type": "LocalBusiness",
++  "@id": businessEntityId,
+   name: settings.businessName,
+   url: businessConfig.siteUrl,
+   telephone: settings.phoneDisplay,
+   email: settings.email,
+   logo: `${businessConfig.siteUrl}/images/logo/cleanbrothers-logo.png`,
+   description: settings.structuredDescription,
+-  areaServed: settings.serviceAreas.map((area) => ({
+-    "@type": "City",
++  areaServed: settings.serviceAreas.filter(area => area !== "והסביבה").map((area) => ({
++    "@type": "Place",
+     name: area,
+   })),
+ }; }
+@@ -24,10 +27,7 @@
+   "@type": "Service",
+   name: "שירותי ניקיון מקצועיים לבית, לעסק ולרכב",
+   provider: {
+-    "@type": "LocalBusiness",
+-    name: settings.businessName,
+-    telephone: settings.phoneDisplay,
+-    email: settings.email,
++    "@id": businessEntityId,
+   },
+   areaServed: settings.serviceAreas.join(", "),
+   serviceType: services.map((service) => service.title),
+@@ -35,6 +35,16 @@
+     "שירות ניקוי מקצועי לספות, מזרנים, שטיחים, כורסאות, ריפודי רכב, מזגנים וחלונות לבית ולעסק.",
+ }; }
+ export const serviceJsonLd = buildServiceJsonLd();
++
++export function buildPageServiceJsonLd(service: { serviceName: string; intro: string; path: string }) {
++  return {
++    "@context": "https://schema.org", "@type": "Service",
++    "@id": `${businessConfig.siteUrl}${service.path}#service`,
++    name: service.serviceName, serviceType: service.serviceName,
++    description: service.intro, url: `${businessConfig.siteUrl}${service.path}`,
++    provider: { "@id": businessEntityId },
++  };
++}
+ 
+ export const faqJsonLd = {
+   "@context": "https://schema.org",
+--- a/src/lib/seo.ts
++++ b/src/lib/seo.ts
+@@ -15,19 +15,21 @@
+   "ניקוי מזגנים בבית הלקוח",
+   "ניקוי ספות בבית הלקוח",
+   "ניקוי ריפודים במרכז",
+-  ...businessConfig.serviceAreas.map((area) => `ניקוי ריפודים ב${area}`),
++  ...businessConfig.serviceAreas.filter(area => area !== "והסביבה").map((area) => `ניקוי ריפודים ב${area}`),
+ ];
+ 
+ type BuildMetadataArgs = {
+   title: string;
+   description: string;
+   path?: string;
++  image?: { url: string; alt: string };
+ };
+ 
+ export function buildMetadata({
+   title,
+   description,
+   path = "/",
++  image,
+ }: BuildMetadataArgs): Metadata {
+   const url = new URL(path, businessConfig.siteUrl).toString();
+ 
+@@ -45,7 +47,7 @@
+       siteName: businessConfig.name,
+       locale: "he_IL",
+       type: "website",
+-      images: [
++      images: image ? [image] : [
+         {
+           url: "/images/logo/cleanbrothers-logo.png",
+           width: 600,
+@@ -55,10 +57,10 @@
+       ],
+     },
+     twitter: {
+-      card: "summary",
++      card: image ? "summary_large_image" : "summary",
+       title,
+       description,
+-      images: ["/images/logo/cleanbrothers-logo.png"],
++      images: [image?.url || "/images/logo/cleanbrothers-logo.png"],
+     },
+   };
+ }
+--- a/src/app/sitemap.ts
++++ b/src/app/sitemap.ts
+@@ -1,31 +1,11 @@
+ import type { MetadataRoute } from "next";
+ import { businessConfig } from "@/config/business";
+ import { listPublicNewPageSlugs } from "@/cms/pages/new-public-source";
++import { publicPagePaths } from "@/lib/public-routes";
+ 
+ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+-  const routes = [
+-    "",
+-    "/services",
+-    "/air-conditioner-cleaning",
+-    "/window-cleaning",
+-    "/sofa-cleaning",
+-    "/mattress-cleaning",
+-    "/carpet-cleaning",
+-    "/car-upholstery-cleaning",
+-    "/armchair-chair-cleaning",
+-    "/delicate-upholstery-cleaning",
+-    "/post-renovation-cleaning", "/mini-central-air-conditioner-cleaning",
+-    "/gallery",
+-    "/about",
+-    "/contact",
+-    "/privacy-policy",
+-    "/accessibility-statement",
+-  ];
+-
+   const published = await listPublicNewPageSlugs();
+-  return [...routes,...published.map(slug => `/${slug}`)].map((route) => ({
+-    url: `${businessConfig.siteUrl}${route}`,
+-    changeFrequency: route === "" ? "weekly" : "monthly",
+-    priority: route === "" ? 1 : 0.8,
+-  }));
++  // No synthetic lastmod: there is no reliable edit date for code-owned pages.
++  return [...new Set([...publicPagePaths, ...published.map(slug => `/${slug}`)])]
++    .map(path => ({ url: new URL(path, businessConfig.siteUrl).href }));
+ }
+--- a/src/app/(site)/page.tsx
++++ b/src/app/(site)/page.tsx
+@@ -1,7 +1,7 @@
+ import { JsonLd } from "@/components/JsonLd";
+ import { buildServiceJsonLd } from "@/lib/structured-data";
+ import { getPublicSiteChrome } from "@/cms/site/public-source";
+-import { HomeBlocksView, homeFaqJsonLd } from "@/cms/home/HomeBlocksView";
++import { HomeBlocksView } from "@/cms/home/HomeBlocksView";
+ import { getPublicHome } from "@/cms/home/public-source";
+ import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
+ import { getPublicActivePromotion } from "@/cms/schedules/public-source";
+@@ -23,12 +23,10 @@
+ export default async function Home() {
+   const [{ settings }, source, homePromotion] = await Promise.all([getPublicSiteChrome(), getPublicHome(),
+     getPublicActivePromotion("home", "home")]);
+-  const faq = homeFaqJsonLd(source.page);
+   const reviews = source.page.blocks.some(block => block.type === "homeGoogleReviews" && !block.hidden) ?
+     await getGoogleReviews("public") : null;
+   return (
+     <>
+-      {faq && <JsonLd id="cleanbrothers-faq-jsonld" data={faq} />}
+       <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
+       {homePromotion && <PublicScheduledPromotion active={homePromotion} />}
+       <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}
+--- a/src/components/ServiceLandingPage.tsx
++++ b/src/components/ServiceLandingPage.tsx
+@@ -6,6 +6,7 @@
+ import { ServiceLandingView } from "@/components/ServiceLandingView";
+ import { businessConfig } from "@/config/business";
+ import type { ServiceLandingConfig } from "@/content/service-landing";
++import { buildPageServiceJsonLd } from "@/lib/structured-data";
+ import { buildMetadata } from "@/lib/seo";
+ import { getPrimaryServiceImage } from "@/lib/service-images";
+ import { getWhatsAppLink } from "@/lib/whatsapp";
+@@ -29,13 +30,13 @@
+       siteName: businessConfig.name,
+       locale: "he_IL",
+       type: "website",
+-      images: primaryImage ? [{ url: primaryImage, alt: config.imageAlt }] : [],
++      images: primaryImage ? [{ url: primaryImage, alt: config.imageAlt }] : base.openGraph?.images,
+     },
+     twitter: {
+       card: "summary_large_image",
+       title: config.metaTitle,
+       description: config.metaDescription,
+-      images: primaryImage ? [primaryImage] : [],
++      images: primaryImage ? [primaryImage] : ["/images/logo/cleanbrothers-logo.png"],
+     },
+   };
+ }
+@@ -44,11 +45,6 @@
+   config: ServiceLandingConfig; crmServiceName?: string;
+ }) {
+   const phoneHref = "tel:0559577731";
+-  const faqJsonLd = {
+-    "@context": "https://schema.org", "@type": "FAQPage",
+-    mainEntity: config.faqs.map((faq) => ({ "@type": "Question", name: faq.question,
+-      acceptedAnswer: { "@type": "Answer", text: faq.answer } })),
+-  };
+   return ServiceLandingView({
+     config,
+     contact: <ContactForm initialService={crmServiceName} />,
+@@ -56,15 +52,15 @@
+     phoneHref,
+     whatsappHref: getWhatsAppLink(`היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`),
+     jsonLd: <>
+-      <JsonLd id={`${config.path.slice(1)}-faq-jsonld`} data={faqJsonLd} />
+-      {config.pageCopy && <JsonLd id={`${config.path.slice(1)}-breadcrumb-jsonld`} data={{
++      <JsonLd id={`${config.path.slice(1)}-service-jsonld`} data={buildPageServiceJsonLd(config)} />
++      <JsonLd id={`${config.path.slice(1)}-breadcrumb-jsonld`} data={{
+         "@context": "https://schema.org", "@type": "BreadcrumbList",
+         itemListElement: [
+           { "@type": "ListItem", position: 1, name: "בית", item: businessConfig.siteUrl },
+           { "@type": "ListItem", position: 2, name: "שירותים", item: `${businessConfig.siteUrl}/services` },
+           { "@type": "ListItem", position: 3, name: config.serviceName, item: `${businessConfig.siteUrl}${config.path}` },
+         ],
+-      }} />}
++      }} />
+     </>,
+     video: config.video ? <YouTubeLiteEmbed videoId={config.video.youtubeId} title={config.video.title}
+       poster={config.video.poster} watchUrl={config.video.watchUrl} /> : null,
+--- a/src/components/ServiceLandingView.tsx
++++ b/src/components/ServiceLandingView.tsx
+@@ -19,7 +19,7 @@
+   "עסק של מילואימניקים",
+   "הגעה עד לבית הלקוח",
+   "מענה מהיר",
+-  "מראשון לציון ועד נתניה",
++  "בדיקת זמינות לפי היישוב",
+ ];
+ 
+ export function ServiceLandingView({
+@@ -51,6 +51,15 @@
+       <section className="theme-section-strong overflow-hidden py-9 sm:py-16 lg:py-20">
+         <div className="section-container grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+           <div className="reveal">
++            <nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
++              <ol className="flex flex-wrap items-center gap-2">
++                <li><NavLink href="/">בית</NavLink></li>
++                <li aria-hidden="true">/</li>
++                <li><NavLink href="/services">שירותים</NavLink></li>
++                <li aria-hidden="true">/</li>
++                <li aria-current="page">{config.serviceName}</li>
++              </ol>
++            </nav>
+             <p className="text-sm font-black text-turquoise">{config.eyebrow}</p>
+             <h1 className="mt-3 max-w-3xl text-4xl font-black leading-[1.08] text-white sm:text-5xl lg:text-6xl">
+               {config.h1}
+@@ -72,7 +81,7 @@
+             <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
+               <NavLink href="/services" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">כל השירותים</NavLink>
+               <NavLink href="/gallery" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">גלריית עבודות</NavLink>
+-              <NavLink href="/contact" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">יצירת קשר</NavLink>
++              <NavLink href={`/contact?service=${encodeURIComponent(config.serviceName)}`} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">יצירת קשר</NavLink>
+               {config.relatedLinks.map((link) => (
+                 <NavLink key={link.href} href={link.href} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">
+                   {link.label}
+--- a/src/components/ImageWithFallback.tsx
++++ b/src/components/ImageWithFallback.tsx
+@@ -48,9 +48,7 @@
+           preload={preload || priority}
+           sizes={sizes}
+           decoding="async"
+-          className={`${imageClassName} transition-opacity duration-500 ${
+-            isLoaded ? "opacity-100" : "opacity-0"
+-          }`}
++          className={imageClassName}
+           onLoad={() => setIsLoaded(true)}
+           onError={() => setHasError(true)}
+         />
+--- a/src/components/AirConditionerCleaningView.tsx
++++ b/src/components/AirConditionerCleaningView.tsx
+@@ -6,6 +6,7 @@
+ import { JsonLd } from "@/components/JsonLd";
+ import { SectionHeading } from "@/components/SectionHeading";
+ import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
++import { businessEntityId } from "@/lib/structured-data";
+ import { businessConfig } from "@/config/business";
+ import { acBaseline } from "@/cms/content/special-baseline";
+ import type { AirConditionerCleaningContent } from "@/cms/content/special-model";
+@@ -16,7 +17,7 @@
+ import { serviceRegistry } from "@/content/service-registry";
+ 
+ function buildStructuredData(content: AirConditionerCleaningContent) {
+-  const { airConditionerServiceAreas, faqs } = content;
++  const { airConditionerServiceAreas } = content;
+   const pageUrl = `${businessConfig.siteUrl}/air-conditioner-cleaning`;
+ 
+   return {
+@@ -28,14 +29,9 @@
+       url: pageUrl,
+       description:
+         content.serviceDescription,
+-      provider: {
+-        "@type": "LocalBusiness",
+-        name: businessConfig.name,
+-        telephone: businessConfig.phoneDisplay,
+-        url: businessConfig.siteUrl,
+-      },
+-      areaServed: airConditionerServiceAreas.map((area) => ({
+-        "@type": "City",
++      provider: { "@id": businessEntityId },
++      areaServed: airConditionerServiceAreas.filter(area => area !== "והסביבה").map((area) => ({
++        "@type": "Place",
+         name: area,
+       })),
+     },
+@@ -63,15 +59,7 @@
+         },
+       ],
+     },
+-    faq: {
+-      "@context": "https://schema.org",
+-      "@type": "FAQPage",
+-      mainEntity: faqs.map((faq) => ({
+-        "@type": "Question",
+-        name: faq.question,
+-        acceptedAnswer: { "@type": "Answer", text: faq.answer },
+-      })),
+-    },
++
+   };
+ }
+ 
+@@ -86,12 +74,18 @@
+     <div className="pb-20 sm:pb-0">
+       <JsonLd id="ac-cleaning-service-jsonld" data={structuredData.service} />
+       <JsonLd id="ac-cleaning-breadcrumb-jsonld" data={structuredData.breadcrumb} />
+-      <JsonLd id="ac-cleaning-faq-jsonld" data={structuredData.faq} />
+       {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
+ 
+       <section className="theme-section-strong overflow-hidden py-7 sm:py-14 lg:py-16">
+         <div className="section-container grid items-center gap-6 lg:grid-cols-[1.03fr_0.97fr] lg:gap-12">
+           <div className="reveal">
++            <nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
++              <ol className="flex flex-wrap gap-2">
++                <li><Link href="/">בית</Link></li><li aria-hidden="true">/</li>
++                <li><Link href="/services">שירותים</Link></li><li aria-hidden="true">/</li>
++                <li aria-current="page">{content.h1}</li>
++              </ol>
++            </nav>
+             <p className="text-sm font-black text-turquoise">{content.copy.heroEyebrow}</p>
+             {promotion.enabled && <p className="mt-2 inline-flex rounded-full border border-turquoise/35 bg-turquoise/10 px-3 py-1.5 text-xs font-black text-turquoise sm:text-sm">
+               {promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪
+@@ -307,7 +301,7 @@
+             tone="light"
+           />
+           <div className="flex flex-wrap gap-2" aria-label="אזורי שירות לניקוי מזגנים">
+-            {airConditionerServiceAreas.map((area) => (
++            {airConditionerServiceAreas.filter(area => area !== "והסביבה").map((area) => (
+               <span
+                 key={area}
+                 className="rounded-full border border-turquoise/20 bg-turquoise/[0.08] px-3 py-2 text-sm font-black"
+--- a/src/components/WindowCleaningView.tsx
++++ b/src/components/WindowCleaningView.tsx
+@@ -11,6 +11,7 @@
+ import { Icon } from "@/components/Icon";
+ import { JsonLd } from "@/components/JsonLd";
+ import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
++import { businessEntityId } from "@/lib/structured-data";
+ import { businessConfig } from "@/config/business";
+ 
+ const path = "/window-cleaning";
+@@ -35,12 +36,7 @@
+   description: content.seoDescription,
+   url: pageUrl,
+   serviceType: "ניקוי חלונות",
+-  provider: {
+-    "@type": "LocalBusiness",
+-    name: businessConfig.name,
+-    url: businessConfig.siteUrl,
+-    telephone: businessConfig.phoneDisplay,
+-  },
++  provider: { "@id": businessEntityId },
+ };
+ 
+ 
+--- a/src/cms/pages/PageBlocksView.tsx
++++ b/src/cms/pages/PageBlocksView.tsx
+@@ -1,7 +1,6 @@
+ import Image from "next/image";
+ import type { ReactNode } from "react";
+ import { Icon } from "@/components/Icon";
+-import { JsonLd } from "@/components/JsonLd";
+ import { PageHero } from "@/components/PageHero";
+ import { SectionHeading } from "@/components/SectionHeading";
+ import { buildMetadata } from "@/lib/seo";
+@@ -12,9 +11,12 @@
+ export type BlockMedia = Record<string, { src: string; altText: string }>;
+ export type BlockPromotions = Record<string, PromotionDraft>;
+ 
+-export function pageRevisionMetadata(page: PageDraft) {
++export function pageRevisionMetadata(page: PageDraft, media: BlockMedia = {}) {
+   const draft = validatePageDraft(page);
+-  return buildMetadata({ title: draft.seoTitle, description: draft.seoDescription, path: draft.canonical });
++  const hero = draft.blocks.find(block => block.type === "hero" && !block.hidden && block.mediaVersionId);
++  const image = hero?.mediaVersionId ? media[hero.mediaVersionId] : undefined;
++  return buildMetadata({ title: draft.seoTitle, description: draft.seoDescription, path: draft.canonical,
++    image: image ? { url: image.src, alt: hero?.payload.mediaAlt as string || image.altText } : undefined });
+ }
+ function SafeAction({ cta, preview, className = "btn-primary inline-flex" }: { cta: SafeCta; preview: boolean; className?: string }) {
+   const href = resolveSafeTarget(cta.target, preview);
+@@ -71,7 +73,7 @@
+     </div>
+   </section>;
+ }
+-export function BlockView({ block, media, promotions, preview, revisionId }: {
++export function BlockView({ block, media, promotions, preview }: {
+   block: PageBlock; media: BlockMedia; promotions: BlockPromotions; preview: boolean; revisionId: string;
+ }) {
+   const p = block.payload;
+@@ -94,14 +96,10 @@
+     </div></section>;
+     case "faq": {
+       const items = p.items as { question: string; answer: string }[];
+-      const faqData = { "@context": "https://schema.org", "@type": "FAQPage",
+-        mainEntity: items.map(item => ({ "@type": "Question", name: item.question,
+-          acceptedAnswer: { "@type": "Answer", text: item.answer } })) };
+       return <section className="section-block theme-section-soft"><div className="section-container max-w-4xl">
+         <h2 className="text-2xl font-black">שאלות נפוצות</h2>
+         <div className="mt-6 grid gap-4">{items.map(item => <article key={item.question} className="rounded-2xl border theme-card p-5">
+           <h3 className="font-black">{item.question}</h3><p className="mt-2 leading-8">{item.answer}</p></article>)}</div>
+-        {!preview && <JsonLd id={`cms-faq-${revisionId}-${block.id}`} data={faqData} />}
+       </div></section>;
+     }
+     case "cta": return <section className="section-block theme-section-contrast"><div className="section-container text-center">
+--- a/src/app/(site)/window-cleaning/page.tsx
++++ b/src/app/(site)/window-cleaning/page.tsx
+@@ -2,11 +2,14 @@
+ import { getPublicSpecialService } from "@/cms/content/public-source";
+ import { WindowCleaningLandingPage } from "@/components/WindowCleaningLandingPage";
+ import { buildMetadata } from "@/lib/seo";
++import { specialMedia } from "@/cms/content/special-view";
+ import { PublicScheduledPromotion } from "@/cms/schedules/PublicScheduledPromotion";
+ import { getPublicActivePromotion } from "@/cms/schedules/public-source";
+ export async function generateMetadata(): Promise<Metadata> {
+- const { content } = await getPublicSpecialService("window-cleaning");
+- return buildMetadata({ title: content.seoTitle, description: content.seoDescription, path: "/window-cleaning" });
++ const { content, media, images } = await getPublicSpecialService("window-cleaning");
++ const image = images?.[0] || specialMedia(content, "hero", media)[0];
++ return buildMetadata({ title: content.seoTitle, description: content.seoDescription,
++   path: "/window-cleaning", image: image ? { url: image.src, alt: image.alt } : undefined });
+ }
+ export default async function WindowCleaningPage() {
+  const {content, media, images} = await getPublicSpecialService("window-cleaning");
+--- a/src/components/ContactForm.tsx
++++ b/src/components/ContactForm.tsx
+@@ -112,7 +112,7 @@
+           phone: values.phone,
+           service: values.service,
+           city: values.city,
+-          message: values.message,
++          message: `עמוד הפנייה: ${window.location.pathname}\n${values.message}`,
+           submissionId,
+           marketingAttribution: getStoredMarketingAttribution(),
+         }),
+--- a/src/components/CookieConsent.tsx
++++ b/src/components/CookieConsent.tsx
+@@ -11,11 +11,10 @@
+ } from "@/lib/consent";
+ 
+ export function CookieConsent() {
+-  const [isVisible, setIsVisible] = useState(false);
++  const [isVisible, setIsVisible] = useState(true);
+   const [choice, setChoice] = useState<ConsentChoice>("unknown");
+   const acceptButtonRef = useRef<HTMLButtonElement>(null);
+   const returnFocusRef = useRef<HTMLElement | null>(null);
+-
+   useEffect(() => {
+     const hydrationTimeout = window.setTimeout(() => {
+       const storedChoice = getStoredConsent();
+@@ -58,7 +57,7 @@
+       role="dialog"
+       aria-label="בחירת העדפות עוגיות"
+       aria-modal="false"
+-      className="fixed inset-x-3 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-[60] mx-auto max-w-4xl rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-3 text-[var(--foreground)] shadow-[0_18px_44px_rgba(8,19,31,0.18)] sm:bottom-5 sm:px-4 sm:py-3"
++      className="relative my-3 w-[calc(100%-1.5rem)] z-[60] mx-auto max-w-4xl rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-3 text-[var(--foreground)] shadow-[0_18px_44px_rgba(8,19,31,0.18)] sm:px-4 sm:py-3"
+     >
+       <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-4">
+         <div>
+--- a/src/data/serviceLandingPages.ts
++++ b/src/data/serviceLandingPages.ts
+@@ -76,6 +76,7 @@
+   },
+   relatedLinks: [{ label: "לניקוי כורסאות וכיסאות", href: "/armchair-chair-cleaning" }],
+   faqs: [
++    { question: "מה צריך לשלוח לקבלת מחיר לניקוי ספה?", answer: "שלחו צילום של הספה כולה, תקריב של הכתמים ותווית הבד אם קיימת. ציינו את גודל הספה ואת היישוב. בהצעה נוודא אילו חלקים נכללים ומה דורש בדיקת התאמה." },
+     { question: "האם אתם מנקים כל סוג בד?", answer: "אנחנו בודקים את סוג הבד והוראות היצרן לפני העבודה. אם הבד דורש טיפול מיוחד, נתאים את השיטה או נסביר מה אפשר לבצע." },
+     { question: "כמה זמן לוקח ניקוי ספה?", answer: "משך העבודה תלוי בגודל הספה, סוג הבד ומצב הלכלוך. נוכל לתת הערכה לאחר קבלת תמונה ופרטים." },
+     { question: "כמה זמן לוקח לספה להתייבש?", answer: "זמן הייבוש משתנה לפי הבד, עומק הניקוי והאוורור בבית. בסיום העבודה נמסור הנחיות מתאימות." },
+@@ -114,6 +115,7 @@
+   },
+   relatedLinks: [{ label: "לניקוי ריפודים עדינים", href: "/delicate-upholstery-cleaning" }],
+   faqs: [
++    { question: "מה צריך לציין כשמבקשים הצעה לניקוי מזרן?", answer: "ציינו אם המזרן יחיד או זוגי, אילו צדדים נגישים והאם נדרש גם ניקוי מיטה מרופדת. צרפו תמונות של הבד והכתמים ואת היישוב כדי לתאם את היקף העבודה והמחיר." },
+     { question: "האם מנקים מזרן משני הצדדים?", answer: "אפשר לנקות את הצדדים הנגישים בהתאם לסוג המזרן ולמצבו. נבדוק זאת לפני תחילת העבודה." },
+     { question: "כמה זמן לוקח למזרן להתייבש?", answer: "זמן הייבוש משתנה לפי הבד, עומק הניקוי והאוורור. בסיום נסביר מתי נכון לחזור להשתמש בו." },
+     { question: "האם ניתן לנקות מזרן עם כתמי זיעה?", answer: "אפשר לטפל בכתמי זיעה, אך התוצאה תלויה בגיל הכתם ובמצב הבד ולא ניתן להבטיח הסרה מלאה." },
+@@ -151,6 +153,7 @@
+   },
+   relatedLinks: [{ label: "לניקוי ספות", href: "/sofa-cleaning" }],
+   faqs: [
++    { question: "איזה מידע עוזר לבדוק התאמה לשטיח?", answer: "שלחו תמונה של השטיח כולו, תווית או פרטים על הסיב אם ידועים, מידות ותקריב של הכתמים. בשטיח עדין או עבודת יד יש לבדוק התאמה לפני תיאום הניקוי." },
+     { question: "האם אתם מנקים שטיחים בבית?", answer: "כן, לשטיחים ביתיים שמתאימים לשיטת העבודה לאחר בדיקה. נבקש תמונה ומידות לפני קביעת השירות." },
+     { question: "האם אתם מנקים שטיח עבודת יד?", answer: "שטיח עבודת יד דורש בדיקה מוקדמת של הסיבים, הצבע והוראות היצרן. לא נאשר התאמה לפני בדיקה." },
+     { question: "האם ניתן לנקות שטיח מקיר לקיר?", answer: "זהו שירות שונה משטיח ביתי. יש לשלוח תמונות, מידות ופרטי גישה כדי לבדוק התאמה וזמינות." },
+@@ -189,6 +192,7 @@
+   },
+   relatedLinks: [{ label: "לניקוי ריפודים עדינים", href: "/delicate-upholstery-cleaning" }],
+   faqs: [
++    { question: "מה כלול בהצעת המחיר לרכב?", answer: "ההיקף נקבע לפי סוג הרכב, מספר המושבים והריפודים שנדרש לנקות. ציינו אם הפנייה נוגעת למושבים בלבד או גם לדיפונים, ושלחו תמונות כדי לסכם מראש מה נכלל ומה דורש בדיקה." },
+     { question: "האם אתם מנקים רכב עם 5 או 7 מושבים?", answer: "כן, בהתאם לסוג הרכב, מספר המושבים והגישה אליהם. המחיר נקבע לאחר קבלת הפרטים." },
+     { question: "האם מנקים גם מושבי ילדים?", answer: "אפשר לבדוק התאמה לפי סוג המושב, הוראות היצרן ומצב הריפוד לפני העבודה." },
+     { question: "האם אפשר לטפל בריח לא נעים?", answer: "אפשר לטפל בריחות שמקורם בריפוד ובלכלוך, אך התוצאה תלויה במקור הריח ובמצב הרכב." },
+@@ -219,6 +223,7 @@
+   resultDescription: "מוצגת תמונת עבודה של CleanBrothers. אין בפרויקט זוג לפני ואחרי תואם לשירות זה.",
+   relatedLinks: [{ label: "לניקוי ספות", href: "/sofa-cleaning" }],
+   faqs: [
++    { question: "איך מבקשים הצעה לכמה כיסאות או כורסאות?", answer: "שלחו תמונות, את מספר הפריטים ופרטים על סוג הריפוד. ציינו אילו חלקים מרופדים בכל פריט ומה מצב הכתמים, כדי שנוכל להתאים את ההצעה לכמות ולהיקף הניקוי." },
+     { question: "האם מנקים גם משענת וגם מושב?", answer: "כן, בהתאם למבנה הפריט ולחלקים המרופדים שנגישים לעבודה." },
+     { question: "האם מנקים כיסאות אוכל?", answer: "כן, כיסאות אוכל עם ריפוד בד נבדקים ומטופלים בהתאם לסוג הריפוד." },
+     { question: "האם מנקים כיסאות משרדיים?", answer: "כן, לכיסאות משרדיים מרופדים בבית או בעסק, לאחר בדיקת סוג הבד והגישה." },
+--- a/src/cms/content/special-baseline.ts
++++ b/src/cms/content/special-baseline.ts
+@@ -1,10 +1,11 @@
+ import type { AirConditionerCleaningContent, WindowCleaningContent } from "./special-model";
+-// The approved repaired static baseline, including exact original wording.
++// Static fallback and offline CMS draft baseline. Editorial updates must be
++// merged into a fresh CMS revision when the published content source is active.
+ export const acBaseline: AirConditionerCleaningContent = {
+   "schemaVersion": 4,
+   "publicTitle": "ניקוי מזגנים",
+-  "h1": "מזגן נקי יותר, אוויר נעים יותר",
+-  "seoTitle": "ניקוי מזגנים מקצועי עד הבית | CleanBrothers",
++  "h1": "ניקוי מזגן עילי עד הבית",
++  "seoTitle": "ניקוי מזגן עילי עד הבית במרכז ובשרון | CleanBrothers",
+   "seoDescription": "ניקוי מזגנים מקצועי עד הבית באזור המרכז. שלחו תמונה בוואטסאפ, קבלו הערכת מחיר ותיאום מהיר עם CleanBrothers.",
+   "copy": {
+     "heroEyebrow": "ניקוי מזגנים מקצועי עד הבית",
+@@ -54,17 +55,8 @@
+     "זמינות מהירה באזור המרכז"
+   ],
+   "airConditionerServiceAreas": [
+-    "ראשון לציון",
+-    "בת ים",
+-    "חולון",
+-    "תל אביב",
+-    "רמת גן",
+-    "גבעתיים",
+-    "גבעת שמואל",
+-    "פתח תקווה",
+-    "הוד השרון",
+-    "כפר סבא",
+-    "מרכז הארץ"
++    "פתח תקווה", "רמת גן", "הוד השרון", "תל אביב", "רעננה",
++    "הרצליה", "רמת השרון", "גבעתיים", "והסביבה"
+   ],
+   "intentSignals": [
+     "ריח לא נעים בזמן ההפעלה",
+@@ -106,6 +98,10 @@
+     "מגיעים ומבצעים ניקוי מקצועי"
+   ],
+   "faqs": [
++    {
++      "question": "מה ההבדל בין ניקוי מזגן עילי, מיני מרכזי ותעלות?",
++      "answer": "במזגן עילי הניקוי מתמקד בחלקים הנגישים של היחידה הפנימית. למיני מרכזי נדרשת בדיקת מבנה וגישה נפרדת לפני אישור היקף העבודה. ניקוי תעלות אינו כלול, והשירות אינו תיקון תקלות."
++    },
+     {
+       "question": "מה כולל ניקוי מזגן?",
+       "answer": "הניקוי מתמקד בפילטרים ובחלקים הנגישים ביחידה הפנימית, ובהם סוללת המאייד, תריסים, פתחי אוויר, מעטפת ואזורים נוספים שניתן להגיע אליהם בבטחה. ההיקף נקבע לפי סוג המזגן, המבנה והנגישות."
+--- a/src/config/business.ts
++++ b/src/config/business.ts
+@@ -25,15 +25,10 @@
+   email: BUSINESS_EMAIL,
+   whatsappDefaultMessage:
+     "היי, אשמח לקבל הצעת מחיר לניקוי ספות / ריפודים / שטיחים / רכב.",
++  // Confirmed by the business owner on 2026-10-14. Days were not specified.
++  operatingHoursDisplay: "08:00–18:00",
+   serviceAreas: [
+-    "ראש העין",
+-    "פתח תקווה",
+-    "הוד השרון",
+-    "כפר סבא",
+-    "רמת גן",
+-    "גבעת שמואל",
+-    "גבעתיים",
+-    "תל אביב",
+-    "מרכז הארץ",
++    "פתח תקווה", "רמת גן", "הוד השרון", "תל אביב", "רעננה",
++    "הרצליה", "רמת השרון", "גבעתיים", "והסביבה",
+   ],
+ };
+--- a/src/sections/Footer.tsx
++++ b/src/sections/Footer.tsx
+@@ -21,7 +21,7 @@
+   links = navLinks, services = baselineServices }: FooterProps) {
+   // The dial target stays code/environment owned for call tracking. CMS can
+   // change only formatting of the displayed number after digit equivalence.
+-  const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
++  const phoneDigits = settings.phoneDisplay.replace(/\D/g, "");
+   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
+   const emailHref = `mailto:${settings.email}`;
+ 
+@@ -86,6 +86,7 @@
+             >
+               <GoogleCallTrackingNumber>{settings.phoneDisplay}</GoogleCallTrackingNumber>
+             </a>
++            <p className="text-sm text-white/70">שעות פעילות: {businessConfig.operatingHoursDisplay}</p>
+             <a
+               href={emailHref}
+               aria-label="שליחת אימייל ל-CleanBrothers"
+--- a/src/sections/ServiceAreas.tsx
++++ b/src/sections/ServiceAreas.tsx
+@@ -5,7 +5,7 @@
+   eyebrow: "אזורי שירות",
+   title: "שירותי ניקיון עד הלקוח באזור המרכז",
+   mobileDescription: "מגיעים לערי המרכז. שולחים תמונה ומקבלים הערכה.",
+-  description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, ראש העין, רמת גן, גבעת שמואל, תל אביב וערים נוספות במרכז. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
++  description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, רמת גן, הוד השרון, תל אביב, רעננה, הרצליה, רמת השרון, גבעתיים והסביבה. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
+ };
+ 
+ export function ServiceAreas({ content = serviceAreasContent }: { content?: typeof serviceAreasContent } = {}) {
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -1,4 +1,8 @@
+ @import "tailwindcss";
++
++/* Keep anchored forms clear of navigation and the mobile service actions. */
++html { scroll-padding-bottom: 6rem; }
++#contact-form { scroll-margin-top: 6rem; scroll-margin-bottom: 6rem; }
+ 
+ :root {
+   color-scheme: light;
+--- a/src/app/(site)/layout.tsx
++++ b/src/app/(site)/layout.tsx
+@@ -79,6 +79,7 @@
+         <MetaPixel pixelId={metaPixelId} />
+         <ScrollProgress />
+         <Navbar links={chrome.navLinks} />
++        <CookieConsent />
+         {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
+         <PublicCampaigns />
+         <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
+@@ -88,7 +89,6 @@
+           services={chrome.featuredServiceLinks} />
+         <AccessibilityControls />
+         <WhatsAppButton />
+-        <CookieConsent />
+       </body>
+     </html>
+   );
+--- a/src/app/(site)/contact/page.tsx
++++ b/src/app/(site)/contact/page.tsx
+@@ -41,7 +41,11 @@
+   path: "/contact",
+ });
+ 
+-export default function ContactPage() {
++export default async function ContactPage(props: {
++  searchParams: Promise<Record<string, string | string[] | undefined>>;
++}) {
++  const query = await props?.searchParams || {};
++  const initialService = typeof query.service === "string" ? query.service : "";
+   const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
+   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
+   const emailHref = `mailto:${businessConfig.email}`;
+@@ -121,7 +125,7 @@
+           </aside>
+ 
+           <div className="order-2 lg:order-none">
+-            <ContactForm />
++            <ContactForm initialService={initialService} />
+           </div>
+         </div>
+       </section>
+--- a/src/app/(site)/[slug]/page.tsx
++++ b/src/app/(site)/[slug]/page.tsx
+@@ -17,7 +17,7 @@
+ export async function generateMetadata({ params }: Props): Promise<Metadata> {
+   const snapshot = await getPublicNewPage((await params).slug);
+   if (!snapshot || snapshot.kind === "redirect") return { robots: { index: false, follow: false } };
+-  return pageRevisionMetadata(snapshot.page);
++  return pageRevisionMetadata(snapshot.page, snapshot.media);
+ }
+ export default async function NewCmsPage({ params, searchParams }: Props) {
+   const snapshot = await getPublicNewPage((await params).slug);
+--- a/src/app/(site)/about/page.tsx
++++ b/src/app/(site)/about/page.tsx
+@@ -37,7 +37,7 @@
+ 
+ export async function generateMetadata() {
+   const source = await getPublicAbout();
+-  return source.source === "cms" ? pageRevisionMetadata(source.page) : staticMetadata;
++  return source.source === "cms" ? pageRevisionMetadata(source.page, source.media) : staticMetadata;
+ }
+ 
+ export default async function AboutPage() {
+--- a/src/components/WhatsAppButton.tsx
++++ b/src/components/WhatsAppButton.tsx
+@@ -1,17 +1,10 @@
+ "use client";
+ 
++import { managedServiceKeys } from "@/content/service-registry";
+ import { usePathname } from "next/navigation";
+ import { getWhatsAppLink } from "@/lib/whatsapp";
+ 
+-const serviceLandingPaths = new Set([
+-  "/air-conditioner-cleaning",
+-  "/sofa-cleaning",
+-  "/mattress-cleaning",
+-  "/carpet-cleaning",
+-  "/car-upholstery-cleaning",
+-  "/armchair-chair-cleaning",
+-  "/delicate-upholstery-cleaning",
+-]);
++const serviceLandingPaths = new Set(managedServiceKeys.map(key => `/${key}`));
+ 
+ function WhatsAppIcon() {
+   return (
+--- /dev/null
++++ b/src/lib/public-routes.ts
+@@ -0,0 +1,13 @@
++import { managedServiceKeys } from "@/content/service-registry";
++
++// Explicit route ownership: shared by the sitemap and the pre-render 404 guard.
++// Published CMS slugs are resolved separately, through their existing allowlist.
++export const publicPagePaths = [
++  "/", "/services", ...managedServiceKeys.map(key => `/${key}`),
++  "/gallery", "/about", "/contact", "/privacy-policy",
++  "/accessibility-statement", "/data-deletion",
++] as const;
++
++export function isPublicPagePath(path: string): boolean {
++  return publicPagePaths.some(candidate => candidate === path);
++}

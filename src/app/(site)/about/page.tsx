@@ -37,7 +37,7 @@ const staticMetadata = buildMetadata({
 
 export async function generateMetadata() {
   const source = await getPublicAbout();
-  return source.source === "cms" ? pageRevisionMetadata(source.page) : staticMetadata;
+  return source.source === "cms" ? pageRevisionMetadata(source.page, source.media) : staticMetadata;
 }
 
 export default async function AboutPage() {

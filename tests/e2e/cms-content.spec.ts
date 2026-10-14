@@ -27,7 +27,7 @@ async function publicSnapshot(page: Page, origin: string) {
   const response = await page.goto(`${origin}/${key}`);
   expect(response?.status()).toBe(200);
   await expect(page.locator("main h1")).toBeVisible();
-  await expect(page.locator(`script[id="${key}-faq-jsonld"]`)).toHaveCount(1);
+  await expect(page.locator(`script[id="${key}-service-jsonld"]`)).toHaveCount(1);
   return page.evaluate(() => {
     const main = document.querySelector("main")!.cloneNode(true) as HTMLElement;
     main.querySelectorAll("script,style").forEach((element) => element.remove());
@@ -46,7 +46,7 @@ async function publicSnapshot(page: Page, origin: string) {
       description: document.querySelector('meta[name="description"]')?.getAttribute("content"),
       canonical: document.querySelector('link[rel="canonical"]')?.getAttribute("href"),
       social: Array.from(document.querySelectorAll('meta[property^="og:"],meta[name^="twitter:"]')).map((m) => [m.getAttribute("property") ?? m.getAttribute("name"), m.getAttribute("content")]),
-      faqJsonLd: JSON.parse(document.querySelector('script[id="delicate-upholstery-cleaning-faq-jsonld"]')!.textContent!),
+      serviceJsonLd: JSON.parse(document.querySelector('script[id="delicate-upholstery-cleaning-service-jsonld"]')!.textContent!),
       faq: Array.from(main.querySelectorAll("details")).map((faq) => [faq.querySelector("summary")?.textContent, faq.querySelector("p")?.textContent]),
     };
   });
@@ -63,7 +63,7 @@ test("local baseline import is idempotent; static and CMS public rendering are s
     const cms = await publicSnapshot(page, publishedOrigin);
     expect(cms).toEqual(existing);
     expect(cms.formService).toBe("ניקוי ריפודים עדינים");
-    expect(cms.faq).toHaveLength(6);
+    expect(cms.faq).toHaveLength(7);
     expect(cms.images).toHaveLength(3);
     for (const route of ["/", "/services", "/gallery", "/about", "/contact", "/sofa-cleaning", "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning", "/armchair-chair-cleaning", `/${key}`, "/air-conditioner-cleaning", "/window-cleaning", "/privacy-policy", "/accessibility-statement", "/data-deletion"]) {
       expect((await request.get(appOrigin + route)).status(), route).toBe(200);

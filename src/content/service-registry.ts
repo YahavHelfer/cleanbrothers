@@ -33,6 +33,7 @@ export const serviceRegistry = {
   },
   "air-conditioner-cleaning": { crmName: "ניקוי מזגנים", documentId: "2185a776-4440-4728-af2c-909d17994241", path: "/air-conditioner-cleaning" },
   "window-cleaning": { crmName: "ניקוי חלונות", documentId: "f05f10a0-b576-4625-8eb2-8abc5a0a1ae6", path: "/window-cleaning" },
+  "mini-central-air-conditioner-cleaning": { crmName: "ניקוי מזגן מיני מרכזי", documentId: "78f7bdd5-5174-4d7b-8d5c-b0c1fd3a53c1", path: "/mini-central-air-conditioner-cleaning" },
   "post-renovation-cleaning": { crmName: postRenovationIdentity.crmName, documentId: postRenovationIdentity.documentId, path: postRenovationIdentity.path }
 } as const;
 export type ManagedServiceKey = keyof typeof serviceRegistry;

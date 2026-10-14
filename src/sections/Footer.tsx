@@ -21,7 +21,7 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
   links = navLinks, services = baselineServices }: FooterProps) {
   // The dial target stays code/environment owned for call tracking. CMS can
   // change only formatting of the displayed number after digit equivalence.
-  const phoneDigits = businessConfig.phoneDisplay.replace(/\D/g, "");
+  const phoneDigits = settings.phoneDisplay.replace(/\D/g, "");
   const phoneHref = phoneDigits ? `tel:${phoneDigits}` : "/contact";
   const emailHref = `mailto:${settings.email}`;
 
@@ -86,6 +86,7 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
             >
               <GoogleCallTrackingNumber>{settings.phoneDisplay}</GoogleCallTrackingNumber>
             </a>
+            <p className="text-sm text-white/70">שעות פעילות: {businessConfig.operatingHoursDisplay}</p>
             <a
               href={emailHref}
               aria-label="שליחת אימייל ל-CleanBrothers"

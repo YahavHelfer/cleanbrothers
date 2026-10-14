@@ -69,7 +69,7 @@ test("bootstrap repository uses authenticated draft CAS, preserves published poi
   const original = legacy();
   original.seoDescription = "טיוטת Revision 7";
   let state = { generation: 7, draftRevisionId: oldDraftId, publishedRevisionId: publishedId,
-    draft: structuredClone(original), history: [] };
+    draft: structuredClone(original), serviceImages: plain(createSourceLoader()("src/cms/home/service-card-images.ts").baselineImageCollections()), history: [] };
   const historical = structuredClone(state.draft);
   const calls = [];
   const load = createSourceLoader({ mocks: {
@@ -78,7 +78,7 @@ test("bootstrap repository uses authenticated draft CAS, preserves published poi
     "@/cms/server": { createCmsServerClient: async () => ({ rpc: async (name, args) => {
       calls.push(name);
       if (name === "cms_read_home_editor") return { data: state, error: null };
-      if (name !== "cms_save_home_draft") throw Error(`Unexpected RPC: ${name}`);
+      if (name !== "cms_save_home_shared_draft") throw Error(`Unexpected RPC: ${name}`);
       assert.equal(args.expected_generation, 7);
       assert.equal(args.base_revision, oldDraftId);
       assert.equal(args.restore_revision, null);
@@ -94,12 +94,12 @@ test("bootstrap repository uses authenticated draft CAS, preserves published poi
   assert.equal(state.publishedRevisionId, publishedId);
   assert.deepEqual(historical, original);
   assert.equal(state.draft.blocks.length, 12);
-  assert.deepEqual(calls, ["cms_read_home_editor", "cms_save_home_draft"]);
+  assert.deepEqual(calls, ["cms_read_home_editor", "cms_save_home_shared_draft"]);
   const second = await repo.bootstrapHomeGoogleReviews(8, newDraftId);
   assert.deepEqual(plain(second), { created: false, revision: newDraftId });
-  assert.deepEqual(calls, ["cms_read_home_editor", "cms_save_home_draft", "cms_read_home_editor"]);
+  assert.deepEqual(calls, ["cms_read_home_editor", "cms_save_home_shared_draft", "cms_read_home_editor"]);
   await assert.rejects(repo.bootstrapHomeGoogleReviews(7, oldDraftId), /עורך אחר/);
-  assert.equal(calls.filter(name => name === "cms_save_home_draft").length, 1);
+  assert.equal(calls.filter(name => name === "cms_save_home_shared_draft").length, 1);
 });
 
 test("bootstrap rejects a raced save conflict without creating a second revision", async () => {
@@ -110,7 +110,7 @@ test("bootstrap rejects a raced save conflict without creating a second revision
     "@/cms/server": { createCmsServerClient: async () => ({ rpc: async name => {
       if (name === "cms_read_home_editor") return { data: {
         generation: 7, draftRevisionId: "d4000000-0000-4000-8000-000000000071",
-        publishedRevisionId: "d4000000-0000-4000-8000-000000000051", draft: legacy(), history: [],
+        publishedRevisionId: "d4000000-0000-4000-8000-000000000051", draft: legacy(), serviceImages: plain(createSourceLoader()("src/cms/home/service-card-images.ts").baselineImageCollections()), history: [],
       }, error: null };
       saves++;
       return { data: null, error: { code: "PT409" } };
