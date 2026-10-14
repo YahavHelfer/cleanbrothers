@@ -30,7 +30,7 @@ export default async function Home() {
       <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
       {homePromotion && <PublicScheduledPromotion active={homePromotion} />}
       <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}
-        media={source.media} promotions={source.promotions} reviews={reviews} />
+        media={source.media} promotions={source.promotions} reviews={reviews} serviceAreas={settings.serviceAreas} />
     </>
   );
 }

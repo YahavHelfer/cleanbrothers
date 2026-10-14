@@ -13,6 +13,7 @@ import { homeEnvironmentAllowed } from "@/cms/home/environment";
 import { getHomeRevision } from "@/cms/home/repository";
 import { HomeBlocksView, staticHomeMedia } from "@/cms/home/HomeBlocksView";
 import { getGoogleReviews } from "@/cms/reviews/source";
+import { getPublicSiteChrome } from "@/cms/site/public-source";
 
 export const metadata: Metadata = { title: "תצוגה מקדימה פרטית | CleanBrothers", robots: { index: false, follow: false } };
 export default async function PagePreview({ params: routeParams, searchParams }: {
@@ -38,10 +39,12 @@ export default async function PagePreview({ params: routeParams, searchParams }:
       ...Object.fromEntries(choices.map(choice=>[choice.versionId,{src:choice.src,altText:choice.altText}])) };
     const reviews = revision.payload.blocks.some(block => block.type === "homeGoogleReviews" && !block.hidden) ?
       await getGoogleReviews("preview") : null;
+    const { settings } = await getPublicSiteChrome();
     return <><aside className="mb-6 rounded-2xl border theme-card p-5" aria-label="מצב תצוגה מקדימה">
       <p className="font-black">דף הבית — גרסה {revision.number}</p>
       <p>תצוגה פרטית של הגרסה השמורה בלבד. פעולות קשר ומעקב מושבתות.</p>
-    </aside><HomeBlocksView page={revision.payload} revisionId={revision.id} media={media} promotions={promotions} reviews={reviews} preview/></>;
+      <p>רשימת אזורי השירות נלקחת מהגדרות העסק שפורסמו.</p>
+    </aside><HomeBlocksView page={revision.payload} revisionId={revision.id} media={media} promotions={promotions} reviews={reviews} serviceAreas={settings.serviceAreas} preview/></>;
   }
   if (pageId !== "about" && !newPagesEnvironmentAllowed()) notFound();
   let id: string;

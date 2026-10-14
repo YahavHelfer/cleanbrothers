@@ -155,6 +155,7 @@ export function HomeEditor({ snapshot, templates, mediaChoices, promotionRevisio
           <button className={button} type="button" disabled={index===0} onClick={()=>reorder(blocks.filter((_,i)=>i!==index))}>הסרה מהטיוטה</button>
         </div>
         {block.type.startsWith("home") ? <>
+          {block.type==="homeAreas" && <p>רשימת היישובים משותפת למקטע הזה ול־Footer. עורכים ומפרסמים אותה ב־<Link className="underline" href="/admin/site/settings">הגדרות העסק — אזורי שירות</Link>. הכותרת והתיאור נערכים כאן בנפרד.</p>}
           {block.type==="homeHero" && <label className="grid gap-2 font-bold">גרסת מדיה לפתיח
             <select className={field} value={block.mediaVersionId||""} onChange={event=>update(index,{...block,mediaVersionId:event.target.value||null})}>
               {mediaChoices.filter(choice=>!choice.archived||choice.versionId===block.mediaVersionId).map(choice=><option key={choice.versionId} value={choice.versionId}>{choice.label} — גרסה {choice.number}</option>)}

@@ -30,9 +30,10 @@ export function homeFaqJsonLd(page: HomeDraft) {
       acceptedAnswer: { "@type": "Answer", text: item.answer } })) };
 }
 
-function HomeBlockView({ block, media, promotions, preview, revisionId, reviews }: {
+function HomeBlockView({ block, media, promotions, preview, revisionId, reviews, serviceAreas }: {
   block: HomeBlock; media: BlockMedia; promotions: BlockPromotions; preview: boolean; revisionId: string;
   reviews: GoogleReviews | null;
+  serviceAreas?: readonly string[];
 }) {
   const p = block.payload;
   switch (block.type) {
@@ -57,7 +58,7 @@ function HomeBlockView({ block, media, promotions, preview, revisionId, reviews 
       <GoogleReviewsCarousel content={p as GoogleReviewsPresentation} source={reviews} preview={preview} /> : null;
     case "homePricing": return <PricingGuide content={p as typeof pricingGuideContent} preview={preview} />;
     case "homeEstimate": return <QuickPriceEstimate content={p as typeof quickEstimateContent} preview={preview} />;
-    case "homeAreas": return <ServiceAreas content={p as typeof serviceAreasContent} />;
+    case "homeAreas": return <ServiceAreas content={p as typeof serviceAreasContent} areas={serviceAreas} />;
     case "homeFaq": return <FAQ content={p as typeof faqContent} />;
     case "homeFinalCta": return <FinalCTA content={p as typeof finalCtaContent} preview={preview} />;
     default: return <BlockView block={block as PageBlock} media={media} promotions={promotions}
@@ -65,11 +66,12 @@ function HomeBlockView({ block, media, promotions, preview, revisionId, reviews 
   }
 }
 
-export function HomeBlocksView({ page, revisionId, media = staticHomeMedia, promotions = {}, preview = false, reviews = null }: {
+export function HomeBlocksView({ page, revisionId, media = staticHomeMedia, promotions = {}, preview = false, reviews = null, serviceAreas }: {
   page: HomeDraft; revisionId: string; media?: BlockMedia; promotions?: BlockPromotions; preview?: boolean;
   reviews?: GoogleReviews | null;
+  serviceAreas?: readonly string[];
 }) {
   const draft = validateHomeDraft(page);
   return <>{draft.blocks.filter(block => !block.hidden).map(block => <HomeBlockView key={block.id}
-    block={block} media={media} promotions={promotions} preview={preview} revisionId={revisionId} reviews={reviews} />)}</>;
+    block={block} media={media} promotions={promotions} preview={preview} revisionId={revisionId} reviews={reviews} serviceAreas={serviceAreas} />)}</>;
 }

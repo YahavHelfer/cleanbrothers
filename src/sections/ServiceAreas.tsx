@@ -8,7 +8,9 @@ export const serviceAreasContent = {
   description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, רמת גן, הוד השרון, תל אביב, רעננה, הרצליה, רמת השרון, גבעתיים והסביבה. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
 };
 
-export function ServiceAreas({ content = serviceAreasContent }: { content?: typeof serviceAreasContent } = {}) {
+export function ServiceAreas({ content = serviceAreasContent, areas = serviceAreas }: {
+  content?: typeof serviceAreasContent; areas?: readonly string[];
+} = {}) {
   return (
     <section className="reveal theme-section-clean py-8 sm:py-16 lg:py-18">
       <div className="section-container">
@@ -23,7 +25,7 @@ export function ServiceAreas({ content = serviceAreasContent }: { content?: type
           />
 
           <div className="flex flex-wrap gap-1.5 sm:gap-3" aria-label="ערי שירות">
-            {serviceAreas.map((area, index) => (
+            {areas.map((area, index) => (
               <span
                 key={area}
                 className={`reveal inline-flex items-center gap-1.5 rounded-full border border-turquoise/20 bg-turquoise/8 px-3 py-1.5 text-xs font-black text-[var(--foreground)] transition duration-300 hover:border-turquoise/45 hover:bg-turquoise/12 sm:gap-2 sm:px-3.5 sm:py-2 sm:text-sm stagger-${(index % 6) + 1}`}
