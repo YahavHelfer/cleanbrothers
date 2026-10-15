@@ -46,7 +46,7 @@ for(const [key,baseline] of Object.entries(fixtures)){
   const content=clone(baseline);content.publicTitle="שם ערוך";content.h1="כותרת ערוכה";
   const current=createSourceLoader({mocks:{"@/cms/content/public-source":{getPublicSpecialService:async()=>({content})}}});
   const page=current(`src/app/(site)/${key}/page.tsx`);const html=renderToStaticMarkup(await page.default());
-  assert.match(html,/כותרת ערוכה/);assert.ok(html.includes(`<option selected="">${serviceRegistry[key].crmName}</option>`));
+  assert.match(html,/כותרת ערוכה/);assert.ok((html.match(/<option[^>]*>[\s\S]*?<\/option>/g) ?? []).some(option => option.includes(`value="${serviceRegistry[key].crmName}"`) && option.includes('selected=""') && option.endsWith(`${serviceRegistry[key].crmName}</option>`)));
   assert.ok((await page.generateMetadata()).alternates.canonical.endsWith(`/${key}`));
  });
  test(`${key}: wrong document/revision read cannot leak`,async()=>{

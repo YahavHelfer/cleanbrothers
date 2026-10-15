@@ -230,3 +230,17 @@ B2A deployed the approved foundation to a protected Preview. The new B2B1 MFA
 implementation and AAL2 migration are local only; real administrators are not yet
 created. See [the MFA foundation guide](docs/cms-mfa-foundation.md) for the state
 machine, exact future Preview invitation URL and controlled recovery/rollout steps.
+
+### Requested-service split — release candidate (2026-10-15)
+
+The contact form sends the stable CRM values `before_occupancy` and
+`after_renovation` with separate Hebrew labels. Other option values, submission
+identity, attribution and live conversion components are preserved. A legacy
+combined landing value requires the visitor to choose a service explicitly.
+
+Deploy after the coordinated CRM release and migrations 103–108. The hosted CRM
+endpoint is unchanged; local endpoint overrides, synthetic business details,
+network guards and provider interceptors are not included in this release.
+The reviewed CRM deployment plan is `docs/crm-upgrades-deployment-20261015.md`
+in the sibling CRM repository. Physical-device and dedicated WhatsApp provider
+checks remain unverified; no production deployment was performed in preparation.
