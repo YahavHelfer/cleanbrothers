@@ -26,7 +26,7 @@ test("mini-central: responsive page, CMS preview, draft isolation, publish and i
     for (const width of [390, 768, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       expect((await page.goto(`${published}/${key}`, { waitUntil: "domcontentloaded" }))?.status()).toBe(200);
-      await expect(page.locator("main h1")).toHaveText("ניקוי מזגן מיני מרכזי");
+      await expect(page.locator("main h1")).toHaveText("ניקוי מזגן מיני מרכזי ב־550 ₪");
       await expect(page.locator('[name="service"]')).toHaveValue("ניקוי מזגן מיני מרכזי");
       expect(await page.locator("html").getAttribute("dir")).toBe("rtl");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -53,7 +53,7 @@ test("mini-central: responsive page, CMS preview, draft isolation, publish and i
     await expect(page.locator("main h1")).toHaveText("ניקוי מיני מרכזי — תוכן שנערך ב-CMS");
     await expect(page.locator('main a[href="tel:0559577731"]')).toHaveCount(0);
     await page.goto(`${published}/${key}`, { waitUntil: "domcontentloaded" });
-    await expect(page.locator("main h1")).toHaveText("ניקוי מזגן מיני מרכזי");
+    await expect(page.locator("main h1")).toHaveText("ניקוי מזגן מיני מרכזי ב־550 ₪");
     await page.goto(`${published}/admin/services/${key}`);
     await page.getByLabel("אני מאשר/ת לפרסם את הגרסה השמורה").check();
     await page.getByRole("button", { name: "פרסום", exact: true }).click();

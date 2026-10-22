@@ -10,8 +10,7 @@ import { requireCmsAdmin } from "@/cms/authorization";
 import { getServiceRevision } from "@/cms/content/repository";
 import { parseRevisionId } from "@/cms/content/pilot-model";
 import { toServiceLandingProps } from "@/content/service-landing-adapter";
-import { ServiceLandingView } from "@/components/ServiceLandingView";
-import { PreviewContact } from "@/cms/content/PreviewContact";
+import { SharedServicePreview } from "@/cms/content/SharedServicePreview";
 
 export const metadata: Metadata = { title: "תצוגה מקדימה פרטית | CleanBrothers", robots: { index: false, follow: false } };
 export default async function ServicePreview({ params: routeParams, searchParams }: { params: Promise<{ serviceKey: string }>; searchParams: Promise<{ revision?: string | string[] }> }) {
@@ -29,7 +28,7 @@ export default async function ServicePreview({ params: routeParams, searchParams
     : revision.payload.schemaVersion === 5
     ? <WindowCleaningView content={revision.payload} media={revision.media} serviceImages={serviceImages} preview />
     : (() => { const { config } = toServiceLandingProps(withSharedServiceImages(toServiceLanding(serviceKey, revision.payload, revision.media), serviceImages));
-      return <ServiceLandingView config={config} preview phoneNumber="055-957-7731" contact={<PreviewContact serviceName={config.serviceName} />} />; })();
+      return <SharedServicePreview config={config} />; })();
   return <>
     <aside className="mb-6 rounded-2xl border theme-card p-5" aria-label="מצב תצוגה מקדימה">
       <p className="font-black">תצוגה מקדימה — גרסה {revision.number}</p>

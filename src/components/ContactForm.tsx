@@ -296,7 +296,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
             className="field min-h-32 resize-none"
             value={values.message}
             onChange={(event) => updateField("message", event.target.value)}
-            placeholder="כתבו בקצרה מה תרצו לנקות ומה מצב הריפוד"
+            placeholder={defaultService === "ניקוי מזגן מיני מרכזי" ? "ציינו את היישוב, דגם המזגן ופרטים על פתח הגישה" : "כתבו בקצרה מה תרצו לנקות ומה מצב הריפוד"}
           />
         </label>
       </div>
@@ -319,7 +319,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
           {submissionError}
         </p>
       ) : submitted ? (
-        <p className="mt-4 rounded-2xl bg-turquoise/15 p-4 text-sm font-bold text-turquoise-dark">
+        <p role="status" className="mt-4 rounded-2xl bg-turquoise/15 p-4 text-sm font-bold text-turquoise-dark">
           הפרטים נשלחו בהצלחה. נחזור אליכם בהקדם.
         </p>
       ) : (

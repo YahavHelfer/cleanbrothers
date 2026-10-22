@@ -752,3 +752,18 @@ html.a11y-highlight-links button {
     opacity: 0 !important;
   }
 }
+
+/* Mini-central landing only: readable accent text and visible keyboard focus. */
+.mini-central-landing :is(.theme-section-clean, .theme-section-soft) :is(.text-turquoise, .text-turquoise-dark) {
+  color: #00766e;
+}
+html[data-theme="dark"] .mini-central-landing :is(.theme-section-clean, .theme-section-soft) :is(.text-turquoise, .text-turquoise-dark) {
+  color: #27d3c3;
+}
+.mini-central-landing :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.mini-central-landing h1 {
+  text-wrap: balance;
+}

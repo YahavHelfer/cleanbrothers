@@ -35,6 +35,7 @@ export function ServiceLandingView({
   preview?: boolean;
 }) {
   const copy = config.pageCopy;
+  const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
   const NavLink = preview ? DisabledLink : Link;
   const serviceImages = getServiceImages(config);
   const primaryImage = getPrimaryServiceImage(config);
@@ -46,10 +47,10 @@ export function ServiceLandingView({
   ];
 
   return (
-    <div className="pb-20 sm:pb-0">
+    <div className={miniCentral ? "mini-central-landing pb-20 sm:pb-0" : "pb-20 sm:pb-0"}>
       {jsonLd}
       <section className="theme-section-strong overflow-hidden py-9 sm:py-16 lg:py-20">
-        <div className="section-container grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+        <div className={`section-container grid items-center gap-8 ${miniCentral ? "max-w-5xl" : "lg:grid-cols-[1.05fr_0.95fr] lg:gap-14"}`}>
           <div className="reveal">
             <nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap items-center gap-2">
@@ -62,23 +63,27 @@ export function ServiceLandingView({
             </nav>
             <p className="text-sm font-black text-turquoise">{config.eyebrow}</p>
             <h1 className="mt-3 max-w-3xl text-4xl font-black leading-[1.08] text-white sm:text-5xl lg:text-6xl">
-              {config.h1}
+              {miniCentral ? config.h1.split(/(ב־\d[\d,.]*\s*₪|\d[\d,.]*\s*₪)/).map((part, index) =>
+                index % 2 ? <span key={index} className="whitespace-nowrap">{part}</span> : part
+              ) : config.h1}
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-white/80 sm:text-xl sm:leading-9">
               {config.intro}
             </p>
+            {miniCentral && <p className="mt-5 max-w-3xl rounded-2xl border border-white/20 bg-white/5 p-4 text-sm leading-7 text-white">{config.benefitsDescription}</p>}
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href="#contact-form" className="btn-primary inline-flex">{copy?.heroCta || "לקבלת הצעת מחיר"}</a>
-              <a href={whatsappHref} aria-disabled={preview || undefined} aria-label={`שליחת WhatsApp לקבלת הצעת מחיר עבור ${config.serviceName}`} className="btn-secondary inline-flex text-white">
+              {!miniCentral && <a href="#contact-form" className="btn-primary inline-flex">{copy?.heroCta || "לקבלת הצעת מחיר"}</a>}
+              <a href={whatsappHref} aria-disabled={preview || undefined} aria-label={miniCentral ? copy?.whatsappCta : `שליחת WhatsApp לקבלת הצעת מחיר עבור ${config.serviceName}`} className={miniCentral ? "btn-primary inline-flex" : "btn-secondary inline-flex text-white"}>
                 <Icon name="whatsapp" className="ml-2 h-5 w-5" />
                 {copy?.whatsappCta || "שלחו לנו WhatsApp"}
               </a>
-              <a href={phoneHref} aria-disabled={preview || undefined} aria-label="חיוג ל-CleanBrothers במספר 055-957-7731" className="inline-flex min-h-12 items-center justify-center rounded-full px-4 font-black text-white underline decoration-turquoise decoration-2 underline-offset-4 focus:ring-2 focus:ring-turquoise">
+              <a href={phoneHref} aria-disabled={preview || undefined} aria-label={miniCentral ? "התקשרו לבדיקת זמינות ב־055-957-7731" : "חיוג ל-CleanBrothers במספר 055-957-7731"} className="inline-flex min-h-12 items-center justify-center rounded-full px-4 font-black text-white underline decoration-turquoise decoration-2 underline-offset-4 focus:ring-2 focus:ring-turquoise">
                 <Icon name="phone" className="ml-2 h-5 w-5" />
-                {phoneNumber}
+                {miniCentral ? <>התקשרו לבדיקת זמינות <span className="mr-2" dir="ltr">{phoneNumber}</span></> : phoneNumber}
               </a>
+              {miniCentral && <a href="#contact-form" className="inline-flex min-h-12 items-center justify-center px-4 font-bold text-white underline underline-offset-4 focus:ring-2 focus:ring-turquoise">{copy?.heroCta || "השאירו פרטים"}</a>}
             </div>
-            <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
+            {!miniCentral && <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
               <NavLink href="/services" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">כל השירותים</NavLink>
               <NavLink href="/gallery" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">גלריית עבודות</NavLink>
               <NavLink href={`/contact?service=${encodeURIComponent(config.serviceName)}`} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">יצירת קשר</NavLink>
@@ -87,9 +92,9 @@ export function ServiceLandingView({
                   {link.label}
                 </NavLink>
               ))}
-            </div>
+            </div>}
           </div>
-          <div className="reveal stagger-2 relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/15 bg-navy shadow-2xl">
+          {!miniCentral && <div className="reveal stagger-2 relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/15 bg-navy shadow-2xl">
             <ServiceImageCarousel
               images={serviceImages}
               alt={config.imageAlt}
@@ -105,10 +110,10 @@ export function ServiceLandingView({
             {serviceImages.length > 0 && copy?.imageCaption && <p className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
               {copy.imageCaption}
             </p>}
-          </div>
+          </div>}
         </div>
       </section>
-      <section aria-label="יתרונות השירות" className="theme-section-clean py-5 sm:py-8">
+      {!miniCentral && <section aria-label="יתרונות השירות" className="theme-section-clean py-5 sm:py-8">
         <div className="section-container grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {trustItems.map((item) => (
             <div key={item} className="flex items-center gap-3 rounded-2xl border theme-card p-3.5">
@@ -119,11 +124,11 @@ export function ServiceLandingView({
             </div>
           ))}
         </div>
-      </section>
+      </section>}
       <section className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading eyebrow={copy?.signsEyebrow || "סימנים שכדאי לבדוק"} title={config.signsTitle} description={config.signsDescription} tone="light" />
-          <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-5">
+          <div className={`mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 ${miniCentral ? "grid-cols-2 lg:grid-cols-4" : "lg:grid-cols-5"}`}>
             {config.signs.map((item, index) => (
               <article key={item} className="card-lift reveal rounded-3xl border theme-card p-5">
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-turquoise/15 text-lg font-black text-turquoise-dark">
@@ -135,10 +140,19 @@ export function ServiceLandingView({
           </div>
         </div>
       </section>
+      {miniCentral && config.resultsHidden !== true && serviceImages.length > 0 && config.mediaPresentation && <section data-service-results className="section-block theme-section-clean">
+        <div className="section-container grid items-center gap-7 lg:grid-cols-2">
+          <SectionHeading eyebrow={copy?.resultEyebrow || "תיעוד מהשטח"} title={copy?.resultTitle || config.serviceName} description={config.resultDescription} tone="light" align="start" />
+          <ServiceImageCarousel images={serviceImages} alt={config.imageAlt} imageAlts={config.mediaPresentation.heroAlts}
+            className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border theme-card"
+            imageClassName="object-cover" imagePosition={config.imagePosition} imagePositions={config.imagePositions}
+            sizes="(min-width: 1024px) 40vw, 100vw" />
+        </div>
+      </section>}
       <section className="section-block theme-section-contrast">
         <div className="section-container">
           <SectionHeading eyebrow={copy?.processEyebrow || "תהליך מסודר"} title={config.processTitle} description={config.processDescription} />
-          <ol className="mt-7 grid gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className={`mt-7 grid gap-4 sm:mt-10 sm:grid-cols-2 ${miniCentral ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
             {config.process.map((step, index) => (
               <li key={step} className="card-lift rounded-3xl border theme-inverse-card p-5 sm:p-6">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-turquoise font-black text-navy">
@@ -150,7 +164,7 @@ export function ServiceLandingView({
           </ol>
         </div>
       </section>
-      <section className="section-block theme-section-clean">
+      {!miniCentral && <section className="section-block theme-section-clean">
         <div className="section-container grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
           <div>
             <SectionHeading
@@ -180,7 +194,7 @@ export function ServiceLandingView({
             sizes="(min-width: 1024px) 45vw, 100vw"
           />
         </div>
-      </section>
+      </section>}
       {config.video ? (
         <section className="section-block theme-section-contrast">
           <div className="section-container">
@@ -193,7 +207,7 @@ export function ServiceLandingView({
           </div>
         </section>
       ) : null}
-      {config.resultsHidden !== true && <section data-service-results className="section-block theme-section-soft">
+      {!miniCentral && config.resultsHidden !== true && <section data-service-results className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
             eyebrow={copy?.resultEyebrow || "עבודות ניקוי"}
@@ -281,11 +295,11 @@ export function ServiceLandingView({
         className="fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
-          <a href={whatsappHref} aria-disabled={preview || undefined} className="flex min-h-11 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-white">
+          <a href={whatsappHref} aria-disabled={preview || undefined} className={`flex min-h-11 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black ${miniCentral ? "text-navy" : "text-white"} focus:ring-2 focus:ring-white`}>
             WhatsApp
           </a>
           <a href={phoneHref} aria-disabled={preview || undefined} className="flex min-h-11 items-center justify-center rounded-xl border border-white/25 px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-turquoise">
-            התקשרו עכשיו
+            {miniCentral ? "בדיקת זמינות" : "התקשרו עכשיו"}
           </a>
           <a href="#contact-form" className="flex min-h-11 items-center justify-center rounded-xl bg-turquoise px-2 text-center text-xs font-black text-navy focus:ring-2 focus:ring-white">
             {copy?.heroCta || "קבלת הצעת מחיר"}

@@ -30,9 +30,9 @@ test('AC pricing does not display a fictitious regular-price discount, including
 });
 test('mini-central price and separate duct cleaning derive from the validated CMS baseline', () => {
   const draft = load('src/cms/content/baseline.ts').serviceBaseline('mini-central-air-conditioner-cleaning');
-  assert.match(draft.intro, /550 ₪/);
-  assert.match(draft.intro, /150 ₪/);
-  assert.match(draft.signsDescription, /למנוע ולמאייד/);
+  assert.match(draft.h1, /550 ₪/);
+  assert.match(draft.benefitsDescription, /150 ₪/);
+  assert.match(draft.benefitsDescription, /למנוע ולמאייד/);
   assert.ok(draft.faqs.some(faq => /כשעה וחצי עד שעתיים/.test(faq.answer)));
-  assert.ok(!JSON.stringify(draft).includes('ניקוי תעלות אינו כלול'));
+  assert.match(draft.signsDescription, /ניקוי תעלות אינו כלול/);
 });

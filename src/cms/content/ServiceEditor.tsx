@@ -33,6 +33,7 @@ export function ServiceEditor({ snapshot, mediaChoices, serviceKey = PILOT_KEY }
     <input type="hidden" name="generation" value={snapshot.generation} />
     <input type="hidden" name="revision" value={snapshot.draftRevisionId} />
     <input type="hidden" name="payload" value={JSON.stringify(draft)} />
+    {serviceKey === "mini-central-air-conditioner-cleaning" && <p className="text-sm leading-7 theme-muted">בעמוד מיני מרכזי, שדה ״תיאור יתרונות השירות״ מוצג כשורת המחיר והתנאים בפתיחה. רשימת ״סימנים שכדאי לבדוק״ מציגה את החלקים הכלולים בניקוי. התמונות המשותפות מוצגות במקטע התיעוד, כאשר אינו מוסתר.</p>}
     <fieldset disabled={pending} className="grid gap-5 sm:grid-cols-2">
       <legend className="mb-5 text-xl font-black">תוכן השירות</legend>
       {(Object.keys(pilotTextFields) as PilotTextField[]).filter(key => key !== "imageAlt").map((key) => <label key={key} className="grid gap-2 font-bold">

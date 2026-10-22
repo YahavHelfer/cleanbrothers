@@ -44,13 +44,14 @@ export function buildServiceLandingMetadata(
 export function ServiceLandingPage({ config, crmServiceName = config.serviceName }: {
   config: ServiceLandingConfig; crmServiceName?: string;
 }) {
+  const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
   const phoneHref = "tel:0559577731";
   return ServiceLandingView({
     config,
     contact: <ContactForm initialService={crmServiceName} />,
     phoneNumber: <GoogleCallTrackingNumber>055-957-7731</GoogleCallTrackingNumber>,
     phoneHref,
-    whatsappHref: getWhatsAppLink(`היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`),
+    whatsappHref: getWhatsAppLink(miniCentral ? "היי, אשמח לתאם ניקוי מזגן מיני מרכזי. היישוב שלי: ___. מצרף/ת תמונות של המזגן ופתח הגישה." : `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`),
     jsonLd: <>
       <JsonLd id={`${config.path.slice(1)}-service-jsonld`} data={buildPageServiceJsonLd(config)} />
       <JsonLd id={`${config.path.slice(1)}-breadcrumb-jsonld`} data={{
