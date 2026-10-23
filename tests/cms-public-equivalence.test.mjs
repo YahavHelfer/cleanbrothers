@@ -17,6 +17,14 @@ for (const file of ["src/config/business.ts", "src/data/serviceLandingPages.ts",
   "src/cms/content/special-baseline.ts", "src/sections/ServiceAreas.tsx",
   "src/sections/QuickPriceEstimate.tsx", "src/sections/quick-estimate-content.ts", "src/sections/PricingGuide.tsx"])
   overrides[resolve(projectRoot,file)] = readFileSync(resolve(projectRoot,file),"utf8");
+// Requested-service options deliberately changed. Feed only this approved form
+// contract into the historical renderer; keep every other layout assertion.
+overrides[resolve(projectRoot,"src/components/ContactForm.tsx")] = readFileSync("src/components/ContactForm.tsx","utf8");
+const currentSite=readFileSync("src/data/site.ts","utf8");
+const optionStart=currentSite.indexOf("export const contactServiceOptions");
+const optionEnd=currentSite.indexOf("export const serviceAreas",optionStart);
+assert.ok(optionStart>=0 && optionEnd>optionStart);
+overrides[resolve(projectRoot,"src/data/site.ts")] += "\n"+currentSite.slice(optionStart,optionEnd);
 const before=createSourceLoader({sourceOverrides:overrides}),after=createSourceLoader({ env: {
  VERCEL:"1",VERCEL_ENV:"production",VERCEL_PROJECT_ID:"prj_n7Mm1cepeKANL1jNcNjarNh9QR2A",
  VERCEL_GIT_COMMIT_REF:"main",
@@ -96,8 +104,10 @@ for(const file of pages)test(`approved public layout and editorial content prese
   return;
  }
 
- const existingOutput=actual.replace(/ data-service-card="[^"]+"/g,'').replace('<option>ניקיון אחרי שיפוץ ולפני אכלוס</option>','').replace('<option>ניקוי מזגן מיני מרכזי</option>','');
- assert.equal(file==="src/app/(site)/page.tsx"?canonicalReactIds(existingOutput):existingOutput,
-  file==="src/app/(site)/page.tsx"?canonicalReactIds(expected):expected);
+ const existingOutput=actual.replace(/ data-service-card="[^"]+"/g,'').replace(/<option\b(?=[^>]*value="(?:before_occupancy|after_renovation)")[^>]*>[\s\S]*?<\/option>/g,'').replace(/<option\b(?=[^>]*value="ניקוי מזגן מיני מרכזי")[^>]*>[\s\S]*?<\/option>/g,'');
+ const comparableActual=file==="src/app/(site)/page.tsx"?canonicalReactIds(existingOutput):existingOutput;
+ const comparableExpected=file==="src/app/(site)/page.tsx"?canonicalReactIds(expected):expected;
+ let mismatch=0; while(mismatch<comparableActual.length && comparableActual[mismatch]===comparableExpected[mismatch]) mismatch++;
+ assert.ok(comparableActual===comparableExpected, JSON.stringify({at:mismatch,actual:comparableActual.slice(mismatch,mismatch+300),expected:comparableExpected.slice(mismatch,mismatch+300)}));
  assert.deepEqual(comparableMetadata(b.metadata??await b.generateMetadata()),comparableMetadata(a.metadata??await a.generateMetadata()));
 });
