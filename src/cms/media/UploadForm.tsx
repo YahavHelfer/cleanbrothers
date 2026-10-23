@@ -1,13 +1,17 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MAX_IMAGE_BYTES, type MediaAsset } from "./model";
+import { prepareUploadImage } from "./prepare-upload-image";
 
 export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: MediaAsset; maxBytes?: number }) {
   const [file, setFile] = useState<File | null>(null),
     [message, setMessage] = useState(""),
-    [pending, setPending] = useState(false);
+    [pending, setPending] = useState(false),
+    [preparing, setPreparing] = useState(false);
+  const selection = useRef(0);
+  useEffect(() => () => { selection.current++; }, []);
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
   useEffect(
@@ -16,9 +20,13 @@ export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: Medi
     },
     [preview],
   );
-  function choose(f?: File) {
-    setMessage("");
+  async function choose(f?: File) {
     if (!f) return;
+    const selected = ++selection.current;
+    setMessage("");
+    setFile(null);
+    setPreview(null);
+    setPreparing(false);
     if (
       f.size > maxBytes ||
       !["image/jpeg", "image/png", "image/webp"].includes(f.type)
@@ -28,8 +36,18 @@ export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: Medi
       setPreview(null);
       return;
     }
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
+    setPreparing(true);
+    try {
+      const prepared = await prepareUploadImage(f, maxBytes);
+      if (selected !== selection.current) return;
+      setFile(prepared);
+      setPreview(URL.createObjectURL(prepared));
+    } catch (error) {
+      if (selected === selection.current)
+        setMessage(error instanceof Error ? error.message : "לא ניתן להכין את התמונה. נסו קובץ אחר.");
+    } finally {
+      if (selected === selection.current) setPreparing(false);
+    }
   }
   return (
     <form
@@ -38,6 +56,7 @@ export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: Medi
       className="grid gap-4 rounded-2xl border theme-card p-5"
       onSubmit={async (e) => {
         e.preventDefault();
+        if (pending || preparing) return;
         if (!file) {
           setMessage("יש לבחור תמונה.");
           return;
@@ -149,15 +168,15 @@ export function UploadForm({ asset, maxBytes = MAX_IMAGE_BYTES }: { asset?: Medi
             defaultValue={asset?.folder}
           />
         </label>
-        <button className="btn-primary justify-self-start" disabled={!file}>
-          {pending
+        <button className="btn-primary justify-self-start" disabled={!file || preparing}>
+          {preparing ? "מכין את התמונה להעלאה…" : pending
             ? "מעבד ושומר תמונה…"
             : asset
               ? "שמירת גרסה חדשה"
               : "העלאה לספרייה"}
         </button>
       </fieldset>
-      {pending && <p role="status">התמונה בבדיקה ובעיבוד…</p>}
+      {(preparing || pending) && <p role="status">{preparing ? "מכין את התמונה להעלאה…" : "התמונה בבדיקה ובעיבוד…"}</p>}
       {message && (
         <p role="alert" className="rounded border p-3">
           {message}
