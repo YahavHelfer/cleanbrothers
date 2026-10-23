@@ -11,6 +11,7 @@ import { createTrustedMediaClient } from "./trusted-client";
 import { writeCloudImage, readCloudImage, discardUnregisteredCloudImage } from "./cloud-storage";
 import { writeAuthenticatedImage, readAuthenticatedImage, readPublishedImage, discardUnregisteredAuthenticatedImage } from "./authenticated-storage";
 import { validateImage } from "./validate-image";
+import { MediaUploadFailure, mediaFailureCode, mediaUploadStep } from "./upload-diagnostics";
 import { getS3MediaStore, s3UploadCapability, verifiedS3Bytes } from "./s3-store";
 import { mediaObjectKey } from "./object-store";
 import {
@@ -90,7 +91,7 @@ function check(error: { code?: string } | null) {
       "מנהל אחר שינה את המדיה. הקלט שלך נשמר בטופס. טענו מחדש לפני ניסיון נוסף.",
       409,
     );
-  if (error) throw new MediaError();
+  if (error) throw new MediaError(undefined, 400, error.code);
 }
 function definiteConditionalPutRejection(error: unknown) {
   if (!error || typeof error !== "object") return false;
@@ -188,7 +189,7 @@ export async function uploadMedia(
   const expected = asset ? mediaGeneration(generation) : null;
   if (bytes.length > mediaByteLimit())
     throw new MediaError("הקובץ גדול מדי לסביבת ההעלאה.", 413);
-  const validated = await validateImage(bytes, filename, mime);
+  const validated = await mediaUploadStep("image", () => validateImage(bytes, filename, mime));
   if (validated.bytes.length > mediaByteLimit())
     throw new MediaError("התמונה המעובדת גדולה מדי. בחרו תמונה קטנה יותר.", 413);
   const id = randomUUID();
@@ -202,7 +203,7 @@ export async function uploadMedia(
       version_id: id, target_asset: target, expected_generation: expected,
       details, metadata: meta,
     });
-    check(prepareError);
+    await mediaUploadStep("prepare", async () => check(prepareError));
     try {
       await store.putExact(id, processed);
       const head = await store.headExact(id);
@@ -219,7 +220,9 @@ export async function uploadMedia(
       }
       // A write or HEAD transport failure cannot prove that no object exists.
       await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
-      throw new MediaError("מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.");
+      throw new MediaUploadFailure("storage", new MediaError(
+        "מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.",
+        400, mediaFailureCode(error)));
     }
     const { error: markError } = await client.rpc(s3UploadMarkRpc(), {
       version_id: id,
@@ -230,7 +233,9 @@ export async function uploadMedia(
     });
     if (markError) {
       await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
-      throw new MediaError("מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.");
+      throw new MediaUploadFailure("register", new MediaError(
+        "מצב ההעלאה אינו ודאי. בדקו את רשימת ההתאוששות לפני ניסיון נוסף.",
+        400, markError.code));
     }
     const { data, error } = await client.rpc("cms_register_external_media_version", { version_id: id });
     if (error) {
@@ -247,12 +252,13 @@ export async function uploadMedia(
       } else {
         await client.rpc("cms_mark_external_media_ambiguous", { version_id: id });
       }
-      check(error);
+      await mediaUploadStep("register", async () => check(error));
     }
     return mediaId(data);
   }
   const client = authenticated ? await createCmsServerClient() : createTrustedMediaClient();
-  await (authenticated ? writeAuthenticatedImage : cloud ? writeCloudImage : writeLocalImage)(id, validated.bytes);
+  await mediaUploadStep("storage", () =>
+    (authenticated ? writeAuthenticatedImage : cloud ? writeCloudImage : writeLocalImage)(id, validated.bytes));
   const { bytes: processed, ...details } = validated;
   void processed;
   const { data, error } = await client.rpc(authenticated
@@ -272,7 +278,7 @@ export async function uploadMedia(
     ["PT409", "42501", "22023", "23514", "23503", "55000"].includes(error.code)
   )
     await (authenticated ? discardUnregisteredAuthenticatedImage : cloud ? discardUnregisteredCloudImage : discardUnregisteredImage)(id);
-  check(error);
+  await mediaUploadStep("register", async () => check(error));
   return mediaId(data);
 }
 export async function readPrivateMedia(id: string) {

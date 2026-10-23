@@ -3,6 +3,8 @@ import { mediaUploadOriginAllowed, mediaUploadEnabled } from "@/cms/media/enviro
 import { boundedUploadForm, privateMediaHeaders } from "@/cms/media/http";
 import { uploadMedia } from "@/cms/media/repository";
 import { MediaError } from "@/cms/media/model";
+import { randomUUID } from "node:crypto";
+import { mediaUploadStep, reportMediaUploadFailure } from "@/cms/media/upload-diagnostics";
 export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
@@ -15,7 +17,7 @@ export async function POST(request: Request) {
         { message: "הבקשה אינה מורשית." },
         { status: 403, headers: privateMediaHeaders },
       );
-    const form = await boundedUploadForm(request);
+    const form = await mediaUploadStep("request", () => boundedUploadForm(request));
     const file = form.get("file");
     if (!(file instanceof File) || form.getAll("file").length !== 1)
       throw new MediaError("יש לבחור תמונה אחת.");
@@ -35,11 +37,13 @@ export async function POST(request: Request) {
     );
     return Response.json({ id }, { status: 201, headers: privateMediaHeaders });
   } catch (e) {
+    const reference = randomUUID();
+    reportMediaUploadFailure(e, reference);
     return Response.json(
       {
         message:
           e instanceof MediaError
-            ? e.message
+            ? `${e.message} קוד בדיקה: ${reference}`
             : "ההעלאה לא הושלמה. בדקו הרשאה ונסו שוב.",
       },
       {

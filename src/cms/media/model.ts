@@ -11,6 +11,7 @@ export class MediaError extends Error {
   constructor(
     message = "פעולת המדיה לא הושלמה. בדקו את הקובץ וההרשאה ונסו שוב.",
     public status = 400,
+    public code?: string,
   ) {
     super(message);
   }
