@@ -39,8 +39,6 @@ export function WhatsAppButton() {
   return (
     <a
       href={getWhatsAppLink()}
-      target="_blank"
-      rel="noreferrer"
       aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר מ-CleanBrothers"
       className="wa-pulse btn-glow fixed bottom-[calc(0.55rem+env(safe-area-inset-bottom))] left-3 z-50 inline-flex min-h-10 max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-full border border-white/18 bg-[#22c55e] px-3.5 py-2 text-xs font-black text-white shadow-[0_8px_18px_rgba(8,19,31,0.16)] ring-1 ring-[#25d366]/25 transition duration-300 hover:-translate-y-0.5 hover:bg-[#16a34a] hover:shadow-[0_14px_32px_rgba(8,19,31,0.22)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-navy sm:bottom-5 sm:left-5 sm:min-h-13 sm:gap-2.5 sm:px-5 sm:py-3.5 sm:text-sm"
     >
