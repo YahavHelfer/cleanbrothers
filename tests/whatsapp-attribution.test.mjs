@@ -216,7 +216,7 @@ test("invalid issued tokens never add a reference", async () => {
   }
 });
 
-test("all website WhatsApp CTAs use the shared same-origin helper", () => {
+test("all website WhatsApp CTAs use direct wa.me links with click tracking", () => {
   const sourceFiles = listSourceFiles(fileURLToPath(new URL("../src", import.meta.url)));
   const directWaMeFiles = sourceFiles.filter((file) =>
     /https:\/\/wa\.me\//.test(readFileSync(file, "utf8")),
@@ -232,8 +232,8 @@ test("all website WhatsApp CTAs use the shared same-origin helper", () => {
     new URL("../src/components/BusinessEventTracker.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(helper, /\/api\/whatsapp\?message=/);
-  assert.match(tracker, /destination\.pathname === "\/api\/whatsapp"/);
+  assert.match(helper, /return buildDirectWhatsAppLink\(message\)/);
+  assert.match(tracker, /destination\.hostname === "wa.me"/);
 });
 
 test("GA4 WhatsApp event remains free of tokens, attribution, and PII", () => {

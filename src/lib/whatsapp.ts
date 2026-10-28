@@ -1,11 +1,9 @@
 import { businessConfig } from "@/config/business";
 
 export function getWhatsAppLink(message = businessConfig.whatsappDefaultMessage) {
-  if (!businessConfig.whatsappPhone) {
-    return "/contact";
-  }
-
-  return `/api/whatsapp?message=${encodeURIComponent(message)}`;
+  // A direct link avoids the website's intermediate attribution redirect.
+  // BusinessEventTracker recognizes wa.me links and still records click_whatsapp.
+  return buildDirectWhatsAppLink(message);
 }
 
 export function buildDirectWhatsAppLink(
