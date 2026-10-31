@@ -12,8 +12,8 @@ export const metadata: Metadata = buildMetadata({
 const sectors = ["משרדים וחברות", "מסעדות ובתי קפה", "חנויות ורשתות", "מוסדות ומבני ציבור", "חברות ניהול", "קליניקות ומרכזי שירות"];
 
 export default function BusinessAcCleaningPage() {
-  const message = encodeURIComponent("שלום, אני מעוניין/ת בהצעת מחיר לניקוי מזגנים לעסק. שם העסק: ___, עיר: ___, מספר מזגנים: ___, ניקוי חד-פעמי / תקופתי: ___");
-  const whatsapp = buildDirectWhatsAppLink(decodeURIComponent(message));
+  const message = "שלום, אשמח להצעת מחיר לניקוי מזגנים לעסק (חד-פעמי או תקופתי).";
+  const whatsapp = buildDirectWhatsAppLink(message);
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 md:py-20" dir="rtl">
       <section className="rounded-3xl bg-sky-50 px-6 py-12 text-slate-900 md:px-12">
