@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
-import { serviceOptions } from "@/data/site";
+import { contactServiceOptions } from "@/data/site";
 import { parseContactLeadOutcome } from "@/lib/contact-lead-contract";
 import {
   getOrCreateContactSubmissionAttempt,
@@ -36,9 +36,9 @@ type ContactFormProps = {
 };
 
 export function ContactForm({ initialService = "" }: ContactFormProps) {
-  const defaultService = serviceOptions.includes(initialService)
-    ? initialService
-    : "";
+  const defaultService = contactServiceOptions.find(
+    (option) => option.value === initialService || option.label === initialService,
+  )?.value ?? "";
   const [values, setValues] = useState<FormState>(() => ({
     ...initialState,
     service: defaultService,
@@ -264,8 +264,8 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
             <option value="" disabled>
               בחרו שירות
             </option>
-            {serviceOptions.map((option) => (
-              <option key={option}>{option}</option>
+            {contactServiceOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
           {errors.service ? (

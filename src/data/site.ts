@@ -238,4 +238,16 @@ export const galleryItems = [
 
 export const serviceOptions = services.map((service) => service.title);
 
+// Stable values agreed with the CRM requested-service catalog. Keep historical
+// serviceOptions for landing-page compatibility; the combined value is ambiguous.
+export const contactServiceOptions = serviceOptions.flatMap((label) =>
+  label === "ניקיון אחרי שיפוץ ולפני אכלוס"
+    ? [
+        { value: "before_occupancy", label: "ניקיון לפני אכלוס" },
+        { value: "after_renovation", label: "ניקיון אחרי שיפוץ" },
+      ]
+    : [{ value: label, label }],
+);
+
+
 export const serviceAreas = businessConfig.serviceAreas;
