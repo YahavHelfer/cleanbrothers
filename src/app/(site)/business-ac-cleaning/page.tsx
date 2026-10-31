@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { businessConfig } from "@/config/business";
+import { buildDirectWhatsAppLink } from "@/lib/whatsapp";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -12,7 +13,7 @@ const sectors = ["משרדים וחברות", "מסעדות ובתי קפה", "�
 
 export default function BusinessAcCleaningPage() {
   const message = encodeURIComponent("שלום, אני מעוניין/ת בהצעת מחיר לניקוי מזגנים לעסק. שם העסק: ___, עיר: ___, מספר מזגנים: ___, ניקוי חד-פעמי / תקופתי: ___");
-  const whatsapp = `https://wa.me/${businessConfig.whatsappPhone}?text=${message}`;
+  const whatsapp = buildDirectWhatsAppLink(decodeURIComponent(message));
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 md:py-20" dir="rtl">
       <section className="rounded-3xl bg-sky-50 px-6 py-12 text-slate-900 md:px-12">
