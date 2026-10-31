@@ -31,3 +31,13 @@ Audience: residential and business customers, including storefronts; no rope acc
 - No production deployment or site change.
 - Do not activate campaign or merge this branch until explicit sign-off.
 - Do not change shared WhatsApp tracking or global analytics without regression tests across all services.
+
+## Live landing page audit — verified 31 Oct 2026
+- Existing dedicated page: https://www.cleanbrothers.co.il/window-cleaning (confirmed live).
+- Hero states residential and business window cleaning; page includes WhatsApp CTA, phone and a lead form, cleaning scope, renovation FAQ, and explicit no-height/no-rope-access restriction.
+- **Critical ad-to-page mismatch:** active RSA final URL in paused campaign still points to homepage. Change to dedicated window-cleaning URL before launch.
+- Business copy presently emphasizes offices; extend with stores, storefront windows, restaurants and ongoing service **only after confirming operational availability**.
+- Verify form service selection defaults to window cleaning and attribution is persisted through CRM; static HTML alone cannot establish functional tracking.
+- Test actual WhatsApp CTA click path on mobile and conversion event (click is not necessarily qualified lead).
+- Check location targeting and page service area are aligned.
+- No production page edits have been made.
