@@ -32,7 +32,7 @@ function WhatsAppIcon() {
 export function WhatsAppButton() {
   const pathname = usePathname();
 
-  if (serviceLandingPaths.has(pathname)) {
+  if (serviceLandingPaths.has(pathname) || pathname === "/business-ac-cleaning") {
     return null;
   }
 

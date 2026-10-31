@@ -4,6 +4,7 @@ import { managedServiceKeys } from "@/content/service-registry";
 // Published CMS slugs are resolved separately, through their existing allowlist.
 export const publicPagePaths = [
   "/", "/services", ...managedServiceKeys.map(key => `/${key}`),
+  "/business-ac-cleaning",
   "/gallery", "/about", "/contact", "/privacy-policy",
   "/accessibility-statement", "/data-deletion",
 ] as const;
