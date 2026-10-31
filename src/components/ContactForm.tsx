@@ -296,7 +296,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
             className="field min-h-32 resize-none"
             value={values.message}
             onChange={(event) => updateField("message", event.target.value)}
-            placeholder={defaultService === "ניקוי מזגן מיני מרכזי" ? "ציינו את היישוב, דגם המזגן ופרטים על פתח הגישה" : "כתבו בקצרה מה תרצו לנקות ומה מצב הריפוד"}
+            placeholder={defaultService === "ניקוי מזגן מיני מרכזי" ? "ציינו את היישוב, דגם המזגן ופרטים על פתח הגישה" : defaultService === "ניקוי חלונות" ? "ציינו אם מדובר בבית או בעסק, מספר החלונות, הגישה אליהם והאם הניקוי לאחר שיפוץ" : "כתבו בקצרה מה תרצו לנקות ומה מצב הריפוד"}
           />
         </label>
       </div>
