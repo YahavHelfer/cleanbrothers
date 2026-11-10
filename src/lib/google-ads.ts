@@ -16,8 +16,9 @@ export function normalizeIsraeliMobileForGoogleAds(phone: string) {
     return `+972${compactPhone.slice(1)}`;
   }
 
-  if (/^\+9725\d{8}$/.test(compactPhone)) {
-    return compactPhone;
+  const internationalPhone = compactPhone.replace(/^(?:\+|00)/, "");
+  if (/^9725\d{8}$/.test(internationalPhone)) {
+    return `+${internationalPhone}`;
   }
 
   return null;

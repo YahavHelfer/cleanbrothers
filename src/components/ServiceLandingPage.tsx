@@ -45,13 +45,21 @@ export function ServiceLandingPage({ config, crmServiceName = config.serviceName
   config: ServiceLandingConfig; crmServiceName?: string;
 }) {
   const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
+  const sofa = config.path === "/sofa-cleaning";
   const phoneHref = "tel:0559577731";
+  let whatsappMessage = `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`;
+  if (miniCentral) {
+    whatsappMessage = "היי, אשמח לתאם ניקוי מזגן מיני מרכזי. היישוב שלי: ___. מצרף/ת תמונות של המזגן ופתח הגישה.";
+  }
+  if (sofa) {
+    whatsappMessage = "היי, אשמח להצעת מחיר לניקוי ספה. היישוב שלי: ___. אשלח תמונה של הספה.";
+  }
   return ServiceLandingView({
     config,
     contact: <ContactForm initialService={crmServiceName} />,
     phoneNumber: <GoogleCallTrackingNumber>055-957-7731</GoogleCallTrackingNumber>,
     phoneHref,
-    whatsappHref: getWhatsAppLink(miniCentral ? "היי, אשמח לתאם ניקוי מזגן מיני מרכזי. היישוב שלי: ___. מצרף/ת תמונות של המזגן ופתח הגישה." : `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`),
+    whatsappHref: getWhatsAppLink(whatsappMessage),
     jsonLd: <>
       <JsonLd id={`${config.path.slice(1)}-service-jsonld`} data={buildPageServiceJsonLd(config)} />
       <JsonLd id={`${config.path.slice(1)}-breadcrumb-jsonld`} data={{

@@ -140,6 +140,70 @@ test("one passive delegated tracker covers dynamic business links", () => {
   assert.doesNotMatch(trackerSource, /location\.href|location\.search/);
 });
 
+test("forwarded phone links and middle-clicked WhatsApp links report once", () => {
+  const listeners = new Map();
+  const events = [];
+  let cleanup;
+  class Element {
+    constructor(href, originalHref) {
+      this.href = href;
+      this.dataset = { googleCallOriginalHref: originalHref };
+    }
+    closest() { return this; }
+    getAttribute() { return this.href; }
+  }
+  const context = {
+    Element,
+    URL,
+    window: { location: { origin: "https://example.com" } },
+    document: {
+      addEventListener: (type, handler) => listeners.set(type, handler),
+      removeEventListener: (type) => listeners.delete(type),
+    },
+    require: (name) => ({
+      react: { useEffect: (effect) => { cleanup = effect(); } },
+      "@/config/business": {
+        businessConfig: { phoneDisplay: "0501234567", whatsappPhone: "972501234567" },
+      },
+      "@/lib/google-analytics": { trackGoogleAnalyticsEvent: (name) => events.push(name) },
+    })[name],
+    exports: {},
+  };
+  const js = ts.transpileModule(trackerSource, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  }).outputText;
+  vm.runInNewContext(js, context);
+  context.exports.BusinessEventTracker();
+
+  const phone = new Element("tel:037000000", "tel:0501234567");
+  const whatsapp = new Element("https://wa.me/972501234567?text=synthetic");
+  listeners.get("click")({ type: "click", button: 0, target: phone });
+  listeners.get("click")({ type: "click", button: 0, target: new Element("tel:037000000") });
+  listeners.get("auxclick")({ type: "auxclick", button: 1, target: phone });
+  listeners.get("auxclick")({ type: "auxclick", button: 2, target: whatsapp });
+  listeners.get("auxclick")({ type: "auxclick", button: 1, target: whatsapp });
+  listeners.get("click")({ type: "click", button: 0, target: whatsapp });
+  assert.deepEqual(events, ["click_phone", "click_whatsapp", "click_whatsapp"]);
+  cleanup();
+  assert.equal(listeners.size, 0);
+});
+
+test("form enhanced conversion normalizes Israeli mobile country-code formats", () => {
+  const context = {
+    exports: {},
+    require: () => ({ hasAdUserDataConsent: () => false }),
+  };
+  const js = ts.transpileModule(googleAdsSource, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  }).outputText;
+  vm.runInNewContext(js, context);
+  const normalize = context.exports.normalizeIsraeliMobileForGoogleAds;
+  for (const input of ["050-1234567", "+972 50 1234567", "972501234567", "00972501234567"]) {
+    assert.equal(normalize(input), "+972501234567");
+  }
+  assert.equal(normalize("97250123456"), null);
+});
+
 test("Google Ads and Meta remain isolated", () => {
   assert.match(
     googleAdsSource,

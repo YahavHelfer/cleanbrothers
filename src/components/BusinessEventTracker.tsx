@@ -38,16 +38,17 @@ function isCleanBrothersWhatsAppLink(anchor: HTMLAnchorElement) {
 
 function isCleanBrothersPhoneLink(anchor: HTMLAnchorElement) {
   const href = anchor.getAttribute("href");
+  if (!href?.toLowerCase().startsWith("tel:")) return false;
 
-  return (
-    href?.toLowerCase().startsWith("tel:") === true &&
-    normalizeBusinessPhone(href.slice(4)) === CLEANBROTHERS_PHONE
-  );
+  const originalHref = anchor.dataset.googleCallOriginalHref ?? href;
+  return normalizeBusinessPhone(originalHref.slice(4)) === CLEANBROTHERS_PHONE;
 }
 
 export function BusinessEventTracker() {
   useEffect(() => {
     const trackBusinessLink = (event: MouseEvent) => {
+      if (event.type === "auxclick" && event.button !== 1) return;
+
       const target = event.target;
 
       if (!(target instanceof Element)) {
@@ -65,7 +66,7 @@ export function BusinessEventTracker() {
         return;
       }
 
-      if (isCleanBrothersPhoneLink(anchor)) {
+      if (event.type === "click" && isCleanBrothersPhoneLink(anchor)) {
         trackGoogleAnalyticsEvent("click_phone");
       }
     };
@@ -74,11 +75,19 @@ export function BusinessEventTracker() {
       capture: true,
       passive: true,
     });
+    document.addEventListener("auxclick", trackBusinessLink, {
+      capture: true,
+      passive: true,
+    });
 
-    return () =>
+    return () => {
       document.removeEventListener("click", trackBusinessLink, {
         capture: true,
       });
+      document.removeEventListener("auxclick", trackBusinessLink, {
+        capture: true,
+      });
+    };
   }, []);
 
   return null;
