@@ -29,7 +29,7 @@ test("homepage baseline adds one hidden reviews block without changing public HT
   const html = render(page);
   assert.ok(html.includes(page.h1));
   assert.ok(html.includes("/images/hero/hero-sofa-cleaning.jpg"));
-  assert.ok(html.includes("/api/whatsapp"));
+  assert.ok(html.includes("https://wa.me/972559577731?text="));
   assert.ok(html.includes("tel:"));
   assert.ok(!html.includes("Google Maps"));
 });

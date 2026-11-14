@@ -1,0 +1,1302 @@
+{
+  "deployment": "dpl_6kmeJpzHY4giH1i7RdADPxuNX8hg",
+  "baselineCommit": "995a756e8ffd4f3becd6683e0c5326a58e6fcfbc",
+  "files": [
+    {
+      "path": ".vercelignore",
+      "sha1": "6c13b8a48dd1f0323acc971e8136ab6ac7b427a8"
+    },
+    {
+      "path": "deployment/cms-production-preflight.mjs",
+      "sha1": "bd6f8c1a70808f5d186f0d5a2f1a458f21bfc1dc"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha1": "df079aa47cc8733bdc382dcef54b3d80beb34061"
+    },
+    {
+      "path": "next.config.ts",
+      "sha1": "89491785ab0773351faa18499b027ea26ae0c071"
+    },
+    {
+      "path": "package-lock.json",
+      "sha1": "0a012705bbb1674bc5509109ca6454dee936c398"
+    },
+    {
+      "path": "package.json",
+      "sha1": "111aa86c77eeda32b0581a5a09897e98189842a4"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "sha1": "8f8be689e9af58f80351df6e6b551146822f42a4"
+    },
+    {
+      "path": "public/file.svg",
+      "sha1": "fb380eeffe87d50b597383664c02982964d0d28c"
+    },
+    {
+      "path": "public/globe.svg",
+      "sha1": "2eba23b01a46733bb8423e6d38ebf5f7e95abec5"
+    },
+    {
+      "path": "public/images/before-after/car-after.jpeg",
+      "sha1": "0fdfe97e69caf66ed28389b8d9ffd6a0296e7640"
+    },
+    {
+      "path": "public/images/before-after/car-before.jpeg",
+      "sha1": "a798325c8c62d9e35974f7f52b753cf5c70bd65c"
+    },
+    {
+      "path": "public/images/before-after/carpet-after.jpeg",
+      "sha1": "4c1c791f6bd5ce9f305d9ab709fab4bf97ade1b6"
+    },
+    {
+      "path": "public/images/before-after/carpet-before.jpeg",
+      "sha1": "3beb868893b9192e8a1e251e0483ca256b757d30"
+    },
+    {
+      "path": "public/images/before-after/mattress-after.jpeg",
+      "sha1": "dc2abf3bc9c1e172a9f87c5b413cfcd385e2416b"
+    },
+    {
+      "path": "public/images/before-after/mattress-before.jpeg",
+      "sha1": "a32c7b46083134757efada80238956306f1e6867"
+    },
+    {
+      "path": "public/images/before-after/sofa-after.png",
+      "sha1": "a996769550b23c3cfb4296b704456d866b16d123"
+    },
+    {
+      "path": "public/images/before-after/sofa-before.png",
+      "sha1": "26fbb77df25e838a22abe4a4545a930f3fb80294"
+    },
+    {
+      "path": "public/images/branding/cleanbrothers-brothers.png",
+      "sha1": "55ccffa4d472fb6bc71e64344290afbc07f4cc5f"
+    },
+    {
+      "path": "public/images/mascots/cleanbrothers-mascots.png",
+      "sha1": "55ccffa4d472fb6bc71e64344290afbc07f4cc5f"
+    },
+    {
+      "path": "public/images/google/GoogleMaps_Logo_DarkGray.svg",
+      "sha1": "c4f106500f201509fe47fa9c08ebdd4c287eb0ff"
+    },
+    {
+      "path": "public/images/hero/hero-car-cleaning.jpg",
+      "sha1": "cfe47c26c3ef28c64c20da95fd109afea31aec6e"
+    },
+    {
+      "path": "public/images/hero/hero-sofa-cleaning.jpg",
+      "sha1": "edb6e4c02ed2a242dfebc8836466bc0dd6675774"
+    },
+    {
+      "path": "public/images/logo/cleanbrothers-logo-light.png",
+      "sha1": "d6343cad01818d2b7ab609c5d0635ef903d89aea"
+    },
+    {
+      "path": "public/images/logo/cleanbrothers-logo.png",
+      "sha1": "a5a6b9bf06a755fcd39d05e839d7d31645395172"
+    },
+    {
+      "path": "public/images/services/Air-conditioner-cleaning.PNG",
+      "sha1": "cc5a24f5306459a1c666e775476df90fc55372f7"
+    },
+    {
+      "path": "public/images/services/Air-conditioner-cleaning2.PNG",
+      "sha1": "701d01c2e1aee01c8652c1ab0f2a7220362aeedf"
+    },
+    {
+      "path": "public/images/services/Air-conditioner-cleaning4.JPG",
+      "sha1": "97d8fe188d79d130c076cd6b8ef88a5419d0910a"
+    },
+    {
+      "path": "public/images/services/armchair-chair-cleaning.jpeg",
+      "sha1": "1a5da9eff8d09281e9d10e95e2db27b2ab8ae35b"
+    },
+    {
+      "path": "public/images/services/car-upholstery-cleaning.jpg",
+      "sha1": "f729d28bd96250591f2c6b0dafec5500530d0d77"
+    },
+    {
+      "path": "public/images/services/car-upholstery-cleaning2.jpg",
+      "sha1": "59a57547142abea15635d20765a141f0373b8173"
+    },
+    {
+      "path": "public/images/services/car-upholstery-cleaning3.jpg",
+      "sha1": "c4ae1a12bce5bed1290c8f678696176ba1297434"
+    },
+    {
+      "path": "public/images/services/car-upholstery-cleaning4.jpg",
+      "sha1": "6cd95e21cf815b4daf5b1210fb6268531739a2e0"
+    },
+    {
+      "path": "public/images/services/carpet-cleaning.jpeg",
+      "sha1": "1fc03ea0d8abde4fe28da001c812cbf1166378a3"
+    },
+    {
+      "path": "public/images/services/delicate-upholstery-cleaning.jpeg",
+      "sha1": "1b5ccc5484604e7c8b47597922b6e2eb8cc1a2a8"
+    },
+    {
+      "path": "public/images/services/mattress-cleaning.jpeg",
+      "sha1": "d7e255b9fbcb68c8fc254849cf0e8fae912fbcdc"
+    },
+    {
+      "path": "public/images/services/post-renovation-cleaning-1.png",
+      "sha1": "3a27390d91f21183964077df2df7e65fa532a8e3"
+    },
+    {
+      "path": "public/images/services/post-renovation-cleaning-2.png",
+      "sha1": "2fd28b262ddc5f8f562c8cd06a5114d2aed1c32d"
+    },
+    {
+      "path": "public/images/services/post-renovation-cleaning-3.png",
+      "sha1": "5bba54dd1a944b65820d1de8ef157eaa898bf036"
+    },
+    {
+      "path": "public/images/services/post-renovation-cleaning-4.png",
+      "sha1": "6b5afdd11fdc92c660d08dc81f6153fb342452c2"
+    },
+    {
+      "path": "public/images/services/sofa-cleaning.png",
+      "sha1": "074f184ab0e411bcbd948a7a4ca616764f70184f"
+    },
+    {
+      "path": "public/images/services/sofa-cleaning2.png",
+      "sha1": "b849056a12e272c2c9444fd8509875b0bec05ff3"
+    },
+    {
+      "path": "public/images/services/sofa-cleaning5.png",
+      "sha1": "f2465a46e614864c539ab08da2a9ff3818398eb4"
+    },
+    {
+      "path": "public/images/services/sofa-cleaning6.png",
+      "sha1": "d4470f08759fd09d7adac17e984629955b014ee1"
+    },
+    {
+      "path": "public/next.svg",
+      "sha1": "3f3e95622612b989c5bd6a03299a308c6f3c7e6b"
+    },
+    {
+      "path": "public/vercel.svg",
+      "sha1": "cebb8852d58c8886be3e9051a26957f42bb82f1a"
+    },
+    {
+      "path": "public/window.svg",
+      "sha1": "54c48e0daa6caa317fe1b4c419007fd93e948db9"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/layout.tsx",
+      "sha1": "91749a6431e5b63d7dc8968b0ded9ec5d36c4e86"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/media/[id]/page.tsx",
+      "sha1": "c863064a703ea9502f5f80e33fb2aba253862a62"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/media/page.tsx",
+      "sha1": "83ad95eb3c8389e025fc8568f5ea6fb6863c3e83"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/page.tsx",
+      "sha1": "4c28f63eb36a7cd253d30c49bdc5dbd452396c08"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/pages/[pageId]/page.tsx",
+      "sha1": "c06a2ca7732a4f44fa131443385deef0e3377e1e"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/pages/[pageId]/promotion/page.tsx",
+      "sha1": "2bbca71eaeb08b5235134135e1f99de5a0fca1dc"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/pages/new/page.tsx",
+      "sha1": "8123e7399f1f1416bafa01d52b33798ee6da61bd"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/pages/page.tsx",
+      "sha1": "79d2373ba04aae6c66bc54226659318d8653eeac"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/preview/pages/[pageId]/page.tsx",
+      "sha1": "6bfc9f3e8590a6ed64d041b2ffd3b31ac4000e01"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/preview/promotions/[id]/page.tsx",
+      "sha1": "6330613879ccfcaf200b4ae69b8e1f86fa07c27f"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/preview/promotions/schedules/[id]/page.tsx",
+      "sha1": "a6021b90748cc48a8380f41c1ebe41e6810594f0"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/preview/services/[serviceKey]/page.tsx",
+      "sha1": "30406a35b9e730b7596f69b84f3a22a4dc234481"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/preview/site/[kind]/page.tsx",
+      "sha1": "64bab4c836c2403edbe743e3f86351ad8364cd8e"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/promotions/[id]/page.tsx",
+      "sha1": "4c5949385ae900fa53e544b95018cb2f3599d4ed"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/promotions/page.tsx",
+      "sha1": "100bf60f40a17a9ca1504978cfaac1b06fbc4c72"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/promotions/schedules/page.tsx",
+      "sha1": "b30a7445ccfd124dbbf23477d356c590eccf027b"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/services/[serviceKey]/page.tsx",
+      "sha1": "c5b1c962d42d4c203e0b53471e30a25853b9f3ab"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/services/page.tsx",
+      "sha1": "324be57472dbfebd6ccf6c2c7fecfbbc8f1413ab"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/site/[kind]/page.tsx",
+      "sha1": "25f090ed0b8b9402226150079a1f3bbf7cac6f4c"
+    },
+    {
+      "path": "src/app/(admin)/admin/(protected)/site/page.tsx",
+      "sha1": "d3c1778fe5c7c829402ce9305bdf6033519df0fd"
+    },
+    {
+      "path": "src/app/(admin)/admin/AuthPanel.tsx",
+      "sha1": "11555417955af5e9f01fc77b625a0c5dfbbf1ea4"
+    },
+    {
+      "path": "src/app/(admin)/admin/actions.ts",
+      "sha1": "77e62f9ee439e6d257d85e5fe272458b7a0ced6c"
+    },
+    {
+      "path": "src/app/(admin)/admin/auth/confirm/route.ts",
+      "sha1": "162cb7a6d405839a55c9a8c67671881dc26617fe"
+    },
+    {
+      "path": "src/app/(admin)/admin/login/LoginForm.tsx",
+      "sha1": "1e60ca235c79336f3f8f0c7bbe6aa5afa9e44d0c"
+    },
+    {
+      "path": "src/app/(admin)/admin/login/page.tsx",
+      "sha1": "68aa83c67cb81e04ed9cf7503c1b658b403682f3"
+    },
+    {
+      "path": "src/app/(admin)/admin/media/file/[id]/route.ts",
+      "sha1": "c4f7d627517c1c6063ac97acb1fe158b7db3fa11"
+    },
+    {
+      "path": "src/app/(admin)/admin/media/upload/route.ts",
+      "sha1": "d740e59ded03b205564f64a9c21fd7b0e579f6e0"
+    },
+    {
+      "path": "src/app/(admin)/admin/mfa/VerifyForm.tsx",
+      "sha1": "7a8289198e707b23ca0a9e33a9279f6ee5667163"
+    },
+    {
+      "path": "src/app/(admin)/admin/mfa/challenge/page.tsx",
+      "sha1": "397441735c76bed7958b835770f69781e6f02717"
+    },
+    {
+      "path": "src/app/(admin)/admin/mfa/setup/SetupForm.tsx",
+      "sha1": "e753d11fb632361621f9e06fa27f3db19a9b5174"
+    },
+    {
+      "path": "src/app/(admin)/admin/mfa/setup/page.tsx",
+      "sha1": "7a3fc16c37f0bb879a7395b1f3fd9c047f108185"
+    },
+    {
+      "path": "src/app/(admin)/admin/onboarding-actions.ts",
+      "sha1": "07c13f98edcbcf68dc96d4efeac0aacec19f944c"
+    },
+    {
+      "path": "src/app/(admin)/admin/onboarding/password/PasswordForm.tsx",
+      "sha1": "5c999e15d72e158f2d29d85c93fa884d15e05af4"
+    },
+    {
+      "path": "src/app/(admin)/admin/onboarding/password/page.tsx",
+      "sha1": "c5a76df820f864d1fbdd7929ad20d16f91e81d1a"
+    },
+    {
+      "path": "src/app/(admin)/layout.tsx",
+      "sha1": "853a1e95b9a30dbdee4f5d672f977f28cd41c4c4"
+    },
+    {
+      "path": "src/app/(preview)/layout.tsx",
+      "sha1": "626ed442b69a23b49f9e63bd6a9fa42462697cb3"
+    },
+    {
+      "path": "src/app/(site)/[slug]/page.tsx",
+      "sha1": "dc3e2875f1be8bb45256c31d0ea1ec69e88932fc"
+    },
+    {
+      "path": "src/app/(site)/about/page.tsx",
+      "sha1": "07cef5b29f6f6ed9aa9936c2161983a744f6003f"
+    },
+    {
+      "path": "src/app/(site)/accessibility-statement/page.tsx",
+      "sha1": "d47700db5d46ecdf68a00c91ed906ef047caa0ec"
+    },
+    {
+      "path": "src/app/(site)/air-conditioner-cleaning/page.tsx",
+      "sha1": "c527cedd0588af11a028e9621c8211204ffcdaa1"
+    },
+    {
+      "path": "src/app/(site)/armchair-chair-cleaning/page.tsx",
+      "sha1": "0d92db41793722f6e430b3360df2607d66ec51c6"
+    },
+    {
+      "path": "src/app/(site)/business-ac-cleaning/page.tsx",
+      "sha1": "adced0731625eb6b715dce49c9a2f2ea3899d160"
+    },
+    {
+      "path": "src/app/(site)/car-upholstery-cleaning/page.tsx",
+      "sha1": "c02b053d49c80fa150917c6798cba0054f48f094"
+    },
+    {
+      "path": "src/app/(site)/carpet-cleaning/page.tsx",
+      "sha1": "6aab652eb397bff679caa4162a7d1db52a253448"
+    },
+    {
+      "path": "src/app/(site)/contact/page.tsx",
+      "sha1": "47cab06cdba146fa13b19f96d2d2e4a10bbebde1"
+    },
+    {
+      "path": "src/app/(site)/data-deletion/page.tsx",
+      "sha1": "ed5ef0316f7e4cb074ace5cc7fc3b7bb2a013fc1"
+    },
+    {
+      "path": "src/app/(site)/delicate-upholstery-cleaning/page.tsx",
+      "sha1": "087b23f47feeb6fde5c1ceb44eece3cc811d5a2b"
+    },
+    {
+      "path": "src/app/(site)/gallery/page.tsx",
+      "sha1": "6b2adedc12d0b38e02ce6b4605500ff8efe7f954"
+    },
+    {
+      "path": "src/app/(site)/layout.tsx",
+      "sha1": "c51defb045a2acdc575ea66155badfcb7f4719a9"
+    },
+    {
+      "path": "src/app/(site)/mattress-cleaning/page.tsx",
+      "sha1": "ab974ec9fbe947bdeb48d88896755b036e246737"
+    },
+    {
+      "path": "src/app/(site)/mini-central-air-conditioner-cleaning/page.tsx",
+      "sha1": "3b1c25ea115b32fafd3bcf610fac7136d8d653fb"
+    },
+    {
+      "path": "src/app/(site)/page.tsx",
+      "sha1": "8ffac3b22ec857cf0fa6562508001f8a7511e560"
+    },
+    {
+      "path": "src/app/(site)/post-renovation-cleaning/page.tsx",
+      "sha1": "d9a2e5b4f4963d2a73ae22cf346c39445d6b6d7e"
+    },
+    {
+      "path": "src/app/(site)/privacy-policy/page.tsx",
+      "sha1": "ee4d8a2395083ed4725a663224aa4ba6290929f3"
+    },
+    {
+      "path": "src/app/(site)/services/page.tsx",
+      "sha1": "a2e226512f6cf94b739d30e6ff10d3be4299d235"
+    },
+    {
+      "path": "src/app/(site)/sofa-cleaning/page.tsx",
+      "sha1": "280308b84fdf52f28933a8ebd1efc3c8b67844c3"
+    },
+    {
+      "path": "src/app/(site)/window-cleaning/page.tsx",
+      "sha1": "ff04311620d468820e4db009b3e8fff9ae856236"
+    },
+    {
+      "path": "src/app/api/cms/public-promotion/route.ts",
+      "sha1": "c5dcda7ee5658c52a9fe14a8b60955711f4eac7b"
+    },
+    {
+      "path": "src/app/api/contact-lead/route.ts",
+      "sha1": "e245696107e8be2fbc804dae011239dda63f2be1"
+    },
+    {
+      "path": "src/app/api/website-chat/route.ts",
+      "sha1": "aa515451a521c1fc264155e8c68693463fe10b82"
+    },
+    {
+      "path": "src/app/api/whatsapp/pilot/route.ts",
+      "sha1": "09a9d87d3b834f4d891fa5ffeaaca48e06cf58c1"
+    },
+    {
+      "path": "src/app/api/whatsapp/route.ts",
+      "sha1": "86f58a5c475c19d077f9069e41165d591e09261a"
+    },
+    {
+      "path": "src/app/apple-icon.png",
+      "sha1": "b19204fac2b9bf01ec79d8d6de7261eae99d8325"
+    },
+    {
+      "path": "src/app/cms-media/[id]/route.ts",
+      "sha1": "1b6e965c3506631ee48e3a32a66bd196ad9f87ed"
+    },
+    {
+      "path": "src/app/favicon.ico",
+      "sha1": "2409a1c0f0396e6e322b6f566b0000e231ee365c"
+    },
+    {
+      "path": "src/app/globals.css",
+      "sha1": "fca27d8936437bace6d4069fa8116833e31d7e07"
+    },
+    {
+      "path": "src/app/icon.png",
+      "sha1": "c620813cd7d87393f8d0c5e93370d9398a6900dc"
+    },
+    {
+      "path": "src/app/robots.ts",
+      "sha1": "66a66d7d59b452b64050ca6b9a6b725293b8882c"
+    },
+    {
+      "path": "src/app/sitemap.ts",
+      "sha1": "a81c23a86fe98922b373443913f30befb838a0f8"
+    },
+    {
+      "path": "src/cms/authorization.ts",
+      "sha1": "60c2cc6047055e2e4d0d94e6dcf80137396d0bf9"
+    },
+    {
+      "path": "src/cms/client.ts",
+      "sha1": "7e0d868663800ccb43b65a3584f35017337b84e0"
+    },
+    {
+      "path": "src/cms/config.ts",
+      "sha1": "5cb0f1ada811f0cd0728d7c64b318245d71352d6"
+    },
+    {
+      "path": "src/cms/content/PreviewContact.tsx",
+      "sha1": "8f4e6485fe2ca619ad19259192a0e5deef8a40e8"
+    },
+    {
+      "path": "src/cms/content/ServiceEditor.tsx",
+      "sha1": "dc19cab9b86a8326749372aedf5dc3bdfa406527"
+    },
+    {
+      "path": "src/cms/content/SharedServicePreview.tsx",
+      "sha1": "23e675de3083ac87c9b3148c22782ddd64a7a8fe"
+    },
+    {
+      "path": "src/cms/content/SpecialServiceEditor.tsx",
+      "sha1": "9b2b14401853a022d890bde7d19f83f35b07988b"
+    },
+    {
+      "path": "src/cms/content/actions.ts",
+      "sha1": "60991228cb444a210b63568d186df93edf8f6de3"
+    },
+    {
+      "path": "src/cms/content/baseline.ts",
+      "sha1": "db005230ed3f2a140f3109633bec784b10e11e0a"
+    },
+    {
+      "path": "src/cms/content/environment.ts",
+      "sha1": "740c3c9804ac60da2175764dc17c84cb98e0191d"
+    },
+    {
+      "path": "src/cms/content/managed-model.ts",
+      "sha1": "5b35fa58847e5c8d4250a632a5706e8f5c42e99d"
+    },
+    {
+      "path": "src/cms/content/pilot-model.ts",
+      "sha1": "cab6e1e10bf9d1d07269e06e81d6cee1f6da5880"
+    },
+    {
+      "path": "src/cms/content/public-source.ts",
+      "sha1": "4101514dbe54af3cc4df8f8a18bf37c4abad12e1"
+    },
+    {
+      "path": "src/cms/content/repository.ts",
+      "sha1": "01edcaabf326c212ed1707bf1dca8d9a4d081e3c"
+    },
+    {
+      "path": "src/cms/content/service-model.ts",
+      "sha1": "f4b94e8875fad184ece1af27ecd1278b344661dc"
+    },
+    {
+      "path": "src/cms/content/special-baseline.ts",
+      "sha1": "0ff923ebdfbdf737bd004793c9093082b44fe272"
+    },
+    {
+      "path": "src/cms/content/special-model.ts",
+      "sha1": "a250d4d807f067ec21869d56048bc79e0753b11e"
+    },
+    {
+      "path": "src/cms/content/special-view.ts",
+      "sha1": "2995f9e2a7ab35b43720c750848cbd36c6700c48"
+    },
+    {
+      "path": "src/cms/dashboard.ts",
+      "sha1": "9374c95197c56932611ac14b10165f8a648718d1"
+    },
+    {
+      "path": "src/cms/home/HomeBlocksView.tsx",
+      "sha1": "59cbdc9155deb573227c698a6d88f9cd32ed9220"
+    },
+    {
+      "path": "src/cms/home/HomeEditor.tsx",
+      "sha1": "2f471358527356b218e3dbc7864758496e0597d6"
+    },
+    {
+      "path": "src/cms/home/HomeReviewsBootstrapControl.tsx",
+      "sha1": "1aad03dbc29837ab1c63eb460334b2fb23ddfdcb"
+    },
+    {
+      "path": "src/cms/home/ServiceCardImagesEditor.tsx",
+      "sha1": "15616faad85923f726ef95988519561a9ba7d7cf"
+    },
+    {
+      "path": "src/cms/home/actions.ts",
+      "sha1": "f08c5fb90d678e66559689559a458f7a35e52fa3"
+    },
+    {
+      "path": "src/cms/home/baseline.ts",
+      "sha1": "a9cd50da73827c2227daeaff229faaa75dd6a388"
+    },
+    {
+      "path": "src/cms/home/environment.ts",
+      "sha1": "35ff5566ee67a803052326a1e66decb7911e247e"
+    },
+    {
+      "path": "src/cms/home/google-reviews-bootstrap.ts",
+      "sha1": "9a2e6b515f587e2ed8d3f772d62fd8328b42bbb2"
+    },
+    {
+      "path": "src/cms/home/model.ts",
+      "sha1": "03c0b916b3855890df11ad07d42c89c31749379f"
+    },
+    {
+      "path": "src/cms/home/public-source.ts",
+      "sha1": "e38c5ad9ee86edd93e88b65a9fbc0ab713cc1261"
+    },
+    {
+      "path": "src/cms/home/repository.ts",
+      "sha1": "239883c9e3ef18ce7c16d665fd94fd082f048d66"
+    },
+    {
+      "path": "src/cms/home/service-card-images.ts",
+      "sha1": "c759f43206209b7c0f8d948aaabe2a63750e0686"
+    },
+    {
+      "path": "src/cms/invitation.ts",
+      "sha1": "2dfb0dadd7dcd79f2ee7f91e101ab6ba343469d6"
+    },
+    {
+      "path": "src/cms/media/Library.tsx",
+      "sha1": "a3b5ad6226d6e70cbe6c78488509501af3fe4693"
+    },
+    {
+      "path": "src/cms/media/MetadataEditor.tsx",
+      "sha1": "57e08aeaa9c7e2ef4ab8daefd55514544eaad504"
+    },
+    {
+      "path": "src/cms/media/UploadForm.tsx",
+      "sha1": "0d5b9bcff8f0dbd997e3379f85178249fe486d51"
+    },
+    {
+      "path": "src/cms/media/actions.ts",
+      "sha1": "d63e2d009420ea213283499a1da0ee4a3012c3eb"
+    },
+    {
+      "path": "src/cms/media/authenticated-storage.ts",
+      "sha1": "97f8894b19a3c592474e71f77129a61b30ff4853"
+    },
+    {
+      "path": "src/cms/media/cloud-storage.ts",
+      "sha1": "ed3443512939be90ce95aeea68dda422881f6e81"
+    },
+    {
+      "path": "src/cms/media/environment.ts",
+      "sha1": "d52d5a84aac4c0e20df6172f18cf57493fcfdd1a"
+    },
+    {
+      "path": "src/cms/media/http.ts",
+      "sha1": "d0cc4976fef127da6cd5ff168e2b36cb5aa426b9"
+    },
+    {
+      "path": "src/cms/media/local-storage.ts",
+      "sha1": "3581ddd708da2d7c75c85025945329af78c7e815"
+    },
+    {
+      "path": "src/cms/media/model.ts",
+      "sha1": "93ec9079f8dad9433ec8f454f372c96f700c124a"
+    },
+    {
+      "path": "src/cms/media/object-store.ts",
+      "sha1": "0ededa40e4300d2b2822602e9ca861cf356c515c"
+    },
+    {
+      "path": "src/cms/media/prepare-upload-image.ts",
+      "sha1": "bd1d308f57c09e8b32cca4e254621edcb2d8e7e9"
+    },
+    {
+      "path": "src/cms/media/repository.ts",
+      "sha1": "767dc7e8c25f03e847852c4cbf82484f12d51ab0"
+    },
+    {
+      "path": "src/cms/media/resolve.ts",
+      "sha1": "d5b2354cbb587b0ad772217a55bf11fa5441866a"
+    },
+    {
+      "path": "src/cms/media/s3-object-backend.ts",
+      "sha1": "0e0395c9d1d751f846beef82d57ebc36ddbb3ede"
+    },
+    {
+      "path": "src/cms/media/s3-registration-attestation.ts",
+      "sha1": "64d5532be227eecf29851bd10bc4816c2d4dbc20"
+    },
+    {
+      "path": "src/cms/media/s3-store.ts",
+      "sha1": "32082160ae381dd4bc80d5da07215198faef2541"
+    },
+    {
+      "path": "src/cms/media/special-static-inventory.ts",
+      "sha1": "d0084e4d938747bd3248c3c6280f257dacb3ef12"
+    },
+    {
+      "path": "src/cms/media/static-inventory.ts",
+      "sha1": "81a62f06307757e73695fc0e56cc061179b85434"
+    },
+    {
+      "path": "src/cms/media/trusted-client.ts",
+      "sha1": "8a9c4bad5c022ffb8aec2b0a910a564d4c8abf9c"
+    },
+    {
+      "path": "src/cms/media/upload-diagnostics.ts",
+      "sha1": "6a7346ce5d96818957e5a5b20e26461842840363"
+    },
+    {
+      "path": "src/cms/media/validate-image.ts",
+      "sha1": "eddef41d3b9a6ee3e81a1cbf1b7a6de449cad3a4"
+    },
+    {
+      "path": "src/cms/onboarding.ts",
+      "sha1": "5497482e645d5b177111174e89f4dc22969d61d7"
+    },
+    {
+      "path": "src/cms/pages/NewPageForms.tsx",
+      "sha1": "74c4e304f03df53bd0dc8bb2452bbb223f913090"
+    },
+    {
+      "path": "src/cms/pages/PageBlocksView.tsx",
+      "sha1": "1550ef3a0268f83f6d3900c7bff4d62c0d863f68"
+    },
+    {
+      "path": "src/cms/pages/PageEditor.tsx",
+      "sha1": "313f744b93fc353ed7c08d246f8809cee114120a"
+    },
+    {
+      "path": "src/cms/pages/PromotionBannerView.tsx",
+      "sha1": "d66453175ef453374d012889fc8668cbd4133e98"
+    },
+    {
+      "path": "src/cms/pages/actions.ts",
+      "sha1": "e35014c829a23ccc77b110bbabf026e51ac7fe52"
+    },
+    {
+      "path": "src/cms/pages/baseline.ts",
+      "sha1": "7e0354b552bffd06740ae06f9f8e0bafe5511826"
+    },
+    {
+      "path": "src/cms/pages/environment.ts",
+      "sha1": "6edbbe521b8ebc0cce1754b5b567c8703a4b0ab0"
+    },
+    {
+      "path": "src/cms/pages/model.ts",
+      "sha1": "e021daca56f7a827d3ff81e3546da31c62fb5b8a"
+    },
+    {
+      "path": "src/cms/pages/new-actions.ts",
+      "sha1": "fba4070a96f4b864b1bafe31531b5641b9f46cb1"
+    },
+    {
+      "path": "src/cms/pages/new-environment.ts",
+      "sha1": "951c02ae9407cac583ec3c1d0b6b78b2a9a895e7"
+    },
+    {
+      "path": "src/cms/pages/new-public-source.ts",
+      "sha1": "6bede101b10013676e0b06a450144f187e66aa8c"
+    },
+    {
+      "path": "src/cms/pages/new-repository.ts",
+      "sha1": "ddeeb38d7f44b17390b711c66fb4e3de8ecba54d"
+    },
+    {
+      "path": "src/cms/pages/public-source.ts",
+      "sha1": "b729a468d90b4be4fdb98977514ee92f986ff270"
+    },
+    {
+      "path": "src/cms/pages/repository.ts",
+      "sha1": "449b0322e6b39b0dce755ec446f9301cd4e2e4fc"
+    },
+    {
+      "path": "src/cms/pages/routes.ts",
+      "sha1": "b88a43a7092b8228a388cd6a3c8164f80d7210b4"
+    },
+    {
+      "path": "src/cms/preview-environment.ts",
+      "sha1": "2be46549a239d5491d29ca41a22f49d68d7f923f"
+    },
+    {
+      "path": "src/cms/production-environment.ts",
+      "sha1": "4a9b14eaef5689dc1de8d72ca9dca7e8a9834d70"
+    },
+    {
+      "path": "src/cms/promotions/CampaignEditor.tsx",
+      "sha1": "f29549521ef65eb12c158c276cea6f8b0cd87799"
+    },
+    {
+      "path": "src/cms/promotions/CampaignPlacementSection.tsx",
+      "sha1": "1d5d18b23828a261289ae6f44b52decbcaa67534"
+    },
+    {
+      "path": "src/cms/promotions/PromotionPopupView.tsx",
+      "sha1": "f4b2677e4c4c993e1cbc7f5f59da4acb3bb7e92c"
+    },
+    {
+      "path": "src/cms/promotions/PublicCampaigns.tsx",
+      "sha1": "f6147195b9baf3ab69922c0efad13acdfab1f33f"
+    },
+    {
+      "path": "src/cms/promotions/actions.ts",
+      "sha1": "0983843af593210cc6a9bd2cb53359ea75dbf6f7"
+    },
+    {
+      "path": "src/cms/promotions/environment.ts",
+      "sha1": "be18dcfb51c4b2372d299aa268ebf14e152e786b"
+    },
+    {
+      "path": "src/cms/promotions/model.ts",
+      "sha1": "9662cdbe99ab8e9a51d9f101dfdb40c63c1125da"
+    },
+    {
+      "path": "src/cms/promotions/repository.ts",
+      "sha1": "92dd056c6d63b1b6834dd3c41983925ccbc1f356"
+    },
+    {
+      "path": "src/cms/reviews/GoogleReviewsCarousel.tsx",
+      "sha1": "04704e3bafd7a5ed38b41b4610c7ad0fd7ca2d33"
+    },
+    {
+      "path": "src/cms/reviews/environment.ts",
+      "sha1": "030b1cf608841b7ffde90234c9cbe7e89d1ebe0a"
+    },
+    {
+      "path": "src/cms/reviews/fixture.ts",
+      "sha1": "5b4f9d69a9b41680b400e54577a3311e9d456c90"
+    },
+    {
+      "path": "src/cms/reviews/google-provider.ts",
+      "sha1": "71e8ea25180a4de0f26351276b5ec56154563606"
+    },
+    {
+      "path": "src/cms/reviews/model.ts",
+      "sha1": "82c5b9f622cceece9b06fc63588c9561ccbdb9f9"
+    },
+    {
+      "path": "src/cms/reviews/source.ts",
+      "sha1": "654d981a89dd373464332c3874e61f87fe10b2cf"
+    },
+    {
+      "path": "src/cms/schedules/PublicScheduledPromotion.tsx",
+      "sha1": "ec61a8b50766d12aaa6e0c13d2810f567b7f5cc9"
+    },
+    {
+      "path": "src/cms/schedules/ScheduleManager.tsx",
+      "sha1": "7e07ab71b8f4f76e389cff2f719af2de94f60303"
+    },
+    {
+      "path": "src/cms/schedules/actions.ts",
+      "sha1": "c219e0d45828be9b5bd86a18514024be1e947722"
+    },
+    {
+      "path": "src/cms/schedules/environment.ts",
+      "sha1": "dec0dc801fd76247290c6a795fc0e704b1433b37"
+    },
+    {
+      "path": "src/cms/schedules/model.ts",
+      "sha1": "a7d499c200e5805216d0b5feea01cd707ea32828"
+    },
+    {
+      "path": "src/cms/schedules/public-environment.ts",
+      "sha1": "5315974fdb6f1a8834de5e38717e969394a04d20"
+    },
+    {
+      "path": "src/cms/schedules/public-source.ts",
+      "sha1": "abf469fd1bcd3ef4d4c64305a274c8a8269e5fea"
+    },
+    {
+      "path": "src/cms/schedules/repository.ts",
+      "sha1": "62c7627cc84a700cecaaa3b3d3602f090ae65e58"
+    },
+    {
+      "path": "src/cms/server.ts",
+      "sha1": "d42c082b36d8271aa91587f88240f8cf07311ac1"
+    },
+    {
+      "path": "src/cms/service-images/model.ts",
+      "sha1": "10580a92a6f8a3bdc8b276cdf2a9d55f1026f78b"
+    },
+    {
+      "path": "src/cms/service-images/presentation.ts",
+      "sha1": "5348cb9ac5dbe093daebf9b39953d3bb9bc78ea4"
+    },
+    {
+      "path": "src/cms/service-images/private-source.ts",
+      "sha1": "feef0fa1d5aa5175f70a00a03ee34ffbb3ed0b94"
+    },
+    {
+      "path": "src/cms/service-images/public-source.ts",
+      "sha1": "36774b73897512fb6506b818fdd0dde1b8803cea"
+    },
+    {
+      "path": "src/cms/site/SiteEditor.tsx",
+      "sha1": "3cc3763ff5b14cc43f8c9d5d2eab8ab557073c6e"
+    },
+    {
+      "path": "src/cms/site/actions.ts",
+      "sha1": "d2a98c6eeef5a0bc37e1391c520a73beeb001c09"
+    },
+    {
+      "path": "src/cms/site/baseline.ts",
+      "sha1": "d872d86e08c48b9e68e4721b9173713495e83e7f"
+    },
+    {
+      "path": "src/cms/site/environment.ts",
+      "sha1": "7d5c6847924deac042bffd4f1f5349de21ca1a5f"
+    },
+    {
+      "path": "src/cms/site/model.ts",
+      "sha1": "fc61c8b7070ff2e8c86d06915d6951bc883d84a3"
+    },
+    {
+      "path": "src/cms/site/public-source.ts",
+      "sha1": "3a4215a5de831937c5502072b1bd5933f951ed80"
+    },
+    {
+      "path": "src/cms/site/repository.ts",
+      "sha1": "86a3ecf7b5aa231f57b462153a3e44228691682e"
+    },
+    {
+      "path": "src/components/AcPromotionContent.tsx",
+      "sha1": "fc65ded6a6439742b5b0164707f796fec7edd832"
+    },
+    {
+      "path": "src/components/AccessibilityControls.tsx",
+      "sha1": "d205f466271199c5d2256afa0af7cdc61e419d47"
+    },
+    {
+      "path": "src/components/AirConditionerCleaningLandingPage.tsx",
+      "sha1": "bf83b059020133988b77dcdeb332f77b9b5271f6"
+    },
+    {
+      "path": "src/components/AirConditionerCleaningView.tsx",
+      "sha1": "09f9ac3472163b82dc0cf7ae189240ffd92b7fd8"
+    },
+    {
+      "path": "src/components/BeforeAfterCard.tsx",
+      "sha1": "5196d6d664771b0bae1bbd791fdec918e25fb43a"
+    },
+    {
+      "path": "src/components/BusinessEventTracker.tsx",
+      "sha1": "54f4a2b6e15ad1bea9b77176cfc7e59ce0dfb320"
+    },
+    {
+      "path": "src/components/ContactAvatar.tsx",
+      "sha1": "7d48e67b579343fef6dc6d251d12cff1bc3a3dd9"
+    },
+    {
+      "path": "src/components/ContactForm.tsx",
+      "sha1": "6b2e0477793c0ab3d2f72ab9c24a4c917d2d07ee"
+    },
+    {
+      "path": "src/components/CookieConsent.tsx",
+      "sha1": "ddfe2bf2d9ed4407436378d27671930e102e8f61"
+    },
+    {
+      "path": "src/components/CookiePreferencesButton.tsx",
+      "sha1": "7072a2a0113f8d78450c33f18ea633c98d6c1e4b"
+    },
+    {
+      "path": "src/components/GalleryGrid.tsx",
+      "sha1": "ee0b56c3244411fa5edcc136f50b1256099fa34d"
+    },
+    {
+      "path": "src/components/GoogleAdsTag.tsx",
+      "sha1": "78e901b3e53f124e2e2fad06f39df229c37d4cac"
+    },
+    {
+      "path": "src/components/GoogleCallTrackingNumber.tsx",
+      "sha1": "499040412dd1063f6e0a06995585ba27a46639c3"
+    },
+    {
+      "path": "src/components/GuideLinks.tsx",
+      "sha1": "f0a5ef5afcc71b5db14752a55941ad79ebc9b47f"
+    },
+    {
+      "path": "src/components/GuidePageView.tsx",
+      "sha1": "95618e07981f34ed28f09d809ea5fcf1e6bc8971"
+    },
+    {
+      "path": "src/components/Icon.tsx",
+      "sha1": "19de61f53d3801d90e0360d22f8de0e1bdf56f88"
+    },
+    {
+      "path": "src/components/ImageWithFallback.tsx",
+      "sha1": "84aa5e299f3ebbd68405d5994d83c28a073b2784"
+    },
+    {
+      "path": "src/components/JsonLd.tsx",
+      "sha1": "c96909efe9a8552858730d26df41170a42ed0ad5"
+    },
+    {
+      "path": "src/components/MarketingAttributionTracker.tsx",
+      "sha1": "18ee6fdaab571c4de5df1ff867b25f32ed7d11d9"
+    },
+    {
+      "path": "src/components/MetaPixel.tsx",
+      "sha1": "81e8435781f2c1e2a60c6f3a0cdb083e79023279"
+    },
+    {
+      "path": "src/components/PageHero.tsx",
+      "sha1": "682347844b543011b96a570235181d0b2a49f907"
+    },
+    {
+      "path": "src/components/PropertyCleaningDetails.tsx",
+      "sha1": "166fa63c1355fdee8c3730ce4273dc30661232b5"
+    },
+    {
+      "path": "src/components/ScrollProgress.tsx",
+      "sha1": "c85f0f766250700ce2af23fdf758ec9f142f04f5"
+    },
+    {
+      "path": "src/components/SectionHeading.tsx",
+      "sha1": "4e689e7a14284bc9524142eb68390b86e62a2939"
+    },
+    {
+      "path": "src/components/ServiceHero.tsx",
+      "sha1": "f1400fc43fa2c4592a8adb97c3ebb84c56c6e99c"
+    },
+    {
+      "path": "src/components/ServiceImageCarousel.tsx",
+      "sha1": "56e1ac3da6b335343e7c7991decb57b09233a554"
+    },
+    {
+      "path": "src/components/ServiceLandingPage.tsx",
+      "sha1": "71bf64d52e64dc53c0c36c676c9e9403af3622df"
+    },
+    {
+      "path": "src/components/ServiceLandingView.tsx",
+      "sha1": "f649473aa01a8124955129c495e5e0593a8d479b"
+    },
+    {
+      "path": "src/components/SummerAcPromotionPopup.tsx",
+      "sha1": "2b0da4554009a0f3ef485512c958096197a6864c"
+    },
+    {
+      "path": "src/components/ThemeToggle.tsx",
+      "sha1": "052a6e913e13c811168bc6a4165930818783b690"
+    },
+    {
+      "path": "src/components/WebsiteChat.tsx",
+      "sha1": "fa666dd65909968455d8b853bbcdf4664e6e4100"
+    },
+    {
+      "path": "src/components/WhatsAppButton.tsx",
+      "sha1": "01b162ad886ce069679654bc76c95eff38b341e2"
+    },
+    {
+      "path": "src/components/WindowCleaningLandingPage.tsx",
+      "sha1": "6e53296d21481d9b2dd859141e7e3b219fd4c283"
+    },
+    {
+      "path": "src/components/WindowCleaningView.tsx",
+      "sha1": "aba766ea10ef45523a51fc81d1ffdadca18c7a2b"
+    },
+    {
+      "path": "src/components/WindowCleaningVisual.tsx",
+      "sha1": "72bf7caa8b14d7b515e9feff1bad6a935c33c9cd"
+    },
+    {
+      "path": "src/components/YouTubeLiteEmbed.tsx",
+      "sha1": "9330d57d98e63da18c8a023329d454ac6a1bd0f2"
+    },
+    {
+      "path": "src/config/business.ts",
+      "sha1": "925c47d35bf42834de2231928d2c49140de2d930"
+    },
+    {
+      "path": "src/content/ac-price-revision.ts",
+      "sha1": "c3d69038fff762c142cf376ba27f887537315e1e"
+    },
+    {
+      "path": "src/content/guide-environment.ts",
+      "sha1": "b5cabf20854985efd6157e17aab3842c9f1df166"
+    },
+    {
+      "path": "src/content/guide-page-source.ts",
+      "sha1": "68b59840a249887b0ee56401abdc5ca8812baec9"
+    },
+    {
+      "path": "src/content/guide-pages.ts",
+      "sha1": "ac31ad92eb4e1da05e1ef7b04c01926e5d983e3e"
+    },
+    {
+      "path": "src/content/guide-routes.ts",
+      "sha1": "ffa6194d686e016aec518930d0bf9f8bf9ea26a3"
+    },
+    {
+      "path": "src/content/post-renovation-identity.ts",
+      "sha1": "b8d053b0b486c8a4d84de3c95a3cfc9ad089290a"
+    },
+    {
+      "path": "src/content/service-identity.ts",
+      "sha1": "af3d0299e93a1d2946bcc6e05de600019e9a5b67"
+    },
+    {
+      "path": "src/content/service-landing-adapter.ts",
+      "sha1": "e430ae8434dfc4c08dcab1c50e9dcd7eb0e4631a"
+    },
+    {
+      "path": "src/content/service-landing.ts",
+      "sha1": "4681a63714ef4a92a8795f3f55a35d8896066d47"
+    },
+    {
+      "path": "src/content/service-page-copy.ts",
+      "sha1": "7d158f13680f709530633eec246b18ecc98ea893"
+    },
+    {
+      "path": "src/content/service-registry.ts",
+      "sha1": "940e7173ddec2e89edfc645697d4cb932ecc068c"
+    },
+    {
+      "path": "src/content/source.ts",
+      "sha1": "4a4f0d8e2bff473207ca81abf075f03de8ea6e5e"
+    },
+    {
+      "path": "src/content/static-source.ts",
+      "sha1": "bb8f9d70f9da36fa101f7a0e998e23d1a3aa9a4a"
+    },
+    {
+      "path": "src/data/miniCentralAirConditionerCopy.ts",
+      "sha1": "e7b7e5bb0ded7f422ab52a599cf20766a86a349b"
+    },
+    {
+      "path": "src/data/postRenovationCopy.ts",
+      "sha1": "0b5db515661f1c1910e5a5607102a6c289d8542c"
+    },
+    {
+      "path": "src/data/serviceImages.ts",
+      "sha1": "a86fd08ec091b657330d444d3253b4a69521cfdb"
+    },
+    {
+      "path": "src/data/serviceLandingPages.ts",
+      "sha1": "146ecef42c184c28329c0d4ac3bac136fbaf72c4"
+    },
+    {
+      "path": "src/data/site.ts",
+      "sha1": "20b23af52bb81b08f0da24d61d451e534d209f54"
+    },
+    {
+      "path": "src/lib/consent.ts",
+      "sha1": "a030efa4f64626ec7571f1b46c7e61628e3e984c"
+    },
+    {
+      "path": "src/lib/contact-lead-contract.ts",
+      "sha1": "a3cdbf7fec21f3c8cb3768dee829a93631524798"
+    },
+    {
+      "path": "src/lib/contact-lead-submission.ts",
+      "sha1": "6aa404fe866beb9641f8bd68c00482c11e927df7"
+    },
+    {
+      "path": "src/lib/google-ads.ts",
+      "sha1": "7b0ffe38c4e2768d6ccac2fb3dc012bd6a2208b7"
+    },
+    {
+      "path": "src/lib/google-analytics.ts",
+      "sha1": "3b6c19451d2a48e0a8cfc1975135223122d2ff61"
+    },
+    {
+      "path": "src/lib/google-call-tracking-constant.ts",
+      "sha1": "b946ea75e3873c766519196ce51fc2807d68179a"
+    },
+    {
+      "path": "src/lib/google-call-tracking.ts",
+      "sha1": "047cb0003a1dca6ef29398ff4b8b82076cfc54d5"
+    },
+    {
+      "path": "src/lib/json-ld.ts",
+      "sha1": "01f2ae4429ee8715dcbdfe801a9ac396c21a9b4e"
+    },
+    {
+      "path": "src/lib/marketing-attribution-shared.ts",
+      "sha1": "bf5819c88416389c74f1ab6f9474312c1b69f18e"
+    },
+    {
+      "path": "src/lib/marketing-attribution.ts",
+      "sha1": "346e47f725ce5a590e75126d11fe1e3a4bc7abcb"
+    },
+    {
+      "path": "src/lib/meta-pixel.ts",
+      "sha1": "de268461b1e077bee0701ce1eeda0f0d24bb2d76"
+    },
+    {
+      "path": "src/lib/public-routes.ts",
+      "sha1": "88ff9a8777aa03cb748119e1af720a9cf1034ae3"
+    },
+    {
+      "path": "src/lib/seo.ts",
+      "sha1": "4696335fae1a881d718f7445396b843c3ed47a6c"
+    },
+    {
+      "path": "src/lib/service-images.ts",
+      "sha1": "039e465e5df68518195476ed52a4f030cf56569c"
+    },
+    {
+      "path": "src/lib/site-review.ts",
+      "sha1": "320fd2f8dbb418e6e68f73b72892b53e49903ca9"
+    },
+    {
+      "path": "src/lib/structured-data.ts",
+      "sha1": "2a05bc76c3df40199652ae3fcd5aa038b9348dc7"
+    },
+    {
+      "path": "src/lib/website-chat/config.ts",
+      "sha1": "266e17d113dc3abfdcfe1baea18d037c8e6e0653"
+    },
+    {
+      "path": "src/lib/website-chat/contract.ts",
+      "sha1": "5f3727d76109a0c9ac2e30caaaf8129f5761ca74"
+    },
+    {
+      "path": "src/lib/website-chat/deployment-policy.ts",
+      "sha1": "4a6064e4136433ae13b28f57888ce3686ca22966"
+    },
+    {
+      "path": "src/lib/website-chat/http.ts",
+      "sha1": "12499c95a54ce852c59331baa8bed017eb28dbf2"
+    },
+    {
+      "path": "src/lib/website-chat/website-server.ts",
+      "sha1": "6e6d8c6ceca0610eb2cb24e7a620dafc723b54c4"
+    },
+    {
+      "path": "src/lib/whatsapp-attribution-request.ts",
+      "sha1": "2ac201c6fef2aa2c4af007b85a8ab67b8d56fa8d"
+    },
+    {
+      "path": "src/lib/whatsapp-attribution.ts",
+      "sha1": "9d04af9f0edaa4612f7ea38b95dbf5c494e69d33"
+    },
+    {
+      "path": "src/lib/whatsapp-click-context.ts",
+      "sha1": "d183229aa76ef8c71717f88ec413ce16416f0f98"
+    },
+    {
+      "path": "src/lib/whatsapp-measurement-pilot.ts",
+      "sha1": "fb27637b4d1779f752f6ae6d6d3527d787d77814"
+    },
+    {
+      "path": "src/lib/whatsapp-messages.ts",
+      "sha1": "a58403e2c5349eb8c63e8125955b49e5832baf05"
+    },
+    {
+      "path": "src/lib/whatsapp-redirect.ts",
+      "sha1": "0d5a6b0637f6985b6fc0010f77bb4a5371e4ecb3"
+    },
+    {
+      "path": "src/lib/whatsapp.ts",
+      "sha1": "bfeb13e10a4c5aaa0ffc28d9896bc08f4dee13cb"
+    },
+    {
+      "path": "src/proxy.ts",
+      "sha1": "cb15a1a3f964e9fe6f645f88b57d010b7b9bf21b"
+    },
+    {
+      "path": "src/sections/BeforeAfter.tsx",
+      "sha1": "ca1517bf73acf4d95a6952ae1e78e74d6a7a4b5d"
+    },
+    {
+      "path": "src/sections/CleaningProcess.tsx",
+      "sha1": "55052c75bd6b402d086be29c8e6187ce495de40d"
+    },
+    {
+      "path": "src/sections/FAQ.tsx",
+      "sha1": "434aaafdb2115d68c1bb3dd0223849940a1decac"
+    },
+    {
+      "path": "src/sections/FinalCTA.tsx",
+      "sha1": "557a7451cccbba23dfcd2e89afac2ccdc41a65ad"
+    },
+    {
+      "path": "src/sections/Footer.tsx",
+      "sha1": "324b5ce827aff147f69a4ffb8a6df2ef2b2660ba"
+    },
+    {
+      "path": "src/sections/Hero.tsx",
+      "sha1": "07643ca03bff629425e62ffb2b74a04dd6827fec"
+    },
+    {
+      "path": "src/sections/InstantQuote.tsx",
+      "sha1": "b6dcd172e645b2bfb74902ef457705d4e701dcb0"
+    },
+    {
+      "path": "src/sections/Navbar.tsx",
+      "sha1": "1deefc22e1500f2c8a8e7b15007432739c7a379b"
+    },
+    {
+      "path": "src/sections/PricingGuide.tsx",
+      "sha1": "bf6a3304f77eccd6a1bc94eebf2a4a5a030b44c0"
+    },
+    {
+      "path": "src/sections/QuickPriceEstimate.tsx",
+      "sha1": "5c77d734005f186cae058ee5223cb1189f1582e5"
+    },
+    {
+      "path": "src/sections/ServiceAreas.tsx",
+      "sha1": "e8999fad5331a4dc8e47355caac3fbd336631c12"
+    },
+    {
+      "path": "src/sections/Services.tsx",
+      "sha1": "11a7a874edae09838b92169b71eea5fd7378aa5a"
+    },
+    {
+      "path": "src/sections/Testimonials.tsx",
+      "sha1": "6ad3cc31b32f1d2efde9d3b7301802551a5dc1b3"
+    },
+    {
+      "path": "src/sections/TrustStrip.tsx",
+      "sha1": "f8502e16167986594ecd5955cedd7d267cf3cdcc"
+    },
+    {
+      "path": "src/sections/WhoItFits.tsx",
+      "sha1": "7f913d863f81af1ae439598a8c5c334309a6f91c"
+    },
+    {
+      "path": "src/sections/WhyChooseUs.tsx",
+      "sha1": "a5a1cbc09cb52bb0943df0d8a539308483455fa8"
+    },
+    {
+      "path": "src/sections/quick-estimate-content.ts",
+      "sha1": "2b3e2afa70b905abb8a45d6911fe5167e5745ad4"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha1": "ca450ef880f450fc71a5eda76d11461e7756ad96"
+    },
+    {
+      "path": "vercel.json",
+      "sha1": "9feed5310bcd2f44ca2bce7bec8d037c84b6c6a2"
+    }
+  ]
+}

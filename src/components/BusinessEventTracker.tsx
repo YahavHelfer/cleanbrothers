@@ -41,7 +41,6 @@ function isCleanBrothersWhatsAppLink(anchor: HTMLAnchorElement) {
 
 function isCleanBrothersPhoneLink(anchor: HTMLAnchorElement) {
   const href = anchor.getAttribute("href");
-
   if (!href?.toLowerCase().startsWith("tel:")) return false;
 
   const originalHref = anchor.dataset.googleCallOriginalHref ?? href;

@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
+import { createSourceLoader } from "./helpers/source-module.mjs";
+const sourceLoader = createSourceLoader();
 
 const readSource = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const analyticsSource = readSource("../src/lib/google-analytics.ts");
@@ -29,6 +31,10 @@ function loadAnalyticsHelper({
   const calls = [];
   const context = vm.createContext({
     __hasAnalyticsConsent: () => consent === "accepted",
+    require: specifier => {
+      assert.equal(specifier, "./whatsapp-click-context");
+      return sourceLoader("src/lib/whatsapp-click-context.ts");
+    },
     exports: {},
     module: { exports: {} },
     window: {
@@ -134,7 +140,7 @@ test("one passive delegated tracker covers dynamic business links", () => {
     /target\.closest<HTMLAnchorElement>\("a\[href\]"/,
   );
   assert.match(trackerSource, /destination\.hostname === "wa\.me"/);
-  assert.match(trackerSource, /trackGoogleAnalyticsEvent\("click_whatsapp"\)/);
+  assert.match(trackerSource, /trackGoogleAnalyticsEvent\("click_whatsapp", context\)/);
   assert.match(trackerSource, /trackGoogleAnalyticsEvent\("click_phone"\)/);
   assert.match(trackerSource, /passive: true/);
   assert.doesNotMatch(trackerSource, /location\.href|location\.search/);
@@ -155,4 +161,18 @@ test("Google Ads and Meta remain isolated", () => {
     metaPixelSource,
     /generate_lead|click_whatsapp|click_phone/,
   );
+});
+
+test('WhatsApp analytics accepts only enumerated context and drops raw customer/click data', () => {
+  const {calls,helper}=loadAnalyticsHelper({consent:'accepted'});
+  assert.equal(helper.trackGoogleAnalyticsEvent('click_whatsapp',{
+    service:'sofa-cleaning',button_location:'hero',device_type:'mobile',campaign_source:'google',
+    phone:'0500000000',message:'private synthetic message',gclid:'synthetic-private-click',
+  }),true);
+  assertSafeGa4Call(calls[0],'click_whatsapp');
+  assert.equal(calls[0][2].service,'sofa-cleaning');
+  assert.equal(calls[0][2].button_location,'hero');
+  assert.equal(calls[0][2].device_type,'mobile');
+  assert.equal(calls[0][2].campaign_source,'google');
+  assert.doesNotMatch(JSON.stringify(calls),/private|0500000000|gclid|message/);
 });
