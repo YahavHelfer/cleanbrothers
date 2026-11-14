@@ -19,6 +19,11 @@ function isValidForwardingNumber(value: string) {
   return /^\+?[\d\s().-]+$/.test(value) && /\d/.test(value);
 }
 
+function normalizeCallNumber(value: string) {
+  const digits = value.replace(/\D/g, "").replace(/^00/, "");
+  return /^0[2-9]\d{7,8}$/.test(digits) ? `972${digits.slice(1)}` : digits;
+}
+
 function updateTrackedNumbers(
   cssClass: string,
   formattedNumber: string,
@@ -32,14 +37,14 @@ function updateTrackedNumbers(
     }
   }
 
-  const originalDigits = originalNumber.replace(/\D/g, "");
+  const originalDigits = normalizeCallNumber(originalNumber);
   for (const phoneLink of document.querySelectorAll<HTMLAnchorElement>(
     'a[href^="tel:"]',
   )) {
     const currentHref = phoneLink.getAttribute("href") || "";
     if (
       !phoneLink.dataset.googleCallOriginalHref &&
-      currentHref.replace(/\D/g, "") !== originalDigits
+      normalizeCallNumber(currentHref) !== originalDigits
     ) {
       continue;
     }
@@ -96,6 +101,7 @@ export function receiveGoogleCallConversion(
     return false;
   }
 
+  window.__cleanBrothersGoogleCallTracking?.observer?.disconnect();
   window.__cleanBrothersGoogleCallTracking = {
     formattedNumber: formatted,
     mobileNumber: mobile,

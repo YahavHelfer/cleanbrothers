@@ -1,6 +1,7 @@
+import { ServiceHero, ServiceIntroduction } from "@/components/ServiceHero";
+import { GuideLinks } from "@/components/GuideLinks";
 import type { SharedServiceImage } from "@/cms/service-images/model";
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { JsonLd } from "@/components/JsonLd";
@@ -66,7 +67,6 @@ function buildStructuredData(content: AirConditionerCleaningContent) {
 export function AirConditionerCleaningView({ content = acBaseline, media, serviceImages, preview = false, contact, phone, popup, whatsappHref, multipleUnitsHref, phoneHref }: { content?: AirConditionerCleaningContent; media?: ResolvedMedia[]; serviceImages?: SharedServiceImage[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string }) {
   const { trustItems, intentSignals, cleaningAreas, processSteps, airConditionerServiceAreas, faqs, promotion } = content;
   const hero = serviceImages ?? specialMedia(content, "hero", media);
-  const gallery = specialMedia(content, "gallery", media);
   const displayedPrice = promotion.startingPrice;
   const structuredData = buildStructuredData(content);
 
@@ -76,51 +76,22 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
       <JsonLd id="ac-cleaning-breadcrumb-jsonld" data={structuredData.breadcrumb} />
       {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
 
-      <section className="theme-section-strong overflow-hidden py-7 sm:py-14 lg:py-16">
-        <div className="section-container grid items-center gap-6 lg:grid-cols-[1.03fr_0.97fr] lg:gap-12">
-          <div className="reveal">
-            <nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
+      <ServiceHero title={content.h1} eyebrow={content.copy.heroEyebrow}
+        breadcrumbs={<nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap gap-2">
                 <li><Link href="/">בית</Link></li><li aria-hidden="true">/</li>
                 <li><Link href="/services">שירותים</Link></li><li aria-hidden="true">/</li>
                 <li aria-current="page">{content.h1}</li>
               </ol>
-            </nav>
-            <p className="text-sm font-black text-turquoise">{content.copy.heroEyebrow}</p>
-            {promotion.enabled && <p className="mt-2 inline-flex rounded-full border border-turquoise/35 bg-turquoise/10 px-3 py-1.5 text-xs font-black text-turquoise sm:text-sm">
-              {promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪
-            </p>}
-            <h1 className="mt-2 max-w-3xl text-[2.35rem] font-black leading-[1.08] text-white sm:mt-3 sm:text-5xl lg:text-6xl">{content.h1}</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/80 sm:text-lg sm:leading-8">{content.copy.heroDescription}</p>
-
-            <div className="mt-5 grid gap-2 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">
-              <a
-                href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-primary inline-flex min-h-12 px-5 text-sm sm:text-base"
-              >
-                <Icon name="whatsapp" className="ml-2 h-5 w-5" />{content.copy.heroCta}</a>
-              <a
-                href={preview ? undefined : phoneHref} aria-disabled={preview || undefined}
-                className="btn-secondary inline-flex min-h-12 px-5 text-sm text-white sm:text-base"
-              >
-                <Icon name="phone" className="ml-2 h-5 w-5" />{content.copy.callCta}</a>
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-1.5 sm:mt-6 sm:gap-2">
-              {trustItems.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 text-xs font-bold text-white/80"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="reveal stagger-2 relative aspect-[16/11] overflow-hidden rounded-[1.5rem] border border-white/15 bg-navy shadow-2xl sm:rounded-[2rem] lg:aspect-[4/3]">
+            </nav>}
+        badge={promotion.enabled ? <span>{promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪</span> : undefined}
+        actions={<>
+          <a data-whatsapp-location="hero" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} target="_blank" rel="noreferrer" className="btn-whatsapp inline-flex">
+            <Icon name="whatsapp" className="h-5 w-5" />{content.copy.heroCta}
+          </a>
+          <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="service-call-link"><Icon name="phone" className="h-5 w-5" />{content.copy.callCta}</a>
+        </>}
+        media={<div className="reveal stagger-2 relative aspect-[16/11] overflow-hidden rounded-[1.5rem] border border-white/15 bg-navy shadow-2xl sm:rounded-[2rem] lg:aspect-[4/3]">
             <ServiceImageCarousel
               images={hero.map(image => image.src)}
               imageAlts={Object.fromEntries(hero.map((image, index) => [image.src, serviceImages ? image.alt : `${image.alt}, תמונה ${index + 1} מתוך ${hero.length}`]))}
@@ -133,10 +104,9 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
               sizes="(min-width: 1024px) 46vw, 100vw"
               priority
             />
-          </div>
-        </div>
-      </section>
-
+          </div>}
+      />
+      <ServiceIntroduction text={content.copy.heroDescription}><ul className="service-intro-trust">{trustItems.map(item => <li key={item}>{item}</li>)}</ul></ServiceIntroduction>
       <section className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
@@ -205,7 +175,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
         </div>
       </section>
 
-      <section className="section-block theme-section-contrast">
+      <section className="section-block premium-service-section theme-section-contrast">
         <div className="section-container">
           <SectionHeading
             eyebrow={content.copy.processEyebrow}
@@ -228,34 +198,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
             ))}
           </ol>
           <div className="mt-6 text-center">
-            <a href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{content.copy.processCta}</a>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-block theme-section-clean">
-        <div className="section-container grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:gap-12">
-          <div>
-            <p className="text-sm font-black text-turquoise-dark">{content.copy.galleryEyebrow}</p>
-            <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{content.copy.galleryTitle}</h2>
-            <p className="mt-4 leading-7 theme-muted sm:text-lg sm:leading-8">{content.copy.galleryDescription}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {gallery.map(({src, alt}) => (
-              <div
-                key={src}
-                className="relative aspect-[4/3] overflow-hidden rounded-2xl border theme-card bg-navy sm:rounded-3xl"
-              >
-                <Image
-                  src={src}
-                  unoptimized={src.startsWith("/admin/media/file/") || src.startsWith("/cms-media/")}
-                  alt={alt}
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 28vw, 50vw"
-                />
-              </div>
-            ))}
+            <a data-whatsapp-location="content" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{content.copy.processCta}</a>
           </div>
         </div>
       </section>
@@ -274,7 +217,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
               </p>}
             </div>
             <p className="mt-4 leading-7 theme-muted sm:text-lg sm:leading-8">{content.copy.pricingDescription}</p>
-            <a href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary mt-5 inline-flex">{content.copy.pricingCta}</a>
+            <a data-whatsapp-location="quote" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary mt-5 inline-flex">{content.copy.pricingCta}</a>
             <p className="mt-4 text-xs leading-5 theme-muted">
               {promotion.priceTerms}{promotion.enabled && promotion.bundleEnabled ? ` ${promotion.bundleTerms}` : ""}
             </p>
@@ -343,6 +286,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
         </div>
       </section>
 
+      {!preview ? <GuideLinks /> : null}
       <section
         id="contact-form"
         className="scroll-mt-24 section-block theme-section-clean pb-28 sm:pb-20"
@@ -353,7 +297,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
             <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{content.copy.contactTitle}</h2>
             <p className="mt-4 leading-7 theme-muted sm:text-lg sm:leading-8">{content.copy.contactDescription}</p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <a href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{content.copy.contactCta}</a>
+              <a data-whatsapp-location="contact" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{content.copy.contactCta}</a>
               <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="btn-secondary inline-flex">{content.copy.callPrefix}{phone ?? businessConfig.phoneDisplay}
               </a>
             </div>
@@ -364,11 +308,11 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
 
       <div
         aria-label="פעולות מהירות לניקוי מזגן"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden"
+        className="mobile-service-actions fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-2 gap-2">
           <a
-            href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined}
+            data-whatsapp-location="sticky" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined}
             className="flex min-h-12 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-white"
           >{content.copy.contactCta}</a>
           <a

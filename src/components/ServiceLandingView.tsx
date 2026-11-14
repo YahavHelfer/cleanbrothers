@@ -1,3 +1,6 @@
+import { ServiceHero, ServiceIntroduction } from "@/components/ServiceHero";
+import { GuideLinks } from "@/components/GuideLinks";
+import { PropertyCleaningDetails } from "@/components/PropertyCleaningDetails";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,6 +39,7 @@ export function ServiceLandingView({
 }) {
   const copy = config.pageCopy;
   const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
+  const propertyCleaning = config.path === "/post-renovation-cleaning";
   const NavLink = preview ? DisabledLink : Link;
   const serviceImages = getServiceImages(config);
   const primaryImage = getPrimaryServiceImage(config);
@@ -49,10 +53,13 @@ export function ServiceLandingView({
   return (
     <div className={miniCentral ? "mini-central-landing pb-20 sm:pb-0" : "pb-20 sm:pb-0"}>
       {jsonLd}
-      <section className="theme-section-strong overflow-hidden py-9 sm:py-16 lg:py-20">
-        <div className={`section-container grid items-center gap-8 ${miniCentral ? "max-w-5xl" : "lg:grid-cols-[1.05fr_0.95fr] lg:gap-14"}`}>
-          <div className="reveal">
-            <nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
+      <ServiceHero
+        eyebrow={config.eyebrow}
+        summary={propertyCleaning ? "הנכס אחרי שיפוץ או לקראת כניסה? מתאמים ניקיון לפי מצב הדירה, המשטחים ומועד המעבר — עם היקף עבודה והצעת מחיר ברורים מראש." : undefined}
+        title={miniCentral ? config.h1.split(/(ב־\d[\d,.]*\s*₪|\d[\d,.]*\s*₪)/).map((part, index) =>
+          index % 2 ? <span key={index} className="whitespace-nowrap">{part}</span> : part
+        ) : config.h1}
+        breadcrumbs={<nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap items-center gap-2">
                 <li><NavLink href="/">בית</NavLink></li>
                 <li aria-hidden="true">/</li>
@@ -60,41 +67,19 @@ export function ServiceLandingView({
                 <li aria-hidden="true">/</li>
                 <li aria-current="page">{config.serviceName}</li>
               </ol>
-            </nav>
-            <p className="text-sm font-black text-turquoise">{config.eyebrow}</p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-black leading-[1.08] text-white sm:text-5xl lg:text-6xl">
-              {miniCentral ? config.h1.split(/(ב־\d[\d,.]*\s*₪|\d[\d,.]*\s*₪)/).map((part, index) =>
-                index % 2 ? <span key={index} className="whitespace-nowrap">{part}</span> : part
-              ) : config.h1}
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-white/80 sm:text-xl sm:leading-9">
-              {config.intro}
-            </p>
-            {miniCentral && <p className="mt-5 max-w-3xl rounded-2xl border border-white/20 bg-white/5 p-4 text-sm leading-7 text-white">{config.benefitsDescription}</p>}
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              {!miniCentral && <a href="#contact-form" className="btn-primary inline-flex">{copy?.heroCta || "לקבלת הצעת מחיר"}</a>}
-              <a href={whatsappHref} aria-disabled={preview || undefined} aria-label={miniCentral ? copy?.whatsappCta : `שליחת WhatsApp לקבלת הצעת מחיר עבור ${config.serviceName}`} className={miniCentral ? "btn-primary inline-flex" : "btn-secondary inline-flex text-white"}>
-                <Icon name="whatsapp" className="ml-2 h-5 w-5" />
-                {copy?.whatsappCta || "שלחו לנו WhatsApp"}
-              </a>
-              <a href={phoneHref} aria-disabled={preview || undefined} aria-label={miniCentral ? "התקשרו לבדיקת זמינות ב־055-957-7731" : "חיוג ל-CleanBrothers במספר 055-957-7731"} className="inline-flex min-h-12 items-center justify-center rounded-full px-4 font-black text-white underline decoration-turquoise decoration-2 underline-offset-4 focus:ring-2 focus:ring-turquoise">
-                <Icon name="phone" className="ml-2 h-5 w-5" />
-                {miniCentral ? <>התקשרו לבדיקת זמינות <span className="mr-2" dir="ltr">{phoneNumber}</span></> : phoneNumber}
-              </a>
-              {miniCentral && <a href="#contact-form" className="inline-flex min-h-12 items-center justify-center px-4 font-bold text-white underline underline-offset-4 focus:ring-2 focus:ring-turquoise">{copy?.heroCta || "השאירו פרטים"}</a>}
-            </div>
-            {!miniCentral && <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
-              <NavLink href="/services" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">כל השירותים</NavLink>
-              <NavLink href="/gallery" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">גלריית עבודות</NavLink>
-              <NavLink href={`/contact?service=${encodeURIComponent(config.serviceName)}`} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">יצירת קשר</NavLink>
-              {config.relatedLinks.map((link) => (
-                <NavLink key={link.href} href={link.href} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">
-                  {link.label}
-                </NavLink>
-              ))}
-            </div>}
-          </div>
-          {!miniCentral && <div className="reveal stagger-2 relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/15 bg-navy shadow-2xl">
+            </nav>}
+        actions={<>
+          <a data-whatsapp-location="hero" href={whatsappHref} aria-disabled={preview || undefined} className="btn-whatsapp inline-flex">
+            <Icon name="whatsapp" className="h-5 w-5" />{copy?.whatsappCta || "שלחו לנו WhatsApp"}
+          </a>
+          <a href={phoneHref} aria-disabled={preview || undefined} className="service-call-link">
+            <Icon name="phone" className="h-5 w-5" />{phoneNumber}
+          </a>
+          {(miniCentral || propertyCleaning) && <a href="#contact-form" className="service-callback-link">
+            אין תמונה? השאירו שם וטלפון ונחזור אליכם
+          </a>}
+        </>}
+        media={!miniCentral ? <div className="reveal stagger-2 relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/15 bg-navy shadow-2xl">
             <ServiceImageCarousel
               images={serviceImages}
               alt={config.imageAlt}
@@ -110,9 +95,25 @@ export function ServiceLandingView({
             {serviceImages.length > 0 && copy?.imageCaption && <p className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-navy/80 px-4 py-2 text-xs font-black text-white backdrop-blur">
               {copy.imageCaption}
             </p>}
-          </div>}
-        </div>
-      </section>
+          </div> : undefined}
+      />
+      <ServiceIntroduction text={config.intro} links={<>
+        <a href="#contact-form">{copy?.heroCta || "לקבלת הצעת מחיר"}</a>
+        {!miniCentral && <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
+              <NavLink href="/services" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">כל השירותים</NavLink>
+              <NavLink href="/gallery" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">גלריית עבודות</NavLink>
+              <NavLink href={`/contact?service=${encodeURIComponent(config.serviceName)}`} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">יצירת קשר</NavLink>
+              {config.relatedLinks.map((link) => (
+                <NavLink key={link.href} href={link.href} className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>}
+      </>}>
+        {miniCentral && <p>{config.benefitsDescription}</p>}
+        {miniCentral && <p className="mt-3 font-bold">ניקוי המערכת: 450 ₪. תוספת לכל התעלות יחד: 250 ₪. סך הכול 700 ₪ כולל מע״מ, בכפוף לבדיקת גישה ותיאום היקף העבודה.</p>}
+      </ServiceIntroduction>
+      {propertyCleaning && <PropertyCleaningDetails />}
       {!miniCentral && <section aria-label="יתרונות השירות" className="theme-section-clean py-5 sm:py-8">
         <div className="section-container grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {trustItems.map((item) => (
@@ -149,7 +150,7 @@ export function ServiceLandingView({
             sizes="(min-width: 1024px) 40vw, 100vw" />
         </div>
       </section>}
-      <section className="section-block theme-section-contrast">
+      <section className="section-block premium-service-section theme-section-contrast">
         <div className="section-container">
           <SectionHeading eyebrow={copy?.processEyebrow || "תהליך מסודר"} title={config.processTitle} description={config.processDescription} />
           <ol className={`mt-7 grid gap-4 sm:mt-10 sm:grid-cols-2 ${miniCentral ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
@@ -196,7 +197,7 @@ export function ServiceLandingView({
         </div>
       </section>}
       {config.video ? (
-        <section className="section-block theme-section-contrast">
+        <section className="section-block premium-service-section theme-section-contrast">
           <div className="section-container">
             <SectionHeading
               eyebrow="וידאו מהשטח"
@@ -272,16 +273,18 @@ export function ServiceLandingView({
           </div>
         </div>
       </section>
+      {miniCentral && !preview ? <GuideLinks /> : null}
+      {propertyCleaning && !preview ? <GuideLinks topic="property" /> : null}
       <section id="contact-form" className="scroll-mt-24 section-block theme-section-soft pb-28 sm:pb-20">
         <div className="section-container grid items-start gap-7 lg:grid-cols-[0.78fr_1.22fr] lg:gap-10">
           <div className="lg:sticky lg:top-28">
             <p className="text-sm font-black text-turquoise-dark">{copy?.contactEyebrow || `הצעת מחיר עבור ${config.serviceName}`}</p>
             <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{copy?.contactTitle || "השאירו פרטים ונחזור אליכם"}</h2>
             <p className="mt-4 text-base leading-8 theme-muted">
-              {preview ? "תצוגה מקדימה בלבד — הטופס ופעולות יצירת הקשר מושבתים." : copy?.contactDescription || "השירות כבר מסומן בטופס. הפרטים נשלחים דרך טופס האתר הקיים ישירות לצוות CleanBrothers."}
+              {preview ? "תצוגה מקדימה בלבד — הטופס ופעולות יצירת הקשר מושבתים." : propertyCleaning ? "בחרו בטופס ניקיון אחרי שיפוץ או לפני אכלוס. השאירו פרטים ונחזור לבירור מצב הנכס, ההיקף והמועד המבוקש." : copy?.contactDescription || "השירות כבר מסומן בטופס. הפרטים נשלחים דרך טופס האתר הקיים ישירות לצוות CleanBrothers."}
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <a href={whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{copy?.contactWhatsappCta || "שלחו תמונה ב-WhatsApp"}</a>
+              <a data-whatsapp-location="contact" href={whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{copy?.contactWhatsappCta || "שלחו תמונה ב-WhatsApp"}</a>
               <a href={phoneHref} aria-disabled={preview || undefined} className="btn-secondary inline-flex">
                 התקשרו: {phoneNumber}
               </a>
@@ -292,10 +295,10 @@ export function ServiceLandingView({
       </section>
       <div
         aria-label={`פעולות מהירות עבור ${config.serviceName}`}
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden"
+        className="mobile-service-actions fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
-          <a href={whatsappHref} aria-disabled={preview || undefined} className={`flex min-h-11 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black ${miniCentral ? "text-navy" : "text-white"} focus:ring-2 focus:ring-white`}>
+          <a data-whatsapp-location="sticky" href={whatsappHref} aria-disabled={preview || undefined} className={`flex min-h-11 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black ${miniCentral ? "text-navy" : "text-white"} focus:ring-2 focus:ring-white`}>
             WhatsApp
           </a>
           <a href={phoneHref} aria-disabled={preview || undefined} className="flex min-h-11 items-center justify-center rounded-xl border border-white/25 px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-turquoise">

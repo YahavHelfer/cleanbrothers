@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
-import { serviceOptions } from "@/data/site";
+import { contactServiceOptions } from "@/data/site";
 import { parseContactLeadOutcome } from "@/lib/contact-lead-contract";
 import {
   getOrCreateContactSubmissionAttempt,
@@ -33,12 +33,17 @@ const initialState: FormState = {
 
 type ContactFormProps = {
   initialService?: string;
+  businessAc?: boolean;
 };
 
-export function ContactForm({ initialService = "" }: ContactFormProps) {
-  const defaultService = serviceOptions.includes(initialService)
-    ? initialService
-    : "";
+export function ContactForm({ initialService = "", businessAc = false }: ContactFormProps) {
+  const propertyCleaning = initialService === "ניקיון אחרי שיפוץ ולפני אכלוס";
+  const availableServices = propertyCleaning
+    ? contactServiceOptions.filter(option => ["before_occupancy", "after_renovation"].includes(option.value))
+    : contactServiceOptions;
+  const defaultService = contactServiceOptions.find(
+    (option) => option.value === initialService || option.label === initialService,
+  )?.value ?? "";
   const [values, setValues] = useState<FormState>(() => ({
     ...initialState,
     service: defaultService,
@@ -84,7 +89,10 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
 
     setErrors(nextErrors);
 
-    if (Object.keys(nextErrors).length > 0) {
+    const firstInvalidField = Object.keys(nextErrors)[0];
+    if (firstInvalidField) {
+      const field = event.currentTarget.elements.namedItem(firstInvalidField);
+      if (field instanceof HTMLElement) field.focus();
       return;
     }
 
@@ -112,7 +120,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
           phone: values.phone,
           service: values.service,
           city: values.city,
-          message: `עמוד הפנייה: ${window.location.pathname}\n${values.message}`,
+          message: `עמוד הפנייה: ${window.location.pathname}\n${businessAc ? "פנייה עסקית: ניקוי מזגנים לעסקים, משרדים ומוסדות.\n" : ""}${values.message}`,
           submissionId,
           marketingAttribution: getStoredMarketingAttribution(),
         }),
@@ -204,8 +212,13 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
           מעדיפים שנחזור אליכם?
         </h2>
         <p className="mt-2 text-sm leading-7 theme-muted sm:text-base">
-          אפשר להשאיר פרטים כאן, אבל לקבלת הערכת מחיר מדויקת ומהירה יותר כדאי
-          לשלוח תמונה בוואטסאפ.
+          {businessAc
+            ? "השאירו שם וטלפון לקבלת הצעת מחיר לעסק. אפשר לציין סוג עסק, מספר מזגנים וניקוי חד פעמי או תקופתי."
+            : defaultService === "ניקוי מזגן מיני מרכזי"
+            ? "אין צורך בתמונה כדי להשאיר פנייה. השאירו שם וטלפון ונחזור אליכם לתיאום; נבדוק יחד את הגישה למזגן ואת היקף הניקוי."
+            : propertyCleaning
+              ? "בחרו ניקיון אחרי שיפוץ או לפני אכלוס, השאירו שם וטלפון ונחזור לבירור היקף העבודה. אין חובה לצרף תמונה."
+              : "אפשר להשאיר פרטים כאן, אבל לקבלת הערכת מחיר מדויקת ומהירה יותר כדאי לשלוח תמונה בוואטסאפ."}
         </p>
       </div>
 
@@ -217,6 +230,8 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
             name="fullName"
             className="field"
             type="text"
+            autoComplete="name"
+            aria-required="true"
             value={values.fullName}
             onChange={(event) => updateField("fullName", event.target.value)}
             placeholder="ישראל ישראלי"
@@ -237,6 +252,8 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
             name="phone"
             className="field"
             type="tel"
+            autoComplete="tel"
+            aria-required="true"
             value={values.phone}
             onChange={(event) => updateField("phone", event.target.value)}
             placeholder="0559577731"
@@ -255,6 +272,7 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
           <select
             id="service"
             name="service"
+            aria-required="true"
             className="field"
             value={values.service}
             onChange={(event) => updateField("service", event.target.value)}
@@ -262,10 +280,10 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
             aria-describedby={errors.service ? "service-error" : undefined}
           >
             <option value="" disabled>
-              בחרו שירות
+              {propertyCleaning ? "אחרי שיפוץ או לפני אכלוס?" : "בחרו שירות"}
             </option>
-            {serviceOptions.map((option) => (
-              <option key={option}>{option}</option>
+            {availableServices.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
           {errors.service ? (
@@ -276,12 +294,13 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
         </label>
 
         <label className="grid gap-2 font-bold">
-          עיר
+          עיר (לא חובה)
           <input
             id="city"
             name="city"
             className="field"
             type="text"
+            autoComplete="address-level2"
             value={values.city}
             onChange={(event) => updateField("city", event.target.value)}
             placeholder="לדוגמה: תל אביב"
@@ -289,14 +308,14 @@ export function ContactForm({ initialService = "" }: ContactFormProps) {
         </label>
 
         <label className="grid gap-2 font-bold sm:col-span-2">
-          הודעה
+          הודעה (לא חובה)
           <textarea
             id="message"
             name="message"
             className="field min-h-32 resize-none"
             value={values.message}
             onChange={(event) => updateField("message", event.target.value)}
-            placeholder={defaultService === "ניקוי מזגן מיני מרכזי" ? "ציינו את היישוב, דגם המזגן ופרטים על פתח הגישה" : "כתבו בקצרה מה תרצו לנקות ומה מצב הריפוד"}
+            placeholder={businessAc ? "סוג העסק, מספר המזגנים, סוגי המערכות וניקוי חד פעמי או תקופתי" : defaultService === "ניקוי מזגן מיני מרכזי" ? "ציינו את היישוב, דגם המזגן ופרטים על פתח הגישה" : propertyCleaning ? "יישוב, גודל הנכס, מועד כניסה ומה בוצע בשיפוץ" : "כתבו בקצרה מה תרצו לנקות ומה מצב הריפוד"}
           />
         </label>
       </div>

@@ -149,7 +149,7 @@ export function CleaningProcess({ content = processContent, preview = false }: {
             href={getWhatsAppLink(
               "היי, אשמח לקבל הצעת מחיר לניקוי ריפודים.",
             )}
-            aria-label="פתיחת וואטסאפ לקבלת הצעת מחיר"
+            aria-label="התחילו עכשיו בוואטסאפ"
             className="btn-primary inline-flex"
           >
             התחילו עכשיו בוואטסאפ

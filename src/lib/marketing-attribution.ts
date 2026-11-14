@@ -1,4 +1,4 @@
-import { hasAnalyticsConsent } from "@/lib/consent";
+import { hasAnalyticsConsent, hasAdStorageConsent } from "@/lib/consent";
 import {
   ATTRIBUTION_COOKIE_NAME,
   ATTRIBUTION_MAX_AGE_SECONDS,
@@ -29,7 +29,7 @@ function getCookieOptions() {
 }
 
 export function getStoredMarketingAttribution(): MarketingAttribution {
-  if (!hasAnalyticsConsent()) {
+  if ((!hasAnalyticsConsent() || !hasAdStorageConsent())) {
     return {};
   }
 
@@ -49,7 +49,7 @@ export function getStoredMarketingAttribution(): MarketingAttribution {
 }
 
 export function captureFirstTouchMarketingAttribution() {
-  if (typeof window === "undefined" || !hasAnalyticsConsent()) {
+  if (typeof window === "undefined" || (!hasAnalyticsConsent() || !hasAdStorageConsent())) {
     return;
   }
 

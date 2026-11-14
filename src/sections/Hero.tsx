@@ -25,84 +25,28 @@ export function Hero({ content = heroContent, backgroundSrc = "/images/hero/hero
   content?: typeof heroContent; backgroundSrc?: string; preview?: boolean;
 } = {}) {
   return (
-    <section className="relative overflow-hidden bg-page-hero">
-      <ImageWithFallback
-        src={backgroundSrc}
-        alt={content.backgroundAlt}
-        className="image-reveal absolute inset-0 h-full w-full"
-        imageClassName="object-cover object-[58%_48%] sm:object-[55%_45%] lg:object-[50%_45%]"
-        fallbackLabel=""
-        fallbackClassName="from-navy via-navy-soft to-ink"
-        preload
-      />
-      <div className="absolute inset-0 bg-navy/14" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_44%,_rgba(8,19,31,0.02)_0%,_rgba(8,19,31,0.22)_54%,_rgba(8,19,31,0.5)_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(8,19,31,0.10)_0%,_rgba(8,19,31,0.14)_42%,_rgba(8,19,31,0.52)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-l from-transparent via-turquoise/45 to-transparent" />
-
-      <div className="section-container relative flex min-h-[calc(100svh-74px)] items-center justify-center py-8 pb-12 sm:py-18 lg:min-h-[calc(100vh-168px)] lg:py-20">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-7 [direction:ltr] lg:grid-cols-[0.86fr_1.14fr] lg:gap-12">
-          <div className="reveal-soft stagger-1 relative mx-auto mb-1 w-full max-w-[16rem] bg-transparent sm:max-w-[20rem] lg:mb-0 lg:max-w-[34rem]">
-            <div className="pointer-events-none absolute inset-[12%] hidden rounded-full bg-cyan-300/20 opacity-80 blur-3xl md:block" />
-            <div className="pointer-events-none absolute bottom-[6%] left-1/2 hidden h-[18%] w-[58%] -translate-x-1/2 rounded-full bg-turquoise/12 opacity-80 blur-2xl md:block" />
-            <Image
-              src="/images/mascots/cleanbrothers-mascots.png"
-              alt={mascotAlt}
-              width={1536}
-              height={1024}
-              className="mascot-float mascot-render-safe relative z-10 h-auto w-full bg-transparent object-contain"
-              sizes="(min-width: 1024px) 544px, (min-width: 640px) 320px, 256px"
-              priority
-            />
+    <section className="premium-hero relative overflow-hidden">
+      <div aria-hidden="true" className="hero-orbit" />
+      <div className="section-container premium-hero-grid">
+        <div className="hero-copy">
+          <p className="hero-eyebrow">{content.eyebrow}</p>
+          <h1>{content.title}</h1>
+          <p className="hero-description">{content.description}</p>
+          <div className="hero-actions">
+            {preview ? <span className="btn-whatsapp inline-flex" aria-disabled="true">{content.primaryLabel}</span> :
+              <a data-whatsapp-location="hero" href={getWhatsAppLink()} className="btn-whatsapp inline-flex">{content.primaryLabel}<span aria-hidden="true">↗</span></a>}
+            {preview ? <span className="btn-secondary inline-flex" aria-disabled="true">{content.secondaryLabel}</span> :
+              <Link href="/services" className="btn-secondary inline-flex">{content.secondaryLabel}</Link>}
           </div>
-
-          <div className="mx-auto max-w-4xl text-center [direction:rtl] lg:text-right">
-          <Image
-            src="/images/logo/cleanbrothers-logo.png"
-            alt="CleanBrothers"
-            width={280}
-            height={160}
-            className="reveal-soft stagger-1 mx-auto mb-5 hidden h-auto w-[12.5rem] object-contain drop-shadow-[0_16px_42px_rgba(8,19,31,0.46)] sm:block lg:mx-0 lg:mb-6 lg:w-[16rem]"
-            sizes="(min-width: 1024px) 256px, 200px"
-            preload
-          />
-
-          <p className="reveal stagger-2 mb-3 inline-flex rounded-full border border-turquoise/35 bg-navy/35 px-3 py-1.5 text-xs font-bold text-turquoise backdrop-blur sm:mb-5 sm:px-4 sm:py-2 sm:text-sm lg:mb-4">
-            {content.eyebrow}
-          </p>
-
-          <h1 className="reveal stagger-3 mx-auto max-w-4xl text-[2rem] font-black leading-[1.13] text-white min-[380px]:text-[2.18rem] sm:text-5xl lg:mx-0 lg:text-[4.05rem]">
-            {content.title}
-          </h1>
-
-          <p className="reveal stagger-4 mx-auto mt-4 max-w-2xl text-base leading-7 text-white/86 sm:mt-6 sm:text-xl sm:leading-9 lg:mx-0">
-            {content.description}
-          </p>
-
-          <div className="reveal stagger-5 mx-auto mt-6 flex max-w-2xl flex-col justify-center gap-3 sm:flex-row sm:flex-wrap lg:mx-0 lg:justify-start">
-            {preview ? <span className="btn-primary inline-flex" aria-disabled="true">{content.primaryLabel}</span> : <a
-              href={getWhatsAppLink(
-                "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לשירות ניקיון.",
-              )}
-              className="btn-primary inline-flex"
-            >
-              {content.primaryLabel}
-            </a>}
-            {preview ? <span className="btn-secondary inline-flex text-white" aria-disabled="true">{content.secondaryLabel}</span>
-              : <Link href="/services" className="btn-secondary inline-flex text-white">{content.secondaryLabel}</Link>}
-          </div>
-
-          <div className="reveal stagger-6 mx-auto mt-5 flex max-w-2xl flex-wrap justify-center gap-1.5 sm:mt-6 sm:gap-2 lg:mx-0 lg:justify-start">
-            {content.trustChips.map((item) => (
-              <div
-                key={item}
-                className="rounded-full border border-white/12 bg-navy/26 px-2.5 py-1 text-[0.7rem] font-black text-white/84 backdrop-blur-md transition duration-300 hover:border-turquoise/35 hover:text-turquoise sm:px-3 sm:py-1.5 sm:text-sm"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
+          <ul className="hero-trust">{content.trustChips.map(item => <li key={item}><span aria-hidden="true">✓</span>{item}</li>)}</ul>
         </div>
+        <div className="hero-art">
+          <ImageWithFallback src={backgroundSrc} alt={content.backgroundAlt} className="hero-service-photo"
+            imageClassName="object-cover object-center" fallbackClassName="from-surface-soft to-white" fetchPriority="high"
+            sizes="(min-width: 1024px) 48vw, (min-width: 640px) 70vw, 90vw" />
+          <div className="hero-mascot"><Image src="/images/mascots/cleanbrothers-mascots.png" alt={mascotAlt}
+            width={1536} height={1024} className="mascot-render-safe h-auto w-full" sizes="(min-width: 1024px) 270px, 130px" /></div>
+          <div className="hero-photo-label"><span aria-hidden="true">✦</span> CleanBrothers</div>
         </div>
       </div>
     </section>

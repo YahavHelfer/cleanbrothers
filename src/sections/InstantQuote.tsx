@@ -221,7 +221,8 @@ export function InstantQuote() {
                   הפריט.
                 </p>
                 <a
-                  href={getWhatsAppLink(whatsAppMessage)}
+                  data-whatsapp-location="quote"
+                href={getWhatsAppLink(whatsAppMessage)}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="פתיחת וואטסאפ עם פרטי הצעת המחיר"

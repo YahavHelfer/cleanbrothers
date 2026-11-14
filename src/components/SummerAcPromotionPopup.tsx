@@ -132,7 +132,7 @@ export function SummerAcPromotionPopup({ promotion }: { promotion: AirConditione
           ×
         </button>
 
-        <AcPromotionContent promotion={promotion} whatsappHref={whatsappHref} onContact={() => trackGoogleAnalyticsEvent("promotion_whatsapp_click")} />
+        <AcPromotionContent promotion={promotion} whatsappHref={whatsappHref} />
       </div>
     </div>,
     document.body,

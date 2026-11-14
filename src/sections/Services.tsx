@@ -2,6 +2,8 @@ import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
 import { SectionHeading } from "@/components/SectionHeading";
 import { WindowCleaningVisual } from "@/components/WindowCleaningVisual";
 import Link from "next/link";
+import { getWhatsAppMessage, resolveWhatsAppService } from "@/lib/whatsapp-messages";
+import { getWhatsAppLink } from "@/lib/whatsapp";
 import { baselineServiceImages, type HomeServiceCard } from "@/cms/home/service-card-images";
 import type { BlockMedia } from "@/cms/pages/PageBlocksView";
 import { services } from "@/data/site";
@@ -77,7 +79,7 @@ function ServiceAccentIcon({ title }: { title: string }) {
   );
 }
 
-export function Services({ content = servicesContent, media = {} }: { content?: typeof servicesContent; media?: BlockMedia } = {}) {
+export function Services({ content = servicesContent, media = {}, preview = false }: { content?: typeof servicesContent; media?: BlockMedia; preview?: boolean } = {}) {
   const primaryServices = content.serviceKeys.map(key => {
     const service = services.find(row => row.landingPath === `/${key}`);
     const copy = content.cards[key];
@@ -112,7 +114,7 @@ export function Services({ content = servicesContent, media = {} }: { content?: 
             <article
               key={service.landingPath}
               data-service-card={service.landingPath.slice(1)}
-              className={`card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
+              className={`premium-service-card card-lift reveal group overflow-hidden rounded-[2rem] border theme-card hover:border-turquoise/35 hover:shadow-turquoise/10 stagger-${index + 1}`}
             >
               <div className="relative">
                 {service.landingPath === "/window-cleaning" && !service.images.length ? (
@@ -152,13 +154,14 @@ export function Services({ content = servicesContent, media = {} }: { content?: 
                   {service.description}
                 </p>
 
-                <Link
+                <div className="service-card-actions"><Link
                   href={service.landingPath}
-                  aria-label={`מידע נוסף וקבלת הצעת מחיר עבור ${service.title}`}
+                  aria-label={`לפרטים נוספים על ${service.title}`}
                   className="btn-primary mt-3 inline-flex min-h-10 px-4 py-2 text-xs sm:mt-6 sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
                 >
-                  לפרטים וקבלת מחיר
+                  לפרטים נוספים
                 </Link>
+                <a aria-disabled={preview || undefined} data-whatsapp-location="service_card" href={preview ? undefined : getWhatsAppLink(getWhatsAppMessage(resolveWhatsAppService(service.landingPath)))} className="service-quote-link" aria-label={`הצעת מחיר בוואטסאפ עבור ${service.title}`}>הצעת מחיר <span aria-hidden="true">↗</span></a></div>
                 <p className="mt-2 hidden text-xs font-bold theme-muted sm:mt-3 sm:block">
                   אפשר לשלוח תמונה ולקבל הערכת מחיר ללא התחייבות.
                 </p>

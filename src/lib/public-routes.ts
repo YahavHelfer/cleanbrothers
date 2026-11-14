@@ -1,11 +1,14 @@
 import { managedServiceKeys } from "@/content/service-registry";
+import { guidePaths } from "@/content/guide-routes";
 
 // Explicit route ownership: shared by the sitemap and the pre-render 404 guard.
 // Published CMS slugs are resolved separately, through their existing allowlist.
 export const publicPagePaths = [
   "/", "/services", ...managedServiceKeys.map(key => `/${key}`),
+  "/business-ac-cleaning",
   "/gallery", "/about", "/contact", "/privacy-policy",
   "/accessibility-statement", "/data-deletion",
+  ...guidePaths,
 ] as const;
 
 export function isPublicPagePath(path: string): boolean {

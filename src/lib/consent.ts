@@ -1,4 +1,4 @@
-export type ConsentChoice = "unknown" | "accepted" | "rejected";
+export type ConsentChoice = "unknown" | "accepted" | "rejected" | "analytics" | "marketing";
 
 export type GoogleConsentState = {
   analytics_storage: "granted" | "denied";
@@ -59,6 +59,7 @@ export function parseStoredConsentValue(value: string | null): ConsentChoice {
     return "rejected";
   }
 
+  if (value === "analytics" || value === "marketing") return value;
   return "unknown";
 }
 
@@ -82,7 +83,13 @@ export function buildConsentSnapshotFromCookie(
 }
 
 export function getConsentState(choice: ConsentChoice): GoogleConsentState {
-  return choice === "accepted" ? GRANTED_CONSENT : DENIED_CONSENT;
+  if (choice === "accepted") return GRANTED_CONSENT;
+  return { ...DENIED_CONSENT,
+    analytics_storage: choice === "analytics" ? "granted" : "denied",
+    ad_storage: choice === "marketing" ? "granted" : "denied",
+    ad_user_data: choice === "marketing" ? "granted" : "denied",
+    ad_personalization: choice === "marketing" ? "granted" : "denied",
+  };
 }
 
 export function getStoredConsent(): ConsentChoice {
@@ -105,15 +112,15 @@ export function getStoredConsent(): ConsentChoice {
 }
 
 export function hasAnalyticsConsent() {
-  return getStoredConsent() === "accepted";
+  return ["accepted", "analytics"].includes(getStoredConsent());
 }
 
 export function hasAdStorageConsent() {
-  return getStoredConsent() === "accepted";
+  return ["accepted", "marketing"].includes(getStoredConsent());
 }
 
 export function hasAdUserDataConsent() {
-  return getStoredConsent() === "accepted";
+  return ["accepted", "marketing"].includes(getStoredConsent());
 }
 
 export function synchronizeConsentCookie(choice: ConsentChoice) {
@@ -121,8 +128,8 @@ export function synchronizeConsentCookie(choice: ConsentChoice) {
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
   const sharedOptions = `Path=/; SameSite=Lax${secure}`;
 
-  if (choice === "accepted" || choice === "rejected") {
-    document.cookie = `${CONSENT_COOKIE_NAME}=${choice}; Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}; ${sharedOptions}`;
+  if (choice !== "unknown") {
+    document.cookie = `${CONSENT_COOKIE_NAME}=${choice === "accepted" ? "accepted" : "rejected"}; Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}; ${sharedOptions}`;
   } else {
     document.cookie = `${CONSENT_COOKIE_NAME}=; Max-Age=0; ${sharedOptions}`;
   }
@@ -148,6 +155,8 @@ export function updateConsent(choice: Exclude<ConsentChoice, "unknown">) {
 
   try {
     window.gtag?.("consent", "update", getConsentState(choice));
+  } catch {
+    // A blocked analytics provider cannot prevent saving a privacy choice.
   } finally {
     window.dispatchEvent(
       new CustomEvent<ConsentChoice>(CONSENT_CHANGE_EVENT, { detail: choice }),
@@ -168,6 +177,8 @@ export function subscribeToConsentChanges(
   const handleStorageChange = (event: StorageEvent) => {
     if (event.key === CONSENT_STORAGE_KEY) {
       currentPageConsent = parseStoredConsentValue(event.newValue);
+      synchronizeConsentCookie(currentPageConsent);
+      window.gtag?.("consent", "update", getConsentState(currentPageConsent));
       listener(currentPageConsent);
     }
   };
@@ -215,8 +226,10 @@ export function getGoogleConsentBootstrapScript() {
       var storedConsent = window.localStorage.getItem(${storageKey});
       var acceptedConsent = storedConsent === 'accepted' || storedConsent === 'yes' || storedConsent === 'approved';
       var rejectedConsent = storedConsent === 'rejected' || storedConsent === 'no';
+      var analyticsOnly = storedConsent === 'analytics';
+      var marketingOnly = storedConsent === 'marketing';
       var cookieSecure = window.location.protocol === 'https:' ? '; Secure' : '';
-      if (acceptedConsent || rejectedConsent) {
+      if (acceptedConsent || rejectedConsent || analyticsOnly || marketingOnly) {
         document.cookie = ${consentCookieName} + '=' + (acceptedConsent ? 'accepted' : 'rejected') + '; Path=/; Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax' + cookieSecure;
       } else {
         document.cookie = ${consentCookieName} + '=; Path=/; Max-Age=0; SameSite=Lax' + cookieSecure;
@@ -224,13 +237,13 @@ export function getGoogleConsentBootstrapScript() {
       if (!acceptedConsent) {
         document.cookie = ${attributionCookieName} + '=; Path=/; Max-Age=0; SameSite=Lax' + cookieSecure;
       }
-      if (acceptedConsent || rejectedConsent) {
+      if (acceptedConsent || rejectedConsent || analyticsOnly || marketingOnly) {
         var consentValue = acceptedConsent ? 'granted' : 'denied';
         window.gtag('consent', 'update', {
-          analytics_storage: consentValue,
-          ad_storage: consentValue,
-          ad_user_data: consentValue,
-          ad_personalization: consentValue
+          analytics_storage: acceptedConsent || analyticsOnly ? 'granted' : 'denied',
+          ad_storage: acceptedConsent || marketingOnly ? 'granted' : 'denied',
+          ad_user_data: acceptedConsent || marketingOnly ? 'granted' : 'denied',
+          ad_personalization: acceptedConsent || marketingOnly ? 'granted' : 'denied'
         });
       }
     } catch (error) {

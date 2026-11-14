@@ -1,13 +1,17 @@
 import { businessConfig } from "@/config/business";
+import { getWhatsAppMessage, resolveWhatsAppService } from "./whatsapp-messages";
 
-export function getWhatsAppLink(message = businessConfig.whatsappDefaultMessage) {
-  // A direct link avoids the website's intermediate attribution redirect.
-  // BusinessEventTracker recognizes wa.me links and still records click_whatsapp.
-  return buildDirectWhatsAppLink(message);
+export function getWhatsAppLink(message: string = businessConfig.whatsappDefaultMessage, pathname = "/") {
+  if (!businessConfig.whatsappPhone) {
+    return "/contact";
+  }
+
+  const service = resolveWhatsAppService(pathname, message);
+  return buildDirectWhatsAppLink(getWhatsAppMessage(service));
 }
 
 export function buildDirectWhatsAppLink(
-  message = businessConfig.whatsappDefaultMessage,
+  message: string = businessConfig.whatsappDefaultMessage,
 ) {
   if (!businessConfig.whatsappPhone) {
     return "/contact";

@@ -3,15 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: string; href: string }> }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    function close(event: KeyboardEvent) {
+      if (event.key === "Escape") { setIsMenuOpen(false); menuButton.current?.focus(); }
+    }
+    if (isMenuOpen) document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [isMenuOpen]);
 
   function isLinkActive(href: string) {
     if (href === "/") {
@@ -47,7 +54,7 @@ export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: st
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[color-mix(in_srgb,var(--background)_78%,transparent)] shadow-[0_8px_24px_rgba(8,19,31,0.05)] backdrop-blur-xl transition duration-300">
+    <header className="premium-header sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[color-mix(in_srgb,var(--background)_78%,transparent)] shadow-[0_8px_24px_rgba(8,19,31,0.05)] backdrop-blur-xl transition duration-300">
       <nav className="section-container grid min-h-[3.4rem] grid-cols-[auto_1fr_auto] items-center gap-2 py-1 lg:min-h-[4.5rem] lg:gap-6 lg:py-1.5">
         <Link
           href="/"
@@ -83,15 +90,16 @@ export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: st
           <ThemeToggle />
           <a
             href={getWhatsAppLink()}
-            aria-label="פתיחת וואטסאפ לקבלת הצעת מחיר"
+            aria-label="קבלו הצעת מחיר בוואטסאפ"
             className="btn-primary hidden whitespace-nowrap px-4 text-sm sm:inline-flex lg:px-7 lg:text-base"
           >
-            <GoogleCallTrackingNumber />
+            קבלו הצעת מחיר
           </a>
           <button
             type="button"
             aria-label={isMenuOpen ? "סגירת תפריט הניווט" : "פתיחת תפריט הניווט"}
             aria-expanded={isMenuOpen}
+            ref={menuButton}
             aria-controls="mobile-navigation"
             onClick={() => setIsMenuOpen((current) => !current)}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--card-border)] text-[var(--foreground)] transition hover:border-turquoise/45 hover:text-turquoise-dark focus:outline-none focus:ring-2 focus:ring-turquoise lg:hidden"
@@ -107,7 +115,8 @@ export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: st
 
         <div
           id="mobile-navigation"
-          className={`${isMenuOpen ? "grid" : "hidden"} col-span-3 grid-cols-2 gap-2 border-t border-[var(--glass-border)] py-3 sm:grid-cols-3 lg:hidden`}
+          aria-label="ניווט במובייל"
+          className={`mobile-navigation ${isMenuOpen ? "grid" : "hidden"} col-span-3 grid-cols-2 gap-2 border-t border-[var(--glass-border)] py-3 sm:grid-cols-3 lg:hidden`}
         >
           {links.map(renderNavLink)}
         </div>
