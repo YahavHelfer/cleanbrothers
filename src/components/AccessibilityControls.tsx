@@ -125,7 +125,7 @@ export function AccessibilityControls() {
   }
 
   return (
-    <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-3 z-50 sm:bottom-5 sm:right-5">
+    <div className="accessibility-dock fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-3 z-50 sm:bottom-5 sm:right-5">
       {isOpen ? (
         <div
           role="dialog"

@@ -15,3 +15,21 @@ coverage/
 playwright-report/
 test-results/
 *.tsbuildinfo
+
+# Review/test material and local credentials are never a runtime deployment.
+/docs/
+/tests/
+/scripts/
+/supabase/
+.env*
+*.tsbuildinfo
+node_modules
+.next
+
+# Non-runtime files excluded from the original production source package.
+/AGENTS.md
+/CLAUDE.md
+/README.md
+/m*
+/next-env.d.ts
+/playwright.config.ts

@@ -13,6 +13,7 @@ type ImageWithFallbackProps = {
   priority?: boolean;
   preload?: boolean;
   sizes?: string;
+  fetchPriority?: "high";
 };
 
 export function ImageWithFallback({
@@ -25,6 +26,7 @@ export function ImageWithFallback({
   priority = false,
   preload = false,
   sizes = "100vw",
+  fetchPriority,
 }: ImageWithFallbackProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -35,7 +37,7 @@ export function ImageWithFallback({
       <div
         aria-hidden="true"
         className={`image-skeleton absolute inset-0 transition-opacity duration-500 ${
-          isLoaded || !shouldShowImage ? "opacity-0" : "opacity-100"
+          isLoaded || !shouldShowImage || preload || priority || fetchPriority === "high" ? "opacity-0" : "opacity-100"
         }`}
       />
 
@@ -45,7 +47,9 @@ export function ImageWithFallback({
           unoptimized={src?.startsWith("/admin/media/file/") || src?.startsWith("/cms-media/")}
           alt={alt}
           fill
-          preload={preload || priority}
+          preload={fetchPriority ? false : preload || priority}
+          fetchPriority={fetchPriority}
+          loading={fetchPriority ? "eager" : undefined}
           sizes={sizes}
           decoding="async"
           className={imageClassName}

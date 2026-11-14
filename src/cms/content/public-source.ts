@@ -1,4 +1,5 @@
 import "server-only";
+import { applyAcPriceRevision } from "@/content/ac-price-revision";
 import { getPublicServiceImages } from "@/cms/service-images/public-source";
 import { withSharedServiceImages } from "@/cms/service-images/presentation";
 import { requireMediaReadEnvironment } from "@/cms/media/environment";
@@ -35,7 +36,8 @@ export const getPublicService = cache(async (key: SharedServiceKey) => {
     requireMediaReadEnvironment();
     return resolveMediaProjection(data.media, "public");
   })() : undefined;
-  return { revisionId: parseRevisionId(data.revisionId), page: withSharedServiceImages(toServiceLanding(key, data.payload, media), await getPublicServiceImages(key)) };
+  const page = withSharedServiceImages(toServiceLanding(key, data.payload, media), await getPublicServiceImages(key));
+  return { revisionId: parseRevisionId(data.revisionId), page: key === "mini-central-air-conditioner-cleaning" ? applyAcPriceRevision(page) : page };
 });
 
 export const getPublicPilot = () => getPublicService(PILOT_KEY);
@@ -59,5 +61,6 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
     global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store", signal: AbortSignal.timeout(8000) }) } });
   const { data, error } = await client.rpc("cms_read_published_service", { target_key: key });
   if (error || !data) throw new Error("Published CMS service unavailable");
-  return { revisionId: parseRevisionId(data.revisionId), content: validateSpecialContent(key, data.payload), media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
+  const content = validateSpecialContent(key, data.payload);
+  return { revisionId: parseRevisionId(data.revisionId), content: key === "air-conditioner-cleaning" ? applyAcPriceRevision(content) : content, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
 });

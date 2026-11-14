@@ -1,4 +1,5 @@
 import { hasAnalyticsConsent } from "@/lib/consent";
+import { sanitizeWhatsAppClickContext, type WhatsAppClickContext } from "./whatsapp-click-context";
 
 export const GA4_MEASUREMENT_ID = "G-B0KGLSC7VG";
 
@@ -7,8 +8,7 @@ export type GoogleAnalyticsBusinessEvent =
   | "click_whatsapp"
   | "click_phone"
   | "promotion_popup_impression"
-  | "promotion_popup_close"
-  | "promotion_whatsapp_click";
+  | "promotion_popup_close";
 
 const SAFE_PATHNAME_PATTERN = /^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*)?\/?$/;
 const MAX_PATHNAME_LENGTH = 120;
@@ -28,6 +28,7 @@ function getSafePagePath() {
 
 export function trackGoogleAnalyticsEvent(
   eventName: GoogleAnalyticsBusinessEvent,
+  context?: WhatsAppClickContext,
 ) {
   if (
     typeof window === "undefined" ||
@@ -52,8 +53,7 @@ export function trackGoogleAnalyticsEvent(
   if (eventName !== "click_whatsapp" && eventName !== "click_phone") {
     if (
       eventName !== "promotion_popup_impression" &&
-      eventName !== "promotion_popup_close" &&
-      eventName !== "promotion_whatsapp_click"
+      eventName !== "promotion_popup_close"
     ) {
       return false;
     }
@@ -63,6 +63,7 @@ export function trackGoogleAnalyticsEvent(
     window.gtag("event", eventName, {
       send_to: GA4_MEASUREMENT_ID,
       page_path: getSafePagePath(),
+      ...(eventName === "click_whatsapp" ? sanitizeWhatsAppClickContext(context) : {}),
       ...(eventName.startsWith("promotion_")
         ? { promotion_name: "summer_ac_cleaning_2026" }
         : {}),

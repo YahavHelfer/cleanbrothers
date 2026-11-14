@@ -1,12 +1,15 @@
 "use client";
 
 import Script from "next/script";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getStoredConsent,
+  hasAnalyticsConsent,
+  type ConsentChoice,
   hasAdStorageConsent,
   subscribeToConsentChanges,
 } from "@/lib/consent";
+import { GA4_MEASUREMENT_ID } from "@/lib/google-analytics";
 import {
   receiveGoogleCallConversion,
   restoreOriginalGoogleCallNumbers,
@@ -34,6 +37,10 @@ export function GoogleAdsTag({
   phoneConversionCssClass,
 }: GoogleAdsTagProps) {
   const googleTagLoadedRef = useRef(false);
+  const initialized = useRef(false);
+  const [consent, setConsent] = useState<ConsentChoice>("unknown");
+  const [loaderId, setLoaderId] = useState<string | null>(null);
+  const gaConfigured = useRef(false);
 
   const configureGoogleCallTracking = useCallback(() => {
     if (!googleTagLoadedRef.current || !hasAdStorageConsent()) return;
@@ -69,10 +76,25 @@ export function GoogleAdsTag({
 
   useEffect(() => {
     const hydrationTimeout = window.setTimeout(() => {
-      if (getStoredConsent() === "accepted") configureGoogleCallTracking();
+      const stored = getStoredConsent();
+      setConsent(stored);
+      if (stored !== "unknown" && stored !== "rejected")
+        setLoaderId(id => id ?? (stored === "analytics" ? GA4_MEASUREMENT_ID : adsId));
+      if (hasAdStorageConsent()) configureGoogleCallTracking();
     }, 0);
     const unsubscribe = subscribeToConsentChanges((choice) => {
-      if (choice === "accepted") {
+      setConsent(choice);
+      if (choice !== "unknown" && choice !== "rejected")
+        setLoaderId(id => id ?? (choice === "analytics" ? GA4_MEASUREMENT_ID : adsId));
+      if (googleTagLoadedRef.current && window.gtag) {
+        if (hasAnalyticsConsent() && !gaConfigured.current) {
+          gaConfigured.current = true; window.gtag("config", GA4_MEASUREMENT_ID);
+        }
+        if (hasAdStorageConsent() && !window.__cleanBrothersGoogleAdsConfigured) {
+          window.__cleanBrothersGoogleAdsConfigured = true; window.gtag("config", adsId);
+        }
+      }
+      if (choice === "accepted" || choice === "marketing") {
         configureGoogleCallTracking();
       } else {
         restoreOriginalGoogleCallNumbers(phoneConversionCssClass);
@@ -83,29 +105,38 @@ export function GoogleAdsTag({
       window.clearTimeout(hydrationTimeout);
       unsubscribe();
     };
-  }, [configureGoogleCallTracking, phoneConversionCssClass]);
+  }, [adsId, configureGoogleCallTracking, phoneConversionCssClass]);
 
   function configureGoogleAds() {
     googleTagLoadedRef.current = true;
+    if (!hasAnalyticsConsent() && !hasAdStorageConsent()) return;
+    if (!initialized.current && window.gtag) {
+      initialized.current = true; window.gtag("js", new Date());
+    }
 
     if (
-      !window.__cleanBrothersGoogleAdsConfigured &&
+      hasAdStorageConsent() && !window.__cleanBrothersGoogleAdsConfigured &&
       typeof window.gtag === "function"
     ) {
       window.__cleanBrothersGoogleAdsConfigured = true;
-      window.gtag("js", new Date());
       window.gtag("config", adsId);
     }
 
+    if (hasAnalyticsConsent() && !gaConfigured.current && window.gtag) {
+      gaConfigured.current = true;
+      window.gtag("config", GA4_MEASUREMENT_ID);
+    }
     configureGoogleCallTracking();
   }
 
+  if (!loaderId || consent === "unknown" || consent === "rejected") return null;
   return (
     <Script
       id="google-ads-gtag-loader"
-      src={`https://www.googletagmanager.com/gtag/js?id=${adsId}`}
+      src={`https://www.googletagmanager.com/gtag/js?id=${loaderId}`}
       strategy="afterInteractive"
       onLoad={configureGoogleAds}
+      onReady={configureGoogleAds}
     />
   );
 }

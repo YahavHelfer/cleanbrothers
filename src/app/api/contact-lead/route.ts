@@ -1,3 +1,4 @@
+import { isSiteReview } from "@/lib/site-review";
 import { NextResponse } from "next/server";
 import {
   isValidContactSubmissionId,
@@ -5,6 +6,7 @@ import {
 } from "@/lib/contact-lead-contract";
 
 const CRM_LEAD_ENDPOINT =
+  process.env.CRM_LEAD_ENDPOINT ||
   "https://cleanbrothers-crm.vercel.app/api/integrations/leads/website";
 const SUBMISSION_ERROR =
   "אירעה שגיאה בשליחת הפרטים, נסו שוב או צרו קשר בוואטסאפ.";
@@ -83,6 +85,7 @@ function sanitizeMarketingAttribution(value: unknown): MarketingAttribution {
 }
 
 export async function POST(request: Request) {
+  if (isSiteReview()) return NextResponse.json({ error: "סביבת תצוגה: פניות אינן נשלחות." }, { status: 403 });
   let body: unknown;
 
   try {

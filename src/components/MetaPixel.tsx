@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   getStoredConsent,
+  hasAdStorageConsent,
   subscribeToConsentChanges,
   type ConsentChoice,
 } from "@/lib/consent";
@@ -36,14 +37,14 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
   }, []);
 
   useEffect(() => {
-    if (consent === "rejected") {
+    if (!hasAdStorageConsent()) {
       pageViewReportedForConsentRef.current = false;
       stopPendingMetaPixelInitialization();
       return;
     }
 
     if (
-      consent !== "accepted" ||
+      !hasAdStorageConsent() ||
       pageViewReportedForConsentRef.current ||
       !initializeMetaPixel(pixelId)
     ) {
@@ -60,7 +61,7 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
     }
 
     previousPathname.current = pathname;
-    if (consent === "accepted") {
+    if (hasAdStorageConsent()) {
       trackMetaPixelPageView();
     }
   }, [consent, pathname]);

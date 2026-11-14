@@ -1,4 +1,4 @@
-import { hasAdUserDataConsent } from "@/lib/consent";
+import { hasAdUserDataConsent, hasAdStorageConsent } from "@/lib/consent";
 
 const GOOGLE_ADS_LEAD_CONVERSION_SEND_TO =
   "AW-18271875274/DNSiCK3vzcUcEMrh2ohE";
@@ -16,8 +16,9 @@ export function normalizeIsraeliMobileForGoogleAds(phone: string) {
     return `+972${compactPhone.slice(1)}`;
   }
 
-  if (/^\+9725\d{8}$/.test(compactPhone)) {
-    return compactPhone;
+  const internationalPhone = compactPhone.replace(/^(?:\+|00)/, "");
+  if (/^9725\d{8}$/.test(internationalPhone)) {
+    return `+${internationalPhone}`;
   }
 
   return null;
@@ -78,7 +79,7 @@ export function reportGoogleAdsLeadConversion(
   transactionId: string,
   phone: string,
 ) {
-  if (typeof window === "undefined" || typeof window.gtag !== "function") {
+  if (typeof window === "undefined" || typeof window.gtag !== "function" || !hasAdStorageConsent()) {
     return;
   }
 

@@ -81,7 +81,6 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
             <p className="mb-2 text-sm font-black text-white sm:mb-3">יצירת קשר</p>
             <a
               href={phoneHref}
-              aria-label="חיוג ל-CleanBrothers"
               className="text-lg font-black text-turquoise transition hover:text-white focus:outline-none focus:ring-2 focus:ring-turquoise sm:text-xl"
             >
               <GoogleCallTrackingNumber>{settings.phoneDisplay}</GoogleCallTrackingNumber>
@@ -89,7 +88,6 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
             <p className="text-sm text-white/70">שעות פעילות: {businessConfig.operatingHoursDisplay}</p>
             <a
               href={emailHref}
-              aria-label="שליחת אימייל ל-CleanBrothers"
               className="mt-1 block text-xs font-bold text-white/64 transition hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:text-sm"
             >
               {settings.email}
@@ -97,8 +95,7 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
             <div className="mt-2 sm:mt-3">
               <a
                 href={getWhatsAppLink()}
-                aria-label="שליחת תמונה בוואטסאפ וקבלת מחיר מ-CleanBrothers"
-                className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
+                  className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 {content.whatsappCtaLabel}
               </a>

@@ -221,21 +221,21 @@ export function BeforeAfterCard({
             value={slider}
             onChange={(event) => setSlider(Number(event.target.value))}
             aria-label={`השוואת לפני ואחרי עבור ${title}`}
-            className="absolute inset-x-3 bottom-2.5 h-2.5 cursor-ew-resize touch-pan-x appearance-none rounded-full bg-white/35 accent-turquoise backdrop-blur focus:outline-none focus:ring-2 focus:ring-turquoise sm:inset-x-4 sm:bottom-4 sm:h-2"
+            className="comparison-range absolute inset-x-3 bottom-[4.25rem] h-11 cursor-ew-resize touch-pan-x appearance-none rounded-full bg-white/35 accent-turquoise backdrop-blur focus:outline-none focus:ring-2 focus:ring-turquoise sm:inset-x-4"
           />
 
           <div className="absolute bottom-2.5 left-2.5 flex gap-1 sm:bottom-4 sm:left-4 sm:gap-2">
             <button
               type="button"
               onClick={() => setLightbox("before")}
-              className="rounded-full border border-white/20 bg-navy/68 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3 sm:py-1 sm:text-xs"
+              className="min-h-11 min-w-11 rounded-full border border-white/20 bg-navy/68 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3 sm:py-1 sm:text-xs"
             >
               לפני
             </button>
             <button
               type="button"
               onClick={() => setLightbox("after")}
-              className="rounded-full border border-white/20 bg-navy/68 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3 sm:py-1 sm:text-xs"
+              className="min-h-11 min-w-11 rounded-full border border-white/20 bg-navy/68 px-2.5 py-0.5 text-[0.68rem] font-black text-white backdrop-blur-sm transition hover:border-turquoise hover:text-turquoise focus:outline-none focus:ring-2 focus:ring-turquoise sm:px-3 sm:py-1 sm:text-xs"
             >
               אחרי
             </button>

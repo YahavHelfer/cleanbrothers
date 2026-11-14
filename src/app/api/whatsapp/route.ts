@@ -1,44 +1,25 @@
+import { isSiteReview } from "@/lib/site-review";
 import { NextRequest, NextResponse } from "next/server";
-import { businessConfig } from "@/config/business";
-import {
-  ATTRIBUTION_COOKIE_NAME,
-  CONSENT_COOKIE_NAME,
-} from "@/lib/marketing-attribution-shared";
-import { requestWhatsAppAttributionToken } from "@/lib/whatsapp-attribution-request";
 import { buildDirectWhatsAppLink } from "@/lib/whatsapp";
-import { buildWhatsAppRedirectMessage } from "@/lib/whatsapp-redirect";
+import { getWhatsAppMessage, isWhatsAppService, resolveWhatsAppService } from "@/lib/whatsapp-messages";
 
 export const dynamic = "force-dynamic";
 
-const CRM_ATTRIBUTION_ENDPOINT =
-  "https://cleanbrothers-crm.vercel.app/api/integrations/whatsapp/attribution";
-const MAX_MESSAGE_LENGTH = 2000;
-const TOKEN_REQUEST_TIMEOUT_MS = 3500;
-
+// Compatibility for previously saved URLs. New links navigate directly to wa.me.
 export async function GET(request: NextRequest) {
+  if (isSiteReview()) return new Response("סביבת תצוגה — פתיחת WhatsApp מושבתת כדי למנוע פניות אמיתיות.", { status: 403 });
   const requestedMessage = request.nextUrl.searchParams.get("message") ?? "";
-  const consent = request.cookies.get(CONSENT_COOKIE_NAME)?.value;
-  const attributionCookie = request.cookies.get(ATTRIBUTION_COOKIE_NAME)?.value;
-  const secret = process.env.CRM_WEBHOOK_SECRET?.trim();
-  const humanMessage =
-    requestedMessage.trim().slice(0, MAX_MESSAGE_LENGTH) ||
-    businessConfig.whatsappDefaultMessage;
-  const outboundMessage = await buildWhatsAppRedirectMessage({
-    consent,
-    attributionCookie,
-    humanMessage,
-    requestToken: (marketingAttribution, consentSnapshot) =>
-      requestWhatsAppAttributionToken({
-        endpoint: new URL(CRM_ATTRIBUTION_ENDPOINT),
-        secret,
-        marketingAttribution,
-        consentSnapshot,
-        timeoutMs: TOKEN_REQUEST_TIMEOUT_MS,
-      }),
-  });
-
+  let pagePath = "/";
+  try {
+    const referrer = new URL(request.headers.get("referer") ?? "");
+    if (referrer.origin === request.nextUrl.origin) pagePath = referrer.pathname;
+  } catch { /* A missing referrer uses the general message. */ }
+  const requestedService = request.nextUrl.searchParams.get("service");
+  const service = isWhatsAppService(requestedService) && requestedService !== "general"
+    ? requestedService : resolveWhatsAppService(pagePath, requestedMessage.slice(0, 2000));
+  const humanMessage = getWhatsAppMessage(service);
   const response = NextResponse.redirect(
-    buildDirectWhatsAppLink(outboundMessage),
+    buildDirectWhatsAppLink(humanMessage),
     307,
   );
   response.headers.set("Cache-Control", "no-store");
