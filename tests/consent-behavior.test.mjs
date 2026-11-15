@@ -182,7 +182,7 @@ test("tag integrations retain one loader and enforce consent gates", () => {
     googleCallTracking,
     /querySelectorAll<HTMLAnchorElement>[\s\S]*'a\[href\^="tel:"\]'/,
   );
-  assert.match(googleCallTracking, /currentHref\.replace\(\/\\D\/g, ""\) !== originalDigits/);
+  assert.match(googleCallTracking, /normalizeCallNumber\(currentHref\) !== originalDigits/);
   assert.match(googleCallTracking, /new MutationObserver/);
   assert.match(googleCallTracking, /characterData: true/);
   assert.match(googleCallTracking, /hasAdStorageConsent\(\)/);

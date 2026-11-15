@@ -1,3 +1,5 @@
+import { whatsappMessages } from "@/lib/whatsapp-messages";
+
 export const CANONICAL_SITE_URL = "https://www.cleanbrothers.co.il";
 const BUSINESS_PHONE =
   cleanEnv(process.env.NEXT_PUBLIC_BUSINESS_PHONE) || "0559577731";
@@ -23,8 +25,7 @@ export const businessConfig = {
   phoneDisplay: BUSINESS_PHONE,
   whatsappPhone: WHATSAPP_PHONE,
   email: BUSINESS_EMAIL,
-  whatsappDefaultMessage:
-    "היי, אשמח לקבל הצעת מחיר לניקוי ספות / ריפודים / שטיחים / רכב.",
+  whatsappDefaultMessage: whatsappMessages.general,
   // Confirmed by the business owner on 2026-10-14.
   operatingHoursDisplay: "ראשון–חמישי 08:00–18:00, שישי 07:30–15:00",
   openingHoursSpecification: [

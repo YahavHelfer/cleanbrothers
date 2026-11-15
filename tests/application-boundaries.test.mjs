@@ -17,7 +17,7 @@ const publicRoutes = [
   "/mattress-cleaning", "/carpet-cleaning", "/car-upholstery-cleaning",
   "/armchair-chair-cleaning", "/delicate-upholstery-cleaning",
   "/air-conditioner-cleaning", "/window-cleaning", "/post-renovation-cleaning", "/mini-central-air-conditioner-cleaning", "/privacy-policy",
-  "/accessibility-statement", "/data-deletion",
+  "/accessibility-statement", "/data-deletion", "/business-ac-cleaning",
 ];
 const appDirectory = resolve(projectRoot, "src/app");
 
@@ -57,7 +57,7 @@ test("all existing public page URLs and the new service are in the public route 
 
 test("business and public campaign API URLs stay outside the UI route groups; preview has no endpoint", () => {
   const handlers = filesIn(appDirectory).filter((file) => file.endsWith("/route.ts"));
-  assert.deepEqual(handlers.map(routeFor).sort(), ["/admin/auth/confirm", "/admin/media/file/[id]", "/admin/media/upload", "/api/cms/public-promotion", "/api/contact-lead", "/api/whatsapp", "/cms-media/[id]"]);
+  assert.deepEqual(handlers.map(routeFor).sort(), ["/admin/auth/confirm", "/admin/media/file/[id]", "/admin/media/upload", "/api/cms/public-promotion", "/api/contact-lead", "/api/website-chat", "/api/whatsapp", "/api/whatsapp/pilot", "/cms-media/[id]"]);
   assert.equal(existsSync(resolve(appDirectory, "layout.tsx")), false);
   assert.deepEqual(
     filesIn(resolve(appDirectory, "(preview)")).map((file) => relative(appDirectory, file)),
@@ -76,7 +76,7 @@ test("public metadata, sitemap and robots preserve canonical routes and behavior
   const sitemap = await load("src/app/sitemap.ts").default();
   assert.deepEqual(
     plain(sitemap).sort((a, b) => a.url.localeCompare(b.url)),
-    publicRoutes.map(route => ({ url: `${businessConfig.siteUrl}${route}` }))
+    [...publicRoutes, ...load("src/content/guide-routes.ts").guidePaths].map(route => ({ url: `${businessConfig.siteUrl}${route}` }))
       .sort((a, b) => a.url.localeCompare(b.url)),
   );
   assert.deepEqual(plain(load("src/app/robots.ts").default()), {
@@ -132,10 +132,10 @@ for (const group of ["admin", "preview"]) {
       const sourcePath = relative(projectRoot, file);
       // Typed page CTA targets reuse the existing WhatsApp URL builder. The
       // authenticated preview disables that target before rendering a link.
-      if (sourcePath !== "src/lib/whatsapp.ts" && !(group === "admin" && homePresentation.has(sourcePath)))
+      if (!["src/lib/whatsapp.ts", "src/lib/whatsapp-messages.ts"].includes(sourcePath) && !(group === "admin" && homePresentation.has(sourcePath)))
         assert.doesNotMatch(sourcePath, /src\/(?:sections\/|app\/\(site\)\/|components\/(?:Google|Meta|BusinessEvent|MarketingAttribution|Cookie|ContactForm|WhatsApp|SummerAc)|lib\/(?:google-|meta-pixel|marketing-attribution|consent|whatsapp|contact-lead))/);
       // Admin now legitimately fetches its dedicated Auth/database service.
-      assert.doesNotMatch(readFileSync(file, "utf8"), sourcePath === "src/lib/whatsapp.ts"
+      assert.doesNotMatch(readFileSync(file, "utf8"), ["src/lib/whatsapp.ts", "src/lib/whatsapp-messages.ts"].includes(sourcePath)
         ? /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|cleanbrothers-crm|\/api\/contact-lead/
         : /googletagmanager\.com|connect\.facebook\.net|\b(?:gtag|fbq)\s*\(|cleanbrothers-crm|\/api\/contact-lead|\/api\/whatsapp/);
     }

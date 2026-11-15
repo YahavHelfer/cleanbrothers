@@ -232,7 +232,7 @@ test("all website WhatsApp CTAs use direct wa.me links with click tracking", () 
     new URL("../src/components/BusinessEventTracker.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(helper, /return buildDirectWhatsAppLink\(message\)/);
+  assert.match(helper, /return buildDirectWhatsAppLink\(getWhatsAppMessage\(service\)\)/);
   assert.match(tracker, /destination\.hostname === "wa.me"/);
 });
 
@@ -254,7 +254,7 @@ test("public WhatsApp route exposes no temporary diagnostic state", () => {
     "utf8",
   );
   assert.match(route, /NextResponse\.redirect\([\s\S]*307/);
-  assert.match(route, /buildDirectWhatsAppLink\(outboundMessage\)/);
+  assert.match(route, /buildDirectWhatsAppLink\(humanMessage\)/);
   assert.doesNotMatch(route, /cb_attribution_debug|X-CB-|AttributionDiagnostic/);
   assert.doesNotMatch(route, /searchParams\.get\(["'](?:marker|consentSnapshot)["']\)/);
   assert.doesNotMatch(route, /request\.(?:json|formData)\(/);

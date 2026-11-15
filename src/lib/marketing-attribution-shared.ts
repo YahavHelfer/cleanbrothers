@@ -1,5 +1,6 @@
 export type MarketingAttribution = Partial<
   Record<
+    | "google_ads_campaign_id"
     | "gclid"
     | "gbraid"
     | "wbraid"
@@ -19,6 +20,7 @@ export const CONSENT_COOKIE_NAME = "cb_analytics_consent";
 export const ATTRIBUTION_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
 
 export const ATTRIBUTION_FIELD_LIMITS = {
+  google_ads_campaign_id: 20,
   gclid: 220,
   gbraid: 220,
   wbraid: 220,
@@ -32,6 +34,7 @@ export const ATTRIBUTION_FIELD_LIMITS = {
 } as const;
 
 export const CAMPAIGN_ATTRIBUTION_FIELDS = [
+  "google_ads_campaign_id",
   "gclid",
   "gbraid",
   "wbraid",
@@ -56,6 +59,7 @@ export function sanitizeMarketingAttribution(
     const raw = input[field];
     if (typeof raw !== "string") continue;
     const trimmed = raw.trim();
+    if (field === "google_ads_campaign_id" && !/^[0-9]{1,20}$/.test(trimmed)) continue;
     if (trimmed) output[field] = trimmed.slice(0, maxLength);
   }
   return output;

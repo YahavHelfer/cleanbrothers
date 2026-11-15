@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { PageBlocksView, pageRevisionMetadata } from "@/cms/pages/PageBlocksView";
-import { getPublicNewPage } from "@/cms/pages/new-public-source";
+import { getGuidePageSource } from "@/content/guide-page-source";
+import { isGuideSlug } from "@/content/guide-routes";
+import { GuidePageView } from "@/components/GuidePageView";
 
 type Props = { params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string,string | string[] | undefined>> };
@@ -15,15 +17,21 @@ function queryString(input: Record<string,string | string[] | undefined>): strin
   return query ? `?${query}` : "";
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const snapshot = await getPublicNewPage((await params).slug);
+  const slug = (await params).slug;
+  const snapshot = await getGuidePageSource(slug);
   if (!snapshot || snapshot.kind === "redirect") return { robots: { index: false, follow: false } };
-  return pageRevisionMetadata(snapshot.page, snapshot.media);
+  const metadata = pageRevisionMetadata(snapshot.page, snapshot.media);
+  return isGuideSlug(slug) && slug !== "guides"
+    ? { ...metadata, openGraph: { ...metadata.openGraph, type: "article" } } : metadata;
 }
 export default async function NewCmsPage({ params, searchParams }: Props) {
-  const snapshot = await getPublicNewPage((await params).slug);
+  const slug = (await params).slug;
+  const snapshot = await getGuidePageSource(slug);
   if (!snapshot) notFound();
   if (snapshot.kind === "redirect")
     permanentRedirect(`/${snapshot.destination}${queryString(await searchParams)}`);
+  if (isGuideSlug(slug)) return <GuidePageView page={snapshot.page} revisionId={snapshot.revisionId}
+    media={snapshot.media} promotions={snapshot.promotions} />;
   return <PageBlocksView page={snapshot.page} revisionId={snapshot.revisionId}
     media={snapshot.media} promotions={snapshot.promotions} preview={false} />;
 }

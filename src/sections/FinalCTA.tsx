@@ -73,14 +73,13 @@ export function FinalCTA({ content = finalCtaContent, preview = false }: {
                 href={getWhatsAppLink(
                   "היי, אשמח לשלוח תמונה ולקבל הערכת מחיר לניקוי מזגן או ריפודים.",
                 )}
-                aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת הערכת מחיר"
+                aria-label={content.whatsappLabel}
                 className="btn-primary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 {content.whatsappLabel}
               </a>}
               {preview ? <span className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base" aria-disabled="true">{content.phoneLabel} {businessConfig.phoneDisplay}</span> : <a
                 href={phoneHref}
-                aria-label="חיוג ל-CleanBrothers"
                 className="btn-secondary inline-flex min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 {content.phoneLabel} <GoogleCallTrackingNumber />

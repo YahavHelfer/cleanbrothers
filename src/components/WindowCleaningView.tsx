@@ -1,3 +1,4 @@
+import { ServiceHero, ServiceIntroduction } from "@/components/ServiceHero";
 import type { SharedServiceImage } from "@/cms/service-images/model";
 import type { ReactNode } from "react";
 import Image from "next/image";
@@ -45,9 +46,8 @@ const serviceJsonLd = {
       <JsonLd id="window-cleaning-breadcrumb-jsonld" data={breadcrumbJsonLd} />
       <JsonLd id="window-cleaning-service-jsonld" data={serviceJsonLd} />
 
-      <section className="theme-section-strong overflow-hidden py-8 sm:py-14 lg:py-18">
-        <div className="section-container">
-          <nav aria-label="פירורי לחם" className="mb-7 text-sm font-bold text-white/70">
+      <ServiceHero title={content.h1} eyebrow={content.copy.heroEyebrow}
+        breadcrumbs={<nav aria-label="פירורי לחם" className="mb-7 text-sm font-bold text-white/70">
             <ol className="flex flex-wrap items-center gap-2">
               <li><Link href="/" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">דף הבית</Link></li>
               <li aria-hidden="true">/</li>
@@ -55,29 +55,16 @@ const serviceJsonLd = {
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-turquoise">ניקוי חלונות</li>
             </ol>
-          </nav>
-
-          <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-            <div className="reveal">
-              <p className="text-sm font-black text-turquoise">{content.copy.heroEyebrow}</p>
-              <h1 className="mt-3 max-w-3xl text-4xl font-black leading-[1.08] text-white sm:text-5xl lg:text-6xl">{content.h1}</h1>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-white/80 sm:text-xl sm:leading-9">{content.copy.heroDescription}</p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <a href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex" aria-label="שליחת תמונות ב-WhatsApp לקבלת הערכת מחיר לניקוי חלונות">
-                  <Icon name="whatsapp" className="ml-2 h-5 w-5" />{content.copy.heroCta}</a>
-                <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="btn-secondary inline-flex text-white" aria-label="חיוג ל-CleanBrothers">
-                  <Icon name="phone" className="ml-2 h-5 w-5" />
-                  {phone ?? "055-957-7731"}
-                </a>
-              </div>
-            </div>
-            <div className="reveal stagger-2 mx-auto w-full max-w-xl">
+          </nav>}
+        actions={<>
+          <a data-whatsapp-location="hero" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-whatsapp inline-flex"><Icon name="whatsapp" className="h-5 w-5" />{content.copy.heroCta}</a>
+          <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="service-call-link"><Icon name="phone" className="h-5 w-5" />{phone ?? "055-957-7731"}</a>
+        </>}
+        media={<div className="reveal stagger-2 mx-auto w-full max-w-xl">
               {hero.length ? <Image unoptimized={hero[0].src.startsWith("/admin/media/file/") || hero[0].src.startsWith("/cms-media/")} src={hero[0].src} alt={hero[0].alt} width={900} height={900} className={`h-full w-full object-cover ${serviceImages?.[0]?.position || "object-center"}`} /> : <WindowCleaningVisual />}
-            </div>
-          </div>
-        </div>
-      </section>
-
+            </div>}
+      />
+      <ServiceIntroduction text={content.copy.heroDescription} />
       <section className="section-block theme-section-clean">
         <div className="section-container grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
           <div>
@@ -112,7 +99,7 @@ const serviceJsonLd = {
         </div>
       </section>
 
-      <section className="section-block theme-section-contrast">
+      <section className="section-block premium-service-section theme-section-contrast">
         <div className="section-container">
           <p className="text-sm font-black text-turquoise">{content.copy.processEyebrow}</p>
           <h2 className="mt-2 text-3xl font-black leading-tight text-white sm:text-4xl">{content.copy.processTitle}</h2>
@@ -166,7 +153,7 @@ const serviceJsonLd = {
             <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{content.copy.contactTitle}</h2>
             <p className="mt-4 text-base leading-8 theme-muted">{content.copy.contactDescription}</p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <a href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{content.copy.heroCta}</a>
+              <a data-whatsapp-location="contact" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-primary inline-flex">{content.copy.heroCta}</a>
               <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="btn-secondary inline-flex">{content.copy.callPrefix}{phone ?? "055-957-7731"}</a>
             </div>
           </div>
@@ -174,9 +161,9 @@ const serviceJsonLd = {
         </div>
       </section>
 
-      <div aria-label="פעולות מהירות עבור ניקוי חלונות" className="fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden">
+      <div aria-label="פעולות מהירות עבור ניקוי חלונות" className="mobile-service-actions fixed inset-x-0 bottom-0 z-50 border-t border-white/15 bg-navy/96 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-12px_30px_rgba(8,19,31,0.22)] backdrop-blur sm:hidden">
         <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
-          <a href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="flex min-h-11 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-white">WhatsApp</a>
+          <a data-whatsapp-location="sticky" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="flex min-h-11 items-center justify-center rounded-xl bg-[#22c55e] px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-white">WhatsApp</a>
           <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="flex min-h-11 items-center justify-center rounded-xl border border-white/25 px-2 text-center text-xs font-black text-white focus:ring-2 focus:ring-turquoise">{content.copy.callCta}</a>
           <a href="#contact-form" className="flex min-h-11 items-center justify-center rounded-xl bg-turquoise px-2 text-center text-xs font-black text-navy focus:ring-2 focus:ring-white">{content.copy.quoteCta}</a>
         </div>

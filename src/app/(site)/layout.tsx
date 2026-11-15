@@ -1,3 +1,5 @@
+import { isWebsiteChatEnabled } from "@/lib/website-chat/config";
+import { isSiteReview } from "@/lib/site-review";
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import Script from "next/script";
@@ -68,27 +70,28 @@ export default async function RootLayout({
         <Script id="google-consent-defaults" strategy="beforeInteractive">
           {getGoogleConsentBootstrapScript()}
         </Script>
-        <GoogleAdsTag
+        {!isSiteReview() && <GoogleAdsTag
           adsId={googleAdsId}
           phoneConversionId={googleAdsPhoneConversionId}
           phoneConversionNumber={googleAdsPhoneConversionNumber}
           phoneConversionCssClass={GOOGLE_CALL_CONVERSION_NUMBER_CLASS}
-        />
-        <BusinessEventTracker />
-        <MarketingAttributionTracker />
-        <MetaPixel pixelId={metaPixelId} />
+        />}
+        {!isSiteReview() && <BusinessEventTracker />}
+        {!isSiteReview() && <MarketingAttributionTracker />}
+        {!isSiteReview() && <MetaPixel pixelId={metaPixelId} />}
+        <a className="skip-link" href="#main-content">דילוג לתוכן הראשי</a>
         <ScrollProgress />
         <Navbar links={chrome.navLinks} />
         <CookieConsent />
         {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
         <PublicCampaigns />
-        <main className="flex-1 bg-background text-foreground motion-safe:animate-[page-enter_420ms_ease-out_both]">
+        <main id="main-content" className="flex-1 bg-background text-foreground">
           {children}
         </main>
         <Footer settings={chrome.settings} content={chrome.footer} links={chrome.navLinks}
           services={chrome.featuredServiceLinks} />
         <AccessibilityControls />
-        <WhatsAppButton />
+        <WhatsAppButton chatEnabled={isWebsiteChatEnabled()} />
       </body>
     </html>
   );

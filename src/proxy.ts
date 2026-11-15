@@ -3,6 +3,7 @@ import { createCmsClient } from "@/cms/client";
 import { isCmsCookie } from "@/cms/config";
 import { newPagePublicAllowed } from "@/cms/pages/new-environment";
 import { isPublicPagePath } from "@/lib/public-routes";
+import { guideUsesCms } from "@/content/guide-environment";
 
 async function localNewPageRoute(request: NextRequest, slug: string): Promise<NextResponse> {
   try {
@@ -28,8 +29,16 @@ async function localNewPageRoute(request: NextRequest, slug: string): Promise<Ne
 }
 
 export async function proxy(request: NextRequest) {
+  if (process.env.SITE_REVIEW_MODE === "1" && request.nextUrl.pathname.startsWith("/admin")) {
+    return new NextResponse("סביבת סקירת עיצוב — ניהול תוכן אינו זמין כאן.", { status: 403 });
+  }
   if (request.nextUrl.pathname !== "/admin" && !request.nextUrl.pathname.startsWith("/admin/")) {
     const slug = request.nextUrl.pathname.slice(1);
+    if (guideUsesCms(slug) && !newPagePublicAllowed(slug)) {
+      return new NextResponse("Not Found", { status: 404, headers: {
+        "Cache-Control": "private, no-store, max-age=0", "X-Robots-Tag": "noindex, nofollow",
+      } });
+    }
     if (newPagePublicAllowed(slug)) return localNewPageRoute(request, slug);
     // The catch-all page sits behind loading.tsx, which can otherwise commit
     // a streamed 200 before notFound() runs. Reject unknown page slugs first.

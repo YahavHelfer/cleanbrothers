@@ -94,7 +94,7 @@ const pricingConfig: Record<ServiceKey, ServiceConfig> = {
     label: "מזגן", icon: "ac", options: [
       { label: "מזגן עילי עד 2 כ״ס (כולל)", ranges: { קל: "199 ₪", בינוני: "199 ₪", קשה: "199 ₪" } },
       { label: "מזגן עילי מעל 2 כ״ס", ranges: { קל: "249 ₪", בינוני: "249 ₪", קשה: "249 ₪" } },
-      { label: "מיני מרכזי", ranges: { קל: "550 ₪", בינוני: "550 ₪", קשה: "550 ₪" } },
+      { label: "מיני מרכזי", ranges: { קל: "450 ₪", בינוני: "450 ₪", קשה: "450 ₪" } },
     ],
   },
 };
@@ -321,16 +321,17 @@ export function QuickPriceEstimate({ content = quickEstimateContent, preview = f
               </div>
 
               <p className="mt-3 rounded-2xl border border-[var(--card-border)] bg-[var(--surface-soft)] px-3.5 py-2.5 text-sm font-bold leading-6 theme-muted sm:mt-4 sm:px-4 sm:py-3">
-                המחירים כוללים מע״מ. מחירי הספות הם מחיר התחלתי. במיני מרכזי נבדקת גישה למנוע ולמאייד; ניקוי תעלות בתוספת 150 ₪ לתעלה. מאשרים סוג והיקף לפני ההגעה.
+                המחירים כוללים מע״מ. מחירי הספות הם מחיר התחלתי. במיני מרכזי נבדקת גישה למנוע ולמאייד; ניקוי תעלות בתוספת 250 ₪ לכל התעלות יחד. מאשרים סוג והיקף לפני ההגעה.
               </p>
             </div>
 
             <div className="mt-4 sm:mt-5">
               {preview ? <span aria-disabled="true" className="btn-primary inline-flex w-full min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base">שלחו תמונה לקבלת מחיר מדויק</span> : <a
+                data-whatsapp-location="quote"
                 href={getWhatsAppLink(whatsAppMessage)}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="פתיחת וואטסאפ לשליחת תמונה וקבלת מחיר מדויק"
+                aria-label="שלחו תמונה לקבלת מחיר מדויק"
                 className="btn-primary inline-flex w-full min-h-10 px-4 py-2 text-xs sm:min-h-12 sm:px-7 sm:py-3.5 sm:text-base"
               >
                 שלחו תמונה לקבלת מחיר מדויק

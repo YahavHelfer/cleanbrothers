@@ -55,7 +55,7 @@ test("block registry is closed, versioned, accessible and has safe defaults", ()
 test("safe CTA resolver preserves current phone and WhatsApp routing and disables preview actions", () => {
   assert.equal(model.resolveSafeTarget({ kind: "internal", path: "/contact" }), "/contact");
   assert.match(model.resolveSafeTarget({ kind: "phone" }), /^tel:[0-9+]+$/);
-  assert.match(model.resolveSafeTarget({ kind: "whatsapp", message: "היי" }), /^\/api\/whatsapp\?message=/);
+  assert.match(model.resolveSafeTarget({ kind: "whatsapp", message: "היי" }), /^https:\/\/wa\.me\/972559577731\?text=/);
   assert.equal(model.resolveSafeTarget({ kind: "whatsapp", message: "היי" }, true), undefined);
   for (const value of [
     { kind: "internal", path: "javascript:alert(1)" }, { kind: "internal", path: "data:text/html" },
