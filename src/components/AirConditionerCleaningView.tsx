@@ -77,6 +77,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
       {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
 
       <ServiceHero title={content.h1} eyebrow={content.copy.heroEyebrow}
+        summary={content.copy.heroDescription}
         breadcrumbs={<nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap gap-2">
                 <li><Link href="/">בית</Link></li><li aria-hidden="true">/</li>
@@ -84,12 +85,16 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
                 <li aria-current="page">{content.h1}</li>
               </ol>
             </nav>}
-        badge={promotion.enabled ? <span>{promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪</span> : undefined}
+        badge={promotion.enabled ? <div>
+          <p>{promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪</p>
+          <p className="mt-2 text-sm font-normal leading-6">{promotion.description}</p>
+        </div> : undefined}
         actions={<>
           <a data-whatsapp-location="hero" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} target="_blank" rel="noreferrer" className="btn-whatsapp inline-flex">
             <Icon name="whatsapp" className="h-5 w-5" />{content.copy.heroCta}
           </a>
           <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="service-call-link"><Icon name="phone" className="h-5 w-5" />{content.copy.callCta}</a>
+          <a href="#contact-form" className="service-callback-link">השאירו פרטים לחזרה</a>
         </>}
         media={<div className="reveal stagger-2 relative aspect-[16/11] overflow-hidden rounded-[1.5rem] border border-white/15 bg-navy shadow-2xl sm:rounded-[2rem] lg:aspect-[4/3]">
             <ServiceImageCarousel
@@ -106,7 +111,14 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
             />
           </div>}
       />
-      <ServiceIntroduction text={content.copy.heroDescription}><ul className="service-intro-trust">{trustItems.map(item => <li key={item}>{item}</li>)}</ul></ServiceIntroduction>
+      <ServiceIntroduction text={content.serviceDescription}>
+        <ul className="service-intro-trust">{trustItems.map(item => <li key={item}>{item}</li>)}</ul>
+        <nav aria-label="מידע על ניקוי מזגנים" className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold underline underline-offset-4">
+          <a href="#ac-pricing">{content.copy.pricingTitle}</a>
+          <a href="#ac-included">{content.copy.cleaningTitle}</a>
+          <a href="#contact-form">{content.copy.contactTitle}</a>
+        </nav>
+      </ServiceIntroduction>
       <section className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
@@ -131,7 +143,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
         </div>
       </section>
 
-      <section className="section-block theme-section-clean">
+      <section id="ac-included" className="scroll-mt-24 section-block theme-section-clean">
         <div className="section-container">
           <SectionHeading
             eyebrow={content.copy.cleaningEyebrow}
@@ -203,7 +215,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
         </div>
       </section>
 
-      <section className="section-block theme-section-soft">
+      <section id="ac-pricing" className="scroll-mt-24 section-block theme-section-soft">
         <div className="section-container grid gap-5 lg:grid-cols-2">
           <div className="rounded-[1.5rem] border theme-card p-5 sm:rounded-[2rem] sm:p-8">
             <p className="text-sm font-black text-turquoise-dark">{content.copy.pricingEyebrow}</p>

@@ -15,6 +15,14 @@ const overrides = Object.fromEntries(files.map(file => [resolve(projectRoot, fil
 const env = { VERCEL: "1", VERCEL_ENV: "production", VERCEL_PROJECT_ID: "prj_n7Mm1cepeKANL1jNcNjarNh9QR2A", VERCEL_GIT_COMMIT_REF: "main" };
 const before = createSourceLoader({ env, sourceOverrides: overrides });
 const after = createSourceLoader({ env });
+// The AC page is intentionally changed in this PR. Freeze its prepared
+// revision separately; the other 18 pages still use the verified production
+// baseline above. This snapshot is not a claim that it has been deployed.
+const acRelevanceRevision = "295d2154cc227f50d201fa5942bd8319bd62c42f";
+const acFiles = execFileSync("git", ["ls-tree", "-r", "--name-only", acRelevanceRevision, "src"], { encoding: "utf8" })
+  .trim().split("\n").filter(file => /\.tsx?$/.test(file));
+const acExpected = createSourceLoader({ env, sourceOverrides: Object.fromEntries(acFiles.map(file => [resolve(projectRoot, file),
+  execFileSync("git", ["show", `${acRelevanceRevision}:${file}`], { encoding: "utf8" })])) });
 const pages = files.filter(file => file.startsWith("src/app/(site)/") && file.endsWith("/page.tsx") && !file.includes("[slug]"));
 assert.equal(pages.length, 19);
 function canonicalReactIds(html) {
@@ -32,8 +40,8 @@ function approvedPropertyCopy(html) {
     .replace('מתכננים ניקיון לדירה חדשה או יד שנייה לקראת הכניסה.', 'מתכננים ניקיון לדירה חדשה מקבלן או לדירה יד שנייה לפני כניסה.')
     .replace('הגישה לנכס, זמינות מים וחשמל ומועד הכניסה המתוכנן.', 'היישוב, הקומה, המעלית והחניה לציוד; זמינות מים וחשמל ומועד הכניסה המתוכנן.');
 }
-for (const file of pages) test(`verified deployed page content, links and metadata retained: ${file}`, async () => {
-  const oldPage = before(file), newPage = after(file);
+for (const file of pages) test(`${file.endsWith('/air-conditioner-cleaning/page.tsx') ? 'prepared AC relevance revision' : 'verified deployed page content, links and metadata'} retained: ${file}`, async () => {
+  const oldPage = file.endsWith('/air-conditioner-cleaning/page.tsx') ? acExpected(file) : before(file), newPage = after(file);
   const original = renderToStaticMarkup(await oldPage.default());
   const current = renderToStaticMarkup(await newPage.default());
   const expected = file.endsWith('/post-renovation-cleaning/page.tsx') ? approvedPropertyCopy(original) : original;
