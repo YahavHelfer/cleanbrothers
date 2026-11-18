@@ -45,6 +45,7 @@ export function Hero({ content = heroContent, preview = false }: {
             alt={mascotAlt}
             width={1536}
             height={1024}
+            quality={90}
             className="hero-mascot mascot-render-safe h-auto"
             sizes="(max-width: 639px) 240px, 368px"
           />
