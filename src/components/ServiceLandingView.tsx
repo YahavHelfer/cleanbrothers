@@ -62,9 +62,7 @@ export function ServiceLandingView({
       <ServiceHero
         eyebrow={config.eyebrow}
         summary={heroSummary}
-        title={miniCentral ? config.h1.split(/(ב־\d[\d,.]*\s*₪|\d[\d,.]*\s*₪)/).map((part, index) =>
-          index % 2 ? <span key={index} className="whitespace-nowrap">{part}</span> : part
-        ) : config.h1}
+        title={miniCentral ? config.h1.replace(/\s+ב[־-]?\s*\d[\d,.]*\s*₪\s*$/u, "") : config.h1}
         breadcrumbs={<nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap items-center gap-2">
                 <li><NavLink href="/">בית</NavLink></li>
