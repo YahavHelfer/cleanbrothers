@@ -28,7 +28,10 @@ test("homepage baseline adds one hidden reviews block without changing public HT
   assert.equal(validateHomeDraft(page).canonical, "/");
   const html = render(page);
   assert.ok(html.includes(page.h1));
-  assert.ok(html.includes("/images/hero/hero-sofa-cleaning.jpg"));
+  const hero = html.match(/<section class="premium-hero\b[^>]*>[\s\S]*?<\/section>/)?.[0];
+  assert.ok(hero);
+  assert.match(hero, /\/images\/mascots\/cleanbrothers-mascots\.png/);
+  assert.doesNotMatch(hero, /hero-sofa-cleaning|hero-service-photo/);
   assert.ok(html.includes("https://wa.me/972559577731?text="));
   assert.ok(html.includes("tel:"));
   assert.ok(!html.includes("Google Maps"));
