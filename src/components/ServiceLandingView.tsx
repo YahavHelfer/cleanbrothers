@@ -124,7 +124,7 @@ export function ServiceLandingView({
       {propertyCleaning && <PropertyCleaningDetails />}
       {sofaCleaning && <section id="office-upholstery" className="section-block scroll-mt-24 theme-section-clean">
         <div className="section-container">
-          <SectionHeading title="ניקוי ספות וריפודים לעסקים" tone="light" align="start" />
+          <h2 className="text-2xl font-black sm:text-3xl">ניקוי ספות וריפודים לעסקים</h2>
           <p className="mt-4 max-w-2xl leading-7 theme-muted">
             מנקים ספות המתנה, כורסאות וכיסאות מרופדים במשרדים ובעסקים. כדי שנוכל להעריך את היקף העבודה, ציינו את מספר הפריטים ואת היישוב וצרפו תמונות של הריפודים בוואטסאפ.
           </p>
