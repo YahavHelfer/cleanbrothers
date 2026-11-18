@@ -1,16 +1,20 @@
-import { serviceAreas } from "@/data/site";
+import { publicServiceAreas } from "@/config/service-areas";
 import { SectionHeading } from "@/components/SectionHeading";
 
 export const serviceAreasContent = {
   eyebrow: "אזורי שירות",
   title: "שירותי ניקיון עד הלקוח באזור המרכז",
-  mobileDescription: "מגיעים לערי המרכז. שולחים תמונה ומקבלים הערכה.",
-  description: "CleanBrothers מגיעים לבית או לעסק בפתח תקווה, רמת גן, הוד השרון, תל אביב, רעננה, הרצליה, רמת השרון, גבעתיים והסביבה. אפשר לשלוח תמונה בוואטסאפ ולקבל הערכת מחיר לפי סוג השירות והיקף העבודה.",
+  mobileDescription: "הזמינות משתנה לפי השירות והיישוב.",
+  description: "הזמינות משתנה לפי השירות והיישוב. שלחו תמונה ואת היישוב בוואטסאפ לבדיקת זמינות ולקבלת הערכת מחיר.",
 };
 
-export function ServiceAreas({ content = serviceAreasContent, areas = serviceAreas }: {
+export function ServiceAreas({ content = serviceAreasContent, areas = publicServiceAreas }: {
   content?: typeof serviceAreasContent; areas?: readonly string[];
 } = {}) {
+  const description = content.description.startsWith("CleanBrothers מגיעים לבית או לעסק בפתח תקווה,")
+    ? serviceAreasContent.description : content.description;
+  const mobileDescription = content.mobileDescription.startsWith("מגיעים לערי המרכז")
+    ? serviceAreasContent.mobileDescription : content.mobileDescription;
   return (
     <section className="reveal theme-section-clean py-8 sm:py-16 lg:py-18">
       <div className="section-container">
@@ -19,8 +23,8 @@ export function ServiceAreas({ content = serviceAreasContent, areas = serviceAre
             align="start"
             eyebrow={content.eyebrow}
             title={content.title}
-            mobileDescription={content.mobileDescription}
-            description={content.description}
+            mobileDescription={mobileDescription}
+            description={description}
             tone="light"
           />
 

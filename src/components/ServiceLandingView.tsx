@@ -1,5 +1,7 @@
 import { ServiceHero, ServiceIntroduction } from "@/components/ServiceHero";
 import { GuideLinks } from "@/components/GuideLinks";
+import { miniCentralServiceAreas, sofaServiceAreas } from "@/config/service-areas";
+import { ServiceAreas, serviceAreasContent } from "@/sections/ServiceAreas";
 import { PropertyCleaningDetails } from "@/components/PropertyCleaningDetails";
 import type { ReactNode } from "react";
 import Image from "next/image";
@@ -290,6 +292,12 @@ export function ServiceLandingView({
           </div>
         </div>
       </section>
+      {(miniCentral || sofaCleaning) && (
+        <ServiceAreas
+          content={{ ...serviceAreasContent, title: `אזורי שירות עבור ${config.serviceName}` }}
+          areas={miniCentral ? miniCentralServiceAreas : sofaServiceAreas}
+        />
+      )}
       {miniCentral && !preview ? <GuideLinks /> : null}
       {propertyCleaning && !preview ? <GuideLinks topic="property" /> : null}
       <section id="contact-form" className="scroll-mt-24 section-block theme-section-soft pb-28 sm:pb-20">

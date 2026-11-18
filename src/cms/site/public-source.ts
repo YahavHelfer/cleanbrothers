@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { connection } from "next/server";
 import { cache } from "react";
 import { getCmsConfig } from "@/cms/config";
+import { publicServiceAreas } from "@/config/service-areas";
 import { serviceRegistry } from "@/content/service-registry";
 import { siteSettingsBaseline, siteNavigationBaseline, siteFooterBaseline } from "./baseline";
 import { usesCmsSiteSource } from "./environment";
@@ -30,7 +31,11 @@ export function resolveSiteChrome(settings: SiteSettings, navigation: SiteNaviga
   return { settings, navigation, footer, navLinks, featuredServiceLinks, pageRoutes, revisions };
 }
 
-const staticChrome = resolveSiteChrome(siteSettingsBaseline,siteNavigationBaseline,siteFooterBaseline);
+function withPublicServiceAreas(settings: SiteSettings): SiteSettings {
+  return { ...settings, serviceAreas: publicServiceAreas };
+}
+
+const staticChrome = resolveSiteChrome(withPublicServiceAreas(siteSettingsBaseline),siteNavigationBaseline,siteFooterBaseline);
 function publicClient() {
   const { url, key } = getCmsConfig();
   return createClient(url,key,{ auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -59,7 +64,7 @@ export const getPublicSiteChrome = cache(async (): Promise<SiteChrome> => {
   if (!pageRoutes || typeof pageRoutes !== "object" || Array.isArray(pageRoutes))
     throw new Error("Published CMS page references unavailable");
   return resolveSiteChrome(
-    settingsEnabled ? validateSiteSettings(settingsResult!.data.payload) : siteSettingsBaseline,
+    withPublicServiceAreas(settingsEnabled ? validateSiteSettings(settingsResult!.data.payload) : siteSettingsBaseline),
     navigationEnabled ? validateSiteNavigation(navigationResult!.data.payload) : siteNavigationBaseline,
     footerEnabled ? validateSiteFooter(footerResult!.data.payload) : siteFooterBaseline,
     pageRoutes as Record<string,string>,

@@ -16,9 +16,9 @@ import { specialMedia } from "@/cms/content/special-view";
 import { PreviewContact } from "@/cms/content/PreviewContact";
 import { AcPromotionContent } from "@/components/AcPromotionContent";
 import { serviceRegistry } from "@/content/service-registry";
+import { wallMountedAcServiceAreas } from "@/config/service-areas";
 
 function buildStructuredData(content: AirConditionerCleaningContent) {
-  const { airConditionerServiceAreas } = content;
   const pageUrl = `${businessConfig.siteUrl}/air-conditioner-cleaning`;
 
   return {
@@ -31,7 +31,7 @@ function buildStructuredData(content: AirConditionerCleaningContent) {
       description:
         content.serviceDescription,
       provider: { "@id": businessEntityId },
-      areaServed: airConditionerServiceAreas.filter(area => area !== "והסביבה").map((area) => ({
+      areaServed: wallMountedAcServiceAreas.map((area) => ({
         "@type": "Place",
         name: area,
       })),
@@ -65,7 +65,7 @@ function buildStructuredData(content: AirConditionerCleaningContent) {
 }
 
 export function AirConditionerCleaningView({ content = acBaseline, media, serviceImages, preview = false, contact, phone, popup, whatsappHref, multipleUnitsHref, phoneHref }: { content?: AirConditionerCleaningContent; media?: ResolvedMedia[]; serviceImages?: SharedServiceImage[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string }) {
-  const { trustItems, intentSignals, cleaningAreas, processSteps, airConditionerServiceAreas, faqs, promotion } = content;
+  const { trustItems, intentSignals, cleaningAreas, processSteps, faqs, promotion } = content;
   const hero = serviceImages ?? specialMedia(content, "hero", media);
   const displayedPrice = promotion.startingPrice;
   const structuredData = buildStructuredData(content);
@@ -249,11 +249,11 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
             align="start"
             eyebrow={content.copy.areasEyebrow}
             title={content.copy.areasTitle}
-            description={content.copy.areasDescription}
+            description="שלחו תמונה ואת היישוב כדי לבדוק זמינות ולקבל הערכת מחיר."
             tone="light"
           />
           <div className="flex flex-wrap gap-2" aria-label="אזורי שירות לניקוי מזגנים">
-            {airConditionerServiceAreas.filter(area => area !== "והסביבה").map((area) => (
+            {wallMountedAcServiceAreas.map((area) => (
               <span
                 key={area}
                 className="rounded-full border border-turquoise/20 bg-turquoise/[0.08] px-3 py-2 text-sm font-black"

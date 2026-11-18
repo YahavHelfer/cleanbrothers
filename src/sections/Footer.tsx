@@ -129,6 +129,7 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
 
           <div className="sm:order-4">
             <FooterLinkGroup label="אזורי שירות">
+              <p className="mb-2 text-xs text-white/70">הזמינות משתנה לפי השירות והיישוב.</p>
               <div className="flex max-w-md flex-wrap gap-1 sm:gap-1.5">
                 {settings.serviceAreas.map((area) => (
                   <span
