@@ -40,6 +40,12 @@ export function ServiceLandingView({
   const copy = config.pageCopy;
   const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
   const propertyCleaning = config.path === "/post-renovation-cleaning";
+  const sofaCleaning = config.path === "/sofa-cleaning";
+  const heroSummary = miniCentral
+    ? "ניקוי המערכת ב־450 ₪. תוספת של 250 ₪ לכל התעלות יחד. המחירים כוללים מע״מ וכפופים לבדיקת הגישה."
+    : propertyCleaning
+      ? "הנכס אחרי שיפוץ או לקראת כניסה? מתאמים ניקיון לפי מצב הדירה, המשטחים ומועד המעבר — עם היקף עבודה והצעת מחיר ברורים מראש."
+      : sofaCleaning ? config.intro : undefined;
   const NavLink = preview ? DisabledLink : Link;
   const serviceImages = getServiceImages(config);
   const primaryImage = getPrimaryServiceImage(config);
@@ -55,7 +61,7 @@ export function ServiceLandingView({
       {jsonLd}
       <ServiceHero
         eyebrow={config.eyebrow}
-        summary={propertyCleaning ? "הנכס אחרי שיפוץ או לקראת כניסה? מתאמים ניקיון לפי מצב הדירה, המשטחים ומועד המעבר — עם היקף עבודה והצעת מחיר ברורים מראש." : undefined}
+        summary={heroSummary}
         title={miniCentral ? config.h1.split(/(ב־\d[\d,.]*\s*₪|\d[\d,.]*\s*₪)/).map((part, index) =>
           index % 2 ? <span key={index} className="whitespace-nowrap">{part}</span> : part
         ) : config.h1}
@@ -75,6 +81,9 @@ export function ServiceLandingView({
           <a href={phoneHref} aria-disabled={preview || undefined} className="service-call-link">
             <Icon name="phone" className="h-5 w-5" />{phoneNumber}
           </a>
+          {sofaCleaning && config.beforeAfter && config.resultsHidden !== true && <a href="#service-results" className="service-callback-link">
+            ראו ספה לפני ואחרי הניקוי
+          </a>}
           {(miniCentral || propertyCleaning) && <a href="#contact-form" className="service-callback-link">
             אין תמונה? השאירו שם וטלפון ונחזור אליכם
           </a>}
@@ -111,9 +120,17 @@ export function ServiceLandingView({
             </div>}
       </>}>
         {miniCentral && <p>{config.benefitsDescription}</p>}
-        {miniCentral && <p className="mt-3 font-bold">ניקוי המערכת: 450 ₪. תוספת לכל התעלות יחד: 250 ₪. סך הכול 700 ₪ כולל מע״מ, בכפוף לבדיקת גישה ותיאום היקף העבודה.</p>}
       </ServiceIntroduction>
       {propertyCleaning && <PropertyCleaningDetails />}
+      {sofaCleaning && <section id="office-upholstery" className="section-block scroll-mt-24 theme-section-clean">
+        <div className="section-container">
+          <SectionHeading title="ניקוי ספות וריפודים לעסקים" tone="light" align="start" />
+          <p className="mt-4 max-w-2xl leading-7 theme-muted">
+            מנקים ספות המתנה, כורסאות וכיסאות מרופדים במשרדים ובעסקים. כדי שנוכל להעריך את היקף העבודה, ציינו את מספר הפריטים ואת היישוב וצרפו תמונות של הריפודים בוואטסאפ.
+          </p>
+          <a href="#contact-form" className="btn-primary mt-5 inline-flex">בקשת הצעה לניקוי במשרד</a>
+        </div>
+      </section>}
       {!miniCentral && <section aria-label="יתרונות השירות" className="theme-section-clean py-5 sm:py-8">
         <div className="section-container grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {trustItems.map((item) => (
@@ -208,7 +225,7 @@ export function ServiceLandingView({
           </div>
         </section>
       ) : null}
-      {!miniCentral && config.resultsHidden !== true && <section data-service-results className="section-block theme-section-soft">
+      {!miniCentral && config.resultsHidden !== true && <section id="service-results" data-service-results className="section-block theme-section-soft">
         <div className="section-container">
           <SectionHeading
             eyebrow={copy?.resultEyebrow || "עבודות ניקוי"}
