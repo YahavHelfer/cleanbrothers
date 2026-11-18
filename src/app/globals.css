@@ -811,11 +811,11 @@ h1,h2,h3 { text-wrap: balance; }
 .hero-trust { display: flex; flex-wrap: wrap; gap: .7rem 1.2rem; margin-top: 1.6rem; font-size: .8rem; color: var(--muted); }
 .hero-trust li { display: flex; align-items: center; gap: .4rem; }
 .hero-trust li span { color: #007c72; }
-.hero-art { justify-self: center; width: min(100%, 20rem); min-width: 0; }
+.hero-art { justify-self: center; width: min(100%, 23rem); min-width: 0; }
 .hero-mascot { display: block; width: 100%; filter: drop-shadow(0 8px 12px #0b21331a); }
 
 @media (max-width: 639px) {
-  .hero-art { width: min(100%, 13rem); }
+  .hero-art { width: min(100%, 15rem); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
