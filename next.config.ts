@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: { qualities: [75, 90] },
   // Review deployments must never compete with the canonical public website.
   headers() {
     return process.env.VERCEL_ENV === "preview" ? [{

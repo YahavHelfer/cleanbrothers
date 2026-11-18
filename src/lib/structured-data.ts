@@ -1,4 +1,5 @@
 import { businessConfig } from "@/config/business";
+import { miniCentralServiceAreas, sofaServiceAreas } from "@/config/service-areas";
 import { siteSettingsBaseline } from "@/cms/site/baseline";
 import type { SiteSettings } from "@/cms/site/model";
 import { faqs, services } from "@/data/site";
@@ -38,11 +39,14 @@ export function buildServiceJsonLd(settings: SiteSettings = siteSettingsBaseline
 export const serviceJsonLd = buildServiceJsonLd();
 
 export function buildPageServiceJsonLd(service: { serviceName: string; intro: string; path: string }) {
+  const areas = service.path === "/mini-central-air-conditioner-cleaning" ? miniCentralServiceAreas
+    : service.path === "/sofa-cleaning" ? sofaServiceAreas : undefined;
   return {
     "@context": "https://schema.org", "@type": "Service",
     "@id": `${businessConfig.siteUrl}${service.path}#service`,
     name: service.serviceName, serviceType: service.serviceName,
     description: service.intro, url: `${businessConfig.siteUrl}${service.path}`,
+    ...(areas && { areaServed: areas.map(name => ({ "@type": "Place", name })) }),
     provider: { "@id": businessEntityId },
   };
 }

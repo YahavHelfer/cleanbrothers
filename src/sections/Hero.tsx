@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ImageWithFallback } from "@/components/ImageWithFallback";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const trustChips = [
@@ -21,8 +20,8 @@ export const heroContent = {
   backgroundAlt: "ניקוי ספה מקצועי בבית הלקוח",
 };
 
-export function Hero({ content = heroContent, backgroundSrc = "/images/hero/hero-sofa-cleaning.jpg", preview = false }: {
-  content?: typeof heroContent; backgroundSrc?: string; preview?: boolean;
+export function Hero({ content = heroContent, preview = false }: {
+  content?: typeof heroContent; preview?: boolean;
 } = {}) {
   return (
     <section className="premium-hero relative overflow-hidden">
@@ -41,12 +40,15 @@ export function Hero({ content = heroContent, backgroundSrc = "/images/hero/hero
           <ul className="hero-trust">{content.trustChips.map(item => <li key={item}><span aria-hidden="true">✓</span>{item}</li>)}</ul>
         </div>
         <div className="hero-art">
-          <ImageWithFallback src={backgroundSrc} alt={content.backgroundAlt} className="hero-service-photo"
-            imageClassName="object-cover object-center" fallbackClassName="from-surface-soft to-white" fetchPriority="high"
-            sizes="(min-width: 1024px) 48vw, (min-width: 640px) 70vw, 90vw" />
-          <div className="hero-mascot"><Image src="/images/mascots/cleanbrothers-mascots.png" alt={mascotAlt}
-            width={1536} height={1024} className="mascot-render-safe h-auto w-full" sizes="(min-width: 1024px) 270px, 130px" /></div>
-          <div className="hero-photo-label"><span aria-hidden="true">✦</span> CleanBrothers</div>
+          <Image
+            src="/images/mascots/cleanbrothers-mascots.png"
+            alt={mascotAlt}
+            width={1536}
+            height={1024}
+            quality={90}
+            className="hero-mascot mascot-render-safe h-auto"
+            sizes="(max-width: 639px) 240px, 368px"
+          />
         </div>
       </div>
     </section>

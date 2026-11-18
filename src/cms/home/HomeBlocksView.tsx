@@ -38,11 +38,7 @@ function HomeBlockView({ block, media, promotions, preview, revisionId, reviews,
 }) {
   const p = block.payload;
   switch (block.type) {
-    case "homeHero": {
-      const backgroundSrc = block.mediaVersionId && media[block.mediaVersionId]?.src;
-      if (!backgroundSrc) throw new Error("Homepage hero media unavailable");
-      return <Hero content={p as typeof heroContent} backgroundSrc={backgroundSrc} preview={preview} />;
-    }
+    case "homeHero": return <Hero content={p as typeof heroContent} preview={preview} />;
     case "homeTrust": return <TrustStrip items={p.items as string[]} />;
     case "homeServices": return <Services content={p as typeof servicesContent} media={media} preview={preview} />;
     case "homeProcess": return <CleaningProcess content={p as typeof processContent} preview={preview} />;
