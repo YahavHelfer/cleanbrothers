@@ -27,6 +27,34 @@ const trustItems = [
   "בדיקת זמינות לפי היישוב",
 ];
 
+const serviceQuoteCopy: Record<string, { summary?: string; useIntro?: boolean; request: string; cta: string }> = {
+  "/mattress-cleaning": {
+    useIntro: true,
+    request: "צלמו את המזרן ואת הכתם מקרוב. כתבו מה גודל המזרן והאם תרצו לנקות צד אחד או שניים.",
+    cta: "שלחו תמונת מזרן להערכת מחיר",
+  },
+  "/car-upholstery-cleaning": {
+    summary: "ניקוי מושבי בד ברכב אצלכם, לטיפול בלכלוך, בכתמים ובריחות. נדרשות נקודת מים ונקודת חשמל בקרבת הרכב.",
+    request: "שלחו תמונה של המושבים, ציינו את דגם הרכב ואת היישוב ונבדוק מחיר וזמינות.",
+    cta: "שלחו תמונת מושבים להערכת מחיר",
+  },
+  "/sofa-cleaning": {
+    useIntro: true,
+    request: "צלמו את הספה כולה כך שנראה את מספר המושבים. אם יש כתם שמטריד אתכם, צרפו גם צילום מקרוב.",
+    cta: "שלחו תמונת ספה להערכת מחיר",
+  },
+  "/mini-central-air-conditioner-cleaning": {
+    summary: "ניקוי המערכת ב־450 ₪. ניקוי המערכת וכל התעלות יחד ב־700 ₪, כולל מע״מ ובכפוף לבדיקת גישה.",
+    request: "צלמו את פתח השירות בתקרה. לפי התמונה נבדוק אם יש גישה למערכת ומה אפשר לנקות.",
+    cta: "שלחו תמונת פתח שירות לבדיקת התאמה",
+  },
+  "/post-renovation-cleaning": {
+    summary: "ניקיון דירה אחרי שיפוץ או לפני כניסה. ציינו את שטח הדירה, היישוב ומועד הכניסה כדי שנוכל להעריך את העבודה.",
+    request: "צרפו תמונות של החדרים והמשטחים שדורשים טיפול וציינו אם הדירה ריקה.",
+    cta: "שלחו תמונות של הדירה להצעת מחיר",
+  },
+};
+
 export function ServiceLandingView({
   config, contact, phoneNumber, phoneHref, whatsappHref, jsonLd, video, preview = false,
 }: {
@@ -43,11 +71,8 @@ export function ServiceLandingView({
   const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
   const propertyCleaning = config.path === "/post-renovation-cleaning";
   const sofaCleaning = config.path === "/sofa-cleaning";
-  const heroSummary = miniCentral
-    ? "ניקוי המערכת ב־450 ₪. תוספת של 250 ₪ לכל התעלות יחד. המחירים כוללים מע״מ וכפופים לבדיקת הגישה."
-    : propertyCleaning
-      ? "הנכס אחרי שיפוץ או לקראת כניסה? מתאמים ניקיון לפי מצב הדירה, המשטחים ומועד המעבר — עם היקף עבודה והצעת מחיר ברורים מראש."
-      : sofaCleaning ? config.intro : undefined;
+  const quote = serviceQuoteCopy[config.path];
+  const heroSummary = quote?.useIntro ? config.intro : quote?.summary;
   const NavLink = preview ? DisabledLink : Link;
   const serviceImages = getServiceImages(config);
   const primaryImage = getPrimaryServiceImage(config);
@@ -64,9 +89,7 @@ export function ServiceLandingView({
       <ServiceHero
         eyebrow={config.eyebrow}
         summary={heroSummary}
-        title={miniCentral ? config.h1.split(/(ב־\d[\d,.]*\s*₪|\d[\d,.]*\s*₪)/).map((part, index) =>
-          index % 2 ? <span key={index} className="whitespace-nowrap">{part}</span> : part
-        ) : config.h1}
+        title={miniCentral ? "ניקוי מזגן מיני מרכזי" : config.h1}
         breadcrumbs={<nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap items-center gap-2">
                 <li><NavLink href="/">בית</NavLink></li>
@@ -76,9 +99,10 @@ export function ServiceLandingView({
                 <li aria-current="page">{config.serviceName}</li>
               </ol>
             </nav>}
+        badge={quote && !quote.useIntro ? <p>{quote.request}</p> : undefined}
         actions={<>
           <a data-whatsapp-location="hero" href={whatsappHref} aria-disabled={preview || undefined} className="btn-whatsapp inline-flex">
-            <Icon name="whatsapp" className="h-5 w-5" />{copy?.whatsappCta || "שלחו לנו WhatsApp"}
+            <Icon name="whatsapp" className="h-5 w-5" />{quote?.cta || copy?.whatsappCta || "שלחו לנו WhatsApp"}
           </a>
           <a href={phoneHref} aria-disabled={preview || undefined} className="service-call-link">
             <Icon name="phone" className="h-5 w-5" />{phoneNumber}
@@ -86,8 +110,8 @@ export function ServiceLandingView({
           {sofaCleaning && config.beforeAfter && config.resultsHidden !== true && <a href="#service-results" className="service-callback-link">
             ראו ספה לפני ואחרי הניקוי
           </a>}
-          {(miniCentral || propertyCleaning) && <a href="#contact-form" className="service-callback-link">
-            אין תמונה? השאירו שם וטלפון ונחזור אליכם
+          {quote && <a href="#contact-form" className="service-callback-link">
+            השאירו שם וטלפון ונחזור אליכם
           </a>}
         </>}
         media={!miniCentral ? <div className="reveal stagger-2 relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/15 bg-navy shadow-2xl">
@@ -108,7 +132,7 @@ export function ServiceLandingView({
             </p>}
           </div> : undefined}
       />
-      <ServiceIntroduction text={config.intro} links={<>
+      <ServiceIntroduction text={quote?.useIntro ? quote.request : config.intro} links={<>
         <a href="#contact-form">{copy?.heroCta || "לקבלת הצעת מחיר"}</a>
         {!miniCentral && <div className="mt-7 flex flex-wrap gap-5 text-sm font-bold text-white/75">
               <NavLink href="/services" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">כל השירותים</NavLink>
