@@ -67,6 +67,7 @@ function buildStructuredData(content: AirConditionerCleaningContent) {
 export function AirConditionerCleaningView({ content = acBaseline, media, serviceImages, preview = false, contact, phone, popup, whatsappHref, multipleUnitsHref, phoneHref }: { content?: AirConditionerCleaningContent; media?: ResolvedMedia[]; serviceImages?: SharedServiceImage[]; preview?: boolean; contact?: ReactNode; phone?: ReactNode; popup?: ReactNode; whatsappHref?: string; multipleUnitsHref?: string; phoneHref?: string }) {
   const { trustItems, intentSignals, cleaningAreas, processSteps, faqs, promotion } = content;
   const hero = serviceImages ?? specialMedia(content, "hero", media);
+  const includedAreas = cleaningAreas.slice(0, 3).map(area => area.title).join(", ");
   const displayedPrice = promotion.startingPrice;
   const structuredData = buildStructuredData(content);
 
@@ -77,7 +78,9 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
       {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
 
       <ServiceHero title={content.h1} eyebrow={content.copy.heroEyebrow}
-        summary={content.copy.heroDescription}
+        summary={includedAreas
+          ? `שטיפת מזגן עילי בבית הלקוח כוללת ניקוי של החלקים הנגישים: ${includedAreas}.`
+          : content.copy.heroDescription}
         breadcrumbs={<nav aria-label="פירורי לחם" className="mb-5 text-sm font-bold text-white/75">
               <ol className="flex flex-wrap gap-2">
                 <li><Link href="/">בית</Link></li><li aria-hidden="true">/</li>
@@ -85,10 +88,12 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
                 <li aria-current="page">{content.h1}</li>
               </ol>
             </nav>}
-        badge={promotion.enabled ? <div>
-          <p>{promotion.heroLabel} — החל מ־{promotion.startingPrice} ₪</p>
-          <p className="mt-2 text-sm font-normal leading-6">{promotion.description}</p>
-        </div> : undefined}
+        badge={<div className="text-start">
+          <p className="font-bold">{promotion.enabled ? promotion.heroLabel : content.copy.pricingEyebrow}</p>
+          <p className="mt-1 text-sm font-semibold leading-6">
+            {promotion.enabled ? promotion.description : content.copy.pricingDescription}
+          </p>
+        </div>}
         actions={<>
           <a data-whatsapp-location="hero" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} target="_blank" rel="noreferrer" className="btn-whatsapp inline-flex">
             <Icon name="whatsapp" className="h-5 w-5" />{content.copy.heroCta}
