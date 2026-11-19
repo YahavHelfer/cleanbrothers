@@ -47,6 +47,7 @@ const serviceJsonLd = {
       <JsonLd id="window-cleaning-service-jsonld" data={serviceJsonLd} />
 
       <ServiceHero title={content.h1} eyebrow={content.copy.heroEyebrow}
+        summary="ניקוי חלונות נגישים בבתים, בחנויות ואחרי שיפוץ. צלמו את החלונות מרחוק וציינו כמה יש, באיזו קומה ומה הגישה אליהם."
         breadcrumbs={<nav aria-label="פירורי לחם" className="mb-7 text-sm font-bold text-white/70">
             <ol className="flex flex-wrap items-center gap-2">
               <li><Link href="/" className="hover:text-turquoise focus:ring-2 focus:ring-turquoise">דף הבית</Link></li>
@@ -57,8 +58,9 @@ const serviceJsonLd = {
             </ol>
           </nav>}
         actions={<>
-          <a data-whatsapp-location="hero" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-whatsapp inline-flex"><Icon name="whatsapp" className="h-5 w-5" />{content.copy.heroCta}</a>
+          <a data-whatsapp-location="hero" href={preview ? undefined : whatsappHref} aria-disabled={preview || undefined} className="btn-whatsapp inline-flex"><Icon name="whatsapp" className="h-5 w-5" />שלחו תמונת חלונות להצעת מחיר</a>
           <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="service-call-link"><Icon name="phone" className="h-5 w-5" />{phone ?? "055-957-7731"}</a>
+          <a href="#contact-form" className="service-callback-link">השאירו שם וטלפון ונחזור אליכם</a>
         </>}
         media={<div className="reveal stagger-2 mx-auto w-full max-w-xl">
               {hero.length ? <Image unoptimized={hero[0].src.startsWith("/admin/media/file/") || hero[0].src.startsWith("/cms-media/")} src={hero[0].src} alt={hero[0].alt} width={900} height={900} className={`h-full w-full object-cover ${serviceImages?.[0]?.position || "object-center"}`} /> : <WindowCleaningVisual />}
