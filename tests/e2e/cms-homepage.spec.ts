@@ -366,7 +366,10 @@ test("shared special and unlisted service collections stay isolated, survive his
   await session(actor, context);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.addLocatorHandler(page.getByRole("button", { name: "סגירת מבצע הקיץ", exact: true }), async button => { await button.click(); });
-  await page.addLocatorHandler(page.getByRole("button", { name: "דחיית עוגיות לא הכרחיות", exact: true }), async button => { await button.click(); });
+  await page.addLocatorHandler(page.getByRole("link", { name: "הגדרות עוגיות", exact: true }), async link => {
+    await link.click();
+    await page.getByRole("button", { name: "רק עוגיות הכרחיות" }).click();
+  });
   const errors: string[] = [], failedImages: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("response", response => {

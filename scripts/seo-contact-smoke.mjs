@@ -8,7 +8,8 @@ try {
   page.setDefaultTimeout(10000);
   await page.route('**/*', route => new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
   await page.goto(`${origin}/contact?service=${encodeURIComponent('ניקוי ספות')}&utm_source=seo`);
-  await page.getByRole('button', { name: 'דחיית עוגיות לא הכרחיות' }).click();
+  await page.getByRole('link', { name: 'הגדרות עוגיות', exact: true }).click();
+  await page.getByRole('button', { name: 'רק עוגיות הכרחיות' }).click();
   assert.equal(await page.locator('[name="service"]').inputValue(), 'ניקוי ספות');
   let payload;
   let calls = 0;

@@ -35,7 +35,8 @@ try {
   });
   const ui = await interactive.newPage();
   await ui.goto(origin);
-  await ui.getByRole('button', { name: 'דחיית עוגיות לא הכרחיות' }).click();
+  await ui.getByRole('link', { name: 'הגדרות עוגיות', exact: true }).click();
+  await ui.getByRole('button', { name: 'רק עוגיות הכרחיות' }).click();
   const panel = ui.locator('aside [aria-live="polite"]');
   for (const [label,price] of [['מזגן עילי עד 2 כ״ס (כולל)','199 ₪'],['מזגן עילי מעל 2 כ״ס','249 ₪'],['מיני מרכזי','550 ₪']]) {
     await ui.getByRole('button', { name: `בחירת ${label}`, exact: true }).click();

@@ -852,12 +852,22 @@ h1,h2,h3 { text-wrap: balance; }
 .premium-service-section .text-white { color: var(--foreground); }
 .premium-service-section [class*="text-white/"] { color: var(--muted); }
 .premium-service-section .text-turquoise { color: var(--turquoise-dark); }
-.cookie-banner { position: fixed; bottom: calc(.75rem + env(safe-area-inset-bottom)); inset-inline: 1rem; margin-inline: auto; max-width: 64rem; z-index: 80; background: var(--card); color: var(--foreground); border: 1px solid var(--card-border); border-radius: 1.35rem; box-shadow: 0 12px 50px #0b213324; padding: 1.15rem 1.35rem; display: grid; grid-template-columns: 1fr auto; gap: 1rem 1.5rem; align-items: center; max-height: min(70svh,38rem); overflow-y: auto; animation: consent-enter 220ms ease-out; }
-.cookie-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
-.cookie-actions button { min-height: 44px; font-size: .8rem; padding: .7rem 1rem; }
-.cookie-reject { border: 1px solid var(--card-border); border-radius: 999px; font-weight: 800; background: var(--card); }
-.cookie-customize { text-decoration: underline; text-underline-offset: 4px; font-weight: 700; }
-.cookie-preferences { grid-column: 1/-1; grid-row: 2; padding-top: .75rem; border-top: 1px solid var(--card-border); }
+.cookie-banner {
+  position: fixed; inset-inline: 0; bottom: 0; margin-inline: auto; z-index: 80;
+  width: 100%; max-width: 64rem; max-height: 72svh; overflow-y: auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .85rem;
+  padding: .6rem max(1rem, env(safe-area-inset-right)) calc(.5rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  border-radius: .85rem .85rem 0 0; background: #20262b; color: #f9fbfc;
+  box-shadow: 0 -3px 20px #0b213324; font-size: .875rem; line-height: 1.45;
+  animation: consent-enter 220ms ease-out;
+}
+.cookie-links { display: flex; flex-wrap: wrap; gap: 0 1rem; font-size: .8rem; }
+.cookie-links a { display: inline-flex; align-items: center; min-height: 24px; color: #d0e5e4; text-decoration: underline; text-underline-offset: 3px; }
+.cookie-ack { min-height: 44px; padding: .5rem 1.2rem; border-radius: .55rem; background: #adf1e9; color: #102c2b; font-weight: 800; }
+.cookie-banner[data-customize="true"] { display: block; max-width: 32rem; background: var(--card); color: var(--foreground); padding-top: 1rem; }
+.cookie-preferences { min-width: 0; }
+.cookie-preference-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.cookie-essential { min-height: 44px; padding: .5rem 1rem; border: 1px solid var(--card-border); border-radius: 999px; font-weight: 700; }
 .cookie-preferences label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .75rem; }
 .cookie-preferences small { display: block; font-size: .8rem; color: var(--muted); margin-top: .25rem; }
 .cookie-preferences input { width: 22px; height: 22px; flex-shrink: 0; accent-color: #007c72; }
@@ -873,7 +883,6 @@ html[data-theme="dark"] .service-quote-link,html[data-theme="dark"] :is(.theme-s
 @media (max-width: 1023px) {
  .premium-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; padding-block: 2.75rem; }
  .hero-copy h1 { max-width: 18ch; font-size: clamp(2.1rem,6.5vw,3.75rem); }
- .cookie-banner { grid-template-columns: 1fr; }
 }
 @media (max-width: 639px) {
  .premium-hero-grid { padding-top: 2rem; padding-bottom: 2rem; gap: 1.5rem; }
@@ -883,11 +892,6 @@ html[data-theme="dark"] .service-quote-link,html[data-theme="dark"] :is(.theme-s
  .hero-actions { margin-top: 1.25rem; gap: .6rem; flex-direction: column; }
  .hero-actions a { width: 100%; font-size: .9rem; }
  .hero-trust { gap: .4rem .75rem; margin-top: 1rem; font-size: .7rem; }
- .cookie-banner { inset-inline: .6rem; padding: 1rem; gap: .6rem; border-radius: 1.1rem; }
- .cookie-copy p { font-size: .8rem; line-height: 1.6; }
- .cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
- .cookie-actions button { font-size: .74rem; padding: .6rem; }
- .cookie-customize { grid-column: 1/-1; }
  .accessibility-dock { bottom: calc(var(--cookie-clearance) + 5.6rem + env(safe-area-inset-bottom)); }
  .whatsapp-dock { max-width: calc(100vw - 5rem); }
  .premium-service-section { padding-block: 2.5rem; }
