@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const attribution = readWhatsAppAttributionCookie(request.cookies.get("cb_first_touch_attribution")?.value);
   const humanMessage = getWhatsAppNavigationMessage(service, attribution);
   const message = await buildWhatsAppPilotMessage({
-    enabled: isWhatsAppPilotWindowOpen(process.env, Date.now(), service),
+    enabled: isWhatsAppPilotWindowOpen(process.env, Date.now(), service, attribution.utm_content),
     service, attribution, humanMessage,
     consent: request.cookies.get("cb_analytics_consent")?.value,
     requestToken: (marketingAttribution, consentSnapshot) => requestWhatsAppAttributionToken({
