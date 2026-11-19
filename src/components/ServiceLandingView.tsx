@@ -322,6 +322,7 @@ export function ServiceLandingView({
           areas={miniCentral ? miniCentralServiceAreas : sofaServiceAreas}
         />
       )}
+      {sofaCleaning && !preview ? <GuideLinks topic="sofa" /> : null}
       {miniCentral && !preview ? <GuideLinks /> : null}
       {propertyCleaning && !preview ? <GuideLinks topic="property" /> : null}
       <section id="contact-form" className="scroll-mt-24 section-block theme-section-soft pb-28 sm:pb-20">

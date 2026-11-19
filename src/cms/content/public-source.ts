@@ -45,6 +45,37 @@ export const getPublicPilot = () => getPublicService(PILOT_KEY);
 import { isSpecialServiceKey, type SpecialServiceKey } from "@/content/service-registry";
 import { acBaseline, windowBaseline } from "./special-baseline";
 import { validateSpecialContent } from "./special-model";
+// Older published revisions still advertise horsepower tiers. Apply the approved
+// tariff to their commercial copy without changing media or service coverage.
+function applyPublishedWallAcPrice(content: typeof acBaseline): typeof acBaseline {
+  if (!/249|לפי הספק/.test(content.copy.pricingDescription + content.promotion.priceTerms + content.seoDescription)) return content;
+  return {
+    ...content,
+    h1: acBaseline.h1, seoTitle: acBaseline.seoTitle, seoDescription: acBaseline.seoDescription,
+    copy: {
+      ...content.copy,
+      heroEyebrow: acBaseline.copy.heroEyebrow,
+      heroDescription: acBaseline.copy.heroDescription,
+      heroCta: acBaseline.copy.heroCta,
+      processDescription: acBaseline.copy.processDescription,
+      pricingEyebrow: acBaseline.copy.pricingEyebrow,
+      pricingDescription: acBaseline.copy.pricingDescription,
+      pricingCta: acBaseline.copy.pricingCta,
+      multipleDescription: acBaseline.copy.multipleDescription,
+      areasDescription: acBaseline.copy.areasDescription,
+      contactEyebrow: acBaseline.copy.contactEyebrow,
+      contactDescription: acBaseline.copy.contactDescription,
+      contactCta: acBaseline.copy.contactCta,
+    },
+    promotion: { ...content.promotion, startingPrice: 199, regularPrice: 199, bundleEnabled: false,
+      description: acBaseline.promotion.description, priceTerms: acBaseline.promotion.priceTerms,
+      pricePrefix: acBaseline.promotion.pricePrefix, cta: acBaseline.promotion.cta },
+    trustItems: content.trustItems.map(item => item.includes("הערכת מחיר") ? "מחיר קבוע ליחידה" : item),
+    processSteps: content.processSteps.map(step => step.includes("הערכת מחיר") ? "מאשרים את מספר המזגנים" : step),
+    faqs: content.faqs.map(faq => faq.question.includes("כמה מזגנים")
+      ? { ...faq, answer: acBaseline.copy.multipleDescription } : faq),
+  };
+}
 export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   if (!isSpecialServiceKey(key)) throw new Error("Unsupported special service");
   // AC can be enabled later on the stable Preview alias. Keep its approved
@@ -62,5 +93,5 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   const { data, error } = await client.rpc("cms_read_published_service", { target_key: key });
   if (error || !data) throw new Error("Published CMS service unavailable");
   const content = validateSpecialContent(key, data.payload);
-  return { revisionId: parseRevisionId(data.revisionId), content: key === "air-conditioner-cleaning" ? applyAcPriceRevision(content) : content, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
+  return { revisionId: parseRevisionId(data.revisionId), content: content.schemaVersion === 4 ? applyPublishedWallAcPrice(applyAcPriceRevision(content)) : content, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
 });

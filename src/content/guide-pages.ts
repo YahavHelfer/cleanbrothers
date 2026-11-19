@@ -82,7 +82,7 @@ const pages: Record<string, unknown> = {
               "items": [
                 [
                   {
-                    "text": "ב־CleanBrothers המחיר המפורסם למזגן עילי עד 2 כ״ס, כולל 2 כ״ס, הוא ",
+                    "text": "ניקוי מזגן עילי בכל הספק עולה ",
                     "bold": false,
                     "emphasis": false,
                     "link": null
@@ -94,19 +94,7 @@ const pages: Record<string, unknown> = {
                     "link": null
                   },
                   {
-                    "text": ". למזגן מעל 2 כ״ס המחיר הוא ",
-                    "bold": false,
-                    "emphasis": false,
-                    "link": null
-                  },
-                  {
-                    "text": "249 ₪",
-                    "bold": true,
-                    "emphasis": false,
-                    "link": null
-                  },
-                  {
-                    "text": ". המחירים כוללים מע״מ, ויש לאשר את סוג המזגן והתאמת השירות לפני התיאום.",
+                    "text": " ליחידה, כולל מע״מ.",
                     "bold": false,
                     "emphasis": false,
                     "link": null
@@ -564,33 +552,13 @@ const pages: Record<string, unknown> = {
               "items": [
                 [
                   {
-                    "text": "מזגן עילי עד 2 כ״ס, כולל 2 כ״ס: ",
+                    "text": "ניקוי מזגן עילי בכל הספק: ",
                     "bold": false,
                     "emphasis": false,
                     "link": null
                   },
                   {
                     "text": "199 ₪",
-                    "bold": true,
-                    "emphasis": false,
-                    "link": null
-                  },
-                  {
-                    "text": ".",
-                    "bold": false,
-                    "emphasis": false,
-                    "link": null
-                  }
-                ],
-                [
-                  {
-                    "text": "מזגן עילי מעל 2 כ״ס: ",
-                    "bold": false,
-                    "emphasis": false,
-                    "link": null
-                  },
-                  {
-                    "text": "249 ₪",
                     "bold": true,
                     "emphasis": false,
                     "link": null
@@ -817,7 +785,7 @@ const pages: Record<string, unknown> = {
     "publicTitle": "מדריכים לניקוי הבית",
     "h1": "מדריכים לניקוי הבית",
     "seoTitle": "מדריכים לניקוי הבית ולבחירת השירות | CleanBrothers",
-    "seoDescription": "מדריכים קצרים של CleanBrothers: ניקיון אחרי שיפוץ ולפני אכלוס, הכנה למעבר, ניקוי מזגנים, מיני מרכזי ותעלות ומה כלול בשירות.",
+    "seoDescription": "מדריכים של CleanBrothers לניקוי ספות, מזגנים וניקיון לפני אכלוס ואחרי שיפוץ. מחירים, הכנות ומה כלול בכל שירות.",
     "canonical": "/guides",
     "blocks": [
       {
@@ -1489,6 +1457,292 @@ const pages: Record<string, unknown> = {
             "target": {
               "kind": "internal",
               "path": "/post-renovation-cleaning"
+            }
+          }
+        },
+        "mediaVersionId": null,
+        "promotionRevisionId": null
+      }
+    ]
+  },
+  "sofa-cleaning-price": {
+    "schemaVersion": 8,
+    "publicTitle": "כמה עולה ניקוי ספה ומה משפיע על המחיר?",
+    "h1": "כמה עולה ניקוי ספה ומה משפיע על המחיר?",
+    "seoTitle": "כמה עולה ניקוי ספה ומה משפיע על המחיר? | CleanBrothers",
+    "seoDescription": "ניקוי ספת בד מתחיל ב־300 ₪ כולל מע״מ. כך בודקים מה כלול בהצעה ואילו תמונות לשלוח כדי לקבל מחיר לספה שלכם.",
+    "canonical": "/sofa-cleaning-price",
+    "blocks": [
+      {
+        "id": "abbb442a-03b4-4f79-a854-1acdef000000",
+        "position": 0,
+        "type": "hero",
+        "schemaVersion": 1,
+        "hidden": false,
+        "payload": {
+          "eyebrow": "מדריכי CleanBrothers",
+          "title": "כמה עולה ניקוי ספה ומה משפיע על המחיר?",
+          "description": "ניקוי ספת בד מתחיל ב־300 ₪ כולל מע״מ. כך בודקים מה כלול בהצעה ואילו תמונות לשלוח כדי לקבל מחיר לספה שלכם.",
+          "cta": null,
+          "mediaAlt": null
+        },
+        "mediaVersionId": null,
+        "promotionRevisionId": null
+      },
+      {
+        "id": "abbb442a-03b4-4f79-a854-1acdef000001",
+        "position": 1,
+        "type": "richText",
+        "schemaVersion": 1,
+        "hidden": false,
+        "payload": {
+          "nodes": [
+            {
+              "kind": "heading",
+              "level": 2,
+              "items": [
+                [
+                  {
+                    "text": "מה משפיע על המחיר של הספה שלכם?",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "level": null,
+              "items": [
+                [
+                  {
+                    "text": "ב־CleanBrothers ניקוי ספת בד מתחיל ב־300 ₪ כולל מע״מ. ספרו לנו כמה מושבים יש בספה ואם יש שזלונג, הדום או כריות נפרדות. שתי ספות שמוגדרות כשלושה מושבים יכולות להיות שונות מאוד בגודל ובשטח הריפוד.",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "heading",
+              "level": 2,
+              "items": [
+                [
+                  {
+                    "text": "איזו תמונה עוזרת לקבל מחיר מדויק?",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "level": null,
+              "items": [
+                [
+                  {
+                    "text": "צלמו את הספה כולה מהחזית, כולל הידיות והשזלונג. הוסיפו תקריב של האזור שדורש תשומת לב ותצלום של תווית הבד אם היא זמינה. אם ניסיתם לנקות כתם, ספרו לנו במה השתמשתם. כך נוכל להעריך את היקף העבודה ולהסביר מראש מה סביר שישתפר.",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "heading",
+              "level": 2,
+              "items": [
+                [
+                  {
+                    "text": "מה כדאי להשוות בין הצעות מחיר?",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "level": null,
+              "items": [
+                [
+                  {
+                    "text": "בדקו אם המחיר כולל את גב הספה, שני צדדים של כריות נשלפות ואת ההדום, אם יש כזה. ציינו את היישוב ותנאי הגישה ובקשו מחיר כולל מע״מ עבור הפריטים שסיכמתם. אם כתם מסוים הוא הסיבה להזמנה, כדאי לשאול עליו במפורש לפני שקובעים.",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "mediaVersionId": null,
+        "promotionRevisionId": null
+      },
+      {
+        "id": "abbb442a-03b4-4f79-a854-1acdef000002",
+        "position": 2,
+        "type": "cta",
+        "schemaVersion": 1,
+        "hidden": false,
+        "payload": {
+          "heading": "רוצים הצעת מחיר לספה שלכם?",
+          "description": "שלחו תמונה של הספה, מספר מושבים ושם היישוב. נבדוק יחד מה מתאים לריפוד שלכם.",
+          "cta": {
+            "label": "לפרטי השירות ולהצעת מחיר לניקוי ספות",
+            "target": {
+              "kind": "internal",
+              "path": "/sofa-cleaning"
+            }
+          }
+        },
+        "mediaVersionId": null,
+        "promotionRevisionId": null
+      }
+    ]
+  },
+  "sofa-cleaning-at-home": {
+    "schemaVersion": 8,
+    "publicTitle": "ניקוי ספות בבית: איך מתכוננים ומתי אפשר לשבת שוב?",
+    "h1": "ניקוי ספות בבית: איך מתכוננים ומתי אפשר לשבת שוב?",
+    "seoTitle": "ניקוי ספות בבית: איך מתכוננים ומתי אפשר לשבת שוב? | CleanBrothers",
+    "seoDescription": "מה לפנות לפני שהצוות מגיע, מה חשוב לספר על הבד והכתמים, וכמה זמן להשאיר לייבוש הספה אחרי ניקוי בבית.",
+    "canonical": "/sofa-cleaning-at-home",
+    "blocks": [
+      {
+        "id": "abbb442a-03b4-4f79-a854-1acdef000010",
+        "position": 0,
+        "type": "hero",
+        "schemaVersion": 1,
+        "hidden": false,
+        "payload": {
+          "eyebrow": "מדריכי CleanBrothers",
+          "title": "ניקוי ספות בבית: איך מתכוננים ומתי אפשר לשבת שוב?",
+          "description": "מה לפנות לפני שהצוות מגיע, מה חשוב לספר על הבד והכתמים, וכמה זמן להשאיר לייבוש הספה אחרי ניקוי בבית.",
+          "cta": null,
+          "mediaAlt": null
+        },
+        "mediaVersionId": null,
+        "promotionRevisionId": null
+      },
+      {
+        "id": "abbb442a-03b4-4f79-a854-1acdef000011",
+        "position": 1,
+        "type": "richText",
+        "schemaVersion": 1,
+        "hidden": false,
+        "payload": {
+          "nodes": [
+            {
+              "kind": "heading",
+              "level": 2,
+              "items": [
+                [
+                  {
+                    "text": "מה להכין לפני ההגעה?",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "level": null,
+              "items": [
+                [
+                  {
+                    "text": "פנו צעצועים, שמיכות וחפצים קטנים מהספה ומהרצפה שלידה, והשאירו מעבר לציוד. ציינו מראש אם יש מדרגות או גישה צרה. אם משקה נשפך על כרית אחת, צלמו את האזור וספרו מתי זה קרה.",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "heading",
+              "level": 2,
+              "items": [
+                [
+                  {
+                    "text": "איך מתאימים את הניקוי לבד?",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "level": null,
+              "items": [
+                [
+                  {
+                    "text": "אם יש תווית טיפול מתחת לכרית או לגוף הספה, השאירו אותה נגישה. הראו לצוות כתמים ישנים, אזורים דהויים או קרעים, וציינו אילו חומרי ניקוי כבר נוסו. לפני תחילת העבודה סכמו אילו כריות ומשטחים כלולים ואיזו תוצאה אפשר לצפות לקבל מהריפוד הקיים.",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "heading",
+              "level": 2,
+              "items": [
+                [
+                  {
+                    "text": "כמה זמן לשריין לעבודה ולייבוש?",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "level": null,
+              "items": [
+                [
+                  {
+                    "text": "לספה סטנדרטית כדאי לשריין כ־40–60 דקות לעבודה ועוד כ־4–6 שעות לייבוש. גודל הספה, עובי הריפוד והאוורור בבית משפיעים על הזמן בפועל. השאירו את הספה מאווררת ובדקו גם את התפרים והכריות לפני ישיבה או החזרת כיסוי.",
+                    "bold": false,
+                    "emphasis": false,
+                    "link": null
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "mediaVersionId": null,
+        "promotionRevisionId": null
+      },
+      {
+        "id": "abbb442a-03b4-4f79-a854-1acdef000012",
+        "position": 2,
+        "type": "cta",
+        "schemaVersion": 1,
+        "hidden": false,
+        "payload": {
+          "heading": "רוצים הצעת מחיר לספה שלכם?",
+          "description": "שלחו תמונה של הספה, מספר מושבים ושם היישוב. נבדוק יחד מה מתאים לריפוד שלכם.",
+          "cta": {
+            "label": "לפרטי השירות ולהצעת מחיר לניקוי ספות",
+            "target": {
+              "kind": "internal",
+              "path": "/sofa-cleaning"
             }
           }
         },

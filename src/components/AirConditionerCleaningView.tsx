@@ -100,7 +100,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
           </a>
           <a href={preview ? undefined : phoneHref} aria-disabled={preview || undefined} className="service-call-link"><Icon name="phone" className="h-5 w-5" />{content.copy.callCta}</a>
           <a href="#contact-form" className="service-callback-link">השאירו פרטים לחזרה</a>
-          <a href="#ac-pricing" className="service-callback-link">מחיר לפי הספק המזגן</a>
+          <a href="#ac-pricing" className="service-callback-link">מחיר ניקוי מזגן עילי</a>
         </>}
         media={<div className="reveal stagger-2 relative aspect-[16/11] overflow-hidden rounded-[1.5rem] border border-white/15 bg-navy shadow-2xl sm:rounded-[2rem] lg:aspect-[4/3]">
             <ServiceImageCarousel
@@ -254,7 +254,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
             align="start"
             eyebrow={content.copy.areasEyebrow}
             title={content.copy.areasTitle}
-            description="שלחו תמונה ואת היישוב כדי לבדוק זמינות ולקבל הערכת מחיר."
+            description="שלחו את שם היישוב לבדיקת זמינות."
             tone="light"
           />
           <div className="flex flex-wrap gap-2" aria-label="אזורי שירות לניקוי מזגנים">
