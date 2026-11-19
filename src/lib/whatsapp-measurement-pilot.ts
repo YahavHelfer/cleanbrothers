@@ -8,23 +8,37 @@ export const WHATSAPP_PILOT = {
   service: "air-conditioner-cleaning",
 } as const;
 
-export function isWhatsAppPilotWindowOpen(env: Record<string, string | undefined>, now = Date.now()) {
+const MINI_CENTRAL_SERVICE = "mini-central-air-conditioner-cleaning";
+const MINI_CENTRAL_CAMPAIGN = "24326429732";
+const miniCentralCreatives = new Set(["829563936387", "828718026646"]);
+const maximumPilotDuration = 14 * 86400000;
+
+export function isWhatsAppPilotWindowOpen(env: Record<string, string | undefined>, now = Date.now(), service?: string) {
+  if (service === MINI_CENTRAL_SERVICE) {
+    const start = Date.parse(env.WHATSAPP_MINI_CENTRAL_PILOT_START_AT ?? "");
+    return now >= start && now < start + maximumPilotDuration;
+  }
   const start = Date.parse(env.WHATSAPP_ATTRIBUTION_PILOT_START_AT ?? "");
   const end = Date.parse(env.WHATSAPP_ATTRIBUTION_PILOT_END_AT ?? "");
   return env.WHATSAPP_ATTRIBUTION_PILOT_ENABLED === "1" &&
     Number.isFinite(start) && Number.isFinite(end) &&
-    end > start && end - start <= 14 * 86400000 && now >= start && now < end;
+    end > start && end - start <= maximumPilotDuration && now >= start && now < end;
 }
 
-export function isWhatsAppPilotAttribution(service: unknown, attribution: MarketingAttribution) {
-  return service === WHATSAPP_PILOT.service && attribution.utm_source === "google" &&
-    attribution.utm_medium === "cpc" && attribution.utm_campaign === WHATSAPP_PILOT.campaign &&
+export function isWhatsAppPilotAttribution(service: unknown, attribution: MarketingAttribution): service is string {
+  if (attribution.utm_source !== "google" || attribution.utm_medium !== "cpc") return false;
+  if (service === MINI_CENTRAL_SERVICE) {
+    return attribution.utm_campaign === MINI_CENTRAL_CAMPAIGN &&
+      (!attribution.google_ads_campaign_id || attribution.google_ads_campaign_id === MINI_CENTRAL_CAMPAIGN) &&
+      miniCentralCreatives.has(attribution.utm_content ?? "");
+  }
+  return service === WHATSAPP_PILOT.service && attribution.utm_campaign === WHATSAPP_PILOT.campaign &&
     attribution.utm_content === WHATSAPP_PILOT.content;
 }
 
 export function getWhatsAppPilotHref(service: unknown, attribution: MarketingAttribution) {
   if (!isWhatsAppPilotAttribution(service, attribution)) return null;
-  return `/api/whatsapp/pilot?service=${encodeURIComponent(WHATSAPP_PILOT.service)}`;
+  return `/api/whatsapp/pilot?service=${encodeURIComponent(service)}`;
 }
 
 export async function buildWhatsAppPilotMessage({
@@ -44,7 +58,10 @@ export async function buildWhatsAppPilotMessage({
   const snapshot = buildConsentSnapshotFromCookie(consent);
   if (!snapshot) return humanMessage;
   try {
-    const token = await requestToken(attribution, snapshot);
+    const marketingAttribution = service === MINI_CENTRAL_SERVICE
+      ? { ...attribution, google_ads_campaign_id: MINI_CENTRAL_CAMPAIGN }
+      : attribution;
+    const token = await requestToken(marketingAttribution, snapshot);
     return token ? appendWhatsAppAttributionMarker(humanMessage, token) : humanMessage;
   } catch {
     return humanMessage;
