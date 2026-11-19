@@ -22,8 +22,8 @@ test('AC pricing does not display a fictitious regular-price discount, including
   for (const enabled of [true,false]) {
     const content = { ...acBaseline, promotion: { ...acBaseline.promotion, enabled } };
     const html = renderToStaticMarkup(createElement(AirConditionerCleaningView, { content, preview: true }));
-    for (const amount of ['199','249','450','250']) assert.ok(html.includes(amount));
-    assert.doesNotMatch(html, /line-through/);
+    for (const amount of ['199','450','250']) assert.ok(html.includes(amount));
+    assert.doesNotMatch(html, /249\s*₪|החל מ־199|לפי הספק המזגן|line-through/);
     assert.ok(!html.includes('המזגן ה־6'));
   }
   assert.doesNotMatch(renderToStaticMarkup(createElement(AcPromotionContent, { promotion: acBaseline.promotion, preview: true })), /line-through/);

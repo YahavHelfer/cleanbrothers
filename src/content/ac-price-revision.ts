@@ -4,6 +4,8 @@
 export function applyAcPriceRevision<T>(value: T): T {
   function visit(item: unknown): unknown {
     if (typeof item === "string") return item
+      .replaceAll("מזגן עד 2 כ״ס: 199 ₪, מעל 2 כ״ס: 249 ₪", "מזגן עילי בכל הספק: 199 ₪")
+      .replaceAll("מזגן עד 2 כ״ס ב־199 ₪", "מזגן עילי ב־199 ₪")
       .replace(/(?<!\d)550\s*₪/g, "450 ₪")
       .replace(/(?<!\d)(?:100|150)\s*₪\s*(?:לכל\s+|ל)תעלה/g, "250 ₪ לכל התעלות יחד");
     if (Array.isArray(item)) return item.map(visit);

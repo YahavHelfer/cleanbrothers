@@ -17,12 +17,13 @@ try {
     assert.equal(JSON.parse(schema).openingHoursSpecification.length, 2);
     const main = await page.locator('main').innerText();
     if (path === '/air-conditioner-cleaning') {
-      for (const amount of ['199','249','550','150']) assert.ok(main.includes(amount));
+      assert.ok(main.includes('199 ₪'));
+      assert.doesNotMatch(main, /249\s*₪|לפי הספק המזגן/);
       assert.equal(await page.locator('.line-through').count(), 0);
       assert.ok(!main.includes('המזגן ה־6'));
     }
     if (path === '/mini-central-air-conditioner-cleaning') {
-      for (const text of ['550 ₪','150 ₪','מברשת ייעודית','שואב אבק תעשייתי','כוללים מע״מ']) assert.ok(main.includes(text));
+      for (const text of ['450 ₪','250 ₪','מברשת ייעודית','שואב אבק תעשייתי','כוללים מע״מ']) assert.ok(main.includes(text));
     }
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     result.pages.push({ path, status: response.status(), hours: true, email: true, schemaHours: true, overflow: false });
@@ -38,7 +39,7 @@ try {
   await ui.getByRole('link', { name: 'הגדרות עוגיות', exact: true }).click();
   await ui.getByRole('button', { name: 'רק עוגיות הכרחיות' }).click();
   const panel = ui.locator('aside [aria-live="polite"]');
-  for (const [label,price] of [['מזגן עילי עד 2 כ״ס (כולל)','199 ₪'],['מזגן עילי מעל 2 כ״ס','249 ₪'],['מיני מרכזי','550 ₪']]) {
+  for (const [label,price] of [['מזגן עילי','199 ₪'],['מיני מרכזי','450 ₪']]) {
     await ui.getByRole('button', { name: `בחירת ${label}`, exact: true }).click();
     assert.ok((await panel.textContent()).includes(price));
     result.calculator.push({ label, price });
