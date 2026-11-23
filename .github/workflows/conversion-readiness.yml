@@ -1,0 +1,69 @@
+name: Conversion readiness (no deployment)
+on:
+  push:
+    branches: [fix/consented-whatsapp-braid-attribution]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: conversions-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  readiness:
+    if: github.event_name == 'push' || github.head_ref == 'fix/consented-whatsapp-braid-attribution'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [original, head, baseline]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:1
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: synthetic
+      SUPABASE_SERVICE_ROLE_KEY: synthetic
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: harness
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ matrix.target == 'original' && 'f050cff7ca0dbc98f2855399ae68f1fe9cd05645' || matrix.target == 'baseline' && 'd7771f26ac9250163bd98ae669a926dae86713d0' || (github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha) }}
+          path: subject
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+          cache: npm
+          cache-dependency-path: subject/package-lock.json
+      - name: Record exact source and harness revisions
+        run: |
+          mkdir -p ci-evidence
+          git -C subject rev-parse HEAD > ci-evidence/source-sha.txt
+          git -C harness rev-parse HEAD > ci-evidence/harness-sha.txt
+          node --version > ci-evidence/node-version.txt
+      - name: Install locked dependencies
+        working-directory: subject
+        run: npm ci --no-audit --no-fund
+      - name: Full suite with frozen known-failure gate
+        run: node harness/.ci/test-gate.mjs subject ci-evidence ${{ matrix.target == 'baseline' && '--baseline' || '' }}
+      - name: Build without deployment
+        if: matrix.target != 'baseline'
+        working-directory: subject
+        run: npm run build -- --webpack > ../ci-evidence/build.log 2>&1
+      - name: TypeScript check
+        if: matrix.target != 'baseline'
+        working-directory: subject
+        run: ./node_modules/.bin/tsc --noEmit --incremental false > ../ci-evidence/typecheck.log 2>&1
+      - name: Preserve evidence including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: conversions-17-${{ matrix.target }}-${{ github.run_attempt }}
+          path: ci-evidence/
+          retention-days: 14
