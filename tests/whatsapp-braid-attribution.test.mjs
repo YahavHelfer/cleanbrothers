@@ -41,3 +41,41 @@ test("retains the direct opening when collection is disabled, invalid or unconse
     assert.equal(result, humanMessage);
   }
 });
+
+for (const [label, extra] of [
+  ["bad GBRAID", { gbraid: "bad id" }],
+  ["bad WBRAID", { wbraid: "bad id" }],
+  ["two invalid braids", { gbraid: "bad id", wbraid: "?" }],
+  ["mixed braids", { gbraid: "valid_braid", wbraid: "?" }],
+]) {
+  test(`GCLID-only mode preserves the legacy payload with ${label}`, async () => {
+    const attribution = { ...cohort, gclid: "valid_click", ...extra };
+    for (const allowBraidIds of [undefined, false]) {
+      const requests = [];
+      const message = await buildWhatsAppPilotMessage({
+        enabled: true, service, humanMessage, attribution, consent: "accepted", allowBraidIds,
+        requestToken: async payload => { requests.push(payload); return token; },
+      });
+      assert.deepEqual(requests, [{ ...attribution, google_ads_campaign_id: cohort.utm_campaign }]);
+      assert.ok(message.endsWith("CB-" + token));
+    }
+  });
+}
+
+test("opted-in validation accepts valid mixed IDs and rejects malformed combinations", async () => {
+  for (const [ids, expected] of [
+    [{ gclid: "click", gbraid: "group", wbraid: "web" }, 1],
+    [{ gclid: "click", wbraid: "bad id" }, 0],
+    [{ gbraid: "group", wbraid: "bad id" }, 0],
+    [{ gclid: "bad id", wbraid: "web" }, 0],
+  ]) {
+    let calls = 0;
+    const message = await buildWhatsAppPilotMessage({
+      enabled: true, allowBraidIds: true, service, humanMessage,
+      attribution: { ...cohort, ...ids }, consent: "accepted",
+      requestToken: async () => { calls++; return token; },
+    });
+    assert.equal(calls, expected);
+    assert.equal(message.endsWith(token), Boolean(expected));
+  }
+});
