@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
   const humanMessage = getWhatsAppNavigationMessage(service, attribution);
   const message = await buildWhatsAppPilotMessage({
     enabled: isWhatsAppPilotWindowOpen(process.env, Date.now(), service, attribution.utm_content),
+    allowBraidIds: process.env.WHATSAPP_ATTRIBUTION_BRAID_ENABLED === "1",
     service, attribution, humanMessage,
     consent: request.cookies.get("cb_analytics_consent")?.value,
     requestToken: (marketingAttribution, consentSnapshot) => requestWhatsAppAttributionToken({
