@@ -1,0 +1,107 @@
+{
+  "base": "d7771f2",
+  "candidate": "f050cff",
+  "matching_failures": 12,
+  "test_names": [
+    "prepared AC relevance revision retained: src/app/(site)/air-conditioner-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/armchair-chair-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/car-upholstery-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/carpet-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/delicate-upholstery-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/mattress-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/mini-central-air-conditioner-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/post-renovation-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/sofa-cleaning/page.tsx",
+    "verified deployed page content, links and metadata retained: src/app/(site)/window-cleaning/page.tsx",
+    "explicit local source resolves only three published snapshots and keeps their revision identities"
+  ],
+  "assertions": [
+    {
+      "location": "cms-site-chrome.test.mjs:145:10",
+      "actual": "b16a41941416c855ce01fc8c8c73025ba059866566aaf25d5a11505ab96cfe71",
+      "expected": "c9423701e198d2d847db1ed50daed4c4fe455883629d0b5774ba08c7bf1f29d1",
+      "actualSnippet": "co.il\",\"serviceAreas\":[\"ראש העין\",\"פתח תקווה\",\"תל אביב-יפו\",\"רמת גן\",\"גבעתיים\",\"בני ברק\",\"קריית אונו\",\"אור יהודה\",\"יהוד",
+      "expectedSnippet": "co.il\",\"serviceAreas\":[\"פתח תקווה\",\"רמת גן\",\"הוד השרון\",\"תל אביב\",\"רעננה\",\"הרצליה\",\"רמת השרון\",\"גבעתיים\",\"והסביבה\"],\"st"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "9ec0e3561e057db45222662b5bb8357daba143c31712dace7e8d82bdef5e57db",
+      "expected": "36e8fcb968189da5943e8df58fe1c35c00ac28abbfb929ea8a03df0906eb5baa",
+      "actualSnippet": "e\",\"name\":\"ניקוי מזגנים עד הבית\",\"serviceType\":\"ניקוי מזגנים\",\"url\":\"https://www.cleanbrothers.co.il/air-conditioner-cl",
+      "expectedSnippet": "e\",\"name\":\"ניקוי מזגנים מקצועי עד הבית\",\"serviceType\":\"ניקוי מזגנים\",\"url\":\"https://www.cleanbrothers.co.il/air-conditi"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "e50aaf7198cd79c5b731a555b3c3dc5abe2d6bd37fa7330c990c1cddb8e514dc",
+      "expected": "0fba7dd026ed24c6bd9012c2a3dd517968522494a1b7d677a33ca2d31975549b",
+      "actualSnippet": "/div></section><section id=\"service-results\" data-service-results=\"true\" class=\"section-block theme-section-soft\"><div ",
+      "expectedSnippet": "/div></section><section data-service-results=\"true\" class=\"section-block theme-section-soft\"><div class=\"section-contai"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "3e4e8e5d2b4041689c6c5ee0244d2a987e34567db70528116979fa6eb48afeb6",
+      "expected": "ad5a980fbbf503acaf18dfee62f5a2d31ecc18cf7fee28d34ce6025f4ba5f95c",
+      "actualSnippet": "=\"service-hero-summary\">ניקוי מושבי בד ברכב אצלכם, לטיפול בלכלוך, בכתמים ובריחות. נדרשות נקודת מים ונקודת חשמל בקרבת הר",
+      "expectedSnippet": "=\"service-hero-summary\">שלחו תמונה ונעזור להתאים את השירות לצורך שלכם.</p><div class=\"service-hero-actions\"><a data-wha"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "94ea32d07225b55c73742bef308a9b7601636b444de1ef9eaa068087f06f8492",
+      "expected": "cd1b25467400585694dc06ffb6bf5e5e872754c73e80a4f8d7f7650d71ff44b6",
+      "actualSnippet": "/div></section><section id=\"service-results\" data-service-results=\"true\" class=\"section-block theme-section-soft\"><div ",
+      "expectedSnippet": "/div></section><section data-service-results=\"true\" class=\"section-block theme-section-soft\"><div class=\"section-contai"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "91b6476024cb514eddf0e785de4570a4cdc04805abd6719049b74ce5c6e5ef4d",
+      "expected": "4492139434ec62d4bc8a970c0d0eeff6f7b2c121db341fa1aeb0fc9b97566d68",
+      "actualSnippet": "/div></section><section id=\"service-results\" data-service-results=\"true\" class=\"section-block theme-section-soft\"><div ",
+      "expectedSnippet": "/div></section><section data-service-results=\"true\" class=\"section-block theme-section-soft\"><div class=\"section-contai"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "946f813022172e7b33240c50cfee9ddfac60054540d01d1daedf7bc323cd7912",
+      "expected": "32a6a3b686021fa4072213988e18a566c94702af17b054c371a453878f320633",
+      "actualSnippet": "=\"service-hero-summary\">ניקוי מזרנים בבית הלקוח, במחיר לפי גודל המזרן ומספר הצדדים. מזרן יחיד, צד אחד: 200 ₪; מזרן זוגי",
+      "expectedSnippet": "=\"service-hero-summary\">שלחו תמונה ונעזור להתאים את השירות לצורך שלכם.</p><div class=\"service-hero-actions\"><a data-wha"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "b9f47701129a147eadab34f818a63cfae322dd16334451d561697873c6ec295d",
+      "expected": "893622e6623080f25d2c64507e47732ffeb595e27d242d89754c712544a51b61",
+      "actualSnippet": "-conditioner-cleaning\",\"areaServed\":[{\"@type\":\"Place\",\"name\":\"ראש העין\"},{\"@type\":\"Place\",\"name\":\"פתח תקווה\"},{\"@type\":",
+      "expectedSnippet": "-conditioner-cleaning\",\"provider\":{\"@id\":\"https://www.cleanbrothers.co.il/#business\"}}</script><script id=\"mini-central"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "25d7477738b3d9fcce97d2d6aaf211a38ad58f5dff7e8282d951576ec07b0294",
+      "expected": "ae9ff04dbe212c363cb6f2a3bbe764a5133affa7d38dcdff2b9533c7b448552a",
+      "actualSnippet": "<script id=\"cleanbrothers-service-jsonld\" type=\"application/ld+json\">{\"@context\":\"https://schema",
+      "expectedSnippet": "<link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fimages%2Fhero%2Fhero-sofa-cleani"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "277d92c4d28c054e59474975b98b68c6545ab556d1bbf87b7a8cb6ed372232bb",
+      "expected": "c19e7f0491342cb899bb4cad7b6e5066542247017d316c674f1ce83dd970b104",
+      "actualSnippet": "=\"service-hero-summary\">ניקיון דירה אחרי שיפוץ או לפני כניסה. ציינו את שטח הדירה, היישוב ומועד הכניסה כדי שנוכל להעריך ",
+      "expectedSnippet": "=\"service-hero-summary\">הנכס אחרי שיפוץ או לקראת כניסה? מתאמים ניקיון לפי מצב הדירה, המשטחים ומועד המעבר — עם היקף עבוד"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "7242b27188bb5f0db01c196b195868e41f2f10a3aa480eb56f56d9c618627a93",
+      "expected": "7226f7971051ac7e6bc7647e4352617499e8987360a8b852c52cbce156198b88",
+      "actualSnippet": "s.co.il/sofa-cleaning\",\"areaServed\":[{\"@type\":\"Place\",\"name\":\"ראש העין\"},{\"@type\":\"Place\",\"name\":\"פתח תקווה\"},{\"@type\":",
+      "expectedSnippet": "s.co.il/sofa-cleaning\",\"provider\":{\"@id\":\"https://www.cleanbrothers.co.il/#business\"}}</script><script id=\"sofa-cleanin"
+    },
+    {
+      "location": "cms-public-equivalence.test.mjs:48:10",
+      "actual": "a5cd8251def8727ea059f74e342b1175c8d81ea43d20ff5024de76af5f31abf9",
+      "expected": "7fd87617ed23c56a89d0fec5797a9aff5652b44a547d869d15b5fdc0648fdcef",
+      "actualSnippet": "=\"service-hero-summary\">ניקוי חלונות נגישים בבתים, בחנויות ואחרי שיפוץ. צלמו את החלונות מרחוק וציינו כמה יש, באיזו קומה",
+      "expectedSnippet": "=\"service-hero-summary\">שלחו תמונה ונעזור להתאים את השירות לצורך שלכם.</p><div class=\"service-hero-actions\"><a data-wha"
+    }
+  ],
+  "baseline": "d7771f26ac9250163bd98ae669a926dae86713d0",
+  "source": "f050cff7ca0dbc98f2855399ae68f1fe9cd05645"
+}

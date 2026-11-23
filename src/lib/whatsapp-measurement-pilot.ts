@@ -47,9 +47,10 @@ export function getWhatsAppPilotHref(service: unknown, attribution: MarketingAtt
 }
 
 export async function buildWhatsAppPilotMessage({
-  enabled, service, attribution, consent, humanMessage, requestToken,
+  enabled, allowBraidIds = false, service, attribution, consent, humanMessage, requestToken,
 }: {
   enabled: boolean;
+  allowBraidIds?: boolean;
   service: unknown;
   attribution: MarketingAttribution;
   consent: string | undefined;
@@ -57,9 +58,14 @@ export async function buildWhatsAppPilotMessage({
   requestToken: (attribution: MarketingAttribution, snapshot: ConsentSnapshot) => Promise<string | null>;
 }) {
   // A UTM label is a cohort marker, never proof that a Google click occurred.
-  // Initial pilot requires a present GCLID; its real validity is checked by Google.
-  if (!enabled || !isWhatsAppPilotAttribution(service, attribution) ||
-      !attribution.gclid || !/^[A-Za-z0-9_-]{1,220}$/.test(attribution.gclid)) return humanMessage;
+  if (!enabled || !isWhatsAppPilotAttribution(service, attribution)) return humanMessage;
+  const clickIdPattern = /^[A-Za-z0-9_-]{1,220}$/;
+  // In the original pilot only GCLID determines eligibility.
+  const candidates = allowBraidIds
+    ? [attribution.gclid, attribution.gbraid, attribution.wbraid]
+    : [attribution.gclid];
+  const clickIds = candidates.filter((value): value is string => value !== undefined);
+  if (!clickIds.length || clickIds.some(value => !clickIdPattern.test(value))) return humanMessage;
   const snapshot = buildConsentSnapshotFromCookie(consent);
   if (!snapshot) return humanMessage;
   try {
