@@ -54,3 +54,14 @@ test("the replacement has its own bounded window and respects the wall AC switch
   assert.equal(open(env, start, "cb_wa_site_pilot_ac_829688140730"), false);
   assert.equal(isWhatsAppPilotWindowOpen(env, start, "mini-central-air-conditioner-cleaning"), false);
 });
+
+test("the current wall AC ad uses the same pilot window and routes with its own tag", async () => {
+  const click = { ...attribution, utm_content: "cb_wa_site_pilot_ac_831708035924" };
+  assert.equal(isWhatsAppPilotWindowOpen(env, start, service, click.utm_content), true);
+  assert.equal(isWhatsAppPilotWindowOpen({}, start, service, click.utm_content), false);
+  assert.equal(getWhatsAppPilotHref(service, click), "/api/whatsapp/pilot?service=air-conditioner-cleaning");
+  const message = await buildWhatsAppPilotMessage({ enabled, service, attribution: click, consent: "accepted", humanMessage,
+    requestToken: async (marketing) => { assert.equal(marketing.utm_content, click.utm_content); return "AbCdEfGhIjKlMnOpQrStUv"; },
+  });
+  assert.match(message, /CB-AbCdEfGhIjKlMnOpQrStUv$/);
+});
