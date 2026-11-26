@@ -1,3 +1,8 @@
 {
-  "buildCommand": "node deployment/cms-production-preflight.mjs && npm run build -- --webpack"
+  "buildCommand": "node deployment/cms-production-preflight.mjs && npm run build -- --webpack",
+  "git": {
+    "deploymentEnabled": {
+      "review/whatsapp-pilot-aggregate": false
+    }
+  }
 }
