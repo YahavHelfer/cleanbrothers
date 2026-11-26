@@ -14,6 +14,14 @@ const MINI_CENTRAL_CAMPAIGN = "24326429732";
 const miniCentralCreatives = new Set(["829563936387", "828718026646"]);
 const maximumPilotDuration = 14 * 86400000;
 
+export type WhatsAppPilotCohort = "mini_central" | "wall_wash" | "original_ac";
+export type WhatsAppPilotGate =
+  | "campaign_not_approved"
+  | "pilot_closed_or_disabled"
+  | "gclid_missing_or_invalid"
+  | "consent_unavailable"
+  | "eligible";
+
 export function isWhatsAppPilotWindowOpen(env: Record<string, string | undefined>, now = Date.now(), service?: string, content?: string) {
   const wallWash = service === WHATSAPP_PILOT.service && wallAcPilotContents.has(content ?? "");
   if (service === MINI_CENTRAL_SERVICE || wallWash) {
@@ -29,16 +37,21 @@ export function isWhatsAppPilotWindowOpen(env: Record<string, string | undefined
     end > start && end - start <= maximumPilotDuration && now >= start && now < end;
 }
 
-export function isWhatsAppPilotAttribution(service: unknown, attribution: MarketingAttribution): service is string {
-  if (attribution.utm_source !== "google" || attribution.utm_medium !== "cpc") return false;
+function getWhatsAppPilotCohort(service: unknown, attribution: MarketingAttribution): WhatsAppPilotCohort | null {
+  if (attribution.utm_source !== "google" || attribution.utm_medium !== "cpc") return null;
+  const campaign = attribution.utm_campaign;
+  if (attribution.google_ads_campaign_id && attribution.google_ads_campaign_id !== campaign) return null;
+  const content = attribution.utm_content ?? "";
   if (service === MINI_CENTRAL_SERVICE) {
-    return attribution.utm_campaign === MINI_CENTRAL_CAMPAIGN &&
-      (!attribution.google_ads_campaign_id || attribution.google_ads_campaign_id === MINI_CENTRAL_CAMPAIGN) &&
-      miniCentralCreatives.has(attribution.utm_content ?? "");
+    return campaign === MINI_CENTRAL_CAMPAIGN && miniCentralCreatives.has(content) ? "mini_central" : null;
   }
-  return service === WHATSAPP_PILOT.service && attribution.utm_campaign === WHATSAPP_PILOT.campaign &&
-    (!attribution.google_ads_campaign_id || attribution.google_ads_campaign_id === WHATSAPP_PILOT.campaign) &&
-    (attribution.utm_content === WHATSAPP_PILOT.content || wallAcPilotContents.has(attribution.utm_content ?? ""));
+  if (service !== WHATSAPP_PILOT.service || campaign !== WHATSAPP_PILOT.campaign) return null;
+  if (content === WHATSAPP_PILOT.content) return "original_ac";
+  return wallAcPilotContents.has(content) ? "wall_wash" : null;
+}
+
+export function isWhatsAppPilotAttribution(service: unknown, attribution: MarketingAttribution): service is string {
+  return getWhatsAppPilotCohort(service, attribution) !== null;
 }
 
 export function getWhatsAppPilotHref(service: unknown, attribution: MarketingAttribution) {
@@ -47,7 +60,7 @@ export function getWhatsAppPilotHref(service: unknown, attribution: MarketingAtt
 }
 
 export async function buildWhatsAppPilotMessage({
-  enabled, service, attribution, consent, humanMessage, requestToken,
+  enabled, service, attribution, consent, humanMessage, requestToken, onGate,
 }: {
   enabled: boolean;
   service: unknown;
@@ -55,13 +68,29 @@ export async function buildWhatsAppPilotMessage({
   consent: string | undefined;
   humanMessage: string;
   requestToken: (attribution: MarketingAttribution, snapshot: ConsentSnapshot) => Promise<string | null>;
+  onGate?: (gate: WhatsAppPilotGate, cohort: WhatsAppPilotCohort | null) => void;
 }) {
+  const cohort = getWhatsAppPilotCohort(service, attribution);
+  if (!cohort) {
+    onGate?.("campaign_not_approved", null);
+    return humanMessage;
+  }
+  if (!enabled) {
+    onGate?.("pilot_closed_or_disabled", cohort);
+    return humanMessage;
+  }
   // A UTM label is a cohort marker, never proof that a Google click occurred.
   // Initial pilot requires a present GCLID; its real validity is checked by Google.
-  if (!enabled || !isWhatsAppPilotAttribution(service, attribution) ||
-      !attribution.gclid || !/^[A-Za-z0-9_-]{1,220}$/.test(attribution.gclid)) return humanMessage;
+  if (!attribution.gclid || !/^[A-Za-z0-9_-]{1,220}$/.test(attribution.gclid)) {
+    onGate?.("gclid_missing_or_invalid", cohort);
+    return humanMessage;
+  }
   const snapshot = buildConsentSnapshotFromCookie(consent);
-  if (!snapshot) return humanMessage;
+  if (!snapshot) {
+    onGate?.("consent_unavailable", cohort);
+    return humanMessage;
+  }
+  onGate?.("eligible", cohort);
   try {
     const marketingAttribution = { ...attribution, google_ads_campaign_id: attribution.utm_campaign };
     const token = await requestToken(marketingAttribution, snapshot);
