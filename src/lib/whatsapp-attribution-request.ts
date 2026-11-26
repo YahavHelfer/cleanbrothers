@@ -44,7 +44,9 @@ export async function requestWhatsAppAttributionToken({
   const normalizedSecret = secret?.trim();
   if (!normalizedSecret) return finish("not_configured");
 
+  let signal: AbortSignal | undefined;
   try {
+    signal = AbortSignal.timeout(timeoutMs);
     const response = await fetchImpl(endpoint, {
       method: "POST",
       headers: {
@@ -56,7 +58,7 @@ export async function requestWhatsAppAttributionToken({
         ...(consentSnapshot ? { consentSnapshot } : {}),
       }),
       cache: "no-store",
-      signal: AbortSignal.timeout(timeoutMs),
+      signal,
     });
     if (!response.ok) {
       const { status } = response;
@@ -64,14 +66,22 @@ export async function requestWhatsAppAttributionToken({
       return finish(rejected ? "rejected" : "http_failure");
     }
 
-    const data = (await response.json().catch(() => null)) as {
-      token?: unknown;
-    } | null;
+    let data: { token?: unknown } | null;
+    try {
+      data = await response.json();
+    } catch (error) {
+      if (error instanceof SyntaxError) return finish("invalid_response");
+      throw error;
+    }
     return typeof data?.token === "string" &&
       WHATSAPP_ATTRIBUTION_TOKEN_PATTERN.test(data.token)
       ? finish("issued", data.token)
       : finish("invalid_response");
   } catch (error) {
-    return finish(error instanceof Error && error.name === "TimeoutError" ? "timeout" : "transport_failure");
+    const timedOut = error instanceof Error && (
+      error.name === "TimeoutError" ||
+      (error.name === "AbortError" && signal?.aborted && signal.reason?.name === "TimeoutError")
+    );
+    return finish(timedOut ? "timeout" : "transport_failure");
   }
 }

@@ -42,7 +42,7 @@ function harness({ ageDays = 1, review = false, response, logFailure = false, se
     function fakeFetch(url, options) {
       requests.push({ url, options });
       assert.equal(typeof response, "function", "Unexpected CRM request");
-      return response();
+      return response(options);
     }
     const logger = {
       info(line) {
@@ -165,6 +165,41 @@ test("request result categories preserve fallback without reattempting or delayi
     assert.equal(response.status, 307);
     assert.ok(!response.headers.get("location").includes(token));
     assert.equal(testCase.requests.length, attempts);
+    assert.equal(readObservation(testCase.logs).token_request, expected);
+  }
+});
+
+for (const phase of ["headers", "body"]) {
+  test(`the request deadline expires while waiting for ${phase}`, async () => {
+    function interrupted(signal) {
+      return new Promise((_, reject) => {
+        // A real network request would keep the event loop alive until the deadline.
+        const watchdog = setTimeout(() => reject(new Error("deadline did not fire")), 3000);
+        signal.addEventListener("abort", () => {
+          clearTimeout(watchdog);
+          reject(phase === "headers" ? signal.reason : new DOMException("interrupted", "AbortError"));
+        }, { once: true });
+      });
+    }
+    const testCase = harness({ response: ({ signal }) => phase === "headers"
+      ? interrupted(signal)
+      : { ok: true, json: () => interrupted(signal) } });
+    const result = await testCase.run();
+    assert.equal(result.status, 307);
+    assert.equal(result.headers.get("location"), (await harness().run({ consent: "declined" })).headers.get("location"));
+    assert.equal(testCase.requests.length, 1);
+    assert.equal(readObservation(testCase.logs).token_request, "timeout");
+  });
+}
+
+test("malformed JSON and a body interrupted independently of the deadline have distinct outcomes", async () => {
+  for (const [response, expected] of [
+    [() => new Response("{"), "invalid_response"],
+    [() => ({ ok: true, json: async () => { throw new DOMException("interrupted", "AbortError"); } }), "transport_failure"],
+  ]) {
+    const testCase = harness({ response });
+    assert.equal((await testCase.run()).status, 307);
+    assert.equal(testCase.requests.length, 1);
     assert.equal(readObservation(testCase.logs).token_request, expected);
   }
 });
