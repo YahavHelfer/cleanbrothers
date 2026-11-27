@@ -1,4 +1,6 @@
 "use client";
+import { isUnalignedAcOffer } from "@/content/ac-price-revision";
+
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -26,6 +28,7 @@ export function PublicCampaigns() {
   }, [pathname]);
   if (!current || current.path !== pathname) return null;
   const { campaign, revisionId } = current;
+  if (isUnalignedAcOffer(campaign)) return null;
   if (campaign.displayMode === "popup") return <PromotionPopupView key={revisionId} campaign={campaign} revisionId={revisionId} />;
   const href = resolveSafeTarget(campaign.cta.target);
   return <aside className="section-block theme-section-contrast" data-promotion-revision={revisionId}>

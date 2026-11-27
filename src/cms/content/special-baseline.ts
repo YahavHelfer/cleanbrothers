@@ -1,15 +1,17 @@
+import { acDuctPricingNotice, localAcPrices, localAcPriceTerms, miniCentralStartingPrice, wallAcStartingPrice } from "@/content/local-ac-prices";
+import { wallAcMultipleQuote } from "@/content/ac-price-revision";
 import type { AirConditionerCleaningContent, WindowCleaningContent } from "./special-model";
 // Static fallback and offline CMS draft baseline. Editorial updates must be
 // merged into a fresh CMS revision when the published content source is active.
 export const acBaseline: AirConditionerCleaningContent = {
   "schemaVersion": 4,
   "publicTitle": "ניקוי מזגנים",
-  "h1": "ניקוי מזגן עילי ב־199 ₪",
-  "seoTitle": "ניקוי מזגן עילי ב־199 ₪ עד הבית | CleanBrothers",
-  "seoDescription": "ניקוי מזגן עילי ב־199 ₪ ליחידה, בכל הספק, כולל מע״מ. ניקוי פילטרים, מאייד וחלקי מפוח נגישים בבית הלקוח במרכז ובשרון. שלחו תמונה לתיאום.",
+  "h1": "ניקוי מזגן עילי עד הבית",
+  "seoTitle": "ניקוי מזגן עילי עד הבית | מחירון ניקוי מזגנים | CleanBrothers",
+  "seoDescription": `ניקוי מזגן עילי ${wallAcStartingPrice}, כולל מע״מ ובכפוף לבדיקה ולהיקף העבודה.`,
   "copy": {
     "heroEyebrow": "ניקוי מזגנים עד הבית",
-    "heroDescription": "ניקוי מזגן עילי ב־199 ₪ ליחידה, בכל הספק, כולל מע״מ.",
+    "heroDescription": `ניקוי מזגן עילי ${wallAcStartingPrice}, כולל מע״מ ובכפוף לבדיקה ולהיקף העבודה.`,
     "heroCta": "תאמו ניקוי מזגן בוואטסאפ",
     "callCta": "התקשרו עכשיו",
     "imageCaption": "תמונות מהשטח",
@@ -29,13 +31,13 @@ export const acBaseline: AirConditionerCleaningContent = {
     "galleryEyebrow": "עבודות מהשטח",
     "galleryTitle": "עבודות ניקוי מזגנים",
     "galleryDescription": "תמונות מעבודות שבוצעו על ידי CleanBrothers. איננו מציגים זוג לפני ואחרי כאשר אין תיעוד מלא מאותה עבודה.",
-    "pricingEyebrow": "מחיר קבוע למזגן עילי",
+    "pricingEyebrow": "מחיר פתיחה לניקוי מזגן עילי",
     "pricingTitle": "כמה עולה ניקוי מזגן?",
-    "pricingDescription": "ניקוי מזגן עילי ב־199 ₪ ליחידה, בכל הספק, כולל מע״מ.",
-    "pricingCta": "תאמו ניקוי ב־199 ₪",
+    "pricingDescription": `ניקוי מזגן עילי ${wallAcStartingPrice}, כולל מע״מ ובכפוף לבדיקה ולהיקף העבודה.`,
+    "pricingCta": "תאמו ניקוי מזגן",
     "multipleEyebrow": "תיאום מרוכז",
     "multipleTitle": "יש כמה מזגנים בבית?",
-    "multipleDescription": "המחיר הוא 199 ₪ לכל מזגן עילי. ניקוי שני מזגנים עיליים באותו ביקור עולה 398 ₪ כולל מע״מ.",
+    "multipleDescription": wallAcMultipleQuote,
     "multipleCta": "שלחו את כל התמונות",
     "areasEyebrow": "אזורי שירות",
     "areasTitle": "ניקוי מזגנים עד הבית באזור המרכז",
@@ -51,7 +53,7 @@ export const acBaseline: AirConditionerCleaningContent = {
   },
   "trustItems": [
     "שירות עד הבית",
-    "מחיר קבוע ליחידה",
+    "מחיר פתיחה כולל מע״מ",
     "זמינות מהירה באזור המרכז"
   ],
   "airConditionerServiceAreas": [
@@ -100,7 +102,7 @@ export const acBaseline: AirConditionerCleaningContent = {
   "faqs": [
     {
       "question": "מה ההבדל בין ניקוי מזגן עילי, מיני מרכזי ותעלות?",
-      "answer": "במזגן עילי מנקים את החלקים הנגישים של היחידה הפנימית. ניקוי מיני מרכזי כולל מנוע, מאייד, פתחים ופילטרים, לאחר בדיקת גישה למנוע ולמאייד. ניקוי תעלות מוצע בנפרד בתוספת 250 ₪ לכל התעלות יחד, בעזרת מברשת ייעודית ושואב אבק תעשייתי לשאיבת האבק. השירות אינו תיקון תקלות."
+      "answer": `בעילי מנקים את החלקים הנגישים ביחידה הפנימית. במיני מרכזי בודקים גישה למנוע ולמאייד, ויכולים לנקות גם פתחים ופילטרים. ${acDuctPricingNotice}`
     },
     {
       "question": "מה כולל ניקוי מזגן?",
@@ -128,11 +130,11 @@ export const acBaseline: AirConditionerCleaningContent = {
     },
     {
       "question": "אפשר לנקות כמה מזגנים באותו ביקור?",
-      "answer": "המחיר הוא 199 ₪ לכל מזגן עילי. ניקוי שני מזגנים עיליים באותו ביקור עולה 398 ₪ כולל מע״מ."
+      "answer": wallAcMultipleQuote
     },
     {
       "question": "האם אתם מנקים מזגן עילי בלבד או גם סוגים אחרים?",
-      "answer": "אנחנו מנקים מזגנים עיליים ומיני מרכזי. במיני מרכזי בודקים גישה למאייד ולמנוע לפני התיאום; המחיר 450 ₪ למנוע, למאייד, לפתחים ולפילטרים. ניקוי תעלות מוצע בנפרד ב־250 ₪ לכל התעלות יחד."
+      "answer": `ניקוי מיני מרכזי ${miniCentralStartingPrice}, כולל מע״מ ובכפוף לבדיקת גישה. ${acDuctPricingNotice}`
     }
   ],
   "serviceDescription": "ניקוי מזגנים מקצועי בבית הלקוח, עם טיפול באבק ובלכלוך בחלקים הנגישים לניקוי.",
@@ -183,16 +185,16 @@ export const acBaseline: AirConditionerCleaningContent = {
   },
   "promotion": {
     "enabled": true,
-    "startingPrice": 199,
-    "regularPrice": 199,
+    "startingPrice": localAcPrices.basic.amount,
+    "regularPrice": localAcPrices.basic.amount,
     "bundleEnabled": false,
     "badge": "מחירי ניקוי מזגנים",
     "heroLabel": "מחירי ניקוי מזגנים",
-    "pricePrefix": "ניקוי מזגן עילי ב־",
-    "description": "ניקוי מזגן עילי ב־199 ₪ ליחידה, בכל הספק, כולל מע״מ.",
+    "pricePrefix": "ניקוי מזגן עילי החל מ־",
+    "description": `ניקוי מזגן עילי ${wallAcStartingPrice}, כולל מע״מ ובכפוף לבדיקה ולהיקף העבודה.`,
     "cta": "שלחו תמונה לתיאום",
-    "priceTerms": "המחיר הוא לכל יחידה עילית וכולל מע״מ. למיני מרכזי ולניקוי תעלות יש תמחור נפרד.",
-    "bundleTerms": "הצעת המזגן השישי ללא עלות אינה בתוקף."
+    "priceTerms": localAcPriceTerms,
+    "bundleTerms": localAcPriceTerms
   }
 };
 export const windowBaseline: WindowCleaningContent = {

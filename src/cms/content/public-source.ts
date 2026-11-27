@@ -1,5 +1,6 @@
 import "server-only";
-import { applyAcPriceRevision } from "@/content/ac-price-revision";
+import { miniCentralAirConditionerLanding } from "@/data/miniCentralAirConditionerCopy";
+import { applyAcPriceRevision, isUnalignedAcOffer } from "@/content/ac-price-revision";
 import { getPublicServiceImages } from "@/cms/service-images/public-source";
 import { withSharedServiceImages } from "@/cms/service-images/presentation";
 import { requireMediaReadEnvironment } from "@/cms/media/environment";
@@ -37,7 +38,10 @@ export const getPublicService = cache(async (key: SharedServiceKey) => {
     return resolveMediaProjection(data.media, "public");
   })() : undefined;
   const page = withSharedServiceImages(toServiceLanding(key, data.payload, media), await getPublicServiceImages(key));
-  return { revisionId: parseRevisionId(data.revisionId), page: key === "mini-central-air-conditioner-cleaning" ? applyAcPriceRevision(page) : page };
+  return { revisionId: parseRevisionId(data.revisionId), page: key === "mini-central-air-conditioner-cleaning" ? { ...page, content: { ...applyAcPriceRevision(page.content, "mini"),
+    h1: miniCentralAirConditionerLanding.h1, metaDescription: miniCentralAirConditionerLanding.metaDescription,
+    signsTitle: miniCentralAirConditionerLanding.signsTitle, signsDescription: miniCentralAirConditionerLanding.signsDescription,
+    benefitsDescription: miniCentralAirConditionerLanding.benefitsDescription } } : page };
 });
 
 export const getPublicPilot = () => getPublicService(PILOT_KEY);
@@ -48,7 +52,9 @@ import { validateSpecialContent } from "./special-model";
 // Older published revisions still advertise horsepower tiers. Apply the approved
 // tariff to their commercial copy without changing media or service coverage.
 function applyPublishedWallAcPrice(content: typeof acBaseline): typeof acBaseline {
-  if (!/249|לפי הספק/.test(content.copy.pricingDescription + content.promotion.priceTerms + content.seoDescription)) return content;
+  const { startingPrice, regularPrice } = acBaseline.promotion;
+  if (content.promotion.startingPrice === startingPrice && content.promotion.regularPrice === regularPrice &&
+      !content.promotion.bundleEnabled && !isUnalignedAcOffer(content)) return content;
   return {
     ...content,
     h1: acBaseline.h1, seoTitle: acBaseline.seoTitle, seoDescription: acBaseline.seoDescription,
@@ -67,10 +73,11 @@ function applyPublishedWallAcPrice(content: typeof acBaseline): typeof acBaselin
       contactDescription: acBaseline.copy.contactDescription,
       contactCta: acBaseline.copy.contactCta,
     },
-    promotion: { ...content.promotion, startingPrice: 199, regularPrice: 199, bundleEnabled: false,
+    promotion: { ...content.promotion, startingPrice, regularPrice, bundleEnabled: false,
+      heroLabel: acBaseline.promotion.heroLabel, badge: acBaseline.promotion.badge, bundleTerms: acBaseline.promotion.bundleTerms,
       description: acBaseline.promotion.description, priceTerms: acBaseline.promotion.priceTerms,
       pricePrefix: acBaseline.promotion.pricePrefix, cta: acBaseline.promotion.cta },
-    trustItems: content.trustItems.map(item => item.includes("הערכת מחיר") ? "מחיר קבוע ליחידה" : item),
+    trustItems: content.trustItems.map(item => /מחיר קבוע|בכל הספק/.test(item) ? "מחיר פתיחה כולל מע״מ" : item),
     processSteps: content.processSteps.map(step => step.includes("הערכת מחיר") ? "מאשרים את מספר המזגנים" : step),
     faqs: content.faqs.map(faq => faq.question.includes("כמה מזגנים")
       ? { ...faq, answer: acBaseline.copy.multipleDescription } : faq),
@@ -93,5 +100,5 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   const { data, error } = await client.rpc("cms_read_published_service", { target_key: key });
   if (error || !data) throw new Error("Published CMS service unavailable");
   const content = validateSpecialContent(key, data.payload);
-  return { revisionId: parseRevisionId(data.revisionId), content: content.schemaVersion === 4 ? applyPublishedWallAcPrice(applyAcPriceRevision(content)) : content, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
+  return { revisionId: parseRevisionId(data.revisionId), content: content.schemaVersion === 4 ? applyPublishedWallAcPrice(applyAcPriceRevision(content, "wall")) : content, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
 });

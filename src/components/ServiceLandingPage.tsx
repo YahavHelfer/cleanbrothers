@@ -1,3 +1,4 @@
+import { isAcPriceAlignmentPreview } from "@/lib/local-ac-preview";
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
 import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
@@ -47,12 +48,14 @@ export function ServiceLandingPage({ config, crmServiceName = config.serviceName
   const miniCentral = config.path === "/mini-central-air-conditioner-cleaning";
   const propertyCleaning = config.path === "/post-renovation-cleaning";
   const phoneHref = "tel:0559577731";
+  const preview = isAcPriceAlignmentPreview();
   return ServiceLandingView({
+    preview,
     config,
     contact: <ContactForm initialService={crmServiceName} />,
     phoneNumber: <GoogleCallTrackingNumber>055-957-7731</GoogleCallTrackingNumber>,
-    phoneHref,
-    whatsappHref: getWhatsAppLink(miniCentral ? "היי, אשמח לתאם ניקוי מזגן מיני מרכזי. היישוב שלי: ___. מצרף/ת תמונות של המזגן ופתח הגישה." : propertyCleaning ? "היי, אשמח לקבל הצעת מחיר לניקיון אחרי שיפוץ ולפני אכלוס" : `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`, config.path),
+    phoneHref: preview ? undefined : phoneHref,
+    whatsappHref: preview ? undefined : getWhatsAppLink(miniCentral ? "היי, אשמח לתאם ניקוי מזגן מיני מרכזי. היישוב שלי: ___. מצרף/ת תמונות של המזגן ופתח הגישה." : propertyCleaning ? "היי, אשמח לקבל הצעת מחיר לניקיון אחרי שיפוץ ולפני אכלוס" : `היי, אשמח לקבל הצעת מחיר עבור ${config.serviceName}.`, config.path),
     jsonLd: <>
       <JsonLd id={`${config.path.slice(1)}-service-jsonld`} data={buildPageServiceJsonLd(config)} />
       <JsonLd id={`${config.path.slice(1)}-breadcrumb-jsonld`} data={{

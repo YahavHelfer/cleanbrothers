@@ -1,3 +1,4 @@
+import { isUnalignedAcOffer } from "@/content/ac-price-revision";
 import Image from "next/image";
 import { resolveSafeTarget, validatePromotionDraft, type PromotionDraft } from "./model";
 
@@ -5,6 +6,7 @@ export function PromotionBannerView({ promotion, template, identity, media, prev
   promotion: PromotionDraft; template: "accent" | "quiet"; identity: string;
   media: { src: string; altText: string } | null; preview: boolean;
 }) {
+  if (!preview && isUnalignedAcOffer(promotion)) return null;
   const exact = validatePromotionDraft(promotion);
   if (!exact.enabled) return null;
   if (exact.mediaVersionId && !media) throw new Error("CMS promotion media unavailable");

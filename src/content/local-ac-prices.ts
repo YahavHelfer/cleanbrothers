@@ -15,3 +15,7 @@ export const localAcPriceTerms = "כל המחירים כוללים מע״מ, ה�
 export function formatLocalAcPrice(amount: number) {
   return `החל מ־${amount} ₪`;
 }
+
+export const wallAcStartingPrice = formatLocalAcPrice(localAcPrices.basic.amount);
+export const miniCentralStartingPrice = formatLocalAcPrice(localAcPrices.miniCentral.amount);
+export const acDuctPricingNotice = "היקף ניקוי התעלות והמחיר נקבעים לאחר בדיקת גישה ומוסכמים לפני התיאום.";

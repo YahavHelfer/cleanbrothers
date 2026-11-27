@@ -23,7 +23,7 @@ export const staticHomeMedia: BlockMedia = Object.fromEntries([...staticMediaInv
   [item.versionId, { src: item.path, altText: item.alt }]));
 
 export function homeFaqJsonLd(page: HomeDraft) {
-  const faq = validateHomeDraft(page).blocks.find(block => block.type === "homeFaq" && !block.hidden);
+  const faq = applyAcPriceRevision(validateHomeDraft(page)).blocks.find(block => block.type === "homeFaq" && !block.hidden);
   if (!faq) return null;
   const items = faq.payload.items as { question: string; answer: string }[];
   return { "@context": "https://schema.org", "@type": "FAQPage",
@@ -53,8 +53,8 @@ function HomeBlockView({ block, media, promotions, preview, revisionId, reviews,
     case "homeWhyUs": return <WhyChooseUs content={p as typeof whyUsContent} />;
     case "homeGoogleReviews": return reviews?.reviews.length ?
       <GoogleReviewsCarousel content={p as GoogleReviewsPresentation} source={reviews} preview={preview} /> : null;
-    case "homePricing": return <PricingGuide content={applyAcPriceRevision(p as typeof pricingGuideContent)} preview={preview} />;
-    case "homeEstimate": return <QuickPriceEstimate content={applyAcPriceRevision(p as typeof quickEstimateContent)} preview={preview} />;
+    case "homePricing": return <PricingGuide content={p as typeof pricingGuideContent} preview={preview} />;
+    case "homeEstimate": return <QuickPriceEstimate content={p as typeof quickEstimateContent} preview={preview} />;
     case "homeAreas": return <ServiceAreas content={p as typeof serviceAreasContent} areas={serviceAreas} />;
     case "homeFaq": return <FAQ content={p as typeof faqContent} />;
     case "homeFinalCta": return <FinalCTA content={p as typeof finalCtaContent} preview={preview} />;
@@ -68,7 +68,7 @@ export function HomeBlocksView({ page, revisionId, media = staticHomeMedia, prom
   reviews?: GoogleReviews | null;
   serviceAreas?: readonly string[];
 }) {
-  const draft = validateHomeDraft(page);
+  const draft = applyAcPriceRevision(validateHomeDraft(page));
   return <>{draft.blocks.filter(block => !block.hidden).map(block => <HomeBlockView key={block.id}
     block={block} media={media} promotions={promotions} preview={preview} revisionId={revisionId} reviews={reviews} serviceAreas={serviceAreas} />)}</>;
 }

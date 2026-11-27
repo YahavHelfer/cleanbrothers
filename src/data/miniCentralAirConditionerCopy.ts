@@ -1,3 +1,4 @@
+import { acDuctPricingNotice, miniCentralStartingPrice } from "@/content/local-ac-prices";
 import type { ServiceLandingConfig } from "@/content/service-landing";
 // Import baseline. Scope evidence: special-baseline.ts (accessible parts and
 // suitability by type/access), QuickPriceEstimate.tsx (mini-central inquiry).
@@ -6,25 +7,25 @@ export const miniCentralAirConditionerLanding: ServiceLandingConfig = {
   path: "/mini-central-air-conditioner-cleaning",
   serviceName: "ניקוי מזגן מיני מרכזי",
   metaTitle: "ניקוי מזגן מיני מרכזי | בדיקת התאמה ותיאום | CleanBrothers",
-  metaDescription: "ניקוי מיני מרכזי ב־450 ₪: מנוע, מאייד, פתחים ופילטרים, בכפוף לבדיקת גישה. ניקוי תעלות בתוספת 250 ₪ לכל התעלות יחד. תיאום עם CleanBrothers.",
+  metaDescription: `ניקוי מזגן מיני מרכזי ${miniCentralStartingPrice}, כולל מע״מ ובכפוף לבדיקת גישה והיקף העבודה.`,
   eyebrow: "CleanBrothers • ניקוי מזגנים",
-  h1: "ניקוי מזגן מיני מרכזי ב־450 ₪",
+  h1: "ניקוי מזגן מיני מרכזי",
   intro: "טיפול באבק, בלכלוך ובריחות שמקורם במערכת. ניקוי מנוע, מאייד, פתחים ופילטרים בבית הלקוח, בהתאם למבנה המזגן ולגישה אליו.",
   images: ["/images/services/Air-conditioner-cleaning4.JPG"],
   imageAlt: "תיעוד ניקוי מזגן מתוך עבודות CleanBrothers — תמונת המחשה, לא מזגן מיני מרכזי",
-  signsTitle: "מה כלול ב־450 ₪ ומה בתוספת תשלום?",
-  signsDescription: "ניקוי תעלות אינו כלול ב־450 ₪. אפשר להזמין ניקוי תעלות בתוספת 250 ₪ לכל התעלות יחד, באמצעות מברשת ייעודית ושואב תעשייתי. מספר התעלות והיקף העבודה מסוכמים לפני התיאום.",
+  signsTitle: "מה בודקים לפני ניקוי מערכת מיני מרכזית?",
+  signsDescription: acDuctPricingNotice,
   signs: ["ניקוי מנוע", "ניקוי מאייד", "ניקוי פתחים", "ניקוי פילטרים"],
   processTitle: "שלושה צעדים לתיאום הניקוי",
   processDescription: "שולחים פרטים, מסכמים את העבודה ומתאמים ביקור בבית הלקוח.",
   process: ["שולחים תמונות של המזגן ופתח הגישה, ואת היישוב", "בודקים גישה ומאשרים יחד היקף ומחיר", "מתאמים ביקור ומנקים את המערכת"],
-  benefitsDescription: "ניקוי תעלות בתוספת 250 ₪ לכל התעלות יחד. סך הכול 700 ₪ לניקוי המערכת וכל התעלות יחד. המחירים כוללים מע״מ. השירות בכפוף לבדיקת גישה למנוע ולמאייד.",
+  benefitsDescription: `ניקוי מיני מרכזי ${miniCentralStartingPrice}, כולל מע״מ ובכפוף לבדיקת גישה. ${acDuctPricingNotice}`,
   benefits: ["בדיקת התאמה לפי המערכת שלכם", "התייחסות למבנה ולנגישות", "היקף עבודה מוסכם מראש", "הערכת מחיר לפי פרטי המזגן", "פנייה נוחה בטופס או בוואטסאפ"],
   resultDescription: "צילום מתוך תיעוד המיני מרכזי הקיים ב־CleanBrothers.",
   faqs: [
   {
     "question": "האם ניקוי תעלות כלול במחיר?",
-    "answer": "לא. ניקוי התעלות הוא תוספת של 250 ₪ לכל התעלות יחד, באמצעות מברשת ייעודית ושואב תעשייתי. המחירים כוללים מע״מ."
+    "answer": acDuctPricingNotice
   },
   {
     "question": "כמה זמן נמשך הניקוי ומה צריך להכין?",

@@ -22,17 +22,17 @@ test('AC pricing does not display a fictitious regular-price discount, including
   for (const enabled of [true,false]) {
     const content = { ...acBaseline, promotion: { ...acBaseline.promotion, enabled } };
     const html = renderToStaticMarkup(createElement(AirConditionerCleaningView, { content, preview: true }));
-    for (const amount of ['199','450','250']) assert.ok(html.includes(amount));
-    assert.doesNotMatch(html, /249\s*₪|החל מ־199|לפי הספק המזגן|line-through/);
+    for (const amount of ['600','250']) assert.ok(html.includes(amount));
+    assert.doesNotMatch(html, /(?:199|249|398|700)\s*₪|לפי הספק המזגן|line-through/);
     assert.ok(!html.includes('המזגן ה־6'));
   }
   assert.doesNotMatch(renderToStaticMarkup(createElement(AcPromotionContent, { promotion: acBaseline.promotion, preview: true })), /line-through/);
 });
 test('mini-central price and separate duct cleaning derive from the validated CMS baseline', () => {
   const draft = load('src/cms/content/baseline.ts').serviceBaseline('mini-central-air-conditioner-cleaning');
-  assert.match(draft.h1, /450 ₪/);
-  assert.match(draft.benefitsDescription, /250 ₪/);
-  assert.match(draft.benefitsDescription, /למנוע ולמאייד/);
+  assert.match(draft.seoDescription, /החל מ־600 ₪/);
+  assert.doesNotMatch(draft.benefitsDescription, /(?:250|450|700) ₪/);
+  assert.match(draft.benefitsDescription, /בדיקת גישה/);
   assert.ok(draft.faqs.some(faq => /כשעה וחצי עד שעתיים/.test(faq.answer)));
-  assert.match(draft.signsDescription, /ניקוי תעלות אינו כלול/);
+  assert.match(draft.signsDescription, /היקף ניקוי התעלות והמחיר נקבעים לאחר בדיקת גישה/);
 });

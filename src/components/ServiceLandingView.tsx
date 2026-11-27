@@ -10,6 +10,7 @@ import { BeforeAfterCard } from "@/components/BeforeAfterCard";
 import { Icon } from "@/components/Icon";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceImageCarousel } from "@/components/ServiceImageCarousel";
+import { miniCentralStartingPrice } from "@/content/local-ac-prices";
 import type { ServiceLandingConfig } from "@/content/service-landing";
 import { getPrimaryServiceImage, getServiceImages } from "@/lib/service-images";
 
@@ -44,7 +45,7 @@ const serviceQuoteCopy: Record<string, { summary?: string; useIntro?: boolean; r
     cta: "שלחו תמונת ספה להערכת מחיר",
   },
   "/mini-central-air-conditioner-cleaning": {
-    summary: "ניקוי המערכת ב־450 ₪. ניקוי המערכת וכל התעלות יחד ב־700 ₪, כולל מע״מ ובכפוף לבדיקת גישה.",
+    summary: `ניקוי המערכת ${miniCentralStartingPrice}, כולל מע״מ ובכפוף לבדיקת גישה ולהיקף העבודה.`,
     request: "צלמו את פתח השירות בתקרה. לפי התמונה נבדוק אם יש גישה למערכת ומה אפשר לנקות.",
     cta: "שלחו תמונת פתח שירות לבדיקת התאמה",
   },

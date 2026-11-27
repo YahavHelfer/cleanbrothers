@@ -1,6 +1,6 @@
 import { isWebsiteChatEnabled } from "@/lib/website-chat/config";
 import { isSiteReview } from "@/lib/site-review";
-import { isLocalAcPreview } from "@/lib/local-ac-preview";
+import { acPriceReviewPages, isAcPriceAlignmentPreview, isLocalAcPreview } from "@/lib/local-ac-preview";
 import { localAcCityLinks } from "@/content/local-ac-pilot";
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
@@ -58,7 +58,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const contactReview = isLocalAcPreview();
-  const reviewLinks = localAcCityLinks.map(({ name, path }) => ({ label: name, href: path }));
+  const reviewLinks = [...(isAcPriceAlignmentPreview() ? acPriceReviewPages : []),
+    ...localAcCityLinks.map(({ name, path }) => ({ label: name, href: path }))];
   const chrome = await getPublicSiteChrome();
   const globalPromotion = contactReview ? null : await getPublicActivePromotion("global", "site");
   return (

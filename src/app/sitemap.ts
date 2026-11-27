@@ -1,3 +1,4 @@
+import { publishedLocalAcLinks } from "@/content/local-ac-pilot";
 import type { MetadataRoute } from "next";
 import { businessConfig } from "@/config/business";
 import { listPublicNewPageSlugs } from "@/cms/pages/new-public-source";
@@ -12,6 +13,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Once a guide is CMS-managed, only its published lifecycle may expose it.
   const codePages = publicPagePaths.filter(path =>
     !isGuideSlug(path.slice(1)) || (!newPagePublicAllowed(path.slice(1)) && !guideUsesCms(path.slice(1))));
-  return [...new Set([...codePages, ...published.map(slug => `/${slug}`)])]
+  return [...new Set([...codePages, ...publishedLocalAcLinks.map(link => link.path), ...published.map(slug => `/${slug}`)])]
     .map(path => ({ url: new URL(path, businessConfig.siteUrl).href }));
 }

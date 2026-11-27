@@ -1,5 +1,7 @@
 "use client";
 
+import { miniCentralStartingPrice, wallAcStartingPrice } from "@/content/local-ac-prices";
+
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { getWhatsAppLink } from "@/lib/whatsapp";
@@ -92,8 +94,8 @@ const pricingConfig: Record<ServiceKey, ServiceConfig> = {
   },
   ac: {
     label: "מזגן", icon: "ac", options: [
-      { label: "מזגן עילי", ranges: { קל: "199 ₪", בינוני: "199 ₪", קשה: "199 ₪" } },
-      { label: "מיני מרכזי", ranges: { קל: "450 ₪", בינוני: "450 ₪", קשה: "450 ₪" } },
+      { label: "מזגן עילי", ranges: { קל: wallAcStartingPrice, בינוני: wallAcStartingPrice, קשה: wallAcStartingPrice } },
+      { label: "מיני מרכזי", ranges: { קל: miniCentralStartingPrice, בינוני: miniCentralStartingPrice, קשה: miniCentralStartingPrice } },
     ],
   },
 };
@@ -227,6 +229,9 @@ export function QuickPriceEstimate({ content = quickEstimateContent, preview = f
           <p className="mx-auto mt-3 hidden max-w-2xl text-sm leading-7 theme-muted sm:mt-5 sm:block sm:text-lg sm:leading-8">
             {content.description}
           </p>
+          <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-7">
+            ניקוי מזגן עילי {wallAcStartingPrice}. ניקוי מיני מרכזי {miniCentralStartingPrice}. כולל מע״מ ובכפוף לבדיקה.
+          </p>
         </div>
 
         <div className="mx-auto mt-5 grid max-w-6xl gap-3 pb-16 sm:mt-9 sm:gap-4 sm:pb-0 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:gap-6">
@@ -320,7 +325,7 @@ export function QuickPriceEstimate({ content = quickEstimateContent, preview = f
               </div>
 
               <p className="mt-3 rounded-2xl border border-[var(--card-border)] bg-[var(--surface-soft)] px-3.5 py-2.5 text-sm font-bold leading-6 theme-muted sm:mt-4 sm:px-4 sm:py-3">
-                המחירים כוללים מע״מ. מחירי הספות הם מחיר התחלתי. במיני מרכזי נבדקת גישה למנוע ולמאייד; ניקוי תעלות בתוספת 250 ₪ לכל התעלות יחד. מאשרים סוג והיקף לפני ההגעה.
+                המחירים כוללים מע״מ. מחירי הספות הם מחיר התחלתי. מחירי המזגנים הם מחירי פתיחה וכפופים לבדיקה ולהיקף העבודה. במיני מרכזי נבדקת גישה למנוע ולמאייד.
               </p>
             </div>
 

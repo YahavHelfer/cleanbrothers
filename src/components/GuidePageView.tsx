@@ -1,3 +1,4 @@
+import { isAcPriceAlignmentPreview } from "@/lib/local-ac-preview";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { PageBlocksView, type BlockMedia, type BlockPromotions } from "@/cms/pages/PageBlocksView";
@@ -33,7 +34,7 @@ export function GuidePageView({ page, revisionId, media = {}, promotions = {} }:
       "@id": `${url}#article`, headline: page.h1, description: page.seoDescription,
       mainEntityOfPage: url, inLanguage: "he-IL", author: { "@type": "Organization", name: businessConfig.name },
       publisher: { "@id": businessEntityId } }} /> : null}
-    <PageBlocksView page={page} revisionId={revisionId} media={media} promotions={promotions} preview={false} />
+    <PageBlocksView page={page} revisionId={revisionId} media={media} promotions={promotions} preview={isAcPriceAlignmentPreview()} />
     <nav aria-label={index ? "רשימת המדריכים" : "מדריכים נוספים"} className="section-container pb-12">
       <div className="grid gap-5 md:grid-cols-2">
         {guideSummaries.filter(guide => `/${guide.slug}` !== page.canonical && (index || guide.topic === topic)).map(guide =>

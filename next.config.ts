@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { isLocalAcPreview } from "./src/lib/local-ac-preview";
+import { acPriceReviewPages, isAcPriceAlignmentPreview, isLocalAcPreview } from "./src/lib/local-ac-preview";
 
 const nextConfig: NextConfig = {
   images: { qualities: [75, 90] },
@@ -15,10 +15,14 @@ const nextConfig: NextConfig = {
   async redirects() {
     if (!isLocalAcPreview()) return [];
     const destination = "/air-conditioner-cleaning/petah-tikva";
+    const alignmentPreview = isAcPriceAlignmentPreview();
+    const allowed = alignmentPreview
+      ? acPriceReviewPages.filter(({ href }) => href !== "/").map(({ href }) => `${href.slice(1)}/?$|`).join("")
+      : "";
     return [
-      { source: "/", destination, permanent: false },
+      ...(!alignmentPreview ? [{ source: "/", destination, permanent: false }] : []),
       {
-        source: "/:legacy((?!api(?:/|$)|_next(?:/|$)|images(?:/|$)|air-conditioner-cleaning/[^/]+/?$|[^/]+\\.[^/]+/?$).+)",
+        source: `/:legacy((?!${allowed}api(?:/|$)|_next(?:/|$)|images(?:/|$)|air-conditioner-cleaning/[^/]+/?$|[^/]+\\.[^/]+/?$).+)`,
         destination,
         permanent: false,
       },

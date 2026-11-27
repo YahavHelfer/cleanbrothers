@@ -43,3 +43,14 @@ export const localAcCityLinks = Object.entries(localAcCities).map(([slug, city])
 export function getLocalAcCity(slug: string) {
   return Object.hasOwn(localAcCities, slug) ? localAcCities[slug as keyof typeof localAcCities] : undefined;
 }
+
+// Add each approved city here in its own release. Tel Aviv is preview-only.
+const publishedCitySlugs: readonly ("petah-tikva" | "rosh-haayin" | "herzliya")[] = [];
+
+export function isPublishedLocalAcCity(slug: string) {
+  return publishedCitySlugs.some(city => city === slug);
+}
+
+export const publishedLocalAcLinks = localAcCityLinks.filter(
+  ({ path }) => isPublishedLocalAcCity(path.slice(localAcBasePath.length + 1)),
+);

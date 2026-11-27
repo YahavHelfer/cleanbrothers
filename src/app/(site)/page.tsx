@@ -1,3 +1,5 @@
+import { alignAcPriceCopy } from "@/content/ac-price-revision";
+import { isAcPriceAlignmentPreview } from "@/lib/local-ac-preview";
 import { JsonLd } from "@/components/JsonLd";
 import { buildServiceJsonLd } from "@/lib/structured-data";
 import { getPublicSiteChrome } from "@/cms/site/public-source";
@@ -16,13 +18,13 @@ const staticMetadata = buildMetadata({
 
 export async function generateMetadata() {
   const source = await getPublicHome();
-  return source.source === "cms" ? buildMetadata({ title: source.page.seoTitle,
-    description: source.page.seoDescription, path: "/" }) : staticMetadata;
+  return source.source === "cms" ? buildMetadata({ title: alignAcPriceCopy(source.page.seoTitle, "home"),
+    description: alignAcPriceCopy(source.page.seoDescription, "home"), path: "/" }) : staticMetadata;
 }
 
 export default async function Home() {
   const [{ settings }, source, homePromotion] = await Promise.all([getPublicSiteChrome(), getPublicHome(),
-    getPublicActivePromotion("home", "home")]);
+    isAcPriceAlignmentPreview() ? null : getPublicActivePromotion("home", "home")]);
   const reviews = source.page.blocks.some(block => block.type === "homeGoogleReviews" && !block.hidden) ?
     await getGoogleReviews("public") : null;
   return (
@@ -30,7 +32,7 @@ export default async function Home() {
       <JsonLd id="cleanbrothers-service-jsonld" data={buildServiceJsonLd(settings)} />
       {homePromotion && <PublicScheduledPromotion active={homePromotion} />}
       <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}
-        media={source.media} promotions={source.promotions} reviews={reviews} serviceAreas={settings.serviceAreas} />
+        preview={isAcPriceAlignmentPreview()} media={source.media} promotions={source.promotions} reviews={reviews} serviceAreas={settings.serviceAreas} />
     </>
   );
 }

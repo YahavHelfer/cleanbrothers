@@ -36,7 +36,8 @@ test("every city agrees with the approved price matrix and keeps its own canonic
     descriptions.add(metadata.description);
 
     const node = await route.default(props);
-    const nodes = elementTree(node);
+    const { AcPriceTable } = load("src/components/AcPriceTable.tsx");
+    const nodes = [...elementTree(node), ...elementTree(AcPriceTable())];
     const rows = Object.fromEntries(nodes.filter(x => x.type === "tr" && x.key).map(row => {
       const [label, price] = row.props.children;
       return [label.props.children, price.props.children];
@@ -71,5 +72,51 @@ test("only the isolated preview redirects legacy pages and preserves city, API a
   for (const env of [{ VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "main" }, { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "another-branch" }]) {
     const different = createSourceLoader({ env })("next.config.ts").default;
     assert.deepEqual(plain(await different.redirects()), []);
+  }
+});
+
+test("a separately approved production city uses the real shared contact affordances", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { fileURLToPath } = await import("node:url");
+  const candidatePath = fileURLToPath(new URL("../src/content/local-ac-pilot.ts", import.meta.url));
+  const original = readFileSync(candidatePath, "utf8");
+  const candidate = original.replace('[] = [];', '[] = ["petah-tikva"];');
+  assert.notEqual(candidate, original);
+  const load = createSourceLoader({
+    env: { VERCEL_ENV: "production" },
+    sourceOverrides: { [candidatePath]: candidate },
+  });
+  const route = load("src/app/(site)/air-conditioner-cleaning/[city]/page.tsx");
+  const props = { params: Promise.resolve({ city: "petah-tikva" }) };
+  const nodes = elementTree(await route.default(props));
+  assert.ok(nodes.some(node => node.type === "a" && node.props.href.startsWith("tel:")));
+  assert.ok(nodes.some(node => node.type === "a" && node.props.href.startsWith("https://wa.me/") &&
+    node.props["data-whatsapp-service"] === "air-conditioner-cleaning"));
+  assert.ok(nodes.some(node => node.type.name === "ContactForm" && node.props.initialService));
+  assert.equal((await route.generateMetadata(props)).robots, undefined);
+  for (const city of ["rosh-haayin", "herzliya", "tel-aviv"]) {
+    await assert.rejects(route.default({ params: Promise.resolve({ city }) }), /404/);
+  }
+});
+
+test("old CMS copy, guide amounts and AC-only promotional offers are aligned in the public presentation", () => {
+  const load = createSourceLoader();
+  const { applyAcPriceRevision, isUnalignedAcOffer } = load("src/content/ac-price-revision.ts");
+  const old = "מזגן עילי בכל הספק: 199 ₪. מיני מרכזי: 450 ₪, ותעלות בתוספת 250 ₪ לכל התעלות יחד.";
+  assert.equal(applyAcPriceRevision(old), "מזגן עילי החל מ־250 ₪. מיני מרכזי החל מ־600 ₪.");
+  assert.equal(applyAcPriceRevision("ניקוי ריפודים ב־700 ₪"), "ניקוי ריפודים ב־700 ₪");
+  assert.equal(isUnalignedAcOffer({ h1: "ניקוי מזגן", currentPrice: 199 }), true);
+  assert.equal(isUnalignedAcOffer({ h1: "ניקוי מזרן", currentPrice: 199 }), false);
+  const { getCodeGuidePage } = load("src/content/guide-pages.ts");
+  const { alignAcGuide } = load("src/content/align-ac-guide.ts");
+  for (const slug of ["before-booking-ac-cleaning", "ac-mini-central-and-ducts"]) {
+    const original = getCodeGuidePage(slug);
+    const page = alignAcGuide(slug, original);
+    const copy = JSON.stringify(page);
+    assert.doesNotMatch(copy, /(?:199|398|450|550|700)\s*₪|250\s*₪ לכל התעלות/);
+    assert.match(copy, /החל מ־250 ₪/);
+    assert.match(copy, /החל מ־600 ₪/);
+    assert.equal(page.canonical, original.canonical);
+    load("src/cms/pages/model.ts").validatePageDraft(page);
   }
 });

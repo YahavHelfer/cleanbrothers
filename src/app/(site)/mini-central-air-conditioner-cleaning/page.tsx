@@ -1,3 +1,4 @@
+import { isAcPriceAlignmentPreview } from "@/lib/local-ac-preview";
 import { ServiceLandingPage, buildServiceLandingMetadata } from "@/components/ServiceLandingPage";
 import { getPublicService } from "@/cms/content/public-source";
 import { toServiceLandingProps } from "@/content/service-landing-adapter";
@@ -9,7 +10,7 @@ export async function generateMetadata() {
   return buildServiceLandingMetadata(toServiceLandingProps(page).config);
 }
 export default async function ServicePage() {
-  const [source, active] = await Promise.all([getPublicService("mini-central-air-conditioner-cleaning"), getPublicActivePromotion("service", "mini-central-air-conditioner-cleaning")]);
+  const [source, active] = await Promise.all([getPublicService("mini-central-air-conditioner-cleaning"), isAcPriceAlignmentPreview() ? null : getPublicActivePromotion("service", "mini-central-air-conditioner-cleaning")]);
   const page = <ServiceLandingPage {...toServiceLandingProps(source.page)} />;
   return active ? <><PublicScheduledPromotion active={active} />{page}</> : page;
 }

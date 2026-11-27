@@ -1,3 +1,4 @@
+import { AcPriceTable } from "@/components/AcPriceTable";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,12 +6,16 @@ import { notFound } from "next/navigation";
 import { ContactForm } from "@/components/ContactForm";
 import { JsonLd } from "@/components/JsonLd";
 import { businessConfig } from "@/config/business";
-import { getLocalAcCity, localAcBasePath, localAcCityLinks } from "@/content/local-ac-pilot";
-import { formatLocalAcPrice, localAcPrices, localAcPriceTerms } from "@/content/local-ac-prices";
+import { getLocalAcCity, isPublishedLocalAcCity, localAcBasePath, localAcCityLinks, publishedLocalAcLinks } from "@/content/local-ac-pilot";
+import { formatLocalAcPrice, localAcPrices } from "@/content/local-ac-prices";
 import { serviceRegistry } from "@/content/service-registry";
 import { buildMetadata } from "@/lib/seo";
 import { isLocalAcPreview } from "@/lib/local-ac-preview";
 import { buildPageServiceJsonLd } from "@/lib/structured-data";
+import { isSiteReview } from "@/lib/site-review";
+import { GoogleCallTrackingNumber } from "@/components/GoogleCallTrackingNumber";
+import { buildDirectWhatsAppLink } from "@/lib/whatsapp";
+import { getWhatsAppMessage } from "@/lib/whatsapp-messages";
 import { PreviewContactActions } from "./PreviewContactActions";
 
 type LocalPageProps = { params: Promise<{ city: string }> };
@@ -21,16 +26,17 @@ const servicePhoto = {
 };
 
 async function getPilotPage({ params }: LocalPageProps) {
-  if (!isLocalAcPreview()) notFound();
+  const preview = isLocalAcPreview();
   const { city: slug } = await params;
+  if (!preview && (isSiteReview() || !isPublishedLocalAcCity(slug))) notFound();
   const city = getLocalAcCity(slug);
   if (!city) notFound();
 
-  return { city, path: `${localAcBasePath}/${slug}`, heading: `ניקוי מזגן עילי ב${city.name}` };
+  return { city, preview, path: `${localAcBasePath}/${slug}`, heading: `ניקוי מזגן עילי ב${city.name}` };
 }
 
 export async function generateMetadata(props: LocalPageProps): Promise<Metadata> {
-  const { city, path, heading } = await getPilotPage(props);
+  const { city, preview, path, heading } = await getPilotPage(props);
 
   return {
     ...buildMetadata({
@@ -40,12 +46,12 @@ export async function generateMetadata(props: LocalPageProps): Promise<Metadata>
       image: servicePhoto,
     }),
     keywords: null,
-    robots: { index: false, follow: false },
+    ...(preview ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
 export default async function LocalAcPage(props: LocalPageProps) {
-  const { city, path, heading } = await getPilotPage(props);
+  const { city, preview, path, heading } = await getPilotPage(props);
   const serviceName = serviceRegistry["air-conditioner-cleaning"].crmName;
   const serviceSchema = buildPageServiceJsonLd({ serviceName: heading, intro: city.description, path });
 
@@ -67,9 +73,9 @@ export default async function LocalAcPage(props: LocalPageProps) {
       }} />
 
       <nav aria-label="מיקום באתר" className="mb-7 text-sm">
-        <span>דפי עיר לבדיקה</span>
+        {preview ? <span>דפי עיר לבדיקה</span> : <Link href="/">בית</Link>}
         <span aria-hidden="true"> / </span>
-        <span>ניקוי מזגנים</span>
+        {preview ? <span>ניקוי מזגנים</span> : <Link href={localAcBasePath}>ניקוי מזגנים</Link>}
         <span aria-hidden="true"> / </span>
         <span aria-current="page">{city.name}</span>
       </nav>
@@ -80,7 +86,14 @@ export default async function LocalAcPage(props: LocalPageProps) {
           <p className="mt-3 text-xl font-bold">ניקוי מזגן עילי {formatLocalAcPrice(localAcPrices.basic.amount)}</p>
           <p className="mt-1 text-sm">כולל מע״מ, בכפוף לבדיקה ולסוג העבודה בפועל.</p>
           <p className="mt-4 leading-7">ניקוי בבית הלקוח של הפילטרים, הסוללה והחלקים הנגישים ביחידה הפנימית, לפי מבנה המזגן והגישה אליו.</p>
-          <PreviewContactActions />
+          {preview ? <PreviewContactActions /> : <div className="mt-5 flex flex-wrap gap-2">
+            <a className="btn-primary" data-whatsapp-service="air-conditioner-cleaning" data-whatsapp-location="hero"
+              href={buildDirectWhatsAppLink(getWhatsAppMessage("air-conditioner-cleaning"))}>תיאום ב־WhatsApp</a>
+            <a className="btn-secondary" href={`tel:${businessConfig.phoneDisplay.replace(/[^0-9+]/g, "")}`}>
+              <span className="sr-only">התקשרו אלינו </span><GoogleCallTrackingNumber />
+            </a>
+            <a href="#contact" className="btn-secondary">השאירו פרטים</a>
+          </div>}
         </div>
         <figure>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
@@ -104,24 +117,7 @@ export default async function LocalAcPage(props: LocalPageProps) {
 
       <section aria-labelledby="local-ac-prices" className="mt-8 max-w-3xl space-y-4">
         <h2 id="local-ac-prices" className="text-2xl font-black">מחירון ניקוי מזגנים</h2>
-        <p className="leading-7">{localAcPriceTerms}</p>
-        <table className="w-full border-collapse text-start text-sm sm:text-base">
-          <caption className="sr-only">שירותים ומחירי פתיחה כולל מע״מ</caption>
-          <thead>
-            <tr className="border-b">
-              <th scope="col" className="py-2 pe-3 text-start">שירות</th>
-              <th scope="col" className="py-2 text-start">מחיר פתיחה</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.values(localAcPrices).map(({ service, amount }) => (
-              <tr key={service} className="border-b">
-                <th scope="row" className="py-2 pe-3 text-start font-medium">{service}</th>
-                <td className="whitespace-nowrap py-2">{formatLocalAcPrice(amount)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <AcPriceTable />
         <h3 className="text-xl font-bold">מה ההבדל בין סוגי הניקוי?</h3>
         <ul className="list-disc space-y-2 ps-5 leading-7">
           <li><strong>ניקוי בסיסי</strong> מתאים ללכלוך שגרתי ומתמקד בפילטרים ובחלקים נגישים ביחידה.</li>
@@ -132,12 +128,12 @@ export default async function LocalAcPage(props: LocalPageProps) {
       </section>
 
       <div id="contact" className="mt-10 max-w-3xl scroll-mt-24">
-        <p className="mb-3 text-sm font-semibold" id="contact-review-notice">טופס בדיקה בלבד. הזינו נתוני דמה. הפרטים לא יועברו לצוות.</p>
+        {preview && <p className="mb-3 text-sm font-semibold" id="contact-review-notice">טופס בדיקה בלבד. הזינו נתוני דמה. הפרטים לא יועברו לצוות.</p>}
         <ContactForm initialService={serviceName} />
       </div>
 
       <nav aria-label="אזורי שירות לניקוי מזגנים" className="mt-9 flex flex-wrap gap-4">
-        {localAcCityLinks.filter(link => link.path !== path).map(link => (
+        {(preview ? localAcCityLinks : publishedLocalAcLinks).filter(link => link.path !== path).map(link => (
           <Link key={link.path} href={link.path} className="underline">ניקוי מזגנים ב{link.name}</Link>
         ))}
       </nav>
