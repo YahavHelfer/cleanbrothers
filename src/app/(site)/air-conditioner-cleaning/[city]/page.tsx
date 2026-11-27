@@ -10,6 +10,7 @@ import { serviceRegistry } from "@/content/service-registry";
 import { buildMetadata } from "@/lib/seo";
 import { isSiteReview } from "@/lib/site-review";
 import { buildPageServiceJsonLd } from "@/lib/structured-data";
+import { PreviewContactActions } from "./PreviewContactActions";
 
 type LocalPageProps = { params: Promise<{ city: string }> };
 
@@ -49,6 +50,7 @@ export default async function LocalAcPage(props: LocalPageProps) {
 
   return (
     <article className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
+      {city.name === "תל אביב" && <p className="mb-5 rounded-xl border p-3 text-sm font-bold">דף לבדיקה בלבד. פרסום תלוי באישור כיסוי ותנאי הגעה בעיר.</p>}
       <JsonLd id="local-ac-service" data={{
         ...serviceSchema,
         areaServed: { "@type": "City", name: city.name },
@@ -75,13 +77,9 @@ export default async function LocalAcPage(props: LocalPageProps) {
         <div>
           <h1 className="text-4xl leading-tight font-black sm:text-5xl">{heading}</h1>
           <p className="mt-3 text-xl font-bold">199 ₪ ליחידה עילית, כולל מע״מ</p>
+          <p className="mt-1 text-sm">מחיר בטיוטה, בכפוף לאישור.</p>
           <p className="mt-4 leading-7">ניקוי בבית הלקוח של הפילטרים, הסוללה והחלקים הנגישים ביחידה הפנימית, לפי מבנה המזגן והגישה אליו.</p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <button type="button" className="btn-primary opacity-60" disabled>תיאום ב־WhatsApp</button>
-            <button type="button" className="btn-secondary opacity-60" disabled>התקשרו אלינו</button>
-            <a href="#contact" className="btn-secondary">השאירו פרטים</a>
-          </div>
-          <p className="mt-3 text-sm">בתצוגת הבדיקה אפשר למלא את הטופס. הפנייה לא נשלחת.</p>
+          <PreviewContactActions />
         </div>
         <figure>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
@@ -101,6 +99,12 @@ export default async function LocalAcPage(props: LocalPageProps) {
           <p className="mt-2 leading-7">{city.answer}</p>
         </details>
         <p><Link href="/mini-central-air-conditioner-cleaning" className="underline">לפרטים על ניקוי מזגן מיני מרכזי</Link></p>
+      </section>
+
+      <section className="mt-8 max-w-3xl space-y-3">
+        <h2 className="text-2xl font-black">כמה יחידות ומה כלול במחיר</h2>
+        <p className="leading-7">אפשר לתאם כמה מזגנים באותו ביקור. לפי המחיר בטיוטה, שתי יחידות עיליות עולות 398 ₪ כולל מע״מ. צלמו כל יחידה וציינו אם אחת מהן גבוהה או קשה לגישה.</p>
+        <p className="leading-7">מיני מרכזי וניקוי תעלות מתומחרים בנפרד. לאחר בדיקת תמונות והגישה נסכם את היקף העבודה ואת המחיר לפני קביעת הביקור.</p>
       </section>
 
       <div id="contact" className="mt-10 max-w-3xl scroll-mt-24">
