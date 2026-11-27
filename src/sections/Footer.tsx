@@ -151,7 +151,7 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
         <div className="mt-3 pt-1 text-xs text-white/48 sm:mt-7 sm:flex sm:border-t sm:border-white/10 sm:items-center sm:justify-between sm:gap-4 sm:pt-4 sm:text-sm">
           <p>{content.copyright}</p>
           <div className="mt-2 flex flex-wrap gap-3 sm:mt-0">
-            {content.legal.filter(link => link.visible).map((link) => (
+            {!contactReview && content.legal.filter(link => link.visible).map((link) => (
               <Link
                 key={link.path}
                 href={link.path}

@@ -6,9 +6,10 @@ import { ContactForm } from "@/components/ContactForm";
 import { JsonLd } from "@/components/JsonLd";
 import { businessConfig } from "@/config/business";
 import { getLocalAcCity, localAcBasePath, localAcCityLinks } from "@/content/local-ac-pilot";
+import { formatLocalAcPrice, localAcPrices, localAcPriceTerms } from "@/content/local-ac-prices";
 import { serviceRegistry } from "@/content/service-registry";
 import { buildMetadata } from "@/lib/seo";
-import { isSiteReview } from "@/lib/site-review";
+import { isLocalAcPreview } from "@/lib/local-ac-preview";
 import { buildPageServiceJsonLd } from "@/lib/structured-data";
 import { PreviewContactActions } from "./PreviewContactActions";
 
@@ -20,7 +21,7 @@ const servicePhoto = {
 };
 
 async function getPilotPage({ params }: LocalPageProps) {
-  if (!isSiteReview()) notFound();
+  if (!isLocalAcPreview()) notFound();
   const { city: slug } = await params;
   const city = getLocalAcCity(slug);
   if (!city) notFound();
@@ -33,8 +34,8 @@ export async function generateMetadata(props: LocalPageProps): Promise<Metadata>
 
   return {
     ...buildMetadata({
-      title: `${heading} ב־199 ₪ | CleanBrothers`,
-      description: city.description,
+      title: `${heading} | מחירון ושירות עד הבית | CleanBrothers`,
+      description: `${city.description} ניקוי עילי ${formatLocalAcPrice(localAcPrices.basic.amount)}, כולל מע״מ ובכפוף לבדיקה.`,
       path,
       image: servicePhoto,
     }),
@@ -66,9 +67,9 @@ export default async function LocalAcPage(props: LocalPageProps) {
       }} />
 
       <nav aria-label="מיקום באתר" className="mb-7 text-sm">
-        <Link href="/" className="underline">בית</Link>
+        <span>דפי עיר לבדיקה</span>
         <span aria-hidden="true"> / </span>
-        <Link href={localAcBasePath} className="underline">ניקוי מזגנים</Link>
+        <span>ניקוי מזגנים</span>
         <span aria-hidden="true"> / </span>
         <span aria-current="page">{city.name}</span>
       </nav>
@@ -76,8 +77,8 @@ export default async function LocalAcPage(props: LocalPageProps) {
       <section className="grid items-center gap-6 sm:grid-cols-2 sm:gap-10">
         <div>
           <h1 className="text-4xl leading-tight font-black sm:text-5xl">{heading}</h1>
-          <p className="mt-3 text-xl font-bold">199 ₪ ליחידה עילית, כולל מע״מ</p>
-          <p className="mt-1 text-sm">מחיר בטיוטה, בכפוף לאישור.</p>
+          <p className="mt-3 text-xl font-bold">ניקוי מזגן עילי {formatLocalAcPrice(localAcPrices.basic.amount)}</p>
+          <p className="mt-1 text-sm">כולל מע״מ, בכפוף לבדיקה ולסוג העבודה בפועל.</p>
           <p className="mt-4 leading-7">ניקוי בבית הלקוח של הפילטרים, הסוללה והחלקים הנגישים ביחידה הפנימית, לפי מבנה המזגן והגישה אליו.</p>
           <PreviewContactActions />
         </div>
@@ -98,13 +99,36 @@ export default async function LocalAcPage(props: LocalPageProps) {
           <summary className="cursor-pointer font-bold">{city.question}</summary>
           <p className="mt-2 leading-7">{city.answer}</p>
         </details>
-        <p><Link href="/mini-central-air-conditioner-cleaning" className="underline">לפרטים על ניקוי מזגן מיני מרכזי</Link></p>
+
       </section>
 
-      <section className="mt-8 max-w-3xl space-y-3">
-        <h2 className="text-2xl font-black">כמה יחידות ומה כלול במחיר</h2>
-        <p className="leading-7">אפשר לתאם כמה מזגנים באותו ביקור. לפי המחיר בטיוטה, שתי יחידות עיליות עולות 398 ₪ כולל מע״מ. צלמו כל יחידה וציינו אם אחת מהן גבוהה או קשה לגישה.</p>
-        <p className="leading-7">מיני מרכזי וניקוי תעלות מתומחרים בנפרד. לאחר בדיקת תמונות והגישה נסכם את היקף העבודה ואת המחיר לפני קביעת הביקור.</p>
+      <section aria-labelledby="local-ac-prices" className="mt-8 max-w-3xl space-y-4">
+        <h2 id="local-ac-prices" className="text-2xl font-black">מחירון ניקוי מזגנים</h2>
+        <p className="leading-7">{localAcPriceTerms}</p>
+        <table className="w-full border-collapse text-start text-sm sm:text-base">
+          <caption className="sr-only">שירותים ומחירי פתיחה כולל מע״מ</caption>
+          <thead>
+            <tr className="border-b">
+              <th scope="col" className="py-2 pe-3 text-start">שירות</th>
+              <th scope="col" className="py-2 text-start">מחיר פתיחה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.values(localAcPrices).map(({ service, amount }) => (
+              <tr key={service} className="border-b">
+                <th scope="row" className="py-2 pe-3 text-start font-medium">{service}</th>
+                <td className="whitespace-nowrap py-2">{formatLocalAcPrice(amount)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <h3 className="text-xl font-bold">מה ההבדל בין סוגי הניקוי?</h3>
+        <ul className="list-disc space-y-2 ps-5 leading-7">
+          <li><strong>ניקוי בסיסי</strong> מתאים ללכלוך שגרתי ומתמקד בפילטרים ובחלקים נגישים ביחידה.</li>
+          <li><strong>ניקוי עמוק</strong> מתאים להצטברות משמעותית בתוך היחידה. ההיקף נקבע לפי מצבה והגישה לרכיבים פנימיים.</li>
+          <li><strong>טיפול בבעיה ספציפית</strong> מותאם לממצאים, למשל ריח, סימני עובש, סתימה או טפטוף. בדיקה מקדימה קובעת את העבודה הנדרשת ואת המחיר.</li>
+        </ul>
+        <p className="leading-7">לתיאום כמה מזגנים בביקור אחד, צלמו כל יחידה וציינו אם הגישה אליה מוגבלת. ההצעה נקבעת לפי סוג העבודה והבדיקה.</p>
       </section>
 
       <div id="contact" className="mt-10 max-w-3xl scroll-mt-24">

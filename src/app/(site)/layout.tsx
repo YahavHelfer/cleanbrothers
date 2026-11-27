@@ -1,5 +1,7 @@
 import { isWebsiteChatEnabled } from "@/lib/website-chat/config";
 import { isSiteReview } from "@/lib/site-review";
+import { isLocalAcPreview } from "@/lib/local-ac-preview";
+import { localAcCityLinks } from "@/content/local-ac-pilot";
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import Script from "next/script";
@@ -55,8 +57,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const contactReview = isSiteReview() &&
-    (process.env.VERCEL_GIT_COMMIT_REF === "review/local-ac-seo" || process.env.LOCAL_AC_PREVIEW_MODE === "1");
+  const contactReview = isLocalAcPreview();
+  const reviewLinks = localAcCityLinks.map(({ name, path }) => ({ label: name, href: path }));
   const chrome = await getPublicSiteChrome();
   const globalPromotion = contactReview ? null : await getPublicActivePromotion("global", "site");
   return (
@@ -83,15 +85,15 @@ export default async function RootLayout({
         {!isSiteReview() && <MetaPixel pixelId={metaPixelId} />}
         <a className="skip-link" href="#main-content">דילוג לתוכן הראשי</a>
         <ScrollProgress />
-        <Navbar links={chrome.navLinks} contactReview={contactReview} />
+        <Navbar links={contactReview ? reviewLinks : chrome.navLinks} contactReview={contactReview} />
         <CookieConsent />
         {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
         {!contactReview && <PublicCampaigns />}
         <main id="main-content" className="flex-1 bg-background text-foreground">
           {children}
         </main>
-        <Footer settings={chrome.settings} content={chrome.footer} links={chrome.navLinks}
-          services={chrome.featuredServiceLinks} contactReview={contactReview} />
+        <Footer settings={chrome.settings} content={chrome.footer} links={contactReview ? reviewLinks : chrome.navLinks}
+          services={contactReview ? reviewLinks : chrome.featuredServiceLinks} contactReview={contactReview} />
         <AccessibilityControls />
         {!contactReview && <WhatsAppButton chatEnabled={isWebsiteChatEnabled()} />}
       </body>
