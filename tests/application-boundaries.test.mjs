@@ -77,7 +77,7 @@ test("public metadata, sitemap and robots preserve canonical routes and behavior
   const sitemap = await load("src/app/sitemap.ts").default();
   assert.deepEqual(
     plain(sitemap).sort((a, b) => a.url.localeCompare(b.url)),
-    [...publicRoutes, ...load("src/content/guide-routes.ts").guidePaths].map(route => ({ url: `${businessConfig.siteUrl}${route}` }))
+    [...publicRoutes, "/air-conditioner-cleaning/petah-tikva", ...load("src/content/guide-routes.ts").guidePaths].map(route => ({ url: `${businessConfig.siteUrl}${route}` }))
       .sort((a, b) => a.url.localeCompare(b.url)),
   );
   assert.deepEqual(plain(load("src/app/robots.ts").default()), {

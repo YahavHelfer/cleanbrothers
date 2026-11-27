@@ -1,3 +1,4 @@
+import { PublishedAcCityLinks } from "@/components/PublishedAcCityLinks";
 import { isAcPriceAlignmentPreview } from "@/lib/local-ac-preview";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
@@ -35,6 +36,7 @@ export function GuidePageView({ page, revisionId, media = {}, promotions = {} }:
       mainEntityOfPage: url, inLanguage: "he-IL", author: { "@type": "Organization", name: businessConfig.name },
       publisher: { "@id": businessEntityId } }} /> : null}
     <PageBlocksView page={page} revisionId={revisionId} media={media} promotions={promotions} preview={isAcPriceAlignmentPreview()} />
+    {topic === "ac" && <PublishedAcCityLinks />}
     <nav aria-label={index ? "רשימת המדריכים" : "מדריכים נוספים"} className="section-container pb-12">
       <div className="grid gap-5 md:grid-cols-2">
         {guideSummaries.filter(guide => `/${guide.slug}` !== page.canonical && (index || guide.topic === topic)).map(guide =>

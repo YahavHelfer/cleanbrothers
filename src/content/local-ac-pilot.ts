@@ -45,7 +45,7 @@ export function getLocalAcCity(slug: string) {
 }
 
 // Add each approved city here in its own release. Tel Aviv is preview-only.
-const publishedCitySlugs: readonly ("petah-tikva" | "rosh-haayin" | "herzliya")[] = [];
+const publishedCitySlugs: readonly ("petah-tikva" | "rosh-haayin" | "herzliya")[] = ["petah-tikva"];
 
 export function isPublishedLocalAcCity(slug: string) {
   return publishedCitySlugs.some(city => city === slug);

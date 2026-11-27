@@ -9,7 +9,8 @@ export const acPriceReviewPages = [
 ] as const;
 
 export function isAcPriceAlignmentPreview() {
-  return isSiteReview() && process.env.VERCEL_GIT_COMMIT_REF === "review/ac-price-alignment";
+  const branch = process.env.VERCEL_GIT_COMMIT_REF;
+  return isSiteReview() && (branch === "review/ac-price-alignment" || branch === "review/ac-price-release-rc");
 }
 
 export function isLocalAcPreview() {

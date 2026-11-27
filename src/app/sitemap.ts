@@ -1,3 +1,4 @@
+import { isSiteReview } from "@/lib/site-review";
 import { publishedLocalAcLinks } from "@/content/local-ac-pilot";
 import type { MetadataRoute } from "next";
 import { businessConfig } from "@/config/business";
@@ -13,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Once a guide is CMS-managed, only its published lifecycle may expose it.
   const codePages = publicPagePaths.filter(path =>
     !isGuideSlug(path.slice(1)) || (!newPagePublicAllowed(path.slice(1)) && !guideUsesCms(path.slice(1))));
-  return [...new Set([...codePages, ...publishedLocalAcLinks.map(link => link.path), ...published.map(slug => `/${slug}`)])]
+  const cities = isSiteReview() ? [] : publishedLocalAcLinks.map(link => link.path);
+  return [...new Set([...codePages, ...cities, ...published.map(slug => `/${slug}`)])]
     .map(path => ({ url: new URL(path, businessConfig.siteUrl).href }));
 }

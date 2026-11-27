@@ -75,17 +75,8 @@ test("only the isolated preview redirects legacy pages and preserves city, API a
   }
 });
 
-test("a separately approved production city uses the real shared contact affordances", async () => {
-  const { readFileSync } = await import("node:fs");
-  const { fileURLToPath } = await import("node:url");
-  const candidatePath = fileURLToPath(new URL("../src/content/local-ac-pilot.ts", import.meta.url));
-  const original = readFileSync(candidatePath, "utf8");
-  const candidate = original.replace('[] = [];', '[] = ["petah-tikva"];');
-  assert.notEqual(candidate, original);
-  const load = createSourceLoader({
-    env: { VERCEL_ENV: "production" },
-    sourceOverrides: { [candidatePath]: candidate },
-  });
+test("the release candidate enables Petah Tikva only and uses the real shared contact affordances", async () => {
+  const load = createSourceLoader({ env: { VERCEL_ENV: "production" } });
   const route = load("src/app/(site)/air-conditioner-cleaning/[city]/page.tsx");
   const props = { params: Promise.resolve({ city: "petah-tikva" }) };
   const nodes = elementTree(await route.default(props));
@@ -94,6 +85,14 @@ test("a separately approved production city uses the real shared contact afforda
     node.props["data-whatsapp-service"] === "air-conditioner-cleaning"));
   assert.ok(nodes.some(node => node.type.name === "ContactForm" && node.props.initialService));
   assert.equal((await route.generateMetadata(props)).robots, undefined);
+  const cityLinks = load("src/content/local-ac-pilot.ts").publishedLocalAcLinks;
+  assert.deepEqual(plain(cityLinks.map(link => link.path)), ["/air-conditioner-cleaning/petah-tikva"]);
+  const citySitemap = async read => (await read("src/app/sitemap.ts").default())
+    .map(item => item.url).filter(url => url.includes("/air-conditioner-cleaning/"));
+  assert.deepEqual(plain(await citySitemap(load)), ["https://www.cleanbrothers.co.il/air-conditioner-cleaning/petah-tikva"]);
+  const preview = createSourceLoader({ env: { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "review/ac-price-release-rc" } });
+  assert.deepEqual(plain(await citySitemap(preview)), []);
+  assert.equal((await preview("src/app/(site)/air-conditioner-cleaning/[city]/page.tsx").generateMetadata(props)).robots.index, false);
   for (const city of ["rosh-haayin", "herzliya", "tel-aviv"]) {
     await assert.rejects(route.default({ params: Promise.resolve({ city }) }), /404/);
   }

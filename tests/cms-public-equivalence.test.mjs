@@ -40,11 +40,18 @@ function approvedPropertyCopy(html) {
     .replace('מתכננים ניקיון לדירה חדשה או יד שנייה לקראת הכניסה.', 'מתכננים ניקיון לדירה חדשה מקבלן או לדירה יד שנייה לפני כניסה.')
     .replace('הגישה לנכס, זמינות מים וחשמל ומועד הכניסה המתוכנן.', 'היישוב, הקומה, המעלית והחניה לציוד; זמינות מים וחשמל ומועד הכניסה המתוכנן.');
 }
+function approvedDuctCopy(html) {
+  const priorCopy = "ניקוי תעלות אינו כלול ב־450 ₪. אפשר להזמין ניקוי תעלות בתוספת 250 ₪ לכל התעלות יחד, באמצעות מברשת ייעודית ושואב תעשייתי. מספר התעלות והיקף העבודה מסוכמים לפני התיאום.";
+  const revisedCopy = "היקף ניקוי התעלות והמחיר נקבעים לאחר בדיקת גישה ומוסכמים לפני התיאום.";
+  assert.equal(html.split(priorCopy).length, 2, "frozen service card must contain exactly one old price statement");
+  return html.replace(priorCopy, revisedCopy);
+}
 for (const file of pages) test(`${file.endsWith('/air-conditioner-cleaning/page.tsx') ? 'prepared AC relevance revision' : 'verified deployed page content, links and metadata'} retained: ${file}`, async () => {
   const oldPage = file.endsWith('/air-conditioner-cleaning/page.tsx') ? acExpected(file) : before(file), newPage = after(file);
   const original = renderToStaticMarkup(await oldPage.default());
   const current = renderToStaticMarkup(await newPage.default());
-  const expected = file.endsWith('/post-renovation-cleaning/page.tsx') ? approvedPropertyCopy(original) : original;
+  const expected = file.endsWith('/post-renovation-cleaning/page.tsx') ? approvedPropertyCopy(original) :
+    file.endsWith('/services/page.tsx') ? approvedDuctCopy(original) : original;
   assert.equal(canonicalReactIds(current), canonicalReactIds(expected));
   const metadata = async page => plain(page.metadata ?? await page.generateMetadata());
   assert.deepEqual(await metadata(newPage), await metadata(oldPage));

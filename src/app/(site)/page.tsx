@@ -1,3 +1,4 @@
+import { PublishedAcCityLinks } from "@/components/PublishedAcCityLinks";
 import { alignAcPriceCopy } from "@/content/ac-price-revision";
 import { isAcPriceAlignmentPreview } from "@/lib/local-ac-preview";
 import { JsonLd } from "@/components/JsonLd";
@@ -33,6 +34,7 @@ export default async function Home() {
       {homePromotion && <PublicScheduledPromotion active={homePromotion} />}
       <HomeBlocksView page={source.page} revisionId={source.revisionId || "static-home-baseline"}
         preview={isAcPriceAlignmentPreview()} media={source.media} promotions={source.promotions} reviews={reviews} serviceAreas={settings.serviceAreas} />
+      <PublishedAcCityLinks />
     </>
   );
 }
