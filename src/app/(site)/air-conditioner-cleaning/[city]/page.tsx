@@ -108,6 +108,7 @@ export default async function LocalAcPage(props: LocalPageProps) {
       </section>
 
       <div id="contact" className="mt-10 max-w-3xl scroll-mt-24">
+        <p className="mb-3 text-sm font-semibold" id="contact-review-notice">טופס בדיקה בלבד. הזינו נתוני דמה. הפרטים לא יועברו לצוות.</p>
         <ContactForm initialService={serviceName} />
       </div>
 

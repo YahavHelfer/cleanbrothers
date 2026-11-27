@@ -8,7 +8,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { navLinks } from "@/data/site";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 
-export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: string; href: string }> }) {
+export function Navbar({ links = navLinks, contactReview = false }: {
+  links?: ReadonlyArray<{ label: string; href: string }>;
+  contactReview?: boolean;
+}) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -88,13 +91,15 @@ export function Navbar({ links = navLinks }: { links?: ReadonlyArray<{ label: st
 
         <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2 lg:justify-self-end">
           <ThemeToggle />
-          <a
+          {contactReview ? (
+            <span className="hidden whitespace-nowrap text-sm font-semibold sm:inline">סביבת בדיקה</span>
+          ) : <a
             href={getWhatsAppLink()}
             aria-label="קבלו הצעת מחיר בוואטסאפ"
             className="btn-primary hidden whitespace-nowrap px-4 text-sm sm:inline-flex lg:px-7 lg:text-base"
           >
             קבלו הצעת מחיר
-          </a>
+          </a>}
           <button
             type="button"
             aria-label={isMenuOpen ? "סגירת תפריט הניווט" : "פתיחת תפריט הניווט"}

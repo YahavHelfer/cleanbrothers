@@ -22,7 +22,7 @@ export function resolveSourceImport(specifier, parent) {
 
 // Compile project modules in memory: no generated files, server, or HTTP calls.
 // React/Next components are inspected as element trees or rendered with SSR.
-export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fetchImpl, sourceOverrides = {} } = {}) {
+export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fetchImpl, sourceOverrides = {}, browser = {} } = {}) {
   const cache = new Map();
   function load(filename) {
     const absolute = resolve(projectRoot, filename);
@@ -53,7 +53,9 @@ export function createSourceLoader({ nodeEnv = "test", env = {}, mocks = {}, fet
       module: loadedModule,
       require,
       process: { env: { NODE_ENV: nodeEnv, ...env } },
-      URL, crypto: webcrypto,
+      URL, URLSearchParams, crypto: webcrypto,
+      window: browser.window,
+      document: browser.document,
       Request, Response, FormData, Headers, Uint8Array,
       AbortSignal,
       fetch: fetchImpl, // Explicit test transport; never enable network by default.

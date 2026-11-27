@@ -11,7 +11,9 @@ import { getWhatsAppLink } from "@/lib/whatsapp";
 
 type FooterProps = { settings?: SiteSettings; content?: SiteFooter;
   links?: ReadonlyArray<{ label: string; href: string }>;
-  services?: ReadonlyArray<{ label: string; href: string }> };
+  services?: ReadonlyArray<{ label: string; href: string }>;
+  contactReview?: boolean;
+};
 const baselineServices = [
   { label: "ניקוי ספות", href: "/sofa-cleaning" },
   { label: "ניקוי מזגנים", href: "/air-conditioner-cleaning" },
@@ -37,7 +39,7 @@ function FooterLinkGroup({ label, children }: { label: string; children: ReactNo
 }
 
 export function Footer({ settings = siteSettingsBaseline, content = siteFooterBaseline,
-  links = navLinks, services = baselineServices }: FooterProps) {
+  links = navLinks, services = baselineServices, contactReview = false }: FooterProps) {
   // The dial target stays code/environment owned for call tracking. CMS can
   // change only formatting of the displayed number after digit equivalence.
   const phoneDigits = settings.phoneDisplay.replace(/\D/g, "");
@@ -70,7 +72,9 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
 
           <div className="mb-2 sm:order-3 sm:mb-0">
             <p className="mb-3 hidden text-sm font-black text-white sm:block">יצירת קשר</p>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-col sm:items-start sm:gap-0">
+            {contactReview ? (
+              <p className="text-sm text-white/80">קישורי הקשר מושבתים בסביבת הבדיקה.</p>
+            ) : <div className="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-col sm:items-start sm:gap-0">
               <a
                 href={phoneHref}
                 className="inline-flex min-h-11 items-center text-base font-black text-turquoise transition hover:text-white focus:outline-none focus:ring-2 focus:ring-turquoise sm:min-h-0 sm:text-xl"
@@ -92,7 +96,7 @@ export function Footer({ settings = siteSettingsBaseline, content = siteFooterBa
                   {settings.email}
                 </a>
               </div>
-            </div>
+            </div>}
           </div>
 
           <nav aria-label="קישורי הפוטר" className="sm:order-2">

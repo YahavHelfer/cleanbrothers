@@ -55,8 +55,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contactReview = isSiteReview() &&
+    (process.env.VERCEL_GIT_COMMIT_REF === "review/local-ac-seo" || process.env.LOCAL_AC_PREVIEW_MODE === "1");
   const chrome = await getPublicSiteChrome();
-  const globalPromotion = await getPublicActivePromotion("global", "site");
+  const globalPromotion = contactReview ? null : await getPublicActivePromotion("global", "site");
   return (
     <html
       lang="he"
@@ -81,17 +83,17 @@ export default async function RootLayout({
         {!isSiteReview() && <MetaPixel pixelId={metaPixelId} />}
         <a className="skip-link" href="#main-content">דילוג לתוכן הראשי</a>
         <ScrollProgress />
-        <Navbar links={chrome.navLinks} />
+        <Navbar links={chrome.navLinks} contactReview={contactReview} />
         <CookieConsent />
         {globalPromotion && <PublicScheduledPromotion active={globalPromotion} />}
-        <PublicCampaigns />
+        {!contactReview && <PublicCampaigns />}
         <main id="main-content" className="flex-1 bg-background text-foreground">
           {children}
         </main>
         <Footer settings={chrome.settings} content={chrome.footer} links={chrome.navLinks}
-          services={chrome.featuredServiceLinks} />
+          services={chrome.featuredServiceLinks} contactReview={contactReview} />
         <AccessibilityControls />
-        <WhatsAppButton chatEnabled={isWebsiteChatEnabled()} />
+        {!contactReview && <WhatsAppButton chatEnabled={isWebsiteChatEnabled()} />}
       </body>
     </html>
   );
