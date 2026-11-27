@@ -45,14 +45,15 @@ function sourceDependencies(filename, visited = new Set()) {
   return visited;
 }
 
-test("all existing public page URLs and the new service are in the public route group", () => {
+test("public and local review routes are in the site group without URL collisions", () => {
   const pages = filesIn(resolve(appDirectory, "(site)"))
     .filter((file) => file.endsWith("/page.tsx"));
-  assert.deepEqual(pages.map(routeFor).sort(), [...publicRoutes, "/[slug]"].sort());
+  const siteRoutes = [...publicRoutes, "/[slug]", "/air-conditioner-cleaning/[city]"];
+  assert.deepEqual(pages.map(routeFor).sort(), siteRoutes.sort());
   const allPages = filesIn(appDirectory).filter((file) => file.endsWith("/page.tsx"));
   const allRoutes = allPages.map(routeFor);
   assert.equal(new Set(allRoutes).size, allRoutes.length, "route groups must not create URL collisions");
-  assert.deepEqual(allRoutes.sort(), [...publicRoutes, "/[slug]", "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]", "/admin/promotions", "/admin/promotions/[id]", "/admin/preview/promotions/[id]", "/admin/promotions/schedules", "/admin/preview/promotions/schedules/[id]"].sort());
+  assert.deepEqual(allRoutes.sort(), [...siteRoutes, "/admin", "/admin/login", "/admin/mfa/setup", "/admin/mfa/challenge", "/admin/onboarding/password", "/admin/services", "/admin/services/[serviceKey]", "/admin/preview/services/[serviceKey]", "/admin/media", "/admin/media/[id]", "/admin/pages", "/admin/pages/new", "/admin/pages/[pageId]", "/admin/pages/[pageId]/promotion", "/admin/preview/pages/[pageId]", "/admin/site", "/admin/site/[kind]", "/admin/preview/site/[kind]", "/admin/promotions", "/admin/promotions/[id]", "/admin/preview/promotions/[id]", "/admin/promotions/schedules", "/admin/preview/promotions/schedules/[id]"].sort());
 });
 
 test("business and public campaign API URLs stay outside the UI route groups; preview has no endpoint", () => {
