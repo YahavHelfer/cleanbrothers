@@ -17,6 +17,25 @@ const draft = () => structuredClone(plain(homeBaseline));
 const render = (page, preview = false, promotions = {}) => renderToStaticMarkup(createElement(HomeBlocksView,
   { page, revisionId: "d4000000-0000-4000-8000-000000000001", preview, promotions }));
 
+test("published legacy AC headings become plural while offer and other service copy stay specific", () => {
+  const { alignHomeAcHeadings } = load("src/cms/home/ac-heading-copy.ts");
+  const page = draft();
+  page.h1 = page.blocks[0].payload.title = "ניקוי מזגן עילי עד הבית";
+  page.seoTitle = "ניקוי מזגן עילי עד הבית | CleanBrothers";
+  page.seoDescription = "ניקוי מזגן עילי עד הבית. ניקוי מזגן עילי החל מ־250 ₪ כולל מע״מ.";
+  const cards = page.blocks.find(block => block.type === "homeServices").payload.cards;
+  cards["air-conditioner-cleaning"].title = page.h1;
+  const revised = validateHomeDraft(alignHomeAcHeadings(validateHomeDraft(page)));
+  const revisedCards = revised.blocks.find(block => block.type === "homeServices").payload.cards;
+  assert.equal(revised.h1, "ניקוי מזגנים");
+  assert.equal(revised.seoTitle, "ניקוי מזגנים | CleanBrothers");
+  assert.equal(revised.seoDescription, "ניקוי מזגנים. ניקוי מזגן עילי החל מ־250 ₪ כולל מע״מ.");
+  assert.equal(revisedCards["air-conditioner-cleaning"].title, "ניקוי מזגנים");
+  assert.deepEqual(plain(revisedCards["sofa-cleaning"]), cards["sofa-cleaning"]);
+  assert.match(render(revised), /<h1>ניקוי מזגנים<\/h1>/);
+  assert.equal(alignHomeAcHeadings(homeBaseline).h1, homeBaseline.h1);
+});
+
 test("homepage baseline adds one hidden reviews block without changing public HTML", () => {
   const page = draft();
   assert.deepEqual(page.blocks.map(block => block.type), ["homeHero", "homeTrust", "homeServices", "homeProcess",

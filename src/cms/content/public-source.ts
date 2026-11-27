@@ -57,7 +57,6 @@ function applyPublishedWallAcPrice(content: typeof acBaseline): typeof acBaselin
       !content.promotion.bundleEnabled && !isUnalignedAcOffer(content)) return content;
   return {
     ...content,
-    h1: acBaseline.h1, seoTitle: acBaseline.seoTitle, seoDescription: acBaseline.seoDescription,
     copy: {
       ...content.copy,
       heroEyebrow: acBaseline.copy.heroEyebrow,
@@ -100,5 +99,11 @@ export const getPublicSpecialService = cache(async (key: SpecialServiceKey) => {
   const { data, error } = await client.rpc("cms_read_published_service", { target_key: key });
   if (error || !data) throw new Error("Published CMS service unavailable");
   const content = validateSpecialContent(key, data.payload);
-  return { revisionId: parseRevisionId(data.revisionId), content: content.schemaVersion === 4 ? applyPublishedWallAcPrice(applyAcPriceRevision(content, "wall")) : content, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
+  const publicContent = content.schemaVersion === 4 ? applyPublishedWallAcPrice(applyAcPriceRevision(content, "wall")) : content;
+  return { revisionId: parseRevisionId(data.revisionId), content: publicContent.schemaVersion === 4 ? {
+    ...publicContent,
+    h1: acBaseline.h1, seoTitle: acBaseline.seoTitle, seoDescription: acBaseline.seoDescription,
+    copy: { ...publicContent.copy, signsTitle: acBaseline.copy.signsTitle, cleaningTitle: acBaseline.copy.cleaningTitle,
+      processTitle: acBaseline.copy.processTitle, pricingTitle: acBaseline.copy.pricingTitle, faqTitle: acBaseline.copy.faqTitle },
+  } : publicContent, media: resolveMediaProjection(data.media, "public"), images: await getPublicServiceImages(key) };
 });

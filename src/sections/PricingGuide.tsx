@@ -31,7 +31,7 @@ const pricingCards: {
     icon: "car",
   },
   {
-    title: "ניקוי מזגן",
+    title: "ניקוי מזגנים",
     description: "מתאים למזגן עילי עם אבק, ריחות או לכלוך שהצטבר.",
     icon: "air",
   },

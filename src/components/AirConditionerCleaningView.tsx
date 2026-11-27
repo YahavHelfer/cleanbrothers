@@ -75,7 +75,6 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
     <div className="pb-20 sm:pb-0">
       <JsonLd id="ac-cleaning-service-jsonld" data={structuredData.service} />
       <JsonLd id="ac-cleaning-breadcrumb-jsonld" data={structuredData.breadcrumb} />
-      {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
 
       <ServiceHero title={content.h1} eyebrow={content.copy.heroEyebrow}
         summary={includedAreas
@@ -117,6 +116,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
             />
           </div>}
       />
+      {promotion.enabled && (preview ? <aside aria-label="תצוגת המבצע"><AcPromotionContent promotion={promotion} preview /></aside> : popup)}
       <ServiceIntroduction text={content.serviceDescription}>
         <ul className="service-intro-trust">{trustItems.map(item => <li key={item}>{item}</li>)}</ul>
         <nav aria-label="מידע על ניקוי מזגנים" className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold underline underline-offset-4">
@@ -141,7 +141,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-turquoise/15 text-sm font-black text-turquoise-dark">
                   {index + 1}
                 </span>
-                <h2 className="mt-3 text-base font-black leading-6">{signal}</h2>
+                <h3 className="mt-3 text-base font-black leading-6">{signal}</h3>
               </article>
             ))}
           </div>
@@ -166,7 +166,7 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-turquoise/15 font-black text-turquoise-dark">
                     {index + 1}
                   </span>
-                  <h2 className="text-lg font-black sm:text-xl">{area.title}</h2>
+                  <h3 className="text-lg font-black sm:text-xl">{area.title}</h3>
                 </div>
                 <p className="mt-3 text-sm leading-7 theme-muted">
                   {area.description}
@@ -208,9 +208,9 @@ export function AirConditionerCleaningView({ content = acBaseline, media, servic
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-turquoise font-black text-navy">
                   {index + 1}
                 </span>
-                <h2 className="mt-4 text-lg font-black leading-7 text-white">
+                <h3 className="mt-4 text-lg font-black leading-7 text-white">
                   {step}
-                </h2>
+                </h3>
               </li>
             ))}
           </ol>

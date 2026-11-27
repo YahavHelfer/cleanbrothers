@@ -9,8 +9,11 @@ export function AcPromotionContent({promotion, preview = false, whatsappHref, on
             id="summer-ac-promotion-title"
             className="mx-auto mt-3 max-w-md text-3xl font-black leading-tight sm:text-4xl"
           >
-            {promotion.pricePrefix}<span className="text-turquoise-dark">{promotion.startingPrice} ₪</span>
+            מחירון ניקוי מזגנים
           </h2>
+          <p className="mx-auto mt-2 font-bold">
+            {promotion.pricePrefix}<span className="text-turquoise-dark">{promotion.startingPrice} ₪</span>
+          </p>
 
           {promotion.bundleEnabled && <div className="mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/[0.08] px-4 py-3 sm:mt-5">
             <p className="text-lg font-black sm:text-xl">

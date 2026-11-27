@@ -32,7 +32,7 @@ async function getPilotPage({ params }: LocalPageProps) {
   const city = getLocalAcCity(slug);
   if (!city) notFound();
 
-  return { city, preview, path: `${localAcBasePath}/${slug}`, heading: `ניקוי מזגן עילי ב${city.name}` };
+  return { city, preview, path: `${localAcBasePath}/${slug}`, heading: `ניקוי מזגנים ב${city.name}` };
 }
 
 export async function generateMetadata(props: LocalPageProps): Promise<Metadata> {

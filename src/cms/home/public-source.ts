@@ -13,6 +13,7 @@ import { homeBaseline } from "./baseline";
 import { staticHomeMedia } from "./HomeBlocksView";
 import { approvedHomePreview, requireHomeEnvironment, usesCmsHomeSource } from "./environment";
 import { validateHomeDraft } from "./model";
+import { alignHomeAcHeadings } from "./ac-heading-copy";
 
 type MediaRow = { media_version_id: unknown; usage_role: unknown; position: unknown;
   alt_text: unknown; provider: unknown };
@@ -68,5 +69,5 @@ export const getPublicHome = cache(async () => {
   const serviceImages = validateImageCollections(data.serviceImages);
   for (const images of Object.values(serviceImages)) for (const image of images)
     if (!media[image.versionId]) throw new Error("Shared service media missing");
-  return { source: "cms" as const, revisionId, page, media, promotions, serviceImages };
+  return { source: "cms" as const, revisionId, page: alignHomeAcHeadings(page), media, promotions, serviceImages };
 });

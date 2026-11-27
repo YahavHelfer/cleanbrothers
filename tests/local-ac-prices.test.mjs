@@ -31,13 +31,18 @@ test("every city agrees with the approved price matrix and keeps its own canonic
     assert.equal(metadata.alternates.canonical, `https://www.cleanbrothers.co.il${path}`);
     assert.deepEqual(plain(metadata.robots), { index: false, follow: false });
     assert.match(metadata.description, /החל מ־250 ₪/);
-    assert.ok(metadata.title.includes(name));
+    const heading = `ניקוי מזגנים ב${name}`;
+    assert.equal(metadata.title, `${heading} | מחירון ושירות עד הבית | CleanBrothers`);
+    assert.ok(metadata.description.startsWith(`${heading}.`));
+    assert.equal(metadata.openGraph.title, metadata.title);
+    assert.equal(metadata.openGraph.description, metadata.description);
     titles.add(metadata.title);
     descriptions.add(metadata.description);
 
     const node = await route.default(props);
     const { AcPriceTable } = load("src/components/AcPriceTable.tsx");
     const nodes = [...elementTree(node), ...elementTree(AcPriceTable())];
+    assert.deepEqual(nodes.filter(node => node.type === "h1").map(node => node.props.children), [heading]);
     const rows = Object.fromEntries(nodes.filter(x => x.type === "tr" && x.key).map(row => {
       const [label, price] = row.props.children;
       return [label.props.children, price.props.children];

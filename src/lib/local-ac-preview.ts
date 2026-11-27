@@ -2,7 +2,7 @@ import { isSiteReview } from "./site-review";
 
 export const acPriceReviewPages = [
   { label: "בית", href: "/" },
-  { label: "מזגן עילי", href: "/air-conditioner-cleaning" },
+  { label: "ניקוי מזגנים", href: "/air-conditioner-cleaning" },
   { label: "מיני מרכזי", href: "/mini-central-air-conditioner-cleaning" },
   { label: "לפני הזמנת ניקוי", href: "/before-booking-ac-cleaning" },
   { label: "עילי, מיני מרכזי ותעלות", href: "/ac-mini-central-and-ducts" },
@@ -10,7 +10,8 @@ export const acPriceReviewPages = [
 
 export function isAcPriceAlignmentPreview() {
   const branch = process.env.VERCEL_GIT_COMMIT_REF;
-  return isSiteReview() && (branch === "review/ac-price-alignment" || branch === "review/ac-price-release-rc");
+  return isSiteReview() && (branch === "review/ac-price-alignment" || branch === "review/ac-price-release-rc" ||
+    branch === "review/ac-price-headings-rc");
 }
 
 export function isLocalAcPreview() {

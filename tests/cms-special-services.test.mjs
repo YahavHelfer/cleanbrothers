@@ -65,11 +65,15 @@ test("AC Preview stays request-rendered before allowlisting and reads the newly 
  assert.equal(connections,2,"a static Preview build can preserve the old AC page across allowlist redeployment");
 
  const published=clone(acBaseline);
+ published.h1="ניקוי מזגן עילי עד הבית";
+ published.seoTitle="ניקוי מזגן עילי עד הבית | CleanBrothers";
  published.copy.heroDescription+=" בדיקת פרסום חדשה.";
  const revisionId="a0000000-0000-4000-8000-000000000002";
  const after=createSourceLoader({env:{...env,CMS_CONTENT_SERVICE_ALLOWLIST:`${shared},air-conditioner-cleaning`},mocks:{"next/server":{connection:async()=>{}},"@supabase/supabase-js":{createClient:()=>({rpc:async()=>({data:{revisionId,payload:published,media:media(published)},error:null})})}}})("src/cms/content/public-source.ts");
  const result=await after.getPublicSpecialService("air-conditioner-cleaning");
  assert.equal(result.revisionId,revisionId);
+ assert.equal(result.content.h1,"ניקוי מזגנים מקצועי");
+ assert.equal(result.content.seoTitle,acBaseline.seoTitle);
  assert.equal(result.content.copy.heroDescription,published.copy.heroDescription);
  assert.equal((await before.getPublicSpecialService("air-conditioner-cleaning")).content.copy.heroDescription,acBaseline.copy.heroDescription);
 });
