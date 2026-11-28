@@ -8,9 +8,10 @@ const humanMessage = getWhatsAppMessage(service);
 const attribution = { utm_source: "google", utm_medium: "cpc", utm_campaign: "24326429732", utm_content: "829563936387", gclid: "test_click" };
 const token = "AbCdEfGhIjKlMnOpQrStUv";
 const input = { enabled: true, service, attribution, consent: "accepted", humanMessage };
+const creatives = ["829563936387", "828718026646", "832970587188", "832970559246"];
 
-for (const creative of ["829563936387", "828718026646"]) {
-  test(`consented mini-central click from creative ${creative} reaches the CRM with its campaign`, async () => {
+for (const creative of creatives) {
+  test(`consented mini-central click from creative ${creative} requests a synthetic token with its campaign`, async () => {
     const click = { ...attribution, utm_content: creative };
     assert.equal(getWhatsAppPilotHref(service, click), `/api/whatsapp/pilot?service=${service}`);
     let calls = 0;
@@ -31,7 +32,8 @@ test("organic, mismatched, unconsented and incomplete visits keep the ordinary m
   for (const patch of [
     { enabled: false }, { consent: undefined }, { consent: "rejected" }, { service: WHATSAPP_PILOT.service },
     ...[{}, { ...attribution, utm_source: "organic" }, { ...attribution, utm_medium: "organic" },
-      { ...attribution, utm_campaign: "999" }, { ...attribution, utm_content: "999" },
+      { ...attribution, utm_content: "999" },
+      ...creatives.map(utm_content => ({ ...attribution, utm_content, utm_campaign: WHATSAPP_PILOT.campaign })),
       { ...attribution, google_ads_campaign_id: "999" }, { ...attribution, gclid: undefined },
       { ...attribution, gclid: "invalid click" }].map(attribution => ({ attribution })),
   ]) {
@@ -40,6 +42,10 @@ test("organic, mismatched, unconsented and incomplete visits keep the ordinary m
     assert.equal(calls, 0);
   }
   assert.equal(getWhatsAppPilotHref(service, {}), null);
+  assert.equal(getWhatsAppPilotHref(service, { ...attribution, utm_content: "999" }), null);
+  for (const utm_content of creatives) {
+    assert.equal(getWhatsAppPilotHref(service, { ...attribution, utm_content, utm_campaign: WHATSAPP_PILOT.campaign }), null);
+  }
   assert.equal(await buildWhatsAppPilotMessage({ ...input, requestToken: async () => { throw Error("timed out"); } }), humanMessage);
 });
 

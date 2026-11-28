@@ -11,7 +11,7 @@ export const acPriceReviewPages = [
 export function isAcPriceAlignmentPreview() {
   const branch = process.env.VERCEL_GIT_COMMIT_REF;
   return isSiteReview() && (branch === "review/ac-price-alignment" || branch === "review/ac-price-release-rc" ||
-    branch === "review/ac-price-headings-rc");
+    branch === "review/ac-price-headings-rc" || branch === "review/ac-mini-central-whatsapp-rc");
 }
 
 export function isLocalAcPreview() {

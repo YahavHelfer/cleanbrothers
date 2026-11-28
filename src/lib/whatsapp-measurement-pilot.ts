@@ -11,7 +11,12 @@ export const WHATSAPP_PILOT = {
 const wallAcPilotContents = new Set(["cb_wa_site_pilot_ac_wash_20261119", "cb_wa_site_pilot_ac_831708035924"]);
 const MINI_CENTRAL_SERVICE = "mini-central-air-conditioner-cleaning";
 const MINI_CENTRAL_CAMPAIGN = "24326429732";
-const miniCentralCreatives = new Set(["829563936387", "828718026646"]);
+const miniCentralCreatives = new Set([
+  "829563936387",
+  "828718026646",
+  "832970587188",
+  "832970559246",
+]);
 const maximumPilotDuration = 14 * 86400000;
 
 export type WhatsAppPilotCohort = "mini_central" | "wall_wash" | "original_ac";

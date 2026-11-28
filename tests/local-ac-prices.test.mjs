@@ -80,6 +80,24 @@ test("only the isolated preview redirects legacy pages and preserves city, API a
   }
 });
 
+test("the attribution release candidate uses the isolated price review routes only in Preview", async () => {
+  const branch = "review/ac-mini-central-whatsapp-rc";
+  const config = createSourceLoader({ env: { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: branch } })("next.config.ts").default;
+  const matchers = (await config.redirects()).map(({ source }) => {
+    const parsed = tryToParsePath(source);
+    assert.equal(parsed.error, undefined);
+    return new RegExp(parsed.regexStr);
+  });
+  assert.ok(matchers.some(regex => regex.test("/services")));
+  for (const path of ["/", "/air-conditioner-cleaning", "/mini-central-air-conditioner-cleaning", "/air-conditioner-cleaning/petah-tikva"]) {
+    assert.ok(!matchers.some(regex => regex.test(path)), path);
+  }
+  assert.equal(config.headers()[0].headers[0].value, "noindex, nofollow");
+  const production = createSourceLoader({ env: { VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: branch } })("next.config.ts").default;
+  assert.deepEqual(plain(await production.redirects()), []);
+  assert.deepEqual(plain(production.headers()), []);
+});
+
 test("the release candidate enables Petah Tikva only and uses the real shared contact affordances", async () => {
   const load = createSourceLoader({ env: { VERCEL_ENV: "production" } });
   const route = load("src/app/(site)/air-conditioner-cleaning/[city]/page.tsx");
@@ -95,7 +113,7 @@ test("the release candidate enables Petah Tikva only and uses the real shared co
   const citySitemap = async read => (await read("src/app/sitemap.ts").default())
     .map(item => item.url).filter(url => url.includes("/air-conditioner-cleaning/"));
   assert.deepEqual(plain(await citySitemap(load)), ["https://www.cleanbrothers.co.il/air-conditioner-cleaning/petah-tikva"]);
-  const preview = createSourceLoader({ env: { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "review/ac-price-release-rc" } });
+  const preview = createSourceLoader({ env: { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "review/ac-mini-central-whatsapp-rc" } });
   assert.deepEqual(plain(await citySitemap(preview)), []);
   assert.equal((await preview("src/app/(site)/air-conditioner-cleaning/[city]/page.tsx").generateMetadata(props)).robots.index, false);
   for (const city of ["rosh-haayin", "herzliya", "tel-aviv"]) {
